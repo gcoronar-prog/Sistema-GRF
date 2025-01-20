@@ -1,0 +1,49 @@
+import { Router } from "express";
+import {
+  createArchivoAten,
+  createAtencion,
+  deleteArchivoAten,
+  deleteAtencion,
+  findArchivosAten,
+  getArchivosAten,
+  getAtencion,
+  getAtenciones,
+  getFirstAtencion,
+  getLastAtencion,
+  getNextAtencion,
+  getPrevAtencion,
+  updateAtencion,
+} from "../controllers/atencionSGC.controller.js";
+import {
+  createAccion,
+  deleteAccion,
+  getAcciones,
+  getAccionesId,
+  updateAccion,
+} from "../controllers/acciones.controller.js";
+
+const router = Router();
+
+router.get("/atenciones/sgc", getAtenciones);
+router.get("/atenciones/:id/sgc", getAtencion);
+router.post("/atenciones/sgc", createAtencion);
+router.put("/atenciones/:id/sgc", updateAtencion);
+router.delete("/atenciones/:id/sgc", deleteAtencion);
+
+router.get("/atenciones/sgc/last", getLastAtencion);
+router.get("/atenciones/sgc/first", getFirstAtencion);
+router.get("/atenciones/:id/sgc/prev", getPrevAtencion);
+router.get("/atenciones/:id/sgc/next", getNextAtencion);
+
+router.get("/fileAttach", getArchivosAten);
+router.get("/fileAttach/:id", findArchivosAten);
+router.post("/fileAttach", createArchivoAten);
+router.delete("/fileAttach/:id", deleteArchivoAten);
+
+router.get("/acciones/", getAcciones);
+router.get("/acciones/:id", getAccionesId);
+router.post("/acciones/:id", createAccion);
+router.put("/acciones/:id", updateAccion);
+router.delete("/acciones/:id", deleteAccion);
+
+export default router;

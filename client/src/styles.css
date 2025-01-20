@@ -1,0 +1,13 @@
+body {
+  background: #f2f2f2;
+}
+legend {
+  font-size: larger;
+  font-weight: bold;
+  font-style: italic;
+}
+
+fieldset {
+  border-color: beige;
+  border-width: 2px;
+}
