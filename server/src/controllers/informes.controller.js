@@ -1,0 +1,206 @@
+import { info } from "console";
+import { pool } from "../db.js";
+
+const getInformes = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const informes = await client.query("SELECT * FROM informes_central");
+    const origen = await client.query("SELECT * FROM datos_origen_informe");
+    const tipos = await client.query("SELECT * FROM datos_tipos_informes");
+    const ubicacion = await client.query(
+      "SELECT * FROM datos_ubicacion_informe"
+    );
+    const vehiculos = await client.query(
+      "SELECT * FROM datos_vehiculos_informe"
+    );
+    await client.query("COMMIT");
+    return res.status(200).json({
+      informes: informes.rows,
+      origen: origen.rows,
+      tipos: tipos.rows,
+      ubicacion: ubicacion.rows,
+      vehiculos: vehiculos.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+const getInformeCentral = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
+    await client.query("BEGIN");
+    /*const informe = await client.query(
+      "SELECT * FROM informes_central WHERE id_informes_central = $1",
+      [id]
+    );
+
+    const idOrigen = informe.rows[0].id_origen_informe;
+    const idTipos = informe.rows[0].id_tipos_informe;
+    const idUbicacion = informe.rows[0].id_ubicacion_informe;
+    const idVehiculo = informe.rows[0].id_vehiculo_informe;
+
+    const [origen, tipo, ubicacion, vehiculo] = await Promise.all([
+      await client.query(
+        "SELECT * FROM datos_origen_informe WHERE id_origen_informe=$1",
+        [idOrigen]
+      ),
+      await client.query(
+        "SELECT * FROM datos_tipos_informes WHERE id_tipos_informes=$1",
+        [idTipos]
+      ),
+      await client.query(
+        "SELECT * FROM datos_ubicacion_informe WHERE id_ubicacion =$1",
+        [idUbicacion]
+      ),
+      await client.query(
+        "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculo = $1",
+        [idVehiculo]
+      ),
+    ]);*/
+
+    const informe = await client.query(
+      "SELECT \
+          ic.*,\
+          doi.* AS origen_informe,\
+          dti.* AS tipo_informe,\
+          dui.* AS ubicacion_informe,\
+          dvi.* AS vehiculo_informe\
+      FROM \
+          informes_central ic\
+      LEFT JOIN \
+          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+      LEFT JOIN \
+          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      LEFT JOIN \
+          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
+      LEFT JOIN \
+          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
+        WHERE ic.id_informes_central=$1",
+      [id]
+    );
+
+    await client.query("COMMIT");
+    return res.status(200).json({
+      informe: informe.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+const createInformeCentral = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const data = req.body;
+    await client.query("BEGIN");
+    const [origen, tipos, ubicacion, vehiculo] = await Promise.all([
+      await client.query(
+        "INSERT INTO datos_origen_informe (fecha_informe,\
+        origen_informe,persona_informante,captura_informe,clasificacion_informe,estado_informe)\
+         VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
+        [
+          data.fecha_informe,
+          data.origen_informe,
+          data.persona_informante,
+          data.captura_informe,
+          data.clasificacion_informe,
+          data.estado_informe,
+        ]
+      ),
+      await client.query(
+        "INSERT INTO datos_tipos_informes (tipo_informe, otro_tipo,\
+      descripcion_informe, recursos_informe)\
+         VALUES ($1,$2,$3,$4) RETURNING *",
+        [
+          data.tipo_informe,
+          data.otro_tipo,
+          data.descripcion_informe,
+          data.recursos_informe,
+        ]
+      ),
+      await client.query(
+        "INSERT INTO datos_ubicacion_informe (\
+          sector_informe, direccion_informe)\
+          VALUES ($1,$2) RETURNING *",
+        [data.sector_informe, data.direccion_informe]
+      ),
+
+      await client.query(
+        "INSERT INTO datos_vehiculos_informe (vehiculos_informe, tripulantes_informe)\
+        VALUES ($1,$2) RETURNING *",
+        [data.vehiculos_informe, data.tripulantes_informe]
+      ),
+    ]);
+
+    const idOrigen = origen.rows[0].id_origen_informe;
+    const idTipos = tipos.rows[0].id_tipos_informes;
+    const idUbicacion = ubicacion.rows[0].id_ubicacion;
+    const idVehiculo = vehiculo.rows[0].id_vehiculos;
+
+    const informe = await client.query(
+      "INSERT INTO informes_central (id_origen_informe,id_tipos_informe,\
+            id_ubicacion_informe,id_vehiculo_informe) \
+            VALUES ($1,$2,$3,$4)",
+      [idOrigen, idTipos, idUbicacion, idVehiculo]
+    );
+    await client.query("COMMIT");
+    return res.status(200).json({
+      origen: origen.rows,
+      tipos: tipos.rows,
+      ubicacion: ubicacion.rows,
+      vehiculo: vehiculo.rows,
+      informe: informe.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ message: "Problemas con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+const updateInformeCentral = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    await client.query("BEGIN");
+    const informeCentral = await client.query(
+      "SELECT * FROM informes_central WHERE id_informes_central = $1",
+      [id]
+    );
+
+    const idOrigen = informeCentral.rows[0].id_origen_informe;
+    const idTipos = informeCentral.rows[0].id_tipos_informe;
+    const idUbicacion = informeCentral.rows[0].id_ubicacion_informe;
+    const idVehiculo = informeCentral.rows[0].id_vehiculo_informe;
+    console.log(idOrigen, idTipos, idUbicacion, idVehiculo);
+    await client.query("COMMIT");
+    return res.status(200).json({ message: "yeah!" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ message: "Problemas con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+export {
+  getInformes,
+  getInformeCentral,
+  createInformeCentral,
+  updateInformeCentral,
+};

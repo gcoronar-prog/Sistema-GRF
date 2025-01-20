@@ -7,6 +7,7 @@ import inventarioRoutes from "./routes/inventarioGRD.routes.js";
 import solicitudImagenesRoutes from "./routes/imagenes.routes.js";
 import atencionSGC from "./routes/atencionSGC.routes.js";
 import reportesService from "./routes/reportes.routes.js";
+import informesCentral from "./routes/informes.routes.js";
 
 import cors from "cors";
 import path from "path";
@@ -61,7 +62,8 @@ app.use(
   inventarioRoutes,
   solicitudImagenesRoutes,
   atencionSGC,
-  reportesService
+  reportesService,
+  informesCentral
 );
 
 app.post(
