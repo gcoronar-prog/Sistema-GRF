@@ -8,6 +8,8 @@ import solicitudImagenesRoutes from "./routes/imagenes.routes.js";
 import atencionSGC from "./routes/atencionSGC.routes.js";
 import reportesService from "./routes/reportes.routes.js";
 import informesCentral from "./routes/informes.routes.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 import cors from "cors";
 import path from "path";
@@ -183,5 +185,9 @@ app.get("/api/galeria/:entityType/:id", async (req, res) => {
 
 app.delete("/api/galeria/:entityType/:id", deleteArchivo);
 
-app.listen(3000);
-console.log("conectado a puerto 3000");
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Conectado al puerto ${PORT}`);
+});
+/*app.listen(3001);
+console.log("conectado a puerto 3001");*/

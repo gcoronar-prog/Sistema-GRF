@@ -232,7 +232,7 @@ const deleteSolicitud = async (req, res) => {
     const idGrabacion = selectSoli.rows[0].id_grabacion;
     const idResponsable = selectSoli.rows[0].id_responsable;
     const idUsuario = selectSoli.rows[0].id_usuarios_img;
-    console.log(idDenuncia, idGrabacion, idResponsable, idUsuario);
+    // console.log(idDenuncia, idGrabacion, idResponsable, idUsuario);
 
     const solicitud = await client.query(
       "DELETE FROM solicitudes_imagenes \
