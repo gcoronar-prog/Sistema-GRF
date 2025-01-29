@@ -13,6 +13,7 @@ import FormSolicitud from "./components/Seg_ciudadana/FormSolicitud";
 import FormAtencion from "./components/Seg_ciudadana/FormAtencion";
 
 import FormReportes from "./components/Central_Muni/FormReportes";
+import FormInformes from "./components/Central_Muni/FormInformes";
 function App() {
   return (
     <BrowserRouter>
@@ -42,6 +43,9 @@ function App() {
 
           <Route path="/reporte/new" element={<FormReportes />} />
           <Route path="/reporte/:id" element={<FormReportes />} />
+
+          <Route path="/informes/new" element={<FormInformes />} />
+          <Route path="/informes/central/:id" element={<FormInformes />} />
         </Routes>
       </Container>
     </BrowserRouter>

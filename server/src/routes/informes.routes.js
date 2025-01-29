@@ -7,6 +7,7 @@ import {
   getInformes,
   getLastInformeCentral,
   getNextInformeCentral,
+  getPendientes,
   getPrevInformeCentral,
   updateInformeCentral,
 } from "../controllers/informes.controller.js";
@@ -15,6 +16,7 @@ const router = Router();
 
 router.get("/informes_central", getInformes);
 router.get("/informes_central/:id", getInformeCentral);
+router.get("/informes/pendientes", getPendientes);
 router.post("/informes_central", createInformeCentral);
 router.put("/informes_central/:id", updateInformeCentral);
 router.delete("/informes_central/:id", deleteInformeCentral);
