@@ -326,6 +326,7 @@ const getLastInformeCentral = async (req, res) => {
 
     await client.query("COMMIT");
     return res.status(200).json({
+      informe: informe.rows,
       origen: origen.rows,
       tipos: tipos.rows,
       ubicacion: ubicacion.rows,
