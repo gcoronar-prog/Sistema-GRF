@@ -1,7 +1,10 @@
 import React from "react";
+import { useState } from "react";
 import AsyncSelect from "react-select/async";
 
 function SelectTripulantes() {
+  const [selectedValues, setSelectedValues] = useState([]);
+
   const loadTripulantes = async (inputValue) => {
     try {
       const response = await fetch("http://localhost:3000/tripulantes");
@@ -20,6 +23,11 @@ function SelectTripulantes() {
     }
   };
 
+  const handleChanges = (selected) => {
+    setSelectedValues(selected);
+    console.log(selectedValues.map((item) => item.value));
+  };
+
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
@@ -27,6 +35,8 @@ function SelectTripulantes() {
         cacheOptions
         defaultOptions
         loadOptions={loadTripulantes}
+        onChange={handleChanges}
+        value={selectedValues}
       />
     </div>
   );

@@ -14,6 +14,8 @@ import FormAtencion from "./components/Seg_ciudadana/FormAtencion";
 
 import FormReportes from "./components/Central_Muni/FormReportes";
 import FormInformes from "./components/Central_Muni/FormInformes";
+import SelectTripulantes from "./components/SelectTripulantes";
+import SelectVehiculo from "./components/SelectVehiculo";
 function App() {
   return (
     <BrowserRouter>
@@ -46,6 +48,9 @@ function App() {
 
           <Route path="/informes/new" element={<FormInformes />} />
           <Route path="/informes/central/:id" element={<FormInformes />} />
+
+          <Route path="/selectv" element={<SelectVehiculo />} />
+          <Route path="/selecttripu" element={<SelectTripulantes />} />
         </Routes>
       </Container>
     </BrowserRouter>

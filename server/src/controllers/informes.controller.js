@@ -188,6 +188,7 @@ const updateInformeCentral = async (req, res) => {
     const idUbicacion = informeCentral.rows[0].id_ubicacion_informe;
     const idVehiculo = informeCentral.rows[0].id_vehiculo_informe;
 
+    console.log(req.body);
     const [origen, tipos, ubicacion, vehiculo] = await Promise.all([
       await client.query(
         "UPDATE datos_origen_informe SET fecha_informe=$1,\

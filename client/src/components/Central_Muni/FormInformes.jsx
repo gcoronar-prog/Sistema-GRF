@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import SelectVehiculo from "../SelectVehiculo";
 
 function FormInformes() {
   const params = useParams();
@@ -38,9 +39,11 @@ function FormInformes() {
     id_vehiculo_informe: "",
   };
 
-  const [informes, setInformes] = useState({ defaultInformes });
+  const [informes, setInformes] = useState(defaultInformes);
   const [lastId, setLastId] = useState("");
   const [editing, setEditing] = useState(false);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [selectedVehiculo, setSelectedVehiculo] = useState([]);
 
   useEffect(() => {
     if (params.id) {
@@ -58,52 +61,84 @@ function FormInformes() {
     const formattedDate = dayjs(data.informe.fecha_informe).format(
       "YYYY-MM-DDTHH:mm"
     );
+
+    const vehiculosFormateados = Array.isArray(
+      data.informe[0].vehiculos_informe
+    )
+      ? data.informe[0].vehiculos_informe.map((vehiculo) => ({
+          value: vehiculo.id_vehiculo, // Ajusta según la estructura real de tu API
+          label: vehiculo.vehiculo, // Ajusta según la estructura real de tu API
+        }))
+      : [];
+
+    const recursosFormateados = Array.isArray(data.informe[0].recursos_informe)
+      ? data.informe[0].recursos_informe
+      : [];
+
+    console.log(data);
+
     setInformes({
       //informes
-      id_informes_central: params.id,
-      id_origen_informe: data.informe.id_origen_informe,
-      id_tipos_informe: data.informe.id_tipos_informe,
-      id_ubicacion_informe: data.informe.id_ubicacion_informe,
-      id_vehiculo_informe: data.informe.id_vehiculo_informe,
+      /*id_informes_central: params.id,
+      id_origen_informe: data.informe[0].id_origen_informe,
+      id_tipos_informe: data.informe[0].id_tipos_informe,
+      id_ubicacion_informe: data.informe[0].id_ubicacion_informe,
+      id_vehiculo_informe: data.informe[0].id_vehiculo_informe,*/
 
       //origen informe
       fecha_informe: formattedDate,
-      origen_informe: data.informe.origen_informe,
-      persona_informante: data.informe.persona_informante,
-      captura_informe: data.informe.captura_informe,
-      clasificacion_informe: data.informe.clasificacion_informe,
-      estado_informe: data.informe.estado_informe,
+      origen_informe: data.informe[0].origen_informe,
+      persona_informante: data.informe[0].persona_informante,
+      captura_informe: data.informe[0].captura_informe,
+      clasificacion_informe: data.informe[0].clasificacion_informe,
+      estado_informe: data.informe[0].estado_informe,
 
       //tipos informe
 
-      tipo_informe: data.informe.tipo_informe,
-      otro_tipo: data.informe.otro_tipo,
-      descripcion_informe: data.informe.descripcion_informe,
-      recursos_informe: data.informe.recursos_informe,
+      tipo_informe: data.informe[0].tipo_informe,
+      otro_tipo: data.informe[0].otro_tipo,
+      descripcion_informe: data.informe[0].descripcion_informe,
 
       //ubicacion informe
 
-      sector_informe: data.informe.sector_informe,
-      direccion_informe: data.informe.direccion_informe,
+      sector_informe: data.informe[0].sector_informe,
+      direccion_informe: data.informe[0].direccion_informe,
 
       //datos vehiculos
 
-      vehiculos_informe: data.informe.vehiculos_informe,
-      tripulantes_informe: data.informe.tripulantes_informe,
+      //vehiculos_informe: vehiculosFormateados,
+      tripulantes_informe: data.informe[0].tripulantes_informe,
     });
+
+    setSelectedVehiculo(vehiculosFormateados);
+
+    setSelectedValues(recursosFormateados);
   };
 
   const handleChanges = (e) => {
-    const { name, value } = e.target;
-    setInformes({ ...informes, [name]: value });
+    const { name, value, type, checked } = e.target;
+    setInformes({ ...informes, [name]: type === "checkbox" ? checked : value });
+    console.log(name);
+    console.log(value);
+    console.log(checked);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos enviados", informes);
+    const arrayFormateado = `{${selectedValues.join(",")}}`;
+    const vehiculosFormateados = selectedVehiculo.map((v) => v.value);
+    const datosActualizados = {
+      ...informes,
+      vehiculos_informe: vehiculosFormateados,
+      recursos_informe: arrayFormateado,
+    };
+    setSelectedValues(arrayFormateado);
+    //console.log("Datos enviados", informes);
+    console.log("Datos a enviar:", JSON.stringify(datosActualizados, null, 2));
+
     try {
       const url = params.id
-        ? `http://localhost:3000/informes_central/${id}`
+        ? `http://localhost:3000/informes_central/${params.id}`
         : "http://localhost:3000/informes_central";
 
       const method = params.id ? "PUT" : "POST";
@@ -111,7 +146,7 @@ function FormInformes() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(informes),
+        body: JSON.stringify(datosActualizados),
       });
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
@@ -120,9 +155,9 @@ function FormInformes() {
         "http://localhost:3000/informe/central/last"
       );
       const lastInforme = await lastData.json();
-      setLastId(lastInforme.id_informes_central);
-      if (lastInforme && lastInforme.id_informes_central) {
-        const lastIdInfo = lastInforme.id_informes_central;
+      setLastId(lastInforme.informe[0].id_informes_central);
+      if (lastInforme && lastInforme.informe[0].id_informes_central) {
+        const lastIdInfo = lastInforme.informe[0].id_informes_central;
         navigate(`/informes/central/${lastIdInfo}`);
       }
       const metodo = params.id ? "" : `/informes/central/${lastId + 1}`;
@@ -164,10 +199,27 @@ function FormInformes() {
     }
   };
 
+  const handleCheckbox = (event) => {
+    const { value, checked } = event.target;
+
+    setSelectedValues((prev) => {
+      if (checked) {
+        // Agregar al arreglo si está marcado
+        return [...prev, value];
+      } else {
+        // Quitar del arreglo si se desmarca
+        return prev.filter((item) => item !== value);
+      }
+    });
+
+    // Importante: Ver el estado actualizado en tiempo real
+    console.log("Valores seleccionados: ", selectedValues);
+  };
+
   return (
     <div>
       FormInformes
-      <form action="">
+      <form action="" onSubmit={handleSubmit}>
         <label htmlFor="fecha_informe">Fecha de informe:</label>
         <input
           type="datetime-local"
@@ -198,45 +250,45 @@ function FormInformes() {
           type="radio"
           name="captura_informe"
           id="radios"
+          value={"radios"}
+          checked={informes.captura_informe === "radios"}
           onChange={handleChanges}
-          value={"radio"}
-          checked={informes.captura_informe === "radio"}
         />
         <label htmlFor="telefono">Teléfono</label>
         <input
           type="radio"
           name="captura_informe"
           id="telefono"
-          onChange={handleChanges}
           value={"telefono"}
           checked={informes.captura_informe === "telefono"}
+          onChange={handleChanges}
         />
         <label htmlFor="rrss">RRSS</label>
         <input
           type="radio"
           name="captura_informe"
           id="rrss"
-          onChange={handleChanges}
           value={"rrss"}
           checked={informes.captura_informe === "rrss"}
+          onChange={handleChanges}
         />
         <label htmlFor="presencial">Presencial</label>
         <input
           type="radio"
           name="captura_informe"
           id="presencial"
-          onChange={handleChanges}
           value={"presencial"}
           checked={informes.captura_informe === "presencial"}
+          onChange={handleChanges}
         />
         <label htmlFor="email">E-mail</label>
         <input
           type="radio"
           name="captura_informe"
           id="email"
-          onChange={handleChanges}
           value={"email"}
           checked={informes.captura_informe === "email"}
+          onChange={handleChanges}
         />
         <label htmlFor="clasificacion">Clasificación</label>
         <select
@@ -303,18 +355,18 @@ function FormInformes() {
           type="checkbox"
           name="recursos_informe"
           id="mixta"
-          onChange={handleChanges}
-          checked={informes.recursos_informe === "mixta"}
           value={"mixta"}
+          checked={selectedValues.includes("mixta")}
+          onChange={handleCheckbox}
         />
         <label htmlFor="preventivo">Patrullaje preventivo</label>
         <input
           type="checkbox"
           name="recursos_informe"
           id="preventivo"
-          onChange={handleChanges}
           value={"preventivo"}
-          checked={informes.recursos_informe === "preventivo"}
+          checked={selectedValues.includes("preventivo")}
+          onChange={handleCheckbox}
         />
         <label htmlFor="sector">Sector:</label>
         <select
@@ -334,14 +386,18 @@ function FormInformes() {
           value={informes.direccion_informe}
         />
         <label htmlFor="vehiculos">Ingrese vehículos</label>
-        <select
+        <SelectVehiculo
+          selectedVehiculo={selectedVehiculo}
+          setSelectedVehiculo={setSelectedVehiculo}
+        />
+        {/*<select
           name="vehiculos_informe"
           id="vehiculos"
           onChange={handleChanges}
           value={informes.vehiculos_informe}
         >
           <option value="">Seleccione vehículos</option>
-        </select>
+        </select>*/}
         <label htmlFor="tripu">Ingrese Tripulantes</label>
         <select
           name="tripulantes_informe"
