@@ -2,6 +2,8 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SelectVehiculo from "../SelectVehiculo";
+import SelectTripulantes from "../SelectTripulantes";
+import SelectOrigin from "../SelectOrigin";
 
 function FormInformes() {
   const params = useParams();
@@ -44,6 +46,8 @@ function FormInformes() {
   const [editing, setEditing] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   const [selectedVehiculo, setSelectedVehiculo] = useState([]);
+  const [selectedTripulante, setSelectedTripulante] = useState([]);
+  const [selectedOrigin, setSelectedOrigin] = useState(null);
 
   useEffect(() => {
     if (params.id) {
@@ -62,17 +66,19 @@ function FormInformes() {
       "YYYY-MM-DDTHH:mm"
     );
 
-    const vehiculosFormateados = Array.isArray(
+    /*const vehiculosFormateados = Array.isArray(
       data.informe[0].vehiculos_informe
     )
       ? data.informe[0].vehiculos_informe.map((vehiculo) => ({
           value: vehiculo.id_vehiculo, // Ajusta según la estructura real de tu API
           label: vehiculo.vehiculo, // Ajusta según la estructura real de tu API
         }))
-      : [];
+      : [];*/
 
     const recursosFormateados = Array.isArray(data.informe[0].recursos_informe)
       ? data.informe[0].recursos_informe
+      : data.informe[0].recursos_informe
+      ? data.informe[0].recursos_informe.split(",")
       : [];
 
     console.log(data);
@@ -88,6 +94,7 @@ function FormInformes() {
       //origen informe
       fecha_informe: formattedDate,
       origen_informe: data.informe[0].origen_informe,
+      //origen_informe: setSelectedOrigin(data.informe[0].origen_informe),
       persona_informante: data.informe[0].persona_informante,
       captura_informe: data.informe[0].captura_informe,
       clasificacion_informe: data.informe[0].clasificacion_informe,
@@ -107,10 +114,13 @@ function FormInformes() {
       //datos vehiculos
 
       //vehiculos_informe: vehiculosFormateados,
-      tripulantes_informe: data.informe[0].tripulantes_informe,
+      //tripulantes_informe: data.informe[0].tripulantes_informe,
     });
 
-    setSelectedVehiculo(vehiculosFormateados);
+    //setSelectedOrigin(data.informe[0].origen_informe);
+
+    setSelectedVehiculo(data.informe[0].vehiculos_informe);
+    setSelectedTripulante(data.informe[0].tripulantes_informe);
 
     setSelectedValues(recursosFormateados);
   };
@@ -118,18 +128,19 @@ function FormInformes() {
   const handleChanges = (e) => {
     const { name, value, type, checked } = e.target;
     setInformes({ ...informes, [name]: type === "checkbox" ? checked : value });
-    console.log(name);
-    console.log(value);
-    console.log(checked);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const arrayFormateado = `{${selectedValues.join(",")}}`;
-    const vehiculosFormateados = selectedVehiculo.map((v) => v.value);
+    const arrayFormateado = selectedValues.join(",");
+    const vehiculosFormateados = JSON.stringify(selectedVehiculo); //selectedVehiculo.map((v) => v.value);
+    const tripuFormateado = JSON.stringify(selectedTripulante);
+    const originFormateado = JSON.stringify(selectedOrigin);
     const datosActualizados = {
       ...informes,
+      origen_informe: originFormateado,
       vehiculos_informe: vehiculosFormateados,
+      tripulantes_informe: tripuFormateado,
       recursos_informe: arrayFormateado,
     };
     setSelectedValues(arrayFormateado);
@@ -199,21 +210,22 @@ function FormInformes() {
     }
   };
 
-  const handleCheckbox = (event) => {
-    const { value, checked } = event.target;
-
-    setSelectedValues((prev) => {
-      if (checked) {
-        // Agregar al arreglo si está marcado
-        return [...prev, value];
-      } else {
-        // Quitar del arreglo si se desmarca
-        return prev.filter((item) => item !== value);
-      }
-    });
-
+  const handleCheckbox = (e) => {
+    const { value, checked } = e.target;
+    setSelectedValues((prevValues) =>
+      checked ? [...prevValues, value] : prevValues.filter((v) => v !== value)
+    );
     // Importante: Ver el estado actualizado en tiempo real
     console.log("Valores seleccionados: ", selectedValues);
+  };
+
+  const handleNewInform = () => {
+    navigate("/informes/new");
+    setSelectedTripulante("");
+    setSelectedVehiculo("");
+    setSelectedValues("");
+    setSelectedOrigin("");
+    setEditing(false);
   };
 
   return (
@@ -228,14 +240,11 @@ function FormInformes() {
           value={informes.fecha_informe}
         />
         <label htmlFor="origen_informe">Origen de la información</label>
-        <select
-          name="origen_informe"
-          id="origen_informe"
-          onChange={handleChanges}
-          value={informes.origen_informe}
-        >
-          <option value="">Seleccione origen</option>
-        </select>
+        <SelectOrigin
+          selectedOrigin={selectedOrigin}
+          setSelectedOrigin={setSelectedOrigin}
+        />
+
         <label htmlFor="persona_informante">Persona informante</label>
         <select
           name="persona_informante"
@@ -390,25 +399,16 @@ function FormInformes() {
           selectedVehiculo={selectedVehiculo}
           setSelectedVehiculo={setSelectedVehiculo}
         />
-        {/*<select
-          name="vehiculos_informe"
-          id="vehiculos"
-          onChange={handleChanges}
-          value={informes.vehiculos_informe}
-        >
-          <option value="">Seleccione vehículos</option>
-        </select>*/}
+
         <label htmlFor="tripu">Ingrese Tripulantes</label>
-        <select
-          name="tripulantes_informe"
-          id="tripu"
-          onChange={handleChanges}
-          value={informes.tripulantes_informe}
-        >
-          <option value="">Seleccione Tripulantes</option>
-        </select>
+        <SelectTripulantes
+          selectedTripulante={selectedTripulante}
+          setSelectedTripulante={setSelectedTripulante}
+        />
         {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
-        <button type="button">Nuevo Expediente</button>
+        <button type="button" onClick={handleNewInform}>
+          Nuevo Expediente
+        </button>
         <button type="button" style={{ display: editing ? "" : "none" }}>
           Editar
         </button>

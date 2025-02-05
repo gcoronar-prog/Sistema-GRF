@@ -5,6 +5,7 @@ function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo }) {
     try {
       const response = await fetch("http://localhost:3000/vehiculos");
       const data = await response.json();
+
       return data.map((item) => ({
         value: item.id_vehiculo,
         label: item.vehiculo,
@@ -22,7 +23,9 @@ function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo }) {
         cacheOptions
         defaultOptions
         loadOptions={loadVehiculo}
-        onChange={(selectedOptions) => setSelectedVehiculo(selectedOptions)}
+        onChange={(selectedOptions) => {
+          setSelectedVehiculo(selectedOptions);
+        }}
         value={selectedVehiculo}
       />
     </div>

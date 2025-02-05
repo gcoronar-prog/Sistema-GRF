@@ -1,17 +1,17 @@
 import AsyncSelect from "react-select/async";
 
-function SelectTripulantes({ selectedTripulante, setSelectedTripulante }) {
-  const loadTripulantes = async (inputValue) => {
+function SelectOrigin({ selectedOrigin, setSelectedOrigin }) {
+  const loadOrigin = async (inputValue) => {
     try {
-      const response = await fetch("http://localhost:3000/tripulantes");
+      const response = await fetch("http://localhost:3000/origenes");
       if (!response.ok) {
         throw new Error("Error al cargar los tripulantes");
       }
       const data = await response.json();
-      console.log(data);
+
       return data.map((item) => ({
-        value: item.id_funcionario,
-        label: item.funcionario,
+        value: item.id_origen,
+        label: item.origen,
       }));
     } catch (error) {
       console.error("Error:", error);
@@ -22,17 +22,16 @@ function SelectTripulantes({ selectedTripulante, setSelectedTripulante }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
-        isMulti
         cacheOptions
         defaultOptions
-        loadOptions={loadTripulantes}
+        loadOptions={loadOrigin}
         onChange={(selectedOptions) => {
-          setSelectedTripulante(selectedOptions);
+          setSelectedOrigin(selectedOptions);
         }}
-        value={selectedTripulante}
+        value={selectedOrigin}
       />
     </div>
   );
 }
 
-export default SelectTripulantes;
+export default SelectOrigin;
