@@ -4,6 +4,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import SelectVehiculo from "../SelectVehiculo";
 import SelectTripulantes from "../SelectTripulantes";
 import SelectOrigin from "../SelectOrigin";
+import SelectInformante from "../SelectInformante";
+import SelectTipo from "../SelectTipo";
+import SelectSector from "../SelectSector";
+import ListPendiente from "../ListPendiente";
 
 function FormInformes() {
   const params = useParams();
@@ -48,6 +52,9 @@ function FormInformes() {
   const [selectedVehiculo, setSelectedVehiculo] = useState([]);
   const [selectedTripulante, setSelectedTripulante] = useState([]);
   const [selectedOrigin, setSelectedOrigin] = useState(null);
+  const [selectedInformante, setSelectedInformante] = useState(null);
+  const [selectedTipo, setSelectedTipo] = useState(null);
+  const [selectedSector, setSelectedSector] = useState(null);
 
   useEffect(() => {
     if (params.id) {
@@ -85,17 +92,17 @@ function FormInformes() {
 
     setInformes({
       //informes
-      /*id_informes_central: params.id,
+      id_informes_central: params.id,
       id_origen_informe: data.informe[0].id_origen_informe,
       id_tipos_informe: data.informe[0].id_tipos_informe,
       id_ubicacion_informe: data.informe[0].id_ubicacion_informe,
-      id_vehiculo_informe: data.informe[0].id_vehiculo_informe,*/
+      id_vehiculo_informe: data.informe[0].id_vehiculo_informe,
 
       //origen informe
       fecha_informe: formattedDate,
-      origen_informe: data.informe[0].origen_informe,
+      //origen_informe: data.informe[0].origen_informe,
       //origen_informe: setSelectedOrigin(data.informe[0].origen_informe),
-      persona_informante: data.informe[0].persona_informante,
+      //persona_informante: data.informe[0].persona_informante,
       captura_informe: data.informe[0].captura_informe,
       clasificacion_informe: data.informe[0].clasificacion_informe,
       estado_informe: data.informe[0].estado_informe,
@@ -108,7 +115,7 @@ function FormInformes() {
 
       //ubicacion informe
 
-      sector_informe: data.informe[0].sector_informe,
+      //sector_informe: data.informe[0].sector_informe,
       direccion_informe: data.informe[0].direccion_informe,
 
       //datos vehiculos
@@ -117,8 +124,10 @@ function FormInformes() {
       //tripulantes_informe: data.informe[0].tripulantes_informe,
     });
 
-    //setSelectedOrigin(data.informe[0].origen_informe);
-
+    setSelectedInformante(data.informe[0].persona_informante);
+    setSelectedOrigin(data.informe[0].origen_informe);
+    setSelectedTipo(data.informe[0].tipo_informe);
+    setSelectedSector(data.informe[0].sector_informe);
     setSelectedVehiculo(data.informe[0].vehiculos_informe);
     setSelectedTripulante(data.informe[0].tripulantes_informe);
 
@@ -136,8 +145,14 @@ function FormInformes() {
     const vehiculosFormateados = JSON.stringify(selectedVehiculo); //selectedVehiculo.map((v) => v.value);
     const tripuFormateado = JSON.stringify(selectedTripulante);
     const originFormateado = JSON.stringify(selectedOrigin);
+    const informanteFormateado = JSON.stringify(selectedInformante);
+    const tipoFormateado = JSON.stringify(selectedTipo);
+    const sectorFormateado = JSON.stringify(selectedSector);
     const datosActualizados = {
       ...informes,
+      sector_informe: sectorFormateado,
+      tipo_informe: tipoFormateado,
+      persona_informante: informanteFormateado,
       origen_informe: originFormateado,
       vehiculos_informe: vehiculosFormateados,
       tripulantes_informe: tripuFormateado,
@@ -162,12 +177,15 @@ function FormInformes() {
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
       }
+
       const lastData = await fetch(
         "http://localhost:3000/informe/central/last"
       );
+
       const lastInforme = await lastData.json();
       setLastId(lastInforme.informe[0].id_informes_central);
-      if (lastInforme && lastInforme.informe[0].id_informes_central) {
+      //console.log(lastId);
+      if (lastInforme && lastInforme.informe[0]) {
         const lastIdInfo = lastInforme.informe[0].id_informes_central;
         navigate(`/informes/central/${lastIdInfo}`);
       }
@@ -185,8 +203,9 @@ function FormInformes() {
     if (res.ok) {
       const firstInforme = await res.json();
       if (firstInforme) {
-        const id_informe = firstInforme.id_informes_central;
-        navigate(`/informes/central/${lastIdInfo}`);
+        const id_informe = firstInforme.informe[0].id_informes_central;
+        console.log(firstInforme);
+        navigate(`/informes/central/${id_informe}`);
       } else {
         console.log("No hay informes");
       }
@@ -200,13 +219,51 @@ function FormInformes() {
     if (res.ok) {
       const lastInforme = await res.json();
       if (lastInforme) {
-        const id_informe = lastInforme.id_informes_central;
-        navigate(`/informes/central/${lastIdInfo}`);
+        const id_informe = lastInforme.informe[0].id_informes_central;
+        navigate(`/informes/central/${id_informe}`);
       } else {
         console.log("No hay informes");
       }
     } else {
       console.log("Error al obtener informes");
+    }
+  };
+
+  const handlePrevious = async () => {
+    const id = params.id;
+    try {
+      const res = await fetch(
+        `http://localhost:3000/informe/central/${id}/prev`
+      );
+      const data = await res.json();
+      //console.log(data.informe[0].id_informes_central);
+      const idInforme = data.informe[0].id_informes_central;
+      if (data?.informe?.length > 0) {
+        navigate(`/informes/central/${idInforme}`);
+      } else {
+        console.log("No existen registros anteriores");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleNext = async () => {
+    const id = params.id;
+    try {
+      const res = await fetch(
+        `http://localhost:3000/informe/central/${id}/next`
+      );
+      const data = await res.json();
+      const idInforme = data.informe[0].id_informes_central;
+      console.log(data.informe[0].id_informes_central);
+      if (data?.informe?.length > 0 && idInforme) {
+        navigate(`/informes/central/${idInforme}`);
+      } else {
+        console.log("No existen registros");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -225,12 +282,95 @@ function FormInformes() {
     setSelectedVehiculo("");
     setSelectedValues("");
     setSelectedOrigin("");
+    setSelectedInformante("");
+    setSelectedSector("");
+    setSelectedTipo("");
     setEditing(false);
+  };
+
+  const handleCancel = async () => {
+    const id = params.id;
+
+    try {
+      const res = await fetch("http://localhost:3000/informe/central/last");
+
+      if (!id) {
+        if (res.ok) {
+          const lastInforme = await res.json();
+          const idInforme = lastInforme.informe[0].id_informes_central;
+          if (lastInforme) {
+            navigate(`/informes/central/${idInforme}`);
+            console.log("ultima id", idInforme);
+          }
+        }
+      }
+
+      setEditing(true);
+    } catch (error) {
+      console.error(error);
+    }
+    setEditing(true);
+  };
+
+  const handleDeleteInforme = async () => {
+    const id = params.id;
+    await fetch(`http://localhost:3000/informes_central/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    const updatedInforme = { ...informes };
+    delete updatedInforme[id];
+    setInformes(updatedInforme);
+
+    const res = await fetch("http://localhost:3000/informe/central/last");
+    const data = await res.json();
+    const idInforme = data.informe[0].id_informes_central;
+    navigate(`/informes/central/${idInforme}`);
   };
 
   return (
     <div>
       FormInformes
+      <button
+        type="button"
+        onClick={handleFirstInforme}
+        disabled={
+          //disabledPrevButton
+          false
+        }
+      >
+        Primera solicitud
+      </button>
+      <button
+        type="button"
+        onClick={handlePrevious}
+        disabled={
+          //disabledPrevButton
+          false
+        }
+      >
+        Atras
+      </button>
+      <button
+        type="button"
+        onClick={handleNext}
+        disabled={
+          //disabledNextButton
+          false
+        }
+      >
+        Siguiente
+      </button>
+      <button
+        type="button"
+        onClick={handleLastInforme}
+        disabled={
+          false
+          //disabledNextButton
+        }
+      >
+        Ultimo
+      </button>
       <form action="" onSubmit={handleSubmit}>
         <label htmlFor="fecha_informe">Fecha de informe:</label>
         <input
@@ -246,14 +386,11 @@ function FormInformes() {
         />
 
         <label htmlFor="persona_informante">Persona informante</label>
-        <select
-          name="persona_informante"
-          id="persona_informante"
-          onChange={handleChanges}
-          value={informes.persona_informante}
-        >
-          <option value="">Seleccione...</option>
-        </select>
+        <SelectInformante
+          selectedInformante={selectedInformante}
+          setSelectedInformante={setSelectedInformante}
+        />
+
         <label htmlFor="radios">Radio</label>
         <input
           type="radio"
@@ -307,6 +444,10 @@ function FormInformes() {
           value={informes.clasificacion_informe}
         >
           <option value="">Seleccione informe</option>
+          <option value="Emergencia">Emergencia</option>
+          <option value="Incidente">Incidente</option>
+          <option value="Factor de riesgo">Factor de riesgo</option>
+          <option value="Novedad">Novedad</option>
         </select>
         <label htmlFor="atendido">Atendido</label>
         <input
@@ -336,14 +477,10 @@ function FormInformes() {
           checked={informes.estado_informe === "pendiente"}
         />
         <label htmlFor="tipoInforme">Tipo de informe</label>
-        <select
-          name="tipo_informe"
-          id="tipoInforme"
-          onChange={handleChanges}
-          value={informes.tipo_informe}
-        >
-          <option value="">Seleccione tipo de informe</option>
-        </select>
+        <SelectTipo
+          selectedTipo={selectedTipo}
+          setSelectedTipo={setSelectedTipo}
+        />
         <label htmlFor="otroTipo">Otro tipo de informe:</label>
         <input
           type="text"
@@ -378,14 +515,10 @@ function FormInformes() {
           onChange={handleCheckbox}
         />
         <label htmlFor="sector">Sector:</label>
-        <select
-          name="sector_informe"
-          id="sector"
-          onChange={handleChanges}
-          value={informes.sector_informe}
-        >
-          <option value="">Seleccione Sector</option>
-        </select>
+        <SelectSector
+          selectedSector={selectedSector}
+          setSelectedSector={setSelectedSector}
+        />
         <label htmlFor="direccion">Dirección:</label>
         <input
           type="text"
@@ -415,11 +548,21 @@ function FormInformes() {
         <button type="submit" style={{ display: editing ? "none" : "" }}>
           Guardar Informe
         </button>
-        <button type="button" style={{ display: editing ? "none" : "" }}>
+        <button
+          type="button"
+          style={{ display: editing ? "none" : "" }}
+          onClick={handleCancel}
+        >
           Cancelar
         </button>
-        <button type="button">Eliminar</button>
+        <button type="button" onClick={handleDeleteInforme}>
+          Eliminar
+        </button>
       </form>
+      <div>
+        <h3>Listado informes pendientes</h3>
+        <ListPendiente />
+      </div>
     </div>
   );
 }
