@@ -17,6 +17,10 @@ function ListPendiente() {
     }
   };
 
+  const moveToPendiente = (id) => {
+    console.log(id);
+  };
+
   return (
     <div>
       <table>
@@ -34,7 +38,10 @@ function ListPendiente() {
         </thead>
         <tbody>
           {pendientes.map((p) => (
-            <tr key={p.id_informes_central}>
+            <tr
+              key={p.id_informes_central}
+              onClick={() => moveToPendiente(p.id_informes_central)}
+            >
               <td>{p.id_informes_central}</td>
               <td>{p.cod_informes_central}</td>
               <td>{new Date(p.fecha_informe).toLocaleString()}</td>
