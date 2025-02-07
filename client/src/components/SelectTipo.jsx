@@ -1,6 +1,6 @@
 import AsyncSelect from "react-select/async";
 
-function SelectTipo({ selectedTipo, setSelectedTipo }) {
+function SelectTipo({ selectedTipo, setSelectedTipo, edition }) {
   const loadTipo = async (inputValue) => {
     try {
       const response = await fetch("http://localhost:3000/tipoReportes");
@@ -22,6 +22,7 @@ function SelectTipo({ selectedTipo, setSelectedTipo }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
+        isDisabled={edition}
         cacheOptions
         defaultOptions
         loadOptions={loadTipo}

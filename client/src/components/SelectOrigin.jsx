@@ -1,6 +1,6 @@
 import AsyncSelect from "react-select/async";
 
-function SelectOrigin({ selectedOrigin, setSelectedOrigin }) {
+function SelectOrigin({ selectedOrigin, setSelectedOrigin, edition }) {
   const loadOrigin = async (inputValue) => {
     try {
       const response = await fetch("http://localhost:3000/origenes");
@@ -22,6 +22,7 @@ function SelectOrigin({ selectedOrigin, setSelectedOrigin }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
+        isDisabled={edition}
         cacheOptions
         defaultOptions
         loadOptions={loadOrigin}

@@ -1,6 +1,10 @@
 import AsyncSelect from "react-select/async";
 
-function SelectTripulantes({ selectedTripulante, setSelectedTripulante }) {
+function SelectTripulantes({
+  selectedTripulante,
+  setSelectedTripulante,
+  edition,
+}) {
   const loadTripulantes = async (inputValue) => {
     try {
       const response = await fetch("http://localhost:3000/tripulantes");
@@ -22,7 +26,9 @@ function SelectTripulantes({ selectedTripulante, setSelectedTripulante }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
+        isDisabled={edition}
         isMulti
+        closeMenuOnSelect={false}
         cacheOptions
         defaultOptions
         loadOptions={loadTripulantes}

@@ -1,6 +1,6 @@
 import AsyncSelect from "react-select/async";
 
-function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo }) {
+function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo, edition }) {
   const loadVehiculo = async (inputValue) => {
     try {
       const response = await fetch("http://localhost:3000/vehiculos");
@@ -19,7 +19,9 @@ function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
+        isDisabled={edition}
         isMulti
+        closeMenuOnSelect={false}
         cacheOptions
         defaultOptions
         loadOptions={loadVehiculo}

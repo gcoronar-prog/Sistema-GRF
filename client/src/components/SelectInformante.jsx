@@ -1,6 +1,10 @@
 import AsyncSelect from "react-select/async";
 
-function SelectInformante({ selectedInformante, setSelectedInformante }) {
+function SelectInformante({
+  selectedInformante,
+  setSelectedInformante,
+  edition,
+}) {
   const loadInformante = async (inputValue) => {
     try {
       const response = await fetch("http://localhost:3000/informantes");
@@ -22,6 +26,7 @@ function SelectInformante({ selectedInformante, setSelectedInformante }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
+        isDisabled={edition}
         cacheOptions
         defaultOptions
         loadOptions={loadInformante}

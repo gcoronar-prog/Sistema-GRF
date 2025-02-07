@@ -8,6 +8,7 @@ import SelectInformante from "../SelectInformante";
 import SelectTipo from "../SelectTipo";
 import SelectSector from "../SelectSector";
 import ListPendiente from "../ListPendiente";
+import AttachFiles from "../AttachFiles";
 
 function FormInformes() {
   const params = useParams();
@@ -47,7 +48,6 @@ function FormInformes() {
 
   const [informes, setInformes] = useState(defaultInformes);
   const [lastId, setLastId] = useState("");
-  const [editing, setEditing] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   const [selectedVehiculo, setSelectedVehiculo] = useState([]);
   const [selectedTripulante, setSelectedTripulante] = useState([]);
@@ -55,6 +55,8 @@ function FormInformes() {
   const [selectedInformante, setSelectedInformante] = useState(null);
   const [selectedTipo, setSelectedTipo] = useState(null);
   const [selectedSector, setSelectedSector] = useState(null);
+  const [refresh, setRefresh] = useState(false);
+  const [editing, setEditing] = useState(true);
 
   useEffect(() => {
     if (params.id) {
@@ -141,6 +143,7 @@ function FormInformes() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setRefresh((prev) => !prev);
     const arrayFormateado = selectedValues.join(",");
     const vehiculosFormateados = JSON.stringify(selectedVehiculo); //selectedVehiculo.map((v) => v.value);
     const tripuFormateado = JSON.stringify(selectedTripulante);
@@ -287,6 +290,9 @@ function FormInformes() {
     setSelectedTipo("");
     setEditing(false);
   };
+  const handleEdit = async () => {
+    setEditing(false);
+  };
 
   const handleCancel = async () => {
     const id = params.id;
@@ -378,15 +384,18 @@ function FormInformes() {
           name="fecha_informe"
           onChange={handleChanges}
           value={informes.fecha_informe}
+          disabled={editing}
         />
         <label htmlFor="origen_informe">Origen de la información</label>
         <SelectOrigin
+          edition={editing}
           selectedOrigin={selectedOrigin}
           setSelectedOrigin={setSelectedOrigin}
         />
 
         <label htmlFor="persona_informante">Persona informante</label>
         <SelectInformante
+          edition={editing}
           selectedInformante={selectedInformante}
           setSelectedInformante={setSelectedInformante}
         />
@@ -399,6 +408,7 @@ function FormInformes() {
           value={"radios"}
           checked={informes.captura_informe === "radios"}
           onChange={handleChanges}
+          disabled={editing}
         />
         <label htmlFor="telefono">Teléfono</label>
         <input
@@ -408,6 +418,7 @@ function FormInformes() {
           value={"telefono"}
           checked={informes.captura_informe === "telefono"}
           onChange={handleChanges}
+          disabled={editing}
         />
         <label htmlFor="rrss">RRSS</label>
         <input
@@ -417,6 +428,7 @@ function FormInformes() {
           value={"rrss"}
           checked={informes.captura_informe === "rrss"}
           onChange={handleChanges}
+          disabled={editing}
         />
         <label htmlFor="presencial">Presencial</label>
         <input
@@ -426,6 +438,7 @@ function FormInformes() {
           value={"presencial"}
           checked={informes.captura_informe === "presencial"}
           onChange={handleChanges}
+          disabled={editing}
         />
         <label htmlFor="email">E-mail</label>
         <input
@@ -435,6 +448,7 @@ function FormInformes() {
           value={"email"}
           checked={informes.captura_informe === "email"}
           onChange={handleChanges}
+          disabled={editing}
         />
         <label htmlFor="clasificacion">Clasificación</label>
         <select
@@ -442,6 +456,7 @@ function FormInformes() {
           id="clasificacion"
           onChange={handleChanges}
           value={informes.clasificacion_informe}
+          disabled={editing}
         >
           <option value="">Seleccione informe</option>
           <option value="Emergencia">Emergencia</option>
@@ -457,6 +472,7 @@ function FormInformes() {
           onChange={handleChanges}
           value={"atendido"}
           checked={informes.estado_informe === "atendido"}
+          disabled={editing}
         />
         <label htmlFor="progreso">En progreso</label>
         <input
@@ -466,6 +482,7 @@ function FormInformes() {
           onChange={handleChanges}
           value={"progreso"}
           checked={informes.estado_informe === "progreso"}
+          disabled={editing}
         />
         <label htmlFor="pendiente">Pendiente</label>
         <input
@@ -475,9 +492,11 @@ function FormInformes() {
           onChange={handleChanges}
           value={"pendiente"}
           checked={informes.estado_informe === "pendiente"}
+          disabled={editing}
         />
         <label htmlFor="tipoInforme">Tipo de informe</label>
         <SelectTipo
+          edition={editing}
           selectedTipo={selectedTipo}
           setSelectedTipo={setSelectedTipo}
         />
@@ -488,6 +507,7 @@ function FormInformes() {
           id="otroTipo"
           onChange={handleChanges}
           value={informes.otro_tipo}
+          disabled={editing}
         />
         <label htmlFor="descripcion">Descripción:</label>
         <textarea
@@ -495,6 +515,7 @@ function FormInformes() {
           id="descripcion"
           onChange={handleChanges}
           value={informes.descripcion_informe}
+          disabled={editing}
         ></textarea>
         <label htmlFor="mixta">Patrullaje Mixto</label>
         <input
@@ -504,6 +525,7 @@ function FormInformes() {
           value={"mixta"}
           checked={selectedValues.includes("mixta")}
           onChange={handleCheckbox}
+          disabled={editing}
         />
         <label htmlFor="preventivo">Patrullaje preventivo</label>
         <input
@@ -513,9 +535,11 @@ function FormInformes() {
           value={"preventivo"}
           checked={selectedValues.includes("preventivo")}
           onChange={handleCheckbox}
+          disabled={editing}
         />
         <label htmlFor="sector">Sector:</label>
         <SelectSector
+          edition={editing}
           selectedSector={selectedSector}
           setSelectedSector={setSelectedSector}
         />
@@ -526,15 +550,18 @@ function FormInformes() {
           id="direccion"
           onChange={handleChanges}
           value={informes.direccion_informe}
+          disabled={editing}
         />
         <label htmlFor="vehiculos">Ingrese vehículos</label>
         <SelectVehiculo
+          edition={editing}
           selectedVehiculo={selectedVehiculo}
           setSelectedVehiculo={setSelectedVehiculo}
         />
 
         <label htmlFor="tripu">Ingrese Tripulantes</label>
         <SelectTripulantes
+          edition={editing}
           selectedTripulante={selectedTripulante}
           setSelectedTripulante={setSelectedTripulante}
         />
@@ -542,7 +569,11 @@ function FormInformes() {
         <button type="button" onClick={handleNewInform}>
           Nuevo Expediente
         </button>
-        <button type="button" style={{ display: editing ? "" : "none" }}>
+        <button
+          type="button"
+          onClick={handleEdit}
+          style={{ display: editing ? "" : "none" }}
+        >
           Editar
         </button>
         <button type="submit" style={{ display: editing ? "none" : "" }}>
@@ -561,8 +592,9 @@ function FormInformes() {
       </form>
       <div>
         <h3>Listado informes pendientes</h3>
-        <ListPendiente />
+        <ListPendiente refresh={refresh} />
       </div>
+      <div>{editing ? <AttachFiles /> : ""}</div>
     </div>
   );
 }

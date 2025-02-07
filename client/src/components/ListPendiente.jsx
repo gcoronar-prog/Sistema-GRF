@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function ListPendiente() {
+function ListPendiente(refresh) {
+  const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
 
   useEffect(() => {
     loadPendiente();
-  }, []);
+  }, [refresh]);
 
   const loadPendiente = async () => {
     try {
       const res = await fetch("http://localhost:3000/informes/pendientes");
-      const data = await res.json(); // Obtén los datos de la API
-      setPendientes(data.pendientes); // Accede a la propiedad "pendientes"
+      const data = await res.json();
+      setPendientes(data.pendientes);
     } catch (error) {
       console.error("Error al cargar los pendientes:", error);
     }
   };
 
   const moveToPendiente = (id) => {
-    console.log(id);
+    navigate(`/informes/central/${id}`);
+    //console.log(id);
   };
 
   return (
@@ -40,6 +43,7 @@ function ListPendiente() {
           {pendientes.map((p) => (
             <tr
               key={p.id_informes_central}
+              style={{ cursor: "pointer" }}
               onClick={() => moveToPendiente(p.id_informes_central)}
             >
               <td>{p.id_informes_central}</td>

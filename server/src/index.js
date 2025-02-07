@@ -1,12 +1,13 @@
 import express from "express";
 import morgan from "morgan";
 import centralRoutes from "./routes/central.routes.js";
+
 import inspectRoutes from "./routes/inspect.routes.js";
 import alfaGRDRoutes from "./routes/alfaGRD.routes.js";
 import inventarioRoutes from "./routes/inventarioGRD.routes.js";
 import solicitudImagenesRoutes from "./routes/imagenes.routes.js";
 import atencionSGC from "./routes/atencionSGC.routes.js";
-import reportesService from "./routes/reportes.routes.js";
+
 import informesCentral from "./routes/informes.routes.js";
 import dotenv from "dotenv";
 dotenv.config();
@@ -19,7 +20,7 @@ import {
   deleteArchivo,
   findArchivos,
   findArchivosById,
-} from "./controllers/central.controller.js";
+} from "./controllers/informes.controller.js";
 
 import { fileURLToPath } from "url";
 import {
@@ -64,7 +65,6 @@ app.use(
   inventarioRoutes,
   solicitudImagenesRoutes,
   atencionSGC,
-  reportesService,
   informesCentral
 );
 
@@ -89,8 +89,8 @@ app.post(
       let result;
 
       switch (entityType) {
-        case "reports":
-          console.log("Procesando para: reports");
+        case "informes":
+          console.log("Procesando para: informes");
           result = await createArchivo(fileUrl, id);
           break;
         case "inspect":
@@ -124,7 +124,7 @@ app.get("/api/imagenes/:entityType/:id", async (req, res) => {
   const { entityType, id } = req.params;
   console.log(`Buscando imágenes con ID: ${id}`);
   try {
-    if (entityType === "reports") {
+    if (entityType === "informes") {
       const images = await findArchivos(id); // Asegúrate de implementar esta función
       /* if (!images.length) {
         return res.status(404).json({ msg: "No se encontraron imágenes" });
@@ -149,7 +149,7 @@ app.get("/api/galeria/:entityType/:id", async (req, res) => {
   const { entityType, id } = req.params;
   console.log(`Buscando imágenes con ID: ${id}`);
   try {
-    if (entityType === "reports") {
+    if (entityType === "informes") {
       const images = await findArchivosById(id); // Asegúrate de implementar esta función
       if (!images.length) {
         return res.status(404).json({ msg: "No se encontraron imágenes" });
@@ -185,7 +185,7 @@ app.get("/api/galeria/:entityType/:id", async (req, res) => {
 
 app.delete("/api/galeria/:entityType/:id", deleteArchivo);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Conectado al puerto ${PORT}`);
 });

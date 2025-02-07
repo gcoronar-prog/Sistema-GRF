@@ -11,8 +11,8 @@ const AttachFiles = () => {
   const location = useLocation();
 
   // Define entityType basado en la ruta
-  const entityType = location.pathname.includes("reports")
-    ? "reports"
+  const entityType = location.pathname.includes("informes")
+    ? "informes"
     : location.pathname.includes("inspect")
     ? "inspect"
     : location.pathname.includes("atencion")
@@ -56,7 +56,7 @@ const AttachFiles = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setUploadStatus("Archivo subido exitosamente: " + file.name);
+        //setUploadStatus("Archivo subido exitosamente: " + file.name);
         setFile(null);
       } else {
         setUploadStatus("Error al subir el archivo.");

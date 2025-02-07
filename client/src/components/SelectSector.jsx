@@ -1,7 +1,7 @@
 import AsyncSelect from "react-select/async";
 
-function SelectSector({ selectedSector, setSelectedSector }) {
-  const loadSector = async (inputValue) => {
+function SelectSector({ selectedSector, setSelectedSector, edition }) {
+  const loadSector = async () => {
     try {
       const response = await fetch("http://localhost:3000/sectores");
       if (!response.ok) {
@@ -22,6 +22,7 @@ function SelectSector({ selectedSector, setSelectedSector }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
+        isDisabled={edition}
         cacheOptions
         defaultOptions
         loadOptions={loadSector}

@@ -297,7 +297,7 @@ const getLastInformeCentral = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const informe = await client.query(
+    /*const informe = await client.query(
       "SELECT * FROM informes_central ORDER BY id_informes_central DESC LIMIT 1"
     );
     const idOrigen = informe.rows[0].id_origen_informe;
@@ -323,15 +323,35 @@ const getLastInformeCentral = async (req, res) => {
     const vehiculo = await client.query(
       "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
       [idVehiculo]
+    );*/
+
+    const informe = await client.query(
+      "SELECT \
+          ic.*,\
+          doi.* AS origen_informe,\
+          dti.* AS tipo_informe,\
+          dui.* AS ubicacion_informe,\
+          dvi.* AS vehiculo_informe\
+      FROM \
+          informes_central ic\
+      LEFT JOIN \
+          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+      LEFT JOIN \
+          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      LEFT JOIN \
+          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
+      LEFT JOIN \
+          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
+        ORDER BY ic.id_informes_central DESC LIMIT 1"
     );
 
     await client.query("COMMIT");
     return res.status(200).json({
       informe: informe.rows,
-      origen: origen.rows,
+      /*origen: origen.rows,
       tipos: tipos.rows,
       ubicacion: ubicacion.rows,
-      vehiculo: vehiculo.rows,
+      vehiculo: vehiculo.rows,*/
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -346,7 +366,7 @@ const getFirstInformeCentral = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const informe = await client.query(
+    /*const informe = await client.query(
       "SELECT * FROM informes_central ORDER BY id_informes_central ASC LIMIT 1"
     );
     const idOrigen = informe.rows[0].id_origen_informe;
@@ -372,14 +392,35 @@ const getFirstInformeCentral = async (req, res) => {
     const vehiculo = await client.query(
       "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
       [idVehiculo]
+    );*/
+
+    const informe = await client.query(
+      "SELECT \
+          ic.*,\
+          doi.* AS origen_informe,\
+          dti.* AS tipo_informe,\
+          dui.* AS ubicacion_informe,\
+          dvi.* AS vehiculo_informe\
+      FROM \
+          informes_central ic\
+      LEFT JOIN \
+          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+      LEFT JOIN \
+          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      LEFT JOIN \
+          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
+      LEFT JOIN \
+          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
+        ORDER BY ic.id_informes_central ASC LIMIT 1"
     );
 
     await client.query("COMMIT");
     return res.status(200).json({
-      origen: origen.rows,
+      informe: informe.rows,
+      /* origen: origen.rows,
       tipos: tipos.rows,
       ubicacion: ubicacion.rows,
-      vehiculo: vehiculo.rows,
+      vehiculo: vehiculo.rows,*/
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -395,7 +436,7 @@ const getPrevInformeCentral = async (req, res) => {
   try {
     const { id } = req.params;
     await client.query("BEGIN");
-    const informe = await client.query(
+    /*const informe = await client.query(
       "SELECT * FROM informes_central WHERE id_informes_central < $1 ORDER BY id_informes_central DESC LIMIT 1",
       [id]
     );
@@ -422,14 +463,36 @@ const getPrevInformeCentral = async (req, res) => {
     const vehiculo = await client.query(
       "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
       [idVehiculo]
+    );*/
+
+    const informe = await client.query(
+      "SELECT \
+          ic.*,\
+          doi.* AS origen_informe,\
+          dti.* AS tipo_informe,\
+          dui.* AS ubicacion_informe,\
+          dvi.* AS vehiculo_informe\
+      FROM \
+          informes_central ic\
+      LEFT JOIN \
+          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+      LEFT JOIN \
+          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      LEFT JOIN \
+          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
+      LEFT JOIN \
+          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
+        WHERE ic.id_informes_central< $1 ORDER BY ic.id_informes_central DESC LIMIT 1",
+      [id]
     );
 
     await client.query("COMMIT");
     return res.status(200).json({
-      origen: origen.rows,
+      informe: informe.rows,
+      /*origen: origen.rows,
       tipos: tipos.rows,
       ubicacion: ubicacion.rows,
-      vehiculo: vehiculo.rows,
+      vehiculo: vehiculo.rows,*/
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -445,7 +508,7 @@ const getNextInformeCentral = async (req, res) => {
   try {
     const { id } = req.params;
     await client.query("BEGIN");
-    const informe = await client.query(
+    /* const informe = await client.query(
       "SELECT * FROM informes_central WHERE id_informes_central > $1 ORDER BY id_informes_central ASC LIMIT 1",
       [id]
     );
@@ -473,14 +536,35 @@ const getNextInformeCentral = async (req, res) => {
     const vehiculo = await client.query(
       "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
       [idVehiculo]
+    );*/
+    const informe = await client.query(
+      "SELECT \
+          ic.*,\
+          doi.* AS origen_informe,\
+          dti.* AS tipo_informe,\
+          dui.* AS ubicacion_informe,\
+          dvi.* AS vehiculo_informe\
+      FROM \
+          informes_central ic\
+      LEFT JOIN \
+          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+      LEFT JOIN \
+          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      LEFT JOIN \
+          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
+      LEFT JOIN \
+          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
+        WHERE ic.id_informes_central > $1 ORDER BY ic.id_informes_central ASC LIMIT 1",
+      [id]
     );
 
     await client.query("COMMIT");
     return res.status(200).json({
-      origen: origen.rows,
+      informe: informe.rows,
+      /*origen: origen.rows,
       tipos: tipos.rows,
       ubicacion: ubicacion.rows,
-      vehiculo: vehiculo.rows,
+      vehiculo: vehiculo.rows,*/
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -636,4 +720,8 @@ export {
   getPrevInformeCentral,
   getNextInformeCentral,
   getPendientes,
+  createArchivo,
+  deleteArchivo,
+  findArchivos,
+  findArchivosById,
 };
