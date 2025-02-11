@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { BlobProvider } from "@react-pdf/renderer";
+import SGCImagenPDF from "../PDFs/SGCImagenPDF";
 
 function FormSolicitud() {
   const navigate = useNavigate();
@@ -480,6 +482,19 @@ function FormSolicitud() {
           Eliminar
         </button>
       </form>
+      <div>
+        <BlobProvider document={<SGCImagenPDF />}>
+          {({ url, loading }) =>
+            loading ? (
+              <button>Cargando...</button>
+            ) : (
+              <button onClick={() => window.open(url, "_blank")}>
+                Generar PDF
+              </button>
+            )
+          }
+        </BlobProvider>
+      </div>
     </div>
   );
 }

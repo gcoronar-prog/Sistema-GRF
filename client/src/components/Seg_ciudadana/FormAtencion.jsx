@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AttachFiles from "../AttachFiles";
 import FormAcciones from "../FormAcciones";
+import { BlobProvider } from "@react-pdf/renderer";
+import SCAtencionPDF from "../PDFs/SCAtencionPDF";
 
 function FormAtencion() {
   const defaultAtencion = {
@@ -483,6 +485,19 @@ function FormAtencion() {
           Eliminar
         </button>
       </form>
+      <div>
+        <BlobProvider document={<SCAtencionPDF />}>
+          {({ url, loading }) =>
+            loading ? (
+              <button>Cargando...</button>
+            ) : (
+              <button onClick={() => window.open(url, "_blank")}>
+                Generar PDF
+              </button>
+            )
+          }
+        </BlobProvider>
+      </div>
 
       {params.id ? (
         <div>

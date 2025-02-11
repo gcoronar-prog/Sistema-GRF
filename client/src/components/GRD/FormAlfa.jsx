@@ -1,6 +1,9 @@
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { BlobProvider } from "@react-pdf/renderer";
+import AlfaPDF from "../PDFs/AlfaPDF";
+import CentralPDF from "../PDFs/CentralPDF";
 
 function FormAlfa() {
   const params = useParams();
@@ -1055,6 +1058,19 @@ function FormAlfa() {
           Eliminar
         </button>
       </form>
+      <div>
+        <BlobProvider document={<AlfaPDF />}>
+          {({ url, loading }) =>
+            loading ? (
+              <button>Cargando documento</button>
+            ) : (
+              <button onClick={() => window.open(url, "_blank")}>
+                Generar PDF
+              </button>
+            )
+          }
+        </BlobProvider>
+      </div>
     </div>
   );
 }

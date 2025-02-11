@@ -9,6 +9,8 @@ import SelectTipo from "../SelectTipo";
 import SelectSector from "../SelectSector";
 import ListPendiente from "../ListPendiente";
 import AttachFiles from "../AttachFiles";
+import { BlobProvider } from "@react-pdf/renderer";
+import CentralPDF from "../PDFs/CentralPDF";
 
 function FormInformes() {
   const params = useParams();
@@ -565,7 +567,9 @@ function FormInformes() {
           selectedTripulante={selectedTripulante}
           setSelectedTripulante={setSelectedTripulante}
         />
+
         {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+
         <button type="button" onClick={handleNewInform}>
           Nuevo Expediente
         </button>
@@ -590,6 +594,17 @@ function FormInformes() {
           Eliminar
         </button>
       </form>
+      <BlobProvider document={<CentralPDF data={informes} />}>
+        {({ url, loading }) =>
+          loading ? (
+            <button>Cargando documento</button>
+          ) : (
+            <button onClick={() => window.open(url, "_blank")}>
+              Generar PDF
+            </button>
+          )
+        }
+      </BlobProvider>
       <div>
         <h3>Listado informes pendientes</h3>
         <ListPendiente refresh={refresh} />

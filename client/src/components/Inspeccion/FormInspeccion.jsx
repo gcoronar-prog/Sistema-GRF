@@ -3,6 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import AttachFiles from "../AttachFiles";
 
+import { BlobProvider } from "@react-pdf/renderer";
+import InspeccionPDF from "../PDFs/InspeccionPDF";
+
 function FormInspeccion() {
   const navigate = useNavigate();
   const params = useParams();
@@ -759,6 +762,21 @@ function FormInspeccion() {
           Eliminar
         </button>
       </form>
+
+      <div>
+        <BlobProvider document={<InspeccionPDF />}>
+          {({ url, loading }) =>
+            loading ? (
+              <button>Cargando...</button>
+            ) : (
+              <button onClick={() => window.open(url, "_blank")}>
+                Generar PDF
+              </button>
+            )
+          }
+        </BlobProvider>
+      </div>
+
       <div>
         <AttachFiles />
       </div>
