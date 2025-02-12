@@ -20,8 +20,23 @@ const CentralPDF = ({ data }) => (
           Clasificación: {data.clasificacion_informe}
         </Text>
         <Text style={styles.text}>Estado informe: {data.estado_informe}</Text>
-        <Text style={styles.text}>Estado informe: {data.tipo_informe}</Text>
+        <Text style={styles.text}>Tipo informe: {data.tipo_informe.label}</Text>
+        <Text style={styles.text}>Otro tipo informe: {data.otro_tipo}</Text>
+        <Text style={styles.text}>Descripcion: {data.descripcion_informe}</Text>
+        <Text style={styles.text}>
+          Recursos involucrados:
+          {data.recursos_informe}
+        </Text>
+        <Text style={styles.text}>Sector: {data.sector_informe}</Text>
+        <Text style={styles.text}>Dirección: {data.direccion_informe}</Text>
+
+        <Text style={styles.text}>
+          Vehiculo/s utilizado/s: {data.vehiculos_informe}
+        </Text>
+        <Text style={styles.text}>Tripulantes: {data.tripulantes_informe}</Text>
       </View>
+      {console.log("Datos recibidos en CentralPDF:", data)}
+      {console.log("Recursos en PDF:", data.recursos_informe)}
     </Page>
   </Document>
 );

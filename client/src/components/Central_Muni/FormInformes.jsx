@@ -86,12 +86,11 @@ function FormInformes() {
         }))
       : [];*/
 
-    const recursosFormateados = Array.isArray(data.informe[0].recursos_informe)
-      ? data.informe[0].recursos_informe
-      : data.informe[0].recursos_informe
-      ? data.informe[0].recursos_informe.split(",")
+    const recursosFormateados = data.informe[0].recursos_informe
+      ? data.informe[0].recursos_informe.split(",").map((item) => item.trim()) // Elimina espacios extra
       : [];
 
+    console.log("Recursos formateados:", recursosFormateados);
     console.log(data);
 
     setInformes({
