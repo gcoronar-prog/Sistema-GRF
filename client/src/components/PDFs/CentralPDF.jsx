@@ -6,45 +6,54 @@ const styles = StyleSheet.create({
   text: { fontSize: 14, marginBottom: 10 },
 });
 
-const CentralPDF = ({ data, recursos, vehiculos }) => (
+const CentralPDF = ({
+  data,
+  recursos,
+  vehiculos,
+  tripulante,
+  origen,
+  informante,
+  tipo,
+  sector,
+}) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View>
         <Text style={styles.text}>Informe Central Municipal</Text>
         <Text style={styles.text}>Id: {data.id_informes_central}</Text>
         <Text style={styles.text}>Fecha informe: {data.fecha_informe}</Text>
-        <Text style={styles.text}>Origen: {data.origen_informe}</Text>
-        <Text style={styles.text}>Informante: {data.persona_informante}</Text>
+        <Text style={styles.text}>Origen: {origen?.label}</Text>
+        <Text style={styles.text}>Informante: {informante?.label}</Text>
         <Text style={styles.text}>Captura informe: {data.captura_informe}</Text>
         <Text style={styles.text}>
           Clasificación: {data.clasificacion_informe}
         </Text>
         <Text style={styles.text}>Estado informe: {data.estado_informe}</Text>
-        <Text style={styles.text}>Tipo informe: {data.tipo_informe.label}</Text>
+        <Text style={styles.text}>Tipo informe: {tipo?.label}</Text>
         <Text style={styles.text}>Otro tipo informe: {data.otro_tipo}</Text>
         <Text style={styles.text}>Descripcion: {data.descripcion_informe}</Text>
         <Text style={styles.text}>
           Recursos involucrados:
-          {recursos.join(", ")}
+          {Array.isArray(recursos) ? recursos : "No hay registros"}
         </Text>
-        <Text style={styles.text}>Sector: {data.sector_informe}</Text>
+        <Text style={styles.text}>Sector: {sector?.label}</Text>
         <Text style={styles.text}>Dirección: {data.direccion_informe}</Text>
 
         <Text style={styles.text}>
           Vehiculo/s utilizado/s:
-          {JSON.parse(vehiculos)
-            .map((item) => item.label)
-            .join(", ")}
+          {Array.isArray(vehiculos)
+            ? vehiculos.map((item) => item.label).join(", ")
+            : "No hay registros"}
         </Text>
-        <Text style={styles.text}>Tripulantes: {data.tripulantes_informe}</Text>
+        <Text style={styles.text}>
+          Tripulantes:
+          {Array.isArray(tripulante)
+            ? tripulante.map((item) => item.label).join(", ")
+            : "No hay registros"}
+        </Text>
       </View>
       {console.log("Datos recibidos en CentralPDF:", data)}
-      {console.log(
-        "Recursos en PDF:",
-        JSON.parse(vehiculos)
-          .map((item) => item.label)
-          .join(", ")
-      )}
+      {console.log("Recursos en PDF:", sector?.label)}
     </Page>
   </Document>
 );

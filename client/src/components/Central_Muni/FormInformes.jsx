@@ -73,10 +73,10 @@ function FormInformes() {
       `http://localhost:3000/informes_central/${id}`
     );
     const data = await response.json();
-    const formattedDate = dayjs(data.informe.fecha_informe).format(
+    const formattedDate = dayjs(data.informe[0].fecha_informe).format(
       "YYYY-MM-DDTHH:mm"
     );
-
+    console.log(formattedDate);
     /*const vehiculosFormateados = Array.isArray(
       data.informe[0].vehiculos_informe
     )
@@ -145,7 +145,9 @@ function FormInformes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setRefresh((prev) => !prev);
-    const arrayFormateado = selectedValues.join(",");
+    const arrayFormateado = Array.isArray(selectedValues)
+      ? selectedValues.join(", ")
+      : "";
     const vehiculosFormateados = JSON.stringify(selectedVehiculo); //selectedVehiculo.map((v) => v.value);
     const tripuFormateado = JSON.stringify(selectedTripulante);
     const originFormateado = JSON.stringify(selectedOrigin);
@@ -188,7 +190,7 @@ function FormInformes() {
 
       const lastInforme = await lastData.json();
       setLastId(lastInforme.informe[0].id_informes_central);
-      //console.log(lastId);
+      console.log(lastId);
       if (lastInforme && lastInforme.informe[0]) {
         const lastIdInfo = lastInforme.informe[0].id_informes_central;
         navigate(`/informes/central/${lastIdInfo}`);
@@ -598,7 +600,12 @@ function FormInformes() {
           <CentralPDF
             data={informes}
             recursos={selectedValues}
-            vehiculos={JSON.stringify(selectedVehiculo)}
+            vehiculos={selectedVehiculo}
+            tripulante={selectedTripulante}
+            origen={selectedOrigin}
+            informante={selectedInformante}
+            tipo={selectedTipo}
+            sector={selectedSector}
           />
         }
       >
