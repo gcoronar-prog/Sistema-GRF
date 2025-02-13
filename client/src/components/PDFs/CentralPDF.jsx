@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
   text: { fontSize: 14, marginBottom: 10 },
 });
 
-const CentralPDF = ({ data }) => (
+const CentralPDF = ({ data, recursos, vehiculos }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View>
@@ -25,18 +25,26 @@ const CentralPDF = ({ data }) => (
         <Text style={styles.text}>Descripcion: {data.descripcion_informe}</Text>
         <Text style={styles.text}>
           Recursos involucrados:
-          {data.recursos_informe}
+          {recursos.join(", ")}
         </Text>
         <Text style={styles.text}>Sector: {data.sector_informe}</Text>
         <Text style={styles.text}>Dirección: {data.direccion_informe}</Text>
 
         <Text style={styles.text}>
-          Vehiculo/s utilizado/s: {data.vehiculos_informe}
+          Vehiculo/s utilizado/s:
+          {JSON.parse(vehiculos)
+            .map((item) => item.label)
+            .join(", ")}
         </Text>
         <Text style={styles.text}>Tripulantes: {data.tripulantes_informe}</Text>
       </View>
       {console.log("Datos recibidos en CentralPDF:", data)}
-      {console.log("Recursos en PDF:", data.recursos_informe)}
+      {console.log(
+        "Recursos en PDF:",
+        JSON.parse(vehiculos)
+          .map((item) => item.label)
+          .join(", ")
+      )}
     </Page>
   </Document>
 );

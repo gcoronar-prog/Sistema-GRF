@@ -163,7 +163,7 @@ function FormInformes() {
       recursos_informe: arrayFormateado,
     };
     setSelectedValues(arrayFormateado);
-    //console.log("Datos enviados", informes);
+    console.log("Datos enviados", informes);
     console.log("Datos a enviar:", JSON.stringify(datosActualizados, null, 2));
 
     try {
@@ -593,7 +593,15 @@ function FormInformes() {
           Eliminar
         </button>
       </form>
-      <BlobProvider document={<CentralPDF data={informes} />}>
+      <BlobProvider
+        document={
+          <CentralPDF
+            data={informes}
+            recursos={selectedValues}
+            vehiculos={JSON.stringify(selectedVehiculo)}
+          />
+        }
+      >
         {({ url, loading }) =>
           loading ? (
             <button>Cargando documento</button>
