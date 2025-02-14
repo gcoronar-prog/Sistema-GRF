@@ -73,18 +73,6 @@ function FormInformes() {
       `http://localhost:3000/informes_central/${id}`
     );
     const data = await response.json();
-    const formattedDate = dayjs(data.informe[0].fecha_informe).format(
-      "YYYY-MM-DDTHH:mm"
-    );
-    console.log(formattedDate);
-    /*const vehiculosFormateados = Array.isArray(
-      data.informe[0].vehiculos_informe
-    )
-      ? data.informe[0].vehiculos_informe.map((vehiculo) => ({
-          value: vehiculo.id_vehiculo, // Ajusta según la estructura real de tu API
-          label: vehiculo.vehiculo, // Ajusta según la estructura real de tu API
-        }))
-      : [];*/
 
     const recursosFormateados = data.informe[0].recursos_informe
       ? data.informe[0].recursos_informe.split(",").map((item) => item.trim()) // Elimina espacios extra
@@ -102,7 +90,9 @@ function FormInformes() {
       id_vehiculo_informe: data.informe[0].id_vehiculo_informe,
 
       //origen informe
-      fecha_informe: formattedDate,
+      fecha_informe: dayjs(data.informe[0].fecha_informe).format(
+        "YYYY-MM-DDTHH:mm"
+      ),
       //origen_informe: data.informe[0].origen_informe,
       //origen_informe: setSelectedOrigin(data.informe[0].origen_informe),
       //persona_informante: data.informe[0].persona_informante,
@@ -147,7 +137,7 @@ function FormInformes() {
     setRefresh((prev) => !prev);
     const arrayFormateado = Array.isArray(selectedValues)
       ? selectedValues.join(", ")
-      : "";
+      : [];
     const vehiculosFormateados = JSON.stringify(selectedVehiculo); //selectedVehiculo.map((v) => v.value);
     const tripuFormateado = JSON.stringify(selectedTripulante);
     const originFormateado = JSON.stringify(selectedOrigin);
@@ -187,17 +177,18 @@ function FormInformes() {
       const lastData = await fetch(
         "http://localhost:3000/informe/central/last"
       );
-
       const lastInforme = await lastData.json();
       setLastId(lastInforme.informe[0].id_informes_central);
       console.log(lastId);
       if (lastInforme && lastInforme.informe[0]) {
         const lastIdInfo = lastInforme.informe[0].id_informes_central;
-        navigate(`/informes/central/${lastIdInfo}`);
+        setLastId(lastIdInfo); // Se actualiza el estado (pero no inmediatamente)
+
+        // Usa lastIdInfo en lugar de lastId
+        const metodo = params.id ? "" : `/informes/central/${lastIdInfo}`;
+        navigate(metodo);
+        setEditing(true);
       }
-      const metodo = params.id ? "" : `/informes/central/${lastId + 1}`;
-      navigate(metodo);
-      setEditing(true);
     } catch (error) {
       console.error(error);
     }

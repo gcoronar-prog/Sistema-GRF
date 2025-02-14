@@ -1,4 +1,5 @@
 import React from "react";
+import dayjs from "dayjs";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
@@ -21,7 +22,10 @@ const CentralPDF = ({
       <View>
         <Text style={styles.text}>Informe Central Municipal</Text>
         <Text style={styles.text}>Id: {data.id_informes_central}</Text>
-        <Text style={styles.text}>Fecha informe: {data.fecha_informe}</Text>
+        <Text style={styles.text}>
+          Fecha:
+          {dayjs(data.fecha_informe).format("DD-MM-YYYY [Hora:] HH:mm")}
+        </Text>
         <Text style={styles.text}>Origen: {origen?.label}</Text>
         <Text style={styles.text}>Informante: {informante?.label}</Text>
         <Text style={styles.text}>Captura informe: {data.captura_informe}</Text>
@@ -30,14 +34,25 @@ const CentralPDF = ({
         </Text>
         <Text style={styles.text}>Estado informe: {data.estado_informe}</Text>
         <Text style={styles.text}>Tipo informe: {tipo?.label}</Text>
-        <Text style={styles.text}>Otro tipo informe: {data.otro_tipo}</Text>
-        <Text style={styles.text}>Descripcion: {data.descripcion_informe}</Text>
+        <Text style={styles.text}>
+          Otro tipo informe:
+          {data.otro_tipo ? data.otro_tipo : "No hay registro"}
+        </Text>
+        <Text style={styles.text}>
+          Descripcion:{" "}
+          {data.descripcion_informe
+            ? data.descripcion_informe
+            : "No hay descripción"}
+        </Text>
         <Text style={styles.text}>
           Recursos involucrados:
-          {Array.isArray(recursos) ? recursos : "No hay registros"}
+          {Array.isArray(recursos) ? recursos.join(", ") : "No hay registros"}
         </Text>
         <Text style={styles.text}>Sector: {sector?.label}</Text>
-        <Text style={styles.text}>Dirección: {data.direccion_informe}</Text>
+        <Text style={styles.text}>
+          Dirección:{" "}
+          {data.direccion_informe ? data.direccion_informe : "Sin dirección"}
+        </Text>
 
         <Text style={styles.text}>
           Vehiculo/s utilizado/s:
