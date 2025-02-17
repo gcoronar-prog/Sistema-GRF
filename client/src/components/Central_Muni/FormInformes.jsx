@@ -604,7 +604,10 @@ function FormInformes() {
           loading ? (
             <button>Cargando documento</button>
           ) : (
-            <button onClick={() => window.open(url, "_blank")}>
+            <button
+              style={{ display: editing ? "" : "none" }}
+              onClick={() => window.open(url, "_blank")}
+            >
               Generar PDF
             </button>
           )

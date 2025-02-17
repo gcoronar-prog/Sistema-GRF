@@ -581,7 +581,7 @@ const getPendientes = async (req, res) => {
     await client.query("BEGIN");
     const pendientes = await client.query(
       "SELECT * FROM informes_central a join datos_origen_informe b\
-        on a.id_origen_informe=b.id_origen_informe where estado_informe='pendiente'"
+        on a.id_origen_informe=b.id_origen_informe where estado_informe='pendiente' ORDER BY id_informes_central ASC"
     );
     const idTipos = pendientes.rows[0].id_tipos_informe;
     const idUbicacion = pendientes.rows[0].id_ubicacion_informe;
