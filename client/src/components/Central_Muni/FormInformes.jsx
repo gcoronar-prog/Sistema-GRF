@@ -493,16 +493,24 @@ function FormInformes() {
           edition={editing}
           selectedTipo={selectedTipo}
           setSelectedTipo={setSelectedTipo}
+          tipo={informes?.clasificacion_informe}
         />
-        <label htmlFor="otroTipo">Otro tipo de informe:</label>
-        <input
-          type="text"
-          name="otro_tipo"
-          id="otroTipo"
-          onChange={handleChanges}
-          value={informes.otro_tipo}
-          disabled={editing}
-        />
+
+        {informes.tipo_informe == "Otro" ? (
+          <>
+            <label htmlFor="otroTipo">Otro tipo de informe:</label>
+            <input
+              type="text"
+              name="otro_tipo"
+              id="otroTipo"
+              onChange={handleChanges}
+              value={informes.otro_tipo}
+              disabled={editing}
+            />
+          </>
+        ) : (
+          ""
+        )}
         <label htmlFor="descripcion">Descripción:</label>
         <textarea
           name="descripcion_informe"

@@ -3,7 +3,7 @@ import AsyncSelect from "react-select/async";
 function SelectTipo({ selectedTipo, setSelectedTipo, edition }) {
   const loadTipo = async (inputValue) => {
     try {
-      const response = await fetch("http://localhost:3000/tipoReportes");
+      const response = await fetch(`http://localhost:3000/tipoReportes`);
       if (!response.ok) {
         throw new Error("Error al cargar los tripulantes");
       }

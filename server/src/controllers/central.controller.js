@@ -181,6 +181,26 @@ const getTipoReportes = async (req, res) => {
   }
 };
 
+const getTipoReporte = async (req, res) => {
+  const { grupo } = req.params;
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM tipo_reportes WHERE grupo_reporte = $1",
+      [grupo]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No existen registros" });
+    }
+    return res.json(rows);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Error de conexión con el servidor" });
+  }
+};
+
 const getFuncionarios = async (req, res) => {
   try {
     const { rows } = await pool.query("SELECT * FROM funcionarios");
@@ -357,6 +377,7 @@ export {
   getChoferes,
   getInformantes,
   getVehiculos,
+  getTipoReporte,
   getTipoReportes,
   getFuncionarios,
   getOrigenes,

@@ -7,6 +7,7 @@ import alfaGRDRoutes from "./routes/alfaGRD.routes.js";
 import inventarioRoutes from "./routes/inventarioGRD.routes.js";
 import solicitudImagenesRoutes from "./routes/imagenes.routes.js";
 import atencionSGC from "./routes/atencionSGC.routes.js";
+import loginUser from "./routes/login.routes.js";
 
 import informesCentral from "./routes/informes.routes.js";
 import dotenv from "dotenv";
@@ -65,7 +66,8 @@ app.use(
   inventarioRoutes,
   solicitudImagenesRoutes,
   atencionSGC,
-  informesCentral
+  informesCentral,
+  loginUser
 );
 
 app.post(
