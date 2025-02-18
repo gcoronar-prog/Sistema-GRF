@@ -1,4 +1,6 @@
 import { pool } from "../db.js";
+import bcryptjs from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const getUsers = async (req, res) => {
   const client = await pool.connect();
@@ -42,7 +44,10 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
   const client = await pool.connect();
+
   const data = req.body;
+  const salt = await bcryptjs.genSalt(10);
+  const hashedPassword = await bcryptjs.hash(data.user_password, salt);
   try {
     await client.query("BEGIN");
     const usuarios = await client.query(
@@ -51,7 +56,7 @@ const createUser = async (req, res) => {
       [
         data.cod_user,
         data.user_name,
-        data.user_password,
+        hashedPassword,
         data.nombre,
         data.apellido,
         data.user_rol,
@@ -122,6 +127,26 @@ const deleteuser = async (req, res) => {
       .json({ message: "Problemas de conexión con el servidor" });
   } finally {
     client.release();
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const data = req.body;
+    const user = await pool.query(
+      "SELECT * FROM users_system WHERE user_name=$1",
+      [data.user_name]
+    );
+
+    const isMatch = await bcryptjs.compare(
+      data.user_password,
+      user.user_password
+    );
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ msg: "Problemas de conexión con el servidor" });
   }
 };
 
