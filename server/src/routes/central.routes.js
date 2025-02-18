@@ -37,7 +37,7 @@ router.get("/informantes", getInformantes);
 router.get("/vehiculos", getVehiculos);
 
 router.get("/tipoReportes", getTipoReportes);
-router.get("/tipoReporte/:a", getTipoReporte);
+router.get("/tipoReporte", getTipoReporte);
 
 router.get("/funcionarios", getFuncionarios);
 

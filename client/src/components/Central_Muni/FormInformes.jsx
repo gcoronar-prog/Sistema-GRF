@@ -493,7 +493,7 @@ function FormInformes() {
           edition={editing}
           selectedTipo={selectedTipo}
           setSelectedTipo={setSelectedTipo}
-          tipo={informes?.clasificacion_informe}
+          tipo={informes.clasificacion_informe}
         />
 
         {informes.tipo_informe == "Otro" ? (

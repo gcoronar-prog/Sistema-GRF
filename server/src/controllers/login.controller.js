@@ -1,5 +1,5 @@
 import { pool } from "../db.js";
-import bcryptjs from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const getUsers = async (req, res) => {

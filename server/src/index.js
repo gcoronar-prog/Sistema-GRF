@@ -8,8 +8,10 @@ import inventarioRoutes from "./routes/inventarioGRD.routes.js";
 import solicitudImagenesRoutes from "./routes/imagenes.routes.js";
 import atencionSGC from "./routes/atencionSGC.routes.js";
 import loginUser from "./routes/login.routes.js";
+import statisticsCentral from "./routes/statisticsCentral.routes.js";
 
 import informesCentral from "./routes/informes.routes.js";
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -67,7 +69,8 @@ app.use(
   solicitudImagenesRoutes,
   atencionSGC,
   informesCentral,
-  loginUser
+  loginUser,
+  statisticsCentral
 );
 
 app.post(

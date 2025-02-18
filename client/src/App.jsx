@@ -16,6 +16,7 @@ import FormReportes from "./components/Central_Muni/FormReportes";
 import FormInformes from "./components/Central_Muni/FormInformes";
 import SelectTripulantes from "./components/SelectTripulantes";
 import SelectVehiculo from "./components/SelectVehiculo";
+import StatisticsCentral from "./components/Estadisticas/StatisticsCentral";
 
 function App() {
   return (
@@ -52,6 +53,11 @@ function App() {
 
           <Route path="/selectv" element={<SelectVehiculo />} />
           <Route path="/selecttripu" element={<SelectTripulantes />} />
+
+          <Route
+            path="/statistics/central/v1"
+            element={<StatisticsCentral />}
+          />
         </Routes>
       </Container>
     </BrowserRouter>

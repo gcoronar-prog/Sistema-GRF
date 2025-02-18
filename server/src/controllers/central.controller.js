@@ -182,7 +182,7 @@ const getTipoReportes = async (req, res) => {
 };
 
 const getTipoReporte = async (req, res) => {
-  const { grupo } = req.params;
+  const { grupo } = req.query;
   try {
     const { rows } = await pool.query(
       "SELECT * FROM tipo_reportes WHERE grupo_reporte = $1",

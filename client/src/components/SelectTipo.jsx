@@ -1,11 +1,20 @@
+import { useEffect, useState } from "react";
 import AsyncSelect from "react-select/async";
 
-function SelectTipo({ selectedTipo, setSelectedTipo, edition }) {
-  const loadTipo = async (inputValue) => {
+function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
+  const [key, setKey] = useState(0);
+  useEffect(() => {
+    console.log("Tipo seleccionado:", tipo);
+    setKey((prevKey) => prevKey + 1);
+  }, [tipo]);
+
+  const loadTipo = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/tipoReportes`);
+      const response = await fetch(
+        `http://localhost:3000/tipoReporte?grupo=${tipo}`
+      );
       if (!response.ok) {
-        throw new Error("Error al cargar los tripulantes");
+        throw new Error("Error al cargar los datos");
       }
       const data = await response.json();
 
@@ -22,6 +31,7 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition }) {
   return (
     <div style={{ width: "30%" }}>
       <AsyncSelect
+        key={key}
         isDisabled={edition}
         cacheOptions
         defaultOptions
