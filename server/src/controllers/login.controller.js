@@ -132,16 +132,30 @@ const deleteuser = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const data = req.body;
+    const { user_name, password } = req.body;
+
+    if (!user_name || !password) {
+      return res.status(400).json({ msg: "Complete usuario y contraseña" });
+    }
+
     const user = await pool.query(
       "SELECT * FROM users_system WHERE user_name=$1",
-      [data.user_name]
+      [user_name]
     );
 
     const isMatch = await bcryptjs.compare(
-      data.user_password,
-      user.user_password
+      password,
+      user.rows[0].user_password
     );
+
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Usuario o contraseña incorrectos" });
+    }
+    const token = jwt.sign({ user: user.user_name }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    return res.json({ ok: true, msg: token });
   } catch (error) {
     console.error(error);
     return res
@@ -150,4 +164,4 @@ const login = async (req, res) => {
   }
 };
 
-export { getUser, createUser, updateUser, deleteuser };
+export { getUser, createUser, updateUser, deleteuser, login };
