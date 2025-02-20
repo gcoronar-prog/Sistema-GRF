@@ -3,7 +3,7 @@ import { getEstadisticaCentral } from "../controllers/statisticsCentral.controll
 
 const router = Router();
 
-//router.get("/estadisticaCentral", getEstadisticaCentral);
+router.get("/estadisticaCentral", getEstadisticaCentral);
 router.put("/estadisticaCentral", getEstadisticaCentral);
 
 export default router;
