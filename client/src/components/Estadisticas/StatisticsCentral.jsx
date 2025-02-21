@@ -5,10 +5,33 @@ import SelectVehiculo from "../SelectVehiculo";
 import SelectTipo from "../SelectTipo";
 import { BlobProvider } from "@react-pdf/renderer";
 import CentralStatsPDF from "../PDFs/CentralStatsPDF";
+import dayjs from "dayjs";
 
 function StatisticsCentral() {
-  const [central, setCentral] = useState([]);
+  const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
+  const dateNow = dayjs().format("YYYY-MM-DDTHH:mm");
+
+  const defaultValues = {
+    fechaInicio: startMonth,
+    fechaFin: dateNow,
+    estado: "",
+    clasificacion: "",
+    captura: "",
+    origen: "",
+    recursos: "",
+    sector: "",
+    vehiculo: "",
+    centralista: "",
+    tipoReporte: "",
+  };
+
+  const [central, setCentral] = useState(defaultValues);
+  const [filter, setFilter] = useState([]);
   const [clasif, setClasif] = useState("");
+  const [selectedOrigen, setSelectedOrigen] = useState([]);
+  const [selectedSector, setSelectedSector] = useState([]);
+  const [selectedVehiculo, setSelectedVehiculo] = useState([]);
+  const [selectedTipo, setSelectedTipo] = useState([]);
 
   const loadCentral = async () => {
     try {
@@ -24,7 +47,10 @@ function StatisticsCentral() {
   }, []);
 
   const handleClasificacion = (e) => {
-    setClasif(e.target.value);
+    const { name, value } = e.target;
+    setClasif(value);
+    //console.log(name, value);
+    setCentral({ ...central, [name]: value });
   };
 
   const handleChanges = (e) => {
@@ -35,17 +61,37 @@ function StatisticsCentral() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formattedFechaI = dayjs(central.fechaInicio).format(
+      "YYYY-MM-DDTHH:mm"
+    );
+    const formattedFechaF = dayjs(central.fechaFin).format("YYYY-MM-DDTHH:mm");
+    const formattedOrigen = selectedOrigen;
+    const formattedSector = selectedSector;
+    const formattedVehiculo = selectedVehiculo;
+    const formattedTipo = selectedTipo;
 
+    const formattedData = {
+      ...central,
+      fechaInicio: formattedFechaI,
+      fechaFin: formattedFechaF,
+      origen: formattedOrigen,
+      sector: formattedSector,
+      vehiculo: formattedVehiculo,
+      tipo: formattedTipo,
+    };
+    console.log("formateada", formattedData);
     try {
       const res = await fetch("http://localhost:3000/estadisticaCentral", {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(central),
+        body: JSON.stringify(formattedData),
       });
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
       }
-      console.log(central);
+      const data = await res.json();
+      setFilter(data.informe);
+      console.log("filtro", data);
     } catch (error) {
       console.error(error);
     }
@@ -61,6 +107,7 @@ function StatisticsCentral() {
             name="fechaInicio"
             id=""
             onChange={handleChanges}
+            value={central.fechaInicio}
           />
           <label htmlFor="">Fecha de termino</label>
           <input
@@ -68,6 +115,7 @@ function StatisticsCentral() {
             name="fechaFin"
             id=""
             onChange={handleChanges}
+            value={central.fechaFin}
           />
         </div>
 
@@ -75,32 +123,39 @@ function StatisticsCentral() {
           <label htmlFor="atendido">Atendido</label>
           <input
             type="radio"
-            name="estado_informe"
+            name="estado"
             id="atendido"
             value={"atendido"}
+            onChange={handleChanges}
+            checked={central.estado === "atendido"}
           />
           <label htmlFor="progreso">En progreso</label>
           <input
             type="radio"
-            name="estado_informe"
+            name="estado"
             id="progreso"
             value={"progreso"}
+            onChange={handleChanges}
+            checked={central.estado === "progreso"}
           />
           <label htmlFor="pendiente">Pendiente</label>
           <input
             type="radio"
-            name="estado_informe"
+            name="estado"
             id="pendiente"
             value={"pendiente"}
+            onChange={handleChanges}
+            checked={central.estado === "pendiente"}
           />
         </div>
 
         <div className="clasiInforme">
           <label htmlFor="clasificacion">Clasificación</label>
           <select
-            name="clasificacion_informe"
+            name="clasificacion"
             id="clasificacion"
             onChange={handleClasificacion}
+            value={central.clasificacion}
           >
             <option value="">Seleccione informe</option>
             <option value="Emergencia">Emergencia</option>
@@ -114,37 +169,56 @@ function StatisticsCentral() {
           <label htmlFor="radios">Radio</label>
           <input
             type="radio"
-            name="captura_informe"
+            name="captura"
             id="radios"
             value={"radios"}
+            onChange={handleChanges}
+            checked={central.captura === "radios"}
           />
           <label htmlFor="telefono">Teléfono</label>
           <input
             type="radio"
-            name="captura_informe"
+            name="captura"
             id="telefono"
             value={"telefono"}
+            onChange={handleChanges}
+            checked={central.captura === "telefono"}
           />
           <label htmlFor="rrss">RRSS</label>
-          <input type="radio" name="captura_informe" id="rrss" value={"rrss"} />
+          <input
+            type="radio"
+            name="captura"
+            id="rrss"
+            value={"rrss"}
+            onChange={handleChanges}
+            checked={central.captura === "rrss"}
+          />
           <label htmlFor="presencial">Presencial</label>
           <input
             type="radio"
-            name="captura_informe"
+            name="captura"
             id="presencial"
             value={"presencial"}
+            onChange={handleChanges}
+            checked={central.captura === "presencial"}
           />
           <label htmlFor="email">E-mail</label>
           <input
             type="radio"
-            name="captura_informe"
+            name="captura"
             id="email"
             value={"email"}
+            onChange={handleChanges}
+            checked={central.captura === "email"}
           />
         </div>
 
         <div className="origenInforme">
-          <SelectOrigin />
+          <label htmlFor="">Origen:</label>
+          <SelectOrigin
+            selectedOrigin={selectedOrigen}
+            setSelectedOrigin={setSelectedOrigen}
+          />
         </div>
 
         <div className="recursosInforme">
@@ -153,12 +227,18 @@ function StatisticsCentral() {
 
         <div className="sectorInforme">
           <label htmlFor="">Sector:</label>
-          <SelectSector />
+          <SelectSector
+            selectedSector={selectedSector}
+            setSelectedSector={setSelectedSector}
+          />
         </div>
 
         <div className="vechiculoInforme">
           <label htmlFor="">Vehículos:</label>
-          <SelectVehiculo />
+          <SelectVehiculo
+            selectedVehiculo={selectedVehiculo}
+            setSelectedVehiculo={setSelectedVehiculo}
+          />
         </div>
 
         <div className="operadorInforme">
@@ -167,10 +247,14 @@ function StatisticsCentral() {
 
         <div className="tipoReporte">
           <label htmlFor="">Tipo de informe:</label>
-          <SelectTipo tipo={clasif} />
+          <SelectTipo
+            tipo={clasif}
+            selectedTipo={selectedTipo}
+            setSelectedTipo={setSelectedTipo}
+          />
         </div>
         <div>
-          <BlobProvider document={<CentralStatsPDF data={central} />}>
+          <BlobProvider document={<CentralStatsPDF data={filter} />}>
             {({ url, loading }) =>
               loading ? (
                 <button>Cargando documento</button>

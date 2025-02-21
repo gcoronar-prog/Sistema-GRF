@@ -4,7 +4,7 @@ import { verifyToken } from "../middlewares/jwt.middleware.js";
 
 const router = Router();
 
-router.get("/estadisticaCentral", verifyToken, getEstadisticaCentral);
-router.put("/estadisticaCentral", getEstadisticaCentral);
+router.get("/estadisticaCentral", getEstadisticaCentral);
+router.post("/estadisticaCentral", getEstadisticaCentral);
 
 export default router;
