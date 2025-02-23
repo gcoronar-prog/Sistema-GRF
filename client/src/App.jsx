@@ -17,12 +17,15 @@ import FormInformes from "./components/Central_Muni/FormInformes";
 import SelectTripulantes from "./components/SelectTripulantes";
 import SelectVehiculo from "./components/SelectVehiculo";
 import StatisticsCentral from "./components/Estadisticas/StatisticsCentral";
+import LoginSGF from "./components/Login/LoginSGF";
 
 function App() {
   return (
     <BrowserRouter>
       <Container>
         <Routes>
+          <Route path="/sgf/v1/login/" element={<LoginSGF />} />
+
           <Route path="/" element={<HomeCentral />} />
           <Route path="/Reports/new" element={<FormCentral />} />
           <Route path="/Reports/:id/edit" element={<FormCentral />} />

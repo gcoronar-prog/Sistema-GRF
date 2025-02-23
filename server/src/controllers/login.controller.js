@@ -138,21 +138,25 @@ const login = async (req, res) => {
       return res.status(400).json({ msg: "Complete usuario y contraseña" });
     }
 
-    const user = await pool.query(
+    const usuario = await pool.query(
       "SELECT * FROM users_system WHERE user_name=$1",
       [user_name]
     );
 
     const isMatch = await bcryptjs.compare(
       password,
-      user.rows[0].user_password
+      usuario.rows[0].user_password
     );
 
     if (!isMatch) {
       return res.status(400).json({ msg: "Usuario o contraseña incorrectos" });
     }
-    const token = jwt.sign({ user: user.user_name }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+
+    const payload = {
+      user_name: usuario.rows[0].user_name,
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "10s",
     });
 
     return res.json({ ok: true, msg: token });
@@ -164,4 +168,21 @@ const login = async (req, res) => {
   }
 };
 
-export { getUser, createUser, updateUser, deleteuser, login };
+const profile = async (req, res) => {
+  try {
+    const usuario = req.user;
+    const user = await pool.query(
+      "SELECT * FROM users_system WHERE user_name=$1",
+      [usuario]
+    );
+
+    return res.json({ ok: true, msg: user.rows });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ msg: "Problemas de conexión con el servidor" });
+  }
+};
+
+export { getUser, createUser, updateUser, deleteuser, login, profile };
