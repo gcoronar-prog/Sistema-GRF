@@ -4,8 +4,10 @@ import {
   deleteuser,
   getUser,
   login,
+  profile,
   updateUser,
 } from "../controllers/login.controller.js";
+import { verifyToken } from "../middlewares/jwt.middleware.js";
 
 const router = Router();
 
@@ -15,5 +17,6 @@ router.put("/update/user/:id", updateUser);
 router.delete("/delete/user/:id", deleteuser);
 
 router.post("/login", login);
+router.get("/profile", verifyToken, profile);
 
 export default router;
