@@ -75,11 +75,13 @@ const getEstadisticaCentral = async (req, res) => {
       params.push(captura);
     }
 
-    if (origen?.length > 0) {
-      informes += ` AND doi.origen_informe IN (${origen
+    if (origen) {
+      /*informes += ` AND doi.origen_informe IN (${origen
         .map((_, i) => `$${params.length + i + 1}`)
-        .join(",")})`;
-      // ` AND doi.origen_informe = $${params.length + 1}`;
+        .join(",")})`;*/
+      //informes += ` AND doi.origen_informe = $${params.length + 1}`;
+      informes += ` AND origen_informe::jsonb = $${params.length + 1}::jsonb`;
+
       params.push(origen);
     }
 
@@ -118,7 +120,7 @@ const getEstadisticaCentral = async (req, res) => {
       query += ` AND ic.horario = $${params.length + 1}`;
       params.push(horario);
     }*/
-
+    console.log("origen query", origen);
     console.log(informes, params);
     const result = await client.query(informes, params);
     await client.query("COMMIT");

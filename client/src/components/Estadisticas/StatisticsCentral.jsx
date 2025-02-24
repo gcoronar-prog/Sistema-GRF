@@ -79,6 +79,7 @@ function StatisticsCentral() {
       vehiculo: formattedVehiculo,
       tipo: formattedTipo,
     };
+    console.log("origen", formattedData.origen);
     console.log("formateada", formattedData);
     try {
       const res = await fetch("http://localhost:3000/estadisticaCentral", {
