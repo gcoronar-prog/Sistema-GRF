@@ -75,12 +75,14 @@ const getEstadisticaCentral = async (req, res) => {
       params.push(captura);
     }
 
-    if (origen) {
+    if (origen && Object.keys(origen).length > 0) {
       /*informes += ` AND doi.origen_informe IN (${origen
         .map((_, i) => `$${params.length + i + 1}`)
         .join(",")})`;*/
       //informes += ` AND doi.origen_informe = $${params.length + 1}`;
-      informes += ` AND origen_informe::jsonb = $${params.length + 1}::jsonb`;
+      informes += ` AND doi.origen_informe::jsonb @> $${
+        params.length + 1
+      }::jsonb`;
 
       params.push(origen);
     }
@@ -90,18 +92,21 @@ const getEstadisticaCentral = async (req, res) => {
       params.push(recursos);
     }
 
-    if (sector?.length > 0) {
-      informes += ` AND dui.sector_informe IN (${sector
-        .map((_, i) => `$${params.length + i + 1}`)
-        .join(",")})`;
-      params.push(...sector);
+    if (sector && Object.keys(origen).length > 0) {
+      informes += ` AND dui.sector_informe::jsonb = $${
+        params.length + 1
+      }::jsonb`;
+      params.push(sector);
     }
 
-    if (vehiculo?.length > 0) {
-      informes += ` AND dvi.id_vehiculos IN (${vehiculo
+    if (vehiculo && Object.keys(origen).length > 0) {
+      /*informes += ` AND dvi.id_vehiculos IN (${vehiculo
         .map((_, i) => `$${params.length + i + 1}`)
-        .join(",")})`;
-      params.push(...vehiculo);
+        .join(",")})`;*/
+      informes += ` AND dvi.vehiculos_informe::jsonb @> $${
+        params.length + 1
+      }::jsonb`;
+      params.push(vehiculo);
     }
 
     /*if (centralista) {
@@ -110,10 +115,11 @@ const getEstadisticaCentral = async (req, res) => {
     }*/
 
     if (tipoReporte) {
-      informes += ` AND dti.tipo_informe IN (${tipoReporte
+      /*informes += ` AND dti.tipo_informe IN (${tipoReporte
         .map((_, i) => `$${params.length + i + 1}`)
-        .join(",")})`;
-      params.push(...tipoReporte);
+        .join(",")})`;*/
+      informes += ` AND dti.tipo_informe::jsonb = $${params.length + 1}::jsonb`;
+      params.push(tipoReporte);
     }
 
     /*if (horario) {

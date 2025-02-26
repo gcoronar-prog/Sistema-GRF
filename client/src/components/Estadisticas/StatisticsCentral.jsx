@@ -32,6 +32,8 @@ function StatisticsCentral() {
   const [selectedSector, setSelectedSector] = useState([]);
   const [selectedVehiculo, setSelectedVehiculo] = useState([]);
   const [selectedTipo, setSelectedTipo] = useState([]);
+  const [urlPdf, setUrlPdf] = useState(null);
+  const [generatePDF, setGeneratePDF] = useState(false);
 
   const loadCentral = async () => {
     try {
@@ -46,6 +48,15 @@ function StatisticsCentral() {
     loadCentral();
   }, []);
 
+  useEffect(() => {
+    if (urlPdf && generatePDF) {
+      //window.open(urlPdf, "_blank");
+      console.log("URL:", urlPdf);
+      console.log("FILTRO EN URL:");
+      setGeneratePDF(false);
+    }
+  }, [urlPdf, generatePDF]);
+
   const handleClasificacion = (e) => {
     const { name, value } = e.target;
     setClasif(value);
@@ -56,11 +67,15 @@ function StatisticsCentral() {
   const handleChanges = (e) => {
     const { name, value, checked, type } = e.target;
     console.log(name, value);
-    setCentral({ ...central, [name]: type === "checkbox" ? checked : value });
+    setCentral((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setGeneratePDF(true);
     const formattedFechaI = dayjs(central.fechaInicio).format(
       "YYYY-MM-DDTHH:mm"
     );
@@ -91,12 +106,28 @@ function StatisticsCentral() {
         throw new Error("Error al enviar los datos al servidor");
       }
       const data = await res.json();
-      setFilter(data.informe);
+      setFilter(data);
       console.log("filtro", data);
     } catch (error) {
       console.error(error);
     }
   };
+
+  /*const generatePDF = async (data) => {
+    return new Promise((resolve) => {
+      const blobProvider = (
+        <BlobProvider document={<CentralStatsPDF data={data} />}>
+          {({ url }) => {
+            if (url) {
+              resolve(url);
+            }
+          }}
+        </BlobProvider>
+      );
+
+      render(blobProvider, document.createElement("div"));
+    });
+  };*/
 
   return (
     <div>
@@ -256,15 +287,17 @@ function StatisticsCentral() {
         </div>
         <div>
           <BlobProvider document={<CentralStatsPDF data={filter} />}>
-            {({ url, loading }) =>
-              loading ? (
-                <button>Cargando documento</button>
-              ) : (
-                <button onClick={() => window.open(url, "_blank")}>
-                  Generar PDF
+            {({ url, loading }) => {
+              if (!loading && url && url !== urlPdf) {
+                setUrlPdf(url);
+              }
+
+              return (
+                <button type="submit" disabled={loading}>
+                  {loading ? "Cargando documento" : "Generar PDF"}
                 </button>
-              )
-            }
+              );
+            }}
           </BlobProvider>
         </div>
         <button type="submit">agregar</button>
