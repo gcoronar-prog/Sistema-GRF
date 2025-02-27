@@ -6,6 +6,7 @@ import SelectTipo from "../SelectTipo";
 import { BlobProvider } from "@react-pdf/renderer";
 import CentralStatsPDF from "../PDFs/CentralStatsPDF";
 import dayjs from "dayjs";
+import SelectRecursos from "../SelectRecursos";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -32,8 +33,7 @@ function StatisticsCentral() {
   const [selectedSector, setSelectedSector] = useState([]);
   const [selectedVehiculo, setSelectedVehiculo] = useState([]);
   const [selectedTipo, setSelectedTipo] = useState([]);
-  const [urlPdf, setUrlPdf] = useState(null);
-  const [generatePDF, setGeneratePDF] = useState(false);
+  const [selectedRecursos, setSelectedRecursos] = useState([]);
 
   const loadCentral = async () => {
     try {
@@ -49,13 +49,16 @@ function StatisticsCentral() {
   }, []);
 
   useEffect(() => {
-    if (urlPdf && generatePDF) {
-      //window.open(urlPdf, "_blank");
-      console.log("URL:", urlPdf);
-      console.log("FILTRO EN URL:");
-      setGeneratePDF(false);
+    if (
+      central.fechaInicio ||
+      selectedOrigen ||
+      selectedSector ||
+      selectedTipo ||
+      selectedVehiculo
+    ) {
+      handleSubmit(central);
     }
-  }, [urlPdf, generatePDF]);
+  }, [central, selectedOrigen, selectedSector, selectedTipo, selectedVehiculo]);
 
   const handleClasificacion = (e) => {
     const { name, value } = e.target;
@@ -64,22 +67,37 @@ function StatisticsCentral() {
     setCentral({ ...central, [name]: value });
   };
 
-  const handleChanges = (e) => {
+  /*const handleChanges = (e) => {
     const { name, value, checked, type } = e.target;
-    console.log(name, value);
+    //console.log(name, value);
     setCentral((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    handleSubmit(e, {
+      ...central,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };*/
+  const handleChanges = (e) => {
+    const { name, value, checked, type } = e.target;
+
+    setCentral((prev) => {
+      const newState = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      return newState;
+    });
+    console.log(type, name, value, checked);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setGeneratePDF(true);
-    const formattedFechaI = dayjs(central.fechaInicio).format(
-      "YYYY-MM-DDTHH:mm"
-    );
-    const formattedFechaF = dayjs(central.fechaFin).format("YYYY-MM-DDTHH:mm");
+  const handleSubmit = async (data) => {
+    //e.preventDefault();
+
+    const formattedFechaI = dayjs(data.fechaInicio).format("YYYY-MM-DDTHH:mm");
+    const formattedFechaF = dayjs(data.fechaFin).format("YYYY-MM-DDTHH:mm");
+
     const formattedOrigen = selectedOrigen;
     const formattedSector = selectedSector;
     const formattedVehiculo = selectedVehiculo;
@@ -90,11 +108,13 @@ function StatisticsCentral() {
       fechaInicio: formattedFechaI,
       fechaFin: formattedFechaF,
       origen: formattedOrigen,
+      captura: data.captura,
       sector: formattedSector,
-      vehiculo: formattedVehiculo,
+      vehiculo: JSON.stringify(formattedVehiculo),
       tipo: formattedTipo,
+      recursos: selectedRecursos.map((r) => r.label),
     };
-    console.log("origen", formattedData.origen);
+    console.log("origen", formattedData.captura);
     console.log("formateada", formattedData);
     try {
       const res = await fetch("http://localhost:3000/estadisticaCentral", {
@@ -131,7 +151,7 @@ function StatisticsCentral() {
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div className="rangoFecha">
           <label htmlFor="">Fecha de inicio</label>
           <input
@@ -156,8 +176,7 @@ function StatisticsCentral() {
           <input
             type="radio"
             name="estado"
-            id="atendido"
-            value={"atendido"}
+            value="atendido"
             onChange={handleChanges}
             checked={central.estado === "atendido"}
           />
@@ -285,19 +304,25 @@ function StatisticsCentral() {
             setSelectedTipo={setSelectedTipo}
           />
         </div>
+
+        <div className="recursosInvolucrados">
+          <label htmlFor="">Recursos</label>
+          <SelectRecursos
+            selectedRecursos={selectedRecursos}
+            setSelectedRecursos={setSelectedRecursos}
+          />
+        </div>
         <div>
           <BlobProvider document={<CentralStatsPDF data={filter} />}>
-            {({ url, loading }) => {
-              if (!loading && url && url !== urlPdf) {
-                setUrlPdf(url);
-              }
-
-              return (
-                <button type="submit" disabled={loading}>
-                  {loading ? "Cargando documento" : "Generar PDF"}
+            {({ url, loading }) =>
+              loading ? (
+                <button>Cargando documento</button>
+              ) : (
+                <button onClick={() => window.open(url, "_blank")}>
+                  Generar PDF
                 </button>
-              );
-            }}
+              )
+            }
           </BlobProvider>
         </div>
         <button type="submit">agregar</button>

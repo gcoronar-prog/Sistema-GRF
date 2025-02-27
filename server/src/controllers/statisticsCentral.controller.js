@@ -87,25 +87,23 @@ const getEstadisticaCentral = async (req, res) => {
       params.push(origen);
     }
 
-    if (recursos) {
+    if (recursos && Object.keys(recursos).length > 0) {
       informes += ` AND dti.recursos_informe = $${params.length + 1}`;
       params.push(recursos);
     }
 
-    if (sector && Object.keys(origen).length > 0) {
-      informes += ` AND dui.sector_informe::jsonb = $${
+    if (sector && Object.keys(sector).length > 0) {
+      informes += ` AND dui.sector_informe::jsonb @> $${
         params.length + 1
       }::jsonb`;
       params.push(sector);
     }
 
-    if (vehiculo && Object.keys(origen).length > 0) {
-      /*informes += ` AND dvi.id_vehiculos IN (${vehiculo
-        .map((_, i) => `$${params.length + i + 1}`)
-        .join(",")})`;*/
+    if (vehiculo && Object.keys(vehiculo).length > 0) {
       informes += ` AND dvi.vehiculos_informe::jsonb @> $${
         params.length + 1
       }::jsonb`;
+
       params.push(vehiculo);
     }
 
@@ -114,7 +112,7 @@ const getEstadisticaCentral = async (req, res) => {
       params.push(centralista);
     }*/
 
-    if (tipoReporte) {
+    if (tipoReporte && Object.keys(tipoReporte).length > 0) {
       /*informes += ` AND dti.tipo_informe IN (${tipoReporte
         .map((_, i) => `$${params.length + i + 1}`)
         .join(",")})`;*/
