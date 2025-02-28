@@ -11,6 +11,7 @@ import {
   getInformantes,
   getLastReport,
   getOrigenes,
+  getRecursos,
   getReport,
   getReports,
   getSectores,
@@ -38,6 +39,8 @@ router.get("/vehiculos", getVehiculos);
 
 router.get("/tipoReportes", getTipoReportes);
 router.get("/tipoReporte", getTipoReporte);
+
+router.get("/recursos", getRecursos);
 
 router.get("/funcionarios", getFuncionarios);
 

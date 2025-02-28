@@ -16,6 +16,19 @@ const getReports = async (req, res) => {
   }
 };
 
+const getRecursos = async (req, res) => {
+  try {
+    const { rows } = await pool.query("SELECT * FROM datos_recursos_informe");
+    if (rows.length === 0) {
+      return res.json(404).json({ msg: "No existen recursos" });
+    }
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: "Error de conexión con el servidor" });
+  }
+};
+
 const getReport = async (req, res) => {
   try {
     const { id } = req.params;
@@ -371,6 +384,7 @@ const deleteArchivo = async (req, res) => {
 export {
   getReports,
   getReport,
+  getRecursos,
   createReport,
   updateReport,
   deleteReport,

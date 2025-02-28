@@ -11,6 +11,7 @@ import ListPendiente from "../ListPendiente";
 import AttachFiles from "../AttachFiles";
 import { BlobProvider } from "@react-pdf/renderer";
 import CentralPDF from "../PDFs/CentralPDF";
+import SelectRecursos from "../SelectRecursos";
 
 function FormInformes() {
   const params = useParams();
@@ -57,6 +58,7 @@ function FormInformes() {
   const [selectedInformante, setSelectedInformante] = useState(null);
   const [selectedTipo, setSelectedTipo] = useState(null);
   const [selectedSector, setSelectedSector] = useState(null);
+  const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [editing, setEditing] = useState(true);
 
@@ -74,11 +76,11 @@ function FormInformes() {
     );
     const data = await response.json();
 
-    const recursosFormateados = data.informe[0].recursos_informe
+    /*const recursosFormateados = data.informe[0].recursos_informe
       ? data.informe[0].recursos_informe.split(",").map((item) => item.trim()) // Elimina espacios extra
-      : [];
+      : [];*/
 
-    console.log("Recursos formateados:", recursosFormateados);
+    //console.log("Recursos formateados:", recursosFormateados);
     console.log(data);
 
     setInformes({
@@ -123,8 +125,9 @@ function FormInformes() {
     setSelectedSector(data.informe[0].sector_informe);
     setSelectedVehiculo(data.informe[0].vehiculos_informe);
     setSelectedTripulante(data.informe[0].tripulantes_informe);
+    setSelectedRecursos(data.informe[0].recursos_informe);
 
-    setSelectedValues(recursosFormateados);
+    //setSelectedValues(recursosFormateados);
   };
 
   const handleChanges = (e) => {
@@ -135,15 +138,16 @@ function FormInformes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setRefresh((prev) => !prev);
-    const arrayFormateado = Array.isArray(selectedValues)
+    /*const arrayFormateado = Array.isArray(selectedValues)
       ? selectedValues.join(", ")
-      : [];
-    const vehiculosFormateados = JSON.stringify(selectedVehiculo); //selectedVehiculo.map((v) => v.value);
+      : [];*/
+    const vehiculosFormateados = JSON.stringify(selectedVehiculo);
     const tripuFormateado = JSON.stringify(selectedTripulante);
     const originFormateado = JSON.stringify(selectedOrigin);
     const informanteFormateado = JSON.stringify(selectedInformante);
     const tipoFormateado = JSON.stringify(selectedTipo);
     const sectorFormateado = JSON.stringify(selectedSector);
+    const recursosFormateado = JSON.stringify(selectedRecursos);
     const datosActualizados = {
       ...informes,
       sector_informe: sectorFormateado,
@@ -152,9 +156,9 @@ function FormInformes() {
       origen_informe: originFormateado,
       vehiculos_informe: vehiculosFormateados,
       tripulantes_informe: tripuFormateado,
-      recursos_informe: arrayFormateado,
+      recursos_informe: recursosFormateado,
     };
-    setSelectedValues(arrayFormateado);
+    //setSelectedValues(arrayFormateado);
     console.log("Datos enviados", informes);
     console.log("Datos a enviar:", JSON.stringify(datosActualizados, null, 2));
 
@@ -174,7 +178,22 @@ function FormInformes() {
         throw new Error("Error al enviar los datos al servidor");
       }
 
-      const lastData = await fetch(
+      if (!params.id) {
+        const lastData = await fetch(
+          "http://localhost:3000/informe/central/last"
+        );
+        const lastInforme = await lastData.json();
+
+        if (lastInforme && lastInforme.informe[0]) {
+          const lastIdInfo = lastInforme.informe[0].id_informes_central;
+          setLastId(lastIdInfo); // Actualizar el estado (aunque es asíncrono)
+
+          // Navegar a la nueva ruta
+          navigate(`/informes/central/${lastIdInfo}`);
+        }
+      }
+
+      /*const lastData = await fetch(
         "http://localhost:3000/informe/central/last"
       );
       const lastInforme = await lastData.json();
@@ -188,7 +207,7 @@ function FormInformes() {
         const metodo = params.id ? "" : `/informes/central/${lastIdInfo}`;
         navigate(metodo);
         setEditing(true);
-      }
+      }*/
     } catch (error) {
       console.error(error);
     }
@@ -264,14 +283,14 @@ function FormInformes() {
     }
   };
 
-  const handleCheckbox = (e) => {
+  /*const handleCheckbox = (e) => {
     const { value, checked } = e.target;
     setSelectedValues((prevValues) =>
       checked ? [...prevValues, value] : prevValues.filter((v) => v !== value)
     );
     // Importante: Ver el estado actualizado en tiempo real
     console.log("Valores seleccionados: ", selectedValues);
-  };
+  };*/
 
   const handleNewInform = () => {
     navigate("/informes/new");
@@ -282,6 +301,7 @@ function FormInformes() {
     setSelectedInformante("");
     setSelectedSector("");
     setSelectedTipo("");
+    setSelectedRecursos("");
     setEditing(false);
   };
   const handleEdit = async () => {
@@ -519,25 +539,12 @@ function FormInformes() {
           value={informes.descripcion_informe}
           disabled={editing}
         ></textarea>
-        <label htmlFor="mixta">Patrullaje Mixto</label>
-        <input
-          type="checkbox"
-          name="recursos_informe"
-          id="mixta"
-          value={"mixta"}
-          checked={selectedValues.includes("mixta")}
-          onChange={handleCheckbox}
-          disabled={editing}
-        />
-        <label htmlFor="preventivo">Patrullaje preventivo</label>
-        <input
-          type="checkbox"
-          name="recursos_informe"
-          id="preventivo"
-          value={"preventivo"}
-          checked={selectedValues.includes("preventivo")}
-          onChange={handleCheckbox}
-          disabled={editing}
+
+        <label htmlFor="">Recursos Involucrados:</label>
+        <SelectRecursos
+          edition={editing}
+          selectedRecursos={selectedRecursos}
+          setSelectedRecursos={setSelectedRecursos}
         />
         <label htmlFor="sector">Sector:</label>
         <SelectSector

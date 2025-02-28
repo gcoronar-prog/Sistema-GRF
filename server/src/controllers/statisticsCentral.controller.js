@@ -1,23 +1,8 @@
 import { pool } from "../db.js";
 
-const filters = {
-  fechaInicio: "",
-  fechaFin: "",
-  estado: "",
-  clasificacion: "",
-  caputra: "",
-  origen: "",
-  recursos: "",
-  sector: "",
-  vehiculo: "",
-  centralista: "",
-  tipoReporte: "",
-  horario: "",
-};
-
 const getEstadisticaCentral = async (req, res) => {
   const client = await pool.connect();
-  const {
+  let {
     fechaInicio,
     fechaFin,
     estado,
@@ -76,35 +61,47 @@ const getEstadisticaCentral = async (req, res) => {
     }
 
     if (origen && Object.keys(origen).length > 0) {
-      /*informes += ` AND doi.origen_informe IN (${origen
-        .map((_, i) => `$${params.length + i + 1}`)
-        .join(",")})`;*/
-      //informes += ` AND doi.origen_informe = $${params.length + 1}`;
-      informes += ` AND doi.origen_informe::jsonb @> $${
-        params.length + 1
-      }::jsonb`;
-
+      if (origen === "[]") {
+        origen = null;
+      } else {
+        informes += ` AND doi.origen_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+      }
       params.push(origen);
     }
 
     if (recursos && Object.keys(recursos).length > 0) {
-      informes += ` AND dti.recursos_informe = $${params.length + 1}`;
-      params.push(recursos);
+      if (recursos === "[]") {
+        recursos = null;
+      } else {
+        informes += ` AND dti.recursos_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(recursos);
+      }
     }
 
     if (sector && Object.keys(sector).length > 0) {
-      informes += ` AND dui.sector_informe::jsonb @> $${
-        params.length + 1
-      }::jsonb`;
-      params.push(sector);
+      if (sector === "[]") {
+        sector = null;
+      } else {
+        informes += ` AND dui.sector_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(sector);
+      }
     }
 
     if (vehiculo && Object.keys(vehiculo).length > 0) {
-      informes += ` AND dvi.vehiculos_informe::jsonb @> $${
-        params.length + 1
-      }::jsonb`;
-
-      params.push(vehiculo);
+      if (vehiculo === "[]") {
+        vehiculo = null;
+      } else {
+        informes += ` AND dvi.vehiculos_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(vehiculo);
+      }
     }
 
     /*if (centralista) {
@@ -113,19 +110,22 @@ const getEstadisticaCentral = async (req, res) => {
     }*/
 
     if (tipoReporte && Object.keys(tipoReporte).length > 0) {
-      /*informes += ` AND dti.tipo_informe IN (${tipoReporte
-        .map((_, i) => `$${params.length + i + 1}`)
-        .join(",")})`;*/
-      informes += ` AND dti.tipo_informe::jsonb = $${params.length + 1}::jsonb`;
-      params.push(tipoReporte);
+      if (tipoReporte === "[]") {
+        tipoReporte = null;
+      } else {
+        informes += ` AND dti.tipo_informe::jsonb = $${
+          params.length + 1
+        }::jsonb`;
+        params.push(tipoReporte);
+      }
     }
 
     /*if (horario) {
       query += ` AND ic.horario = $${params.length + 1}`;
       params.push(horario);
     }*/
-    console.log("origen query", origen);
-    console.log(informes, params);
+    console.log("query", informes);
+    console.log("params:", params);
     const result = await client.query(informes, params);
     await client.query("COMMIT");
     //console.log(result.rows);
