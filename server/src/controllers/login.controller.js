@@ -154,9 +154,10 @@ const login = async (req, res) => {
 
     const payload = {
       user_name: usuario.rows[0].user_name,
+      user_rol: usuario.rows[0].user_rol,
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "10s",
+      expiresIn: "1h",
     });
 
     return res.json({ ok: true, msg: token });
@@ -171,12 +172,12 @@ const login = async (req, res) => {
 const profile = async (req, res) => {
   try {
     const usuario = req.user;
-    const user = await pool.query(
+    const users = await pool.query(
       "SELECT * FROM users_system WHERE user_name=$1",
       [usuario]
     );
 
-    return res.json({ ok: true, msg: user.rows });
+    return res.json({ ok: true, msg: users.rows });
   } catch (error) {
     console.error(error);
     return res

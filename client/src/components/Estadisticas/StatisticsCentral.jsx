@@ -34,6 +34,7 @@ function StatisticsCentral() {
   const [selectedTipo, setSelectedTipo] = useState([]);
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [clasif, setClasif] = useState("");
+  const [checkEstado, setCheckEstado] = useState([]);
 
   const fetchData = async (filters) => {
     try {
@@ -124,6 +125,7 @@ function StatisticsCentral() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    console.log(name, value, checked, type);
   };
 
   // Manejar cambios en la clasificación
@@ -155,29 +157,32 @@ function StatisticsCentral() {
       </div>
 
       <div className="estadoInforme">
-        <label htmlFor="atendido">Atendido</label>
+        <label htmlFor="estado">Estados</label>
+
+        <label htmlFor="">Atendido</label>
         <input
-          type="radio"
+          type="checkbox"
           name="estado"
+          id=""
           value="atendido"
           onChange={handleChanges}
           checked={central.estado === "atendido"}
         />
-        <label htmlFor="progreso">En progreso</label>
+        <label htmlFor="">En progreso</label>
         <input
-          type="radio"
+          type="checkbox"
           name="estado"
-          id="progreso"
-          value={"progreso"}
+          id=""
+          value="progreso"
           onChange={handleChanges}
           checked={central.estado === "progreso"}
         />
-        <label htmlFor="pendiente">Pendiente</label>
+        <label htmlFor="">Pendiente</label>
         <input
-          type="radio"
+          type="checkbox"
           name="estado"
-          id="pendiente"
-          value={"pendiente"}
+          id=""
+          value="pendiente"
           onChange={handleChanges}
           checked={central.estado === "pendiente"}
         />
