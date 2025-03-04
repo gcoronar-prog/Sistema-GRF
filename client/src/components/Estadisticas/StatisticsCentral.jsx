@@ -80,9 +80,9 @@ function StatisticsCentral() {
       ...defaultValues,
       fechaInicio: formattedFechaI,
       fechaFin: formattedFechaF,
-      estado: central.estado,
-      captura: central.captura,
-      clasificacion: central.clasificacion,
+      estado: { atendido: false, progreso: false, pendiente: false },
+      captura: "",
+      clasificacion: "",
     };
 
     fetchData(initialData);
@@ -98,7 +98,9 @@ function StatisticsCentral() {
       ...defaultValues,
       fechaInicio: formattedFechaI,
       fechaFin: formattedFechaF,
-      estado: central.estado,
+      estado: Object.keys(central.estado)
+        .filter((key) => central.estado[key])
+        .join(","),
       captura: central.captura,
       clasificacion: central.clasificacion,
       origen: selectedOrigen,
@@ -121,10 +123,22 @@ function StatisticsCentral() {
   // Manejar cambios en los inputs
   const handleChanges = (e) => {
     const { name, value, checked, type } = e.target;
-    setCentral((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    if (name === "estado") {
+      setCentral((prev) => ({
+        ...prev,
+        estado: {
+          ...prev.estado,
+          [value]: checked,
+        },
+      }));
+    } else {
+      setCentral((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
+
     console.log(name, value, checked, type);
   };
 
@@ -163,10 +177,10 @@ function StatisticsCentral() {
         <input
           type="checkbox"
           name="estado"
-          id=""
           value="atendido"
+          id=""
           onChange={handleChanges}
-          checked={central.estado === "atendido"}
+          checked={central.estado.atendido}
         />
         <label htmlFor="">En progreso</label>
         <input
@@ -175,7 +189,7 @@ function StatisticsCentral() {
           id=""
           value="progreso"
           onChange={handleChanges}
-          checked={central.estado === "progreso"}
+          checked={central.estado.progreso}
         />
         <label htmlFor="">Pendiente</label>
         <input
@@ -184,7 +198,7 @@ function StatisticsCentral() {
           id=""
           value="pendiente"
           onChange={handleChanges}
-          checked={central.estado === "pendiente"}
+          checked={central.estado.pendiente}
         />
       </div>
 

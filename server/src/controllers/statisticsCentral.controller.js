@@ -46,8 +46,15 @@ const getEstadisticaCentral = async (req, res) => {
     }
 
     if (estado) {
-      informes += ` AND doi.estado_informe = $${params.length + 1}`;
-      params.push(estado);
+      /*informes += ` AND doi.estado_informe IN $${params.length + 1}`;
+      params.push(estado);*/
+      const estadosArray = estado.split(","); // Convierte el string en un array
+      if (estadosArray.length > 0) {
+        informes += ` AND doi.estado_informe IN (${estadosArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+        params.push(...estadosArray); // Agrega los estados como parámetros
+      }
     }
 
     if (clasificacion?.length > 0) {
