@@ -81,7 +81,13 @@ function StatisticsCentral() {
       fechaInicio: formattedFechaI,
       fechaFin: formattedFechaF,
       estado: { atendido: false, progreso: false, pendiente: false },
-      captura: "",
+      captura: {
+        radios: false,
+        telefono: false,
+        rrss: false,
+        presencial: false,
+        email: false,
+      },
       clasificacion: "",
     };
 
@@ -101,7 +107,9 @@ function StatisticsCentral() {
       estado: Object.keys(central.estado)
         .filter((key) => central.estado[key])
         .join(","),
-      captura: central.captura,
+      captura: Object.keys(central.captura)
+        .filter((key) => central.captura[key])
+        .join(","),
       clasificacion: central.clasificacion,
       origen: selectedOrigen,
       sector: selectedSector,
@@ -109,7 +117,7 @@ function StatisticsCentral() {
       tipoReporte: selectedTipo,
       recursos: JSON.stringify(selectedRecursos),
     };
-    console.log("recursos", selectedRecursos);
+    //console.log("recursos", central.captura);
     fetchData(formattedData);
   }, [
     central,
@@ -129,6 +137,14 @@ function StatisticsCentral() {
         ...prev,
         estado: {
           ...prev.estado,
+          [value]: checked,
+        },
+      }));
+    } else if (name === "captura") {
+      setCentral((prev) => ({
+        ...prev,
+        captura: {
+          ...prev.captura,
           [value]: checked,
         },
       }));
@@ -221,48 +237,48 @@ function StatisticsCentral() {
       <div className="capturaInforme">
         <label htmlFor="radios">Radio</label>
         <input
-          type="radio"
+          type="checkbox"
           name="captura"
           id="radios"
           value={"radios"}
           onChange={handleChanges}
-          checked={central.captura === "radios"}
+          checked={central.captura.radios}
         />
         <label htmlFor="telefono">Teléfono</label>
         <input
-          type="radio"
+          type="checkbox"
           name="captura"
           id="telefono"
           value={"telefono"}
           onChange={handleChanges}
-          checked={central.captura === "telefono"}
+          checked={central.captura.telefono}
         />
         <label htmlFor="rrss">RRSS</label>
         <input
-          type="radio"
+          type="checkbox"
           name="captura"
           id="rrss"
           value={"rrss"}
           onChange={handleChanges}
-          checked={central.captura === "rrss"}
+          checked={central.captura.rrss}
         />
         <label htmlFor="presencial">Presencial</label>
         <input
-          type="radio"
+          type="checkbox"
           name="captura"
           id="presencial"
           value={"presencial"}
           onChange={handleChanges}
-          checked={central.captura === "presencial"}
+          checked={central.captura.presencial}
         />
         <label htmlFor="email">E-mail</label>
         <input
-          type="radio"
+          type="checkbox"
           name="captura"
           id="email"
           value={"email"}
           onChange={handleChanges}
-          checked={central.captura === "email"}
+          checked={central.captura.email}
         />
       </div>
 

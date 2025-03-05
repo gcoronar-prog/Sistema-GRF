@@ -48,23 +48,32 @@ const getEstadisticaCentral = async (req, res) => {
     if (estado) {
       /*informes += ` AND doi.estado_informe IN $${params.length + 1}`;
       params.push(estado);*/
-      const estadosArray = estado.split(","); // Convierte el string en un array
+      const estadosArray = estado.split(",");
       if (estadosArray.length > 0) {
         informes += ` AND doi.estado_informe IN (${estadosArray
           .map((_, index) => `$${params.length + index + 1}`)
           .join(", ")})`;
-        params.push(...estadosArray); // Agrega los estados como parámetros
+        params.push(...estadosArray);
       }
     }
 
     if (clasificacion?.length > 0) {
-      informes += ` AND doi.clasificacion_informe = $${params.length + 1}`;
-      params.push(clasificacion);
+      if (clasificacion === "[]") {
+        clasificacion = null;
+      } else {
+        informes += ` AND doi.clasificacion_informe = $${params.length + 1}`;
+        params.push(clasificacion);
+      }
     }
 
     if (captura) {
-      informes += ` AND doi.captura_informe = $${params.length + 1}`;
-      params.push(captura);
+      const capturaArray = captura.split(",");
+      if (capturaArray.length > 0) {
+        informes += ` AND doi.captura_informe IN (${capturaArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+        params.push(...capturaArray);
+      }
     }
 
     if (origen && Object.keys(origen).length > 0) {
