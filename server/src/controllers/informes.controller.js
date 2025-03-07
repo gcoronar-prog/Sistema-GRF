@@ -107,26 +107,26 @@ const createInformeCentral = async (req, res) => {
     const [origen, tipos, ubicacion, vehiculo] = await Promise.all([
       await client.query(
         "INSERT INTO datos_origen_informe (fecha_informe,\
-        origen_informe,persona_informante,captura_informe,clasificacion_informe,estado_informe)\
-         VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
+        origen_informe,persona_informante,captura_informe,estado_informe)\
+         VALUES ($1,$2,$3,$4,$5) RETURNING *",
         [
           data.fecha_informe,
           data.origen_informe,
           data.persona_informante,
           data.captura_informe,
-          data.clasificacion_informe,
           data.estado_informe,
         ]
       ),
       await client.query(
         "INSERT INTO datos_tipos_informes (tipo_informe, otro_tipo,\
-      descripcion_informe, recursos_informe)\
-         VALUES ($1,$2,$3,$4) RETURNING *",
+      descripcion_informe, recursos_informe,clasificacion_informe)\
+         VALUES ($1,$2,$3,$4,$5) RETURNING *",
         [
           data.tipo_informe,
           data.otro_tipo,
           data.descripcion_informe,
           data.recursos_informe,
+          data.clasificacion_informe,
         ]
       ),
       await client.query(
