@@ -26,6 +26,11 @@ function StatisticsCentral() {
     tipoReporte: "",
   };
 
+  const defaultDate = {
+    fechaInicio: startMonth,
+    fechaFin: dateNow,
+  };
+
   const [central, setCentral] = useState(defaultValues);
   const [filter, setFilter] = useState([]);
   const [selectedOrigen, setSelectedOrigen] = useState([]);
@@ -34,7 +39,7 @@ function StatisticsCentral() {
   const [selectedTipo, setSelectedTipo] = useState([]);
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [clasif, setClasif] = useState("");
-  const [checkEstado, setCheckEstado] = useState([]);
+  const [estadoFilter, setEstadoFilter] = useState(defaultValues);
 
   const fetchData = async (filters) => {
     try {
@@ -50,9 +55,30 @@ function StatisticsCentral() {
 
       const data = await res.json();
       setFilter(data);
-      console.log("filtro", data);
+      //console.log("filtro", data);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const resumenEstado = async (fecha) => {
+    try {
+      const res = await fetch("http://localhost:3000/resumen_estado_central", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fecha),
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al enviar los datos al servidor");
+      }
+
+      const data = await res.json();
+      //console.log(fecha);
+      setFilter(data);
+      console.log("filtro", data);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -92,6 +118,7 @@ function StatisticsCentral() {
     };
 
     fetchData(initialData);
+    resumenEstado(initialData);
   }, []);
 
   useEffect(() => {
@@ -117,8 +144,11 @@ function StatisticsCentral() {
       tipoReporte: selectedTipo,
       recursos: JSON.stringify(selectedRecursos),
     };
+
     //console.log("recursos", central.captura);
     fetchData(formattedData);
+    resumenEstado(formattedData);
+    //console.log("fecha", formattedFechas);
   }, [
     central,
     selectedOrigen,

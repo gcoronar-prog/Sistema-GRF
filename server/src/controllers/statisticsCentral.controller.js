@@ -140,8 +140,8 @@ const getEstadisticaCentral = async (req, res) => {
       query += ` AND ic.horario = $${params.length + 1}`;
       params.push(horario);
     }*/
-    console.log("query", informes);
-    console.log("params:", params);
+    //console.log("query", informes);
+    //console.log("params:", params);
     const result = await client.query(informes, params);
     await client.query("COMMIT");
     //console.log(result.rows);
@@ -157,4 +157,47 @@ const getEstadisticaCentral = async (req, res) => {
   }
 };
 
-export { getEstadisticaCentral };
+const getResumenEstado = async (req, res) => {
+  const client = await pool.connect();
+  let { fechaInicio, fechaFin } = req.body;
+  try {
+    await client.query("BEGIN");
+    let estadoEmergencia =
+      "SELECT dti.tipo_informe::TEXT,COUNT(dti.clasificacion_informe)\
+        FROM informes_central ic\
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
+        WHERE dti.clasificacion_informe = 'Emergencia'\
+       ";
+
+    const parameter = [];
+
+    if (fechaInicio && fechaFin) {
+      estadoEmergencia += ` AND doi.fecha_informe BETWEEN $${
+        parameter.length + 1
+      } AND $${parameter.length + 2} `;
+      parameter.push(fechaInicio, fechaFin);
+    }
+
+    estadoEmergencia += "GROUP BY dti.tipo_informe::TEXT";
+
+    const resultEmergencia = await client.query(estadoEmergencia, parameter);
+
+    console.log(estadoEmergencia, parameter);
+    await client.query("COMMIT");
+    console.log("query", estadoEmergencia);
+    console.log("params:", parameter);
+    console.log("resultado", resultEmergencia.rows);
+    res.status(200).json({
+      informe: resultEmergencia.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    res.status(500).json({ msg: "Error del servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+export { getEstadisticaCentral, getResumenEstado };
