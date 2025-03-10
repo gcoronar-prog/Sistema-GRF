@@ -193,24 +193,24 @@ const updateInformeCentral = async (req, res) => {
       await client.query(
         "UPDATE datos_origen_informe SET fecha_informe=$1,\
         origen_informe=$2,persona_informante=$3,captura_informe=$4,\
-        clasificacion_informe=$5,estado_informe=$6 WHERE id_origen_informe=$7 RETURNING *",
+        estado_informe=$5 WHERE id_origen_informe=$6 RETURNING *",
         [
           data.fecha_informe,
           data.origen_informe,
           data.persona_informante,
           data.captura_informe,
-          data.clasificacion_informe,
           data.estado_informe,
           idOrigen,
         ]
       ),
       await client.query(
         "UPDATE datos_tipos_informes SET tipo_informe=$1, otro_tipo=$2,\
-      descripcion_informe=$3, recursos_informe=$4 WHERE id_tipos_informes=$5 RETURNING *",
+      descripcion_informe=$3, recursos_informe=$4,clasificacion_informe=$5 WHERE id_tipos_informes=$6 RETURNING *",
         [
           data.tipo_informe,
           data.otro_tipo,
           data.descripcion_informe,
+          data.clasificacion_informe,
           data.recursos_informe,
           idTipos,
         ]

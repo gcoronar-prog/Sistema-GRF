@@ -128,6 +128,7 @@ function FormInformes() {
     setSelectedRecursos(data.informe[0].recursos_informe);
 
     //setSelectedValues(recursosFormateados);
+    console.log(data.informe[0].clasificacion_informe);
   };
 
   const handleChanges = (e) => {

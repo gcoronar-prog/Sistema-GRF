@@ -167,7 +167,7 @@ const getResumenEstado = async (req, res) => {
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-        WHERE dti.clasificacion_informe = 'Emergencia'\
+        WHERE dti.clasificacion_informe='Emergencia'\
        ";
 
     const parameter = [];
@@ -200,4 +200,16 @@ const getResumenEstado = async (req, res) => {
   }
 };
 
+const getResumenOrigen = async (req, res) => {
+  const client = await pool.connect();
+  let { fechaInicio, fechaFin } = req.body;
+  try {
+    await client.query("BEGIN");
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error de conexión con el servido" });
+  }
+};
 export { getEstadisticaCentral, getResumenEstado };
