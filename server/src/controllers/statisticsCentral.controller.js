@@ -157,19 +157,59 @@ const getEstadisticaCentral = async (req, res) => {
   }
 };
 
-const getResumenEstado = async (req, res) => {
+const getResumenEstado = async (req, res) => {};
+
+const getResumenOrigen = async (req, res) => {
+  const client = await pool.connect();
+  let { fechaInicio, fechaFin } = req.body;
+  try {
+    await client.query("BEGIN");
+    let origenResumen =
+      "SELECT DISTINCT doi.origen_informe::jsonb, dti.clasificacion_informe, doi.captura_informe,\
+      COUNT(doi.origen_informe) as cantidad\
+        FROM informes_central ic\
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
+        WHERE 1=1";
+
+    const parameter = [];
+
+    if (fechaInicio && fechaFin) {
+      origenResumen += ` AND doi.fecha_informe BETWEEN $${
+        parameter.length + 1
+      } AND $${parameter.length + 2} `;
+      parameter.push(fechaInicio, fechaFin);
+    }
+
+    origenResumen +=
+      "GROUP BY doi.origen_informe::jsonb, dti.clasificacion_informe,doi.captura_informe";
+    const resultOrigen = await client.query(origenResumen, parameter);
+    await client.query("COMMIT");
+    console.log(origenResumen, parameter);
+
+    res.status(200).json({
+      informe: resultOrigen.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error de conexión con el servido" });
+  }
+};
+
+const getResumenClasi = async (req, res) => {
   const client = await pool.connect();
   let { fechaInicio, fechaFin } = req.body;
   try {
     await client.query("BEGIN");
     let estadoEmergencia =
-      "SELECT dti.tipo_informe::TEXT,COUNT(dti.clasificacion_informe)\
+      "SELECT  dti.clasificacion_informe,dti.tipo_informe::jsonb,COUNT(dti.clasificacion_informe) as cantidad\
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-        WHERE dti.clasificacion_informe='Emergencia'\
+       \
        ";
-
+    //WHERE dti.clasificacion_informe='Emergencia'
     const parameter = [];
 
     if (fechaInicio && fechaFin) {
@@ -179,15 +219,16 @@ const getResumenEstado = async (req, res) => {
       parameter.push(fechaInicio, fechaFin);
     }
 
-    estadoEmergencia += "GROUP BY dti.tipo_informe::TEXT";
+    estadoEmergencia +=
+      "GROUP BY dti.clasificacion_informe, dti.tipo_informe::jsonb";
 
     const resultEmergencia = await client.query(estadoEmergencia, parameter);
 
-    console.log(estadoEmergencia, parameter);
+    //console.log(estadoEmergencia, parameter);
     await client.query("COMMIT");
-    console.log("query", estadoEmergencia);
-    console.log("params:", parameter);
-    console.log("resultado", resultEmergencia.rows);
+    //console.log("query", estadoEmergencia);
+    //console.log("params:", parameter);
+    //console.log("resultado", resultEmergencia.rows);
     res.status(200).json({
       informe: resultEmergencia.rows,
     });
@@ -200,16 +241,9 @@ const getResumenEstado = async (req, res) => {
   }
 };
 
-const getResumenOrigen = async (req, res) => {
-  const client = await pool.connect();
-  let { fechaInicio, fechaFin } = req.body;
-  try {
-    await client.query("BEGIN");
-    await client.query("COMMIT");
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error(error);
-    return res.status(500).json({ msg: "Error de conexión con el servido" });
-  }
+export {
+  getResumenClasi,
+  getEstadisticaCentral,
+  getResumenEstado,
+  getResumenOrigen,
 };
-export { getEstadisticaCentral, getResumenEstado };
