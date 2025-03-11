@@ -163,7 +163,7 @@ const getResumenEstado = async (req, res) => {
   try {
     await client.query("BEGIN");
     let estadoResumen =
-      "SELECT doi.estado_informe, dti.clasificacion_informe::jsonb,dti.tipo_informe::jsonb,\
+      "SELECT DISTINCT doi.estado_informe, dti.clasificacion_informe,dti.tipo_informe::jsonb,\
       COUNT(doi.estado_informe) as cantidad\
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
@@ -180,7 +180,8 @@ const getResumenEstado = async (req, res) => {
     }
 
     estadoResumen +=
-      "GROUP BY doi.estado_informe, dti.clasificacion_informe::jsonb,dti.tipo_informe::jsonb";
+      "GROUP BY doi.estado_informe, dti.clasificacion_informe,dti.tipo_informe::jsonb\
+      ORDER BY doi.estado_informe ASC";
     const resultEstado = await client.query(estadoResumen, parameter);
 
     await client.query("COMMIT");
@@ -243,7 +244,7 @@ const getResumenClasi = async (req, res) => {
   try {
     await client.query("BEGIN");
     let estadoEmergencia =
-      "SELECT  dti.clasificacion_informe,dti.tipo_informe::jsonb,COUNT(dti.clasificacion_informe) as cantidad\
+      "SELECT  dti.clasificacion_informe, dti.tipo_informe::jsonb, COUNT(dti.clasificacion_informe) as cantidad\
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\

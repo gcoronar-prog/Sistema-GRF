@@ -76,9 +76,7 @@ const Table = ({ data }) => {
           return (
             <View key={index} style={styles.tableRow}>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {mostarEstado ? row.estadoAnterior : ""}
-                </Text>
+                <Text style={styles.tableCell}>{row.estado_informe}</Text>
               </View>
 
               <View style={styles.tableCol}>

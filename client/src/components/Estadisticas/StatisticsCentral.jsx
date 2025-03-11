@@ -103,7 +103,7 @@ function StatisticsCentral() {
       const data = await res.json();
       //console.log(fecha);
       //setFilter(data);
-      setClasifFilter(data);
+      setEstadoFilter(data);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
@@ -456,7 +456,7 @@ function StatisticsCentral() {
       </div>
 
       <div>
-        <BlobProvider document={<EstadoCentralPDF data={origenFilter} />}>
+        <BlobProvider document={<EstadoCentralPDF data={estadoFilter} />}>
           {({ url, loading }) =>
             loading ? (
               <button>Cargando documento</button>
