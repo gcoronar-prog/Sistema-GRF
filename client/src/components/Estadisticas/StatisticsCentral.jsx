@@ -9,6 +9,7 @@ import CentralStatsPDF from "../PDFs/CentralStatsPDF";
 import dayjs from "dayjs";
 import EstadoCentralPDF from "../PDFs/EstadoCentralPDF";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF";
+import ClasifCentralPDF from "../PDFs/ClasifCentralPDF";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -43,6 +44,7 @@ function StatisticsCentral() {
   const [clasif, setClasif] = useState("");
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
+  const [estadoFilter, setEstadoFilter] = useState(defaultValues);
 
   const fetchData = async (filters) => {
     try {
@@ -67,6 +69,28 @@ function StatisticsCentral() {
   const resumenClasif = async (fecha) => {
     try {
       const res = await fetch("http://localhost:3000/resumen_clasif_central", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fecha),
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al enviar los datos al servidor");
+      }
+
+      const data = await res.json();
+      //console.log(fecha);
+      //setFilter(data);
+      setClasifFilter(data);
+      console.log("filtro", data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenEstado = async (fecha) => {
+    try {
+      const res = await fetch("http://localhost:3000/resumen_estado_central", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(fecha),
@@ -146,6 +170,7 @@ function StatisticsCentral() {
     fetchData(initialData);
     resumenClasif(initialData);
     resumenOrigen(initialData);
+    resumenEstado(initialData);
   }, []);
 
   useEffect(() => {
@@ -176,6 +201,7 @@ function StatisticsCentral() {
     fetchData(formattedData);
     resumenClasif(formattedData);
     resumenOrigen(formattedData);
+    resumenEstado(formattedData);
     //console.log("fecha", formattedFechas);
   }, [
     central,
@@ -402,7 +428,7 @@ function StatisticsCentral() {
         </BlobProvider>
       </div>
       <div>
-        <BlobProvider document={<EstadoCentralPDF data={clasifFilter} />}>
+        <BlobProvider document={<ClasifCentralPDF data={clasifFilter} />}>
           {({ url, loading }) =>
             loading ? (
               <button>Cargando documento</button>
@@ -423,6 +449,20 @@ function StatisticsCentral() {
             ) : (
               <button onClick={() => window.open(url, "_blank")}>
                 Resumen por Origen
+              </button>
+            )
+          }
+        </BlobProvider>
+      </div>
+
+      <div>
+        <BlobProvider document={<EstadoCentralPDF data={origenFilter} />}>
+          {({ url, loading }) =>
+            loading ? (
+              <button>Cargando documento</button>
+            ) : (
+              <button onClick={() => window.open(url, "_blank")}>
+                Resumen por Estado
               </button>
             )
           }

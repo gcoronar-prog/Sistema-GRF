@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function ListPendiente(refresh) {
+function ListPendiente(refresh, estado) {
   const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
 
@@ -11,7 +11,11 @@ function ListPendiente(refresh) {
 
   const loadPendiente = async () => {
     try {
-      const res = await fetch("http://localhost:3000/informes/pendientes");
+      const res = await fetch(
+        estado === 1
+          ? "http://localhost:3000/informes/pendientes"
+          : "http://localhost:3000/informes/progreso"
+      );
       const data = await res.json();
       setPendientes(data.pendientes);
     } catch (error) {
@@ -50,7 +54,7 @@ function ListPendiente(refresh) {
               <td>{p.cod_informes_central}</td>
               <td>{new Date(p.fecha_informe).toLocaleString()}</td>
               <td>{p.captura_informe}</td>
-              <td>{p.clasificacion_informe}</td>
+              <td>{p.clasificacion_informe.label}</td>
               <td>{p.estado_informe}</td>
               <td>{p.origen_informe.label}</td>
               <td>{p.persona_informante.label}</td>

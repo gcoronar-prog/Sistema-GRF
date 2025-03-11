@@ -157,7 +157,47 @@ const getEstadisticaCentral = async (req, res) => {
   }
 };
 
-const getResumenEstado = async (req, res) => {};
+const getResumenEstado = async (req, res) => {
+  const client = await pool.connect();
+  let { fechaInicio, fechaFin } = req.body;
+  try {
+    await client.query("BEGIN");
+    let estadoResumen =
+      "SELECT doi.estado_informe, dti.clasificacion_informe::jsonb,dti.tipo_informe::jsonb,\
+      COUNT(doi.estado_informe) as cantidad\
+        FROM informes_central ic\
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
+        WHERE 1=1";
+
+    const parameter = [];
+
+    if (fechaInicio && fechaFin) {
+      estadoResumen += ` AND doi.fecha_informe BETWEEN $${
+        parameter.length + 1
+      } AND $${parameter.length + 2} `;
+      parameter.push(fechaInicio, fechaFin);
+    }
+
+    estadoResumen +=
+      "GROUP BY doi.estado_informe, dti.clasificacion_informe::jsonb,dti.tipo_informe::jsonb";
+    const resultEstado = await client.query(estadoResumen, parameter);
+
+    await client.query("COMMIT");
+    console.log(estadoResumen, parameter);
+
+    res.status(200).json({
+      informe: resultEstado.rows,
+    });
+    await client.query("COMMIT");
+  } catch (error) {
+    console.error(error);
+    await client.query("ROLLBACK");
+    return res.status(500).json({ msg: "Error de conexión con el servidor" });
+  } finally {
+    client.release();
+  }
+};
 
 const getResumenOrigen = async (req, res) => {
   const client = await pool.connect();
@@ -238,6 +278,39 @@ const getResumenClasi = async (req, res) => {
     res.status(500).json({ msg: "Error del servidor" });
   } finally {
     client.release();
+  }
+};
+
+const getResumenRecursos = async (req, res) => {
+  const client = await pool.connect();
+  let { fechaInicio, fechaFin } = req.body;
+  try {
+    await client.query("BEGIN");
+    let recursosResumen =
+      "SELECT DISTINCT dti.recursos_informe, COUNT(ic.id_informes_central) as cantidad\
+    from informes_central ic\
+    JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+    WHERE 1=1";
+
+    const parameter = [];
+
+    if (fechaInicio && fechaFin) {
+      recursosResumen += ` AND doi.fecha_informe BETWEEN $${
+        parameter.length + 1
+      } AND $${parameter.length + 2} `;
+      parameter.push(fechaInicio, fechaFin);
+    }
+
+    recursosResumen += "GROUP BY dti.recursos_informe";
+
+    const resultRecursos = await client.query(recursosResumen, parameter);
+    await client.query("COMMIT");
+
+    res.status(200).json({ informe: resultRecursos.rows });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error de conexión con el servidor" });
   }
 };
 

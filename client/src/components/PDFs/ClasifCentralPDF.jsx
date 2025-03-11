@@ -44,16 +44,12 @@ const styles = StyleSheet.create({
 });
 
 const Table = ({ data }) => {
-  let estadoAnterior = null;
+  let clasificacionAnterior = null;
 
   return (
     <View style={styles.table}>
       {/* Encabezado de la tabla */}
       <View style={styles.tableRow}>
-        <View style={styles.tableColHeader}>
-          <Text style={styles.tableCellHeader}>Estado</Text>
-        </View>
-
         <View style={styles.tableColHeader}>
           <Text style={styles.tableCellHeader}>Clasificación</Text>
         </View>
@@ -70,20 +66,15 @@ const Table = ({ data }) => {
       {/* Filas de la tabla */}
       {data &&
         data.map((row, index) => {
-          const mostarEstado = row.estado_informe !== estadoAnterior;
-          estadoAnterior = row.estado_informe;
+          const mostrarClasificacion =
+            row.clasificacion_informe !== clasificacionAnterior;
+          clasificacionAnterior = row.clasificacion_informe;
 
           return (
             <View key={index} style={styles.tableRow}>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>
-                  {mostarEstado ? row.estadoAnterior : ""}
-                </Text>
-              </View>
-
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {row.clasificacion_informe}
+                  {mostrarClasificacion ? row.clasificacion_informe : ""}
                 </Text>
               </View>
               <View style={styles.tableCol}>
@@ -99,13 +90,13 @@ const Table = ({ data }) => {
   );
 };
 
-const EstadoCentralPDF = ({ data }) => {
+const ClasifCentralPDF = ({ data }) => {
   return (
     <Document>
       <Page size="A4" orientation="landscape" style={styles.page}>
         <View>
           <Text style={{ fontSize: 20, marginBottom: 10 }}>
-            Resumen reportes por Estado
+            Resumen reportes por Clasificación
           </Text>
           <Table data={data?.informe || []} />
         </View>
@@ -114,4 +105,4 @@ const EstadoCentralPDF = ({ data }) => {
   );
 };
 
-export default EstadoCentralPDF;
+export default ClasifCentralPDF;

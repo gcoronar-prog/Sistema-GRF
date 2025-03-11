@@ -617,6 +617,48 @@ const getPendientes = async (req, res) => {
   }
 };
 
+const getProgreso = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const pendientes = await client.query(
+      "SELECT * FROM informes_central a join datos_origen_informe b\
+        on a.id_origen_informe=b.id_origen_informe where estado_informe='progreso' ORDER BY id_informes_central ASC"
+    );
+    const idTipos = pendientes.rows[0].id_tipos_informe;
+    const idUbicacion = pendientes.rows[0].id_ubicacion_informe;
+    const idVehiculo = pendientes.rows[0].id_vehiculo_informe;
+
+    const [tipos, ubicacion, vehiculo] = await Promise.all([
+      await client.query(
+        "SELECT * FROM datos_tipos_informes WHERE id_tipos_informes=$1",
+        [idTipos]
+      ),
+      await client.query(
+        "SELECT * FROM datos_ubicacion_informe WHERE id_ubicacion=$1",
+        [idUbicacion]
+      ),
+      await client.query(
+        "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
+        [idVehiculo]
+      ),
+    ]);
+    await client.query("COMMIT");
+    return res.status(200).json({
+      pendientes: pendientes.rows,
+      tipos: tipos.rows,
+      ubicacion: ubicacion.rows,
+      vehiculo: vehiculo.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ message: "Problemas con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 //// Archivos adjuntos
 const getArchivos = async (req, res) => {
   try {
@@ -720,6 +762,7 @@ export {
   getPrevInformeCentral,
   getNextInformeCentral,
   getPendientes,
+  getProgreso,
   createArchivo,
   deleteArchivo,
   findArchivos,

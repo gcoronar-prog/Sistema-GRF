@@ -61,6 +61,7 @@ function FormInformes() {
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [editing, setEditing] = useState(true);
+  const [estado, setEstado] = useState(1);
 
   useEffect(() => {
     if (params.id) {
@@ -631,7 +632,9 @@ function FormInformes() {
       </BlobProvider>
       <div>
         <h3>Listado informes pendientes</h3>
-        <ListPendiente refresh={refresh} />
+        <button onClick={() => setEstado(1)}>Pendiente</button>
+        <button onClick={() => setEstado(2)}>Progreso</button>
+        <ListPendiente refresh={refresh} estado={estado} />
       </div>
       <div>{editing ? <AttachFiles /> : ""}</div>
     </div>
