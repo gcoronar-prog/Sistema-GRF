@@ -61,7 +61,7 @@ const getEstadisticaCentral = async (req, res) => {
       if (clasificacion === "[]") {
         clasificacion = null;
       } else {
-        informes += ` AND doi.clasificacion_informe = $${params.length + 1}`;
+        informes += ` AND dti.clasificacion_informe = $${params.length + 1}`;
         params.push(clasificacion);
       }
     }
@@ -185,7 +185,7 @@ const getResumenEstado = async (req, res) => {
     const resultEstado = await client.query(estadoResumen, parameter);
 
     await client.query("COMMIT");
-    console.log(estadoResumen, parameter);
+    //console.log(estadoResumen, parameter);
 
     res.status(200).json({
       informe: resultEstado.rows,
@@ -226,7 +226,7 @@ const getResumenOrigen = async (req, res) => {
       "GROUP BY doi.origen_informe::jsonb, dti.clasificacion_informe,doi.captura_informe";
     const resultOrigen = await client.query(origenResumen, parameter);
     await client.query("COMMIT");
-    console.log(origenResumen, parameter);
+    //console.log(origenResumen, parameter);
 
     res.status(200).json({
       informe: resultOrigen.rows,
@@ -248,7 +248,6 @@ const getResumenClasi = async (req, res) => {
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-       \
        ";
     //WHERE dti.clasificacion_informe='Emergencia'
     const parameter = [];
@@ -288,9 +287,11 @@ const getResumenRecursos = async (req, res) => {
   try {
     await client.query("BEGIN");
     let recursosResumen =
-      "SELECT DISTINCT dti.recursos_informe, COUNT(ic.id_informes_central) as cantidad\
+      "SELECT recurso->>'label' as recursos,COUNT(ic.id_informes_central) as cantidad\
     from informes_central ic\
     JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+    JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe,\
+    LATERAL json_array_elements(dti.recursos_informe) AS recurso\
     WHERE 1=1";
 
     const parameter = [];
@@ -302,11 +303,12 @@ const getResumenRecursos = async (req, res) => {
       parameter.push(fechaInicio, fechaFin);
     }
 
-    recursosResumen += "GROUP BY dti.recursos_informe";
+    recursosResumen += "GROUP BY recurso->>'label'";
 
     const resultRecursos = await client.query(recursosResumen, parameter);
     await client.query("COMMIT");
 
+    console.log(recursosResumen, parameter);
     res.status(200).json({ informe: resultRecursos.rows });
   } catch (error) {
     await client.query("ROLLBACK");

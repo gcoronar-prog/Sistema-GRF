@@ -79,7 +79,7 @@ function StatisticsCentral() {
       //console.log(fecha);
       //setFilter(data);
       setClasifFilter(data);
-      console.log("filtro", data);
+      console.log("clasif", data);
     } catch (error) {
       console.log(error);
     }
@@ -101,7 +101,7 @@ function StatisticsCentral() {
       //console.log(fecha);
       //setFilter(data);
       setEstadoFilter(data);
-      console.log("filtro", data);
+      console.log("estado", data);
     } catch (error) {
       console.log(error);
     }
@@ -123,7 +123,7 @@ function StatisticsCentral() {
       //console.log(fecha);
       //setFilter(data);
       setOrigenFilter(data);
-      console.log("filtro", data);
+      console.log("origen", data);
     } catch (error) {
       console.log(error);
     }
@@ -148,7 +148,7 @@ function StatisticsCentral() {
       //console.log(fecha);
       //setFilter(data);
       setRecursosFilter(data);
-      console.log("filtro", data);
+      console.log("recurso", data);
     } catch (error) {
       console.log(error);
     }

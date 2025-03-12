@@ -67,9 +67,7 @@ const Table = ({ data }) => {
           return (
             <View key={index} style={styles.tableRow}>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>
-                  {row.recursos_informe.label}
-                </Text>
+                <Text style={styles.tableCell}>{row.recursos}</Text>
               </View>
 
               <View style={styles.tableCol}>
