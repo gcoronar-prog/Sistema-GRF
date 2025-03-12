@@ -320,4 +320,5 @@ export {
   getEstadisticaCentral,
   getResumenEstado,
   getResumenOrigen,
+  getResumenRecursos,
 };

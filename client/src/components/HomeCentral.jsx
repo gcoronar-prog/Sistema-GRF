@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import NavbarSGF from "./NavbarSGF";
 
 function HomeCentral() {
   const navigate = useNavigate();
@@ -29,9 +30,10 @@ function HomeCentral() {
   };
 
   return (
-    <div>
+    <>
       <h1>holiii</h1>
-    </div>
+      <NavbarSGF />
+    </>
   );
 }
 

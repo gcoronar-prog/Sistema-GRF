@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import EstadoCentralPDF from "../PDFs/EstadoCentralPDF";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF";
 import ClasifCentralPDF from "../PDFs/ClasifCentralPDF";
+import RecursosCentralPDF from "../PDFs/RecursosCentralPDF";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -29,11 +30,6 @@ function StatisticsCentral() {
     tipoReporte: "",
   };
 
-  const defaultDate = {
-    fechaInicio: startMonth,
-    fechaFin: dateNow,
-  };
-
   const [central, setCentral] = useState(defaultValues);
   const [filter, setFilter] = useState([]);
   const [selectedOrigen, setSelectedOrigen] = useState([]);
@@ -45,6 +41,7 @@ function StatisticsCentral() {
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
   const [estadoFilter, setEstadoFilter] = useState(defaultValues);
+  const [recursosFilter, setRecursosFilter] = useState(defaultValues);
 
   const fetchData = async (filters) => {
     try {
@@ -132,6 +129,31 @@ function StatisticsCentral() {
     }
   };
 
+  const resumenRecursos = async (fecha) => {
+    try {
+      const res = await fetch(
+        "http://localhost:3000/resumen_recursos_central",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fecha),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Error al enviar los datos al servidor");
+      }
+
+      const data = await res.json();
+      //console.log(fecha);
+      //setFilter(data);
+      setRecursosFilter(data);
+      console.log("filtro", data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   /*useEffect(() => {
     const loadCentral = async () => {
       try {
@@ -171,6 +193,7 @@ function StatisticsCentral() {
     resumenClasif(initialData);
     resumenOrigen(initialData);
     resumenEstado(initialData);
+    resumenRecursos(initialData);
   }, []);
 
   useEffect(() => {
@@ -202,6 +225,7 @@ function StatisticsCentral() {
     resumenClasif(formattedData);
     resumenOrigen(formattedData);
     resumenEstado(formattedData);
+    resumenRecursos(formattedData);
     //console.log("fecha", formattedFechas);
   }, [
     central,
@@ -463,6 +487,20 @@ function StatisticsCentral() {
             ) : (
               <button onClick={() => window.open(url, "_blank")}>
                 Resumen por Estado
+              </button>
+            )
+          }
+        </BlobProvider>
+      </div>
+
+      <div>
+        <BlobProvider document={<RecursosCentralPDF data={recursosFilter} />}>
+          {({ url, loading }) =>
+            loading ? (
+              <button>Cargando documento</button>
+            ) : (
+              <button onClick={() => window.open(url, "_blank")}>
+                Resumen Recursos involucrados
               </button>
             )
           }
