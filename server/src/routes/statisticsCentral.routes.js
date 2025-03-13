@@ -4,6 +4,7 @@ import {
   getResumenClasi,
   getResumenEstado,
   getResumenOrigen,
+  getResumenRango,
   getResumenRecursos,
 } from "../controllers/statisticsCentral.controller.js";
 import { verifyToken } from "../middlewares/jwt.middleware.js";
@@ -17,5 +18,6 @@ router.post("/resumen_clasif_central", getResumenClasi);
 router.post("/resumen_origen_central", getResumenOrigen);
 router.post("/resumen_estado_central", getResumenEstado);
 router.post("/resumen_recursos_central", getResumenRecursos);
+router.post("/resumen_rango_central", getResumenRango);
 
 export default router;

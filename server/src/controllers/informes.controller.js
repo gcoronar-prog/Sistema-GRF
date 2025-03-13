@@ -508,35 +508,7 @@ const getNextInformeCentral = async (req, res) => {
   try {
     const { id } = req.params;
     await client.query("BEGIN");
-    /* const informe = await client.query(
-      "SELECT * FROM informes_central WHERE id_informes_central > $1 ORDER BY id_informes_central ASC LIMIT 1",
-      [id]
-    );
 
-    const idOrigen = informe.rows[0].id_origen_informe;
-    const idTipos = informe.rows[0].id_tipos_informe;
-    const idUbicacion = informe.rows[0].id_ubicacion_informe;
-    const idVehiculo = informe.rows[0].id_vehiculo_informe;
-
-    const origen = await client.query(
-      "SELECT * FROM datos_origen_informe WHERE id_origen_informe=$1",
-      [idOrigen]
-    );
-
-    const tipos = await client.query(
-      "SELECT * FROM datos_tipos_informes WHERE id_tipos_informes=$1",
-      [idTipos]
-    );
-
-    const ubicacion = await client.query(
-      "SELECT * FROM datos_ubicacion_informe WHERE id_ubicacion=$1",
-      [idUbicacion]
-    );
-
-    const vehiculo = await client.query(
-      "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
-      [idVehiculo]
-    );*/
     const informe = await client.query(
       "SELECT \
           ic.*,\
@@ -603,7 +575,7 @@ const getPendientes = async (req, res) => {
     ]);
     await client.query("COMMIT");
     return res.status(200).json({
-      pendientes: pendientes.rows,
+      informe: pendientes.rows,
       tipos: tipos.rows,
       ubicacion: ubicacion.rows,
       vehiculo: vehiculo.rows,
@@ -623,7 +595,9 @@ const getProgreso = async (req, res) => {
     await client.query("BEGIN");
     const pendientes = await client.query(
       "SELECT * FROM informes_central a join datos_origen_informe b\
-        on a.id_origen_informe=b.id_origen_informe where estado_informe='progreso' ORDER BY id_informes_central ASC"
+        on a.id_origen_informe=b.id_origen_informe \
+        JOIN datos_tipos_informe c ON a.id_tipos_informes = c.id_tipos_informes\
+        where b.estado_informe='progreso' ORDER BY id_informes_central ASC"
     );
     const idTipos = pendientes.rows[0].id_tipos_informe;
     const idUbicacion = pendientes.rows[0].id_ubicacion_informe;
@@ -645,7 +619,7 @@ const getProgreso = async (req, res) => {
     ]);
     await client.query("COMMIT");
     return res.status(200).json({
-      pendientes: pendientes.rows,
+      informe: pendientes.rows,
       tipos: tipos.rows,
       ubicacion: ubicacion.rows,
       vehiculo: vehiculo.rows,

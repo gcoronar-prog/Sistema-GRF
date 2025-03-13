@@ -11,6 +11,8 @@ import EstadoCentralPDF from "../PDFs/EstadoCentralPDF";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF";
 import ClasifCentralPDF from "../PDFs/ClasifCentralPDF";
 import RecursosCentralPDF from "../PDFs/RecursosCentralPDF";
+import RangoCentralPDF from "../PDFs/RangoCentralPDF";
+import SelectClasifica from "../SelectClasifica";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -37,166 +39,86 @@ function StatisticsCentral() {
   const [selectedVehiculo, setSelectedVehiculo] = useState([]);
   const [selectedTipo, setSelectedTipo] = useState([]);
   const [selectedRecursos, setSelectedRecursos] = useState([]);
+  const [selectedClasif, setSelectedClasif] = useState([]);
   const [clasif, setClasif] = useState("");
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
   const [estadoFilter, setEstadoFilter] = useState(defaultValues);
   const [recursosFilter, setRecursosFilter] = useState(defaultValues);
+  const [rangoFilter, setRangoFilter] = useState(defaultValues);
 
-  const fetchData = async (filters) => {
-    try {
-      const res = await fetch("http://localhost:3000/estadisticaCentral", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(filters),
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
-      const data = await res.json();
-      setFilter(data);
-      //console.log("filtro", data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const resumenClasif = async (fecha) => {
-    try {
-      const res = await fetch("http://localhost:3000/resumen_clasif_central", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
-      const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setClasifFilter(data);
-      console.log("clasif", data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenEstado = async (fecha) => {
-    try {
-      const res = await fetch("http://localhost:3000/resumen_estado_central", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
-      const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setEstadoFilter(data);
-      console.log("estado", data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenOrigen = async (fecha) => {
-    try {
-      const res = await fetch("http://localhost:3000/resumen_origen_central", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
-      const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setOrigenFilter(data);
-      console.log("origen", data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenRecursos = async (fecha) => {
-    try {
-      const res = await fetch(
-        "http://localhost:3000/resumen_recursos_central",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(fecha),
-        }
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const formattedFechaI = dayjs(central.fechaInicio).format(
+        "YYYY-MM-DDTHH:mm"
+      );
+      const formattedFechaF = dayjs(central.fechaFin).format(
+        "YYYY-MM-DDTHH:mm"
       );
 
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
+      const initialData = {
+        ...defaultValues,
+        fechaInicio: formattedFechaI,
+        fechaFin: formattedFechaF,
+        estado: { atendido: false, progreso: false, pendiente: false },
+        captura: {
+          radios: false,
+          telefono: false,
+          rrss: false,
+          presencial: false,
+          email: false,
+        },
+        clasificacion: "",
+      };
 
-      const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setRecursosFilter(data);
-      console.log("recurso", data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  /*useEffect(() => {
-    const loadCentral = async () => {
       try {
-        const res = await fetch("http://localhost:3000/estadisticaCentral");
-        const data = await res.json();
-        setCentral(data);
+        const [data1, data2, data3, data4, data5, data6] = await Promise.all([
+          fetch("http://localhost:3000/estadisticaCentral", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(initialData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_clasif_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(initialData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_origen_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(initialData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_estado_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(initialData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_recursos_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(initialData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_rango_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(initialData),
+          }).then((res) => res.json()),
+        ]);
+
+        setFilter(data1);
+        setClasifFilter(data2);
+        setOrigenFilter(data3);
+        setEstadoFilter(data4);
+        setRecursosFilter(data5);
+        setRangoFilter(data6);
       } catch (error) {
         console.error(error);
       }
+      fetchInitialData();
     };
-
-    loadCentral();
-  }, []);*/
-
-  useEffect(() => {
-    const formattedFechaI = dayjs(central.fechaInicio).format(
-      "YYYY-MM-DDTHH:mm"
-    );
-    const formattedFechaF = dayjs(central.fechaFin).format("YYYY-MM-DDTHH:mm");
-
-    const initialData = {
-      ...defaultValues,
-      fechaInicio: formattedFechaI,
-      fechaFin: formattedFechaF,
-      estado: { atendido: false, progreso: false, pendiente: false },
-      captura: {
-        radios: false,
-        telefono: false,
-        rrss: false,
-        presencial: false,
-        email: false,
-      },
-      clasificacion: "",
-    };
-
-    fetchData(initialData);
-    resumenClasif(initialData);
-    resumenOrigen(initialData);
-    resumenEstado(initialData);
-    resumenRecursos(initialData);
   }, []);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const formattedFechaI = dayjs(central.fechaInicio).format(
       "YYYY-MM-DDTHH:mm"
     );
@@ -226,9 +148,93 @@ function StatisticsCentral() {
     resumenOrigen(formattedData);
     resumenEstado(formattedData);
     resumenRecursos(formattedData);
+    resumenRango(formattedData);
     //console.log("fecha", formattedFechas);
   }, [
     central,
+    selectedOrigen,
+    selectedSector,
+    selectedVehiculo,
+    selectedTipo,
+    selectedRecursos,
+  ]);*/
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      const formattedFechaI = dayjs(central.fechaInicio).format(
+        "YYYY-MM-DDTHH:mm"
+      );
+      const formattedFechaF = dayjs(central.fechaFin).format(
+        "YYYY-MM-DDTHH:mm"
+      );
+
+      const formattedData = {
+        ...defaultValues,
+        fechaInicio: formattedFechaI,
+        fechaFin: formattedFechaF,
+        estado: Object.keys(central.estado)
+          .filter((key) => central.estado[key])
+          .join(","),
+        captura: Object.keys(central.captura)
+          .filter((key) => central.captura[key])
+          .join(","),
+        clasificacion: selectedClasif,
+        origen: selectedOrigen,
+        sector: selectedSector,
+        vehiculo: JSON.stringify(selectedVehiculo),
+        tipoReporte: selectedTipo,
+        recursos: JSON.stringify(selectedRecursos),
+      };
+
+      try {
+        const [data1, data2, data3, data4, data5, data6] = await Promise.all([
+          fetch("http://localhost:3000/estadisticaCentral", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formattedData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_clasif_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formattedData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_origen_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formattedData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_estado_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formattedData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_recursos_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formattedData),
+          }).then((res) => res.json()),
+          fetch("http://localhost:3000/resumen_rango_central", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formattedData),
+          }).then((res) => res.json()),
+        ]);
+
+        setFilter(data1);
+        setClasifFilter(data2);
+        setOrigenFilter(data3);
+        setEstadoFilter(data4);
+        setRecursosFilter(data5);
+        setRangoFilter(data6);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchAllData();
+  }, [
+    central,
+    selectedClasif,
     selectedOrigen,
     selectedSector,
     selectedVehiculo,
@@ -328,7 +334,7 @@ function StatisticsCentral() {
 
       <div className="clasiInforme">
         <label htmlFor="clasificacion">Clasificación</label>
-        <select
+        {/*<select
           name="clasificacion"
           id="clasificacion"
           onChange={handleClasificacion}
@@ -339,7 +345,11 @@ function StatisticsCentral() {
           <option value="Incidente">Incidente</option>
           <option value="Factor de riesgo">Factor de riesgo</option>
           <option value="Novedad">Novedad</option>
-        </select>
+        </select>*/}
+        <SelectClasifica
+          selectedClasif={selectedClasif}
+          setSelectedClasif={setSelectedClasif}
+        />
       </div>
 
       <div className="capturaInforme">
@@ -425,7 +435,7 @@ function StatisticsCentral() {
       <div className="tipoReporte">
         <label htmlFor="">Tipo de informe:</label>
         <SelectTipo
-          tipo={clasif}
+          tipo={selectedClasif}
           selectedTipo={selectedTipo}
           setSelectedTipo={setSelectedTipo}
         />
@@ -501,6 +511,19 @@ function StatisticsCentral() {
             ) : (
               <button onClick={() => window.open(url, "_blank")}>
                 Resumen Recursos involucrados
+              </button>
+            )
+          }
+        </BlobProvider>
+      </div>
+      <div>
+        <BlobProvider document={<RangoCentralPDF data={rangoFilter} />}>
+          {({ url, loading }) =>
+            loading ? (
+              <button>Cargando documento</button>
+            ) : (
+              <button onClick={() => window.open(url, "_blank")}>
+                Resumen Rango Horario
               </button>
             )
           }

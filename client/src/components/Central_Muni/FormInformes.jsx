@@ -12,6 +12,7 @@ import AttachFiles from "../AttachFiles";
 import { BlobProvider } from "@react-pdf/renderer";
 import CentralPDF from "../PDFs/CentralPDF";
 import SelectRecursos from "../SelectRecursos";
+import SelectClasifica from "../SelectClasifica";
 
 function FormInformes() {
   const params = useParams();
@@ -59,6 +60,7 @@ function FormInformes() {
   const [selectedTipo, setSelectedTipo] = useState(null);
   const [selectedSector, setSelectedSector] = useState(null);
   const [selectedRecursos, setSelectedRecursos] = useState([]);
+  const [selectedClasif, setSelectedClasif] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [editing, setEditing] = useState(true);
   const [estado, setEstado] = useState(1);
@@ -100,7 +102,7 @@ function FormInformes() {
       //origen_informe: setSelectedOrigin(data.informe[0].origen_informe),
       //persona_informante: data.informe[0].persona_informante,
       captura_informe: data.informe[0].captura_informe,
-      clasificacion_informe: data.informe[0].clasificacion_informe,
+      //clasificacion_informe: data.informe[0].clasificacion_informe,
       estado_informe: data.informe[0].estado_informe,
 
       //tipos informe
@@ -127,6 +129,7 @@ function FormInformes() {
     setSelectedVehiculo(data.informe[0].vehiculos_informe);
     setSelectedTripulante(data.informe[0].tripulantes_informe);
     setSelectedRecursos(data.informe[0].recursos_informe);
+    setSelectedClasif(data.informe[0].clasificacion_informe);
 
     //setSelectedValues(recursosFormateados);
     console.log(data.informe[0].clasificacion_informe);
@@ -150,6 +153,7 @@ function FormInformes() {
     const tipoFormateado = JSON.stringify(selectedTipo);
     const sectorFormateado = JSON.stringify(selectedSector);
     const recursosFormateado = JSON.stringify(selectedRecursos);
+    const clasificaFormateado = JSON.stringify(selectedClasif);
     const datosActualizados = {
       ...informes,
       sector_informe: sectorFormateado,
@@ -159,6 +163,7 @@ function FormInformes() {
       vehiculos_informe: vehiculosFormateados,
       tripulantes_informe: tripuFormateado,
       recursos_informe: recursosFormateado,
+      clasificacion_informe: clasificaFormateado,
     };
     //setSelectedValues(arrayFormateado);
     console.log("Datos enviados", informes);
@@ -304,7 +309,7 @@ function FormInformes() {
     setSelectedSector("");
     setSelectedTipo("");
     setSelectedRecursos("");
-    setEditing(false);
+    setSelectedClasif(""), setEditing(false);
   };
   const handleEdit = async () => {
     setEditing(false);
@@ -467,7 +472,7 @@ function FormInformes() {
           disabled={editing}
         />
         <label htmlFor="clasificacion">Clasificación</label>
-        <select
+        {/*<select
           name="clasificacion_informe"
           id="clasificacion"
           onChange={handleChanges}
@@ -479,7 +484,12 @@ function FormInformes() {
           <option value="Incidente">Incidente</option>
           <option value="Factor de riesgo">Factor de riesgo</option>
           <option value="Novedad">Novedad</option>
-        </select>
+        </select>*/}
+        <SelectClasifica
+          selectedClasif={selectedClasif}
+          setSelectedClasif={setSelectedClasif}
+          edition={editing}
+        />
         <label htmlFor="atendido">Atendido</label>
         <input
           type="radio"
@@ -631,10 +641,7 @@ function FormInformes() {
         }
       </BlobProvider>
       <div>
-        <h3>Listado informes pendientes</h3>
-        <button onClick={() => setEstado(1)}>Pendiente</button>
-        <button onClick={() => setEstado(2)}>Progreso</button>
-        <ListPendiente refresh={refresh} estado={estado} />
+        <ListPendiente refresh={refresh} />
       </div>
       <div>{editing ? <AttachFiles /> : ""}</div>
     </div>

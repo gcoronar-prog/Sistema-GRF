@@ -308,12 +308,48 @@ const getResumenRecursos = async (req, res) => {
     const resultRecursos = await client.query(recursosResumen, parameter);
     await client.query("COMMIT");
 
-    console.log(recursosResumen, parameter);
+    //console.log(recursosResumen, parameter);
     res.status(200).json({ informe: resultRecursos.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
     return res.status(500).json({ msg: "Error de conexión con el servidor" });
+  }
+};
+
+const getResumenRango = async (req, res) => {
+  const client = await pool.connect();
+  let { fechaInicio, fechaFin } = req.body;
+  try {
+    await client.query("BEGIN");
+    let rangoResumen =
+      "SELECT doi.rango_horario, dti.clasificacion_informe,COUNT(ic.id_informes_central) as cantidad\
+        FROM informes_central ic\
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
+        WHERE 1=1";
+
+    const parameter = [];
+
+    if (fechaInicio && fechaFin) {
+      rangoResumen += ` AND doi.fecha_informe BETWEEN $${
+        parameter.length + 1
+      } AND $${parameter.length + 2} `;
+      parameter.push(fechaInicio, fechaFin);
+    }
+
+    rangoResumen += "GROUP BY doi.rango_horario, dti.clasificacion_informe";
+    const resultRango = await client.query(rangoResumen, parameter);
+    await client.query("COMMIT");
+    //console.log(rangoResumen, parameter);
+
+    res.status(200).json({
+      informe: resultRango.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error de conexión con el servido" });
   }
 };
 
@@ -323,4 +359,5 @@ export {
   getResumenEstado,
   getResumenOrigen,
   getResumenRecursos,
+  getResumenRango,
 };
