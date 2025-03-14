@@ -272,13 +272,6 @@ function StatisticsCentral() {
     console.log(name, value, checked, type);
   };
 
-  // Manejar cambios en la clasificación
-  const handleClasificacion = (e) => {
-    const { name, value } = e.target;
-    setClasif(value);
-    setCentral((prev) => ({ ...prev, [name]: value }));
-  };
-
   return (
     <div>
       <div className="rangoFecha">
@@ -334,18 +327,6 @@ function StatisticsCentral() {
 
       <div className="clasiInforme">
         <label htmlFor="clasificacion">Clasificación</label>
-        {/*<select
-          name="clasificacion"
-          id="clasificacion"
-          onChange={handleClasificacion}
-          value={central.clasificacion}
-        >
-          <option value="">Seleccione informe</option>
-          <option value="Emergencia">Emergencia</option>
-          <option value="Incidente">Incidente</option>
-          <option value="Factor de riesgo">Factor de riesgo</option>
-          <option value="Novedad">Novedad</option>
-        </select>*/}
         <SelectClasifica
           selectedClasif={selectedClasif}
           setSelectedClasif={setSelectedClasif}

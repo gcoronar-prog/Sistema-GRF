@@ -199,22 +199,6 @@ function FormInformes() {
           navigate(`/informes/central/${lastIdInfo}`);
         }
       }
-
-      /*const lastData = await fetch(
-        "http://localhost:3000/informe/central/last"
-      );
-      const lastInforme = await lastData.json();
-      setLastId(lastInforme.informe[0].id_informes_central);
-      console.log(lastId);
-      if (lastInforme && lastInforme.informe[0]) {
-        const lastIdInfo = lastInforme.informe[0].id_informes_central;
-        setLastId(lastIdInfo); // Se actualiza el estado (pero no inmediatamente)
-
-        // Usa lastIdInfo en lugar de lastId
-        const metodo = params.id ? "" : `/informes/central/${lastIdInfo}`;
-        navigate(metodo);
-        setEditing(true);
-      }*/
     } catch (error) {
       console.error(error);
     }
@@ -289,15 +273,6 @@ function FormInformes() {
       console.error(error);
     }
   };
-
-  /*const handleCheckbox = (e) => {
-    const { value, checked } = e.target;
-    setSelectedValues((prevValues) =>
-      checked ? [...prevValues, value] : prevValues.filter((v) => v !== value)
-    );
-    // Importante: Ver el estado actualizado en tiempo real
-    console.log("Valores seleccionados: ", selectedValues);
-  };*/
 
   const handleNewInform = () => {
     navigate("/informes/new");
@@ -472,19 +447,6 @@ function FormInformes() {
           disabled={editing}
         />
         <label htmlFor="clasificacion">Clasificación</label>
-        {/*<select
-          name="clasificacion_informe"
-          id="clasificacion"
-          onChange={handleChanges}
-          value={informes.clasificacion_informe}
-          disabled={editing}
-        >
-          <option value="">Seleccione informe</option>
-          <option value="Emergencia">Emergencia</option>
-          <option value="Incidente">Incidente</option>
-          <option value="Factor de riesgo">Factor de riesgo</option>
-          <option value="Novedad">Novedad</option>
-        </select>*/}
         <SelectClasifica
           selectedClasif={selectedClasif}
           setSelectedClasif={setSelectedClasif}
