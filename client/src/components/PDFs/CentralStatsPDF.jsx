@@ -89,7 +89,9 @@ const Table = ({ data }) => (
             </Text>
           </View>
           <View style={styles.tableCol}>
-            <Text style={styles.tableCell}>{row.clasificacion_informe}</Text>
+            <Text style={styles.tableCell}>
+              {row.clasificacion_informe?.label}
+            </Text>
           </View>
           <View style={styles.tableCol}>
             <Text style={styles.tableCell}>{row.captura_informe}</Text>

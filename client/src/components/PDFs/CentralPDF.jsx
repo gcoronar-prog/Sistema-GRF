@@ -114,7 +114,7 @@ const CentralPDF = ({
           <View style={styles.column}>
             <Text style={styles.label}>Clasificación:</Text>
             <Text style={styles.value}>
-              {data?.clasificacion_informe || "Sin clasificación"}
+              {data?.clasificacion_informe.label || "Sin clasificación"}
             </Text>
           </View>
         </View>

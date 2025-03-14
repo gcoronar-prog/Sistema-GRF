@@ -74,7 +74,7 @@ const Table = ({ data }) => {
             <View key={index} style={styles.tableRow}>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>
-                  {mostrarClasificacion ? row.clasificacion_informe : ""}
+                  {mostrarClasificacion ? row.clasificacion_informe.label : ""}
                 </Text>
               </View>
               <View style={styles.tableCol}>

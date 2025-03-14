@@ -81,7 +81,7 @@ const Table = ({ data }) => {
 
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>
-                  {row.clasificacion_informe}
+                  {row.clasificacion_informe.label}
                 </Text>
               </View>
               <View style={styles.tableCol}>
