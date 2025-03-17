@@ -189,7 +189,7 @@ const getResumenEstado = async (req, res) => {
     await client.query("COMMIT");
     //console.log(estadoResumen, parameter);
 
-    res.status(200).json({
+    return res.status(200).json({
       informe: resultEstado.rows,
     });
     await client.query("COMMIT");
@@ -230,7 +230,7 @@ const getResumenOrigen = async (req, res) => {
     await client.query("COMMIT");
     //console.log(origenResumen, parameter);
 
-    res.status(200).json({
+    return res.status(200).json({
       informe: resultOrigen.rows,
     });
   } catch (error) {
@@ -271,7 +271,7 @@ const getResumenClasi = async (req, res) => {
     //console.log("query", estadoEmergencia);
     //console.log("params:", parameter);
     //console.log("resultado", resultEmergencia.rows);
-    res.status(200).json({
+    return res.status(200).json({
       informe: resultEmergencia.rows,
     });
   } catch (error) {
@@ -311,7 +311,7 @@ const getResumenRecursos = async (req, res) => {
     await client.query("COMMIT");
 
     //console.log(recursosResumen, parameter);
-    res.status(200).json({ informe: resultRecursos.rows });
+    return res.status(200).json({ informe: resultRecursos.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -346,7 +346,7 @@ const getResumenRango = async (req, res) => {
     await client.query("COMMIT");
     //console.log(rangoResumen, parameter);
 
-    res.status(200).json({
+    return res.status(200).json({
       informe: resultRango.rows,
     });
   } catch (error) {
