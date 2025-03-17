@@ -13,6 +13,8 @@ import ClasifCentralPDF from "../PDFs/ClasifCentralPDF";
 import RecursosCentralPDF from "../PDFs/RecursosCentralPDF";
 import RangoCentralPDF from "../PDFs/RangoCentralPDF";
 import SelectClasifica from "../SelectClasifica";
+import jsPDF from "jspdf";
+import { autoTable } from "jspdf-autotable";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -32,8 +34,9 @@ function StatisticsCentral() {
     tipoReporte: "",
   };
 
-  const [central, setCentral] = useState(defaultValues);
-  const [filter, setFilter] = useState([]);
+  const [central, setCentral] = useState([]);
+  const [fechaInicio, setFechaInicio] = useState(startMonth);
+  const [fechaFin, setFechaFin] = useState(dateNow);
   const [selectedOrigen, setSelectedOrigen] = useState([]);
   const [selectedSector, setSelectedSector] = useState([]);
   const [selectedVehiculo, setSelectedVehiculo] = useState([]);
@@ -43,38 +46,15 @@ function StatisticsCentral() {
   const [clasif, setClasif] = useState("");
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
-  const [estadoFilter, setEstadoFilter] = useState(defaultValues);
+  const [estadoFilter, setEstadoFilter] = useState({
+    atendido: false,
+    progreso: false,
+    pendiente: false,
+  });
   const [recursosFilter, setRecursosFilter] = useState(defaultValues);
   const [rangoFilter, setRangoFilter] = useState(defaultValues);
 
-  useEffect(() => {
-    const formattedFechaI = dayjs(central.fechaInicio).format(
-      "YYYY-MM-DDTHH:mm"
-    );
-    const formattedFechaF = dayjs(central.fechaFin).format("YYYY-MM-DDTHH:mm");
-
-    const initialData = {
-      ...defaultValues,
-      fechaInicio: formattedFechaI,
-      fechaFin: formattedFechaF,
-      estado: { atendido: false, progreso: false, pendiente: false },
-      captura: {
-        radios: false,
-        telefono: false,
-        rrss: false,
-        presencial: false,
-        email: false,
-      },
-    };
-    fetchData(initialData);
-    resumenClasif(initialData);
-    resumenOrigen(initialData);
-    resumenEstado(initialData);
-    resumenRecursos(initialData);
-    resumenRango(initialData);
-  }, []);
-
-  useEffect(() => {
+  /*useEffect(() => {
     const formattedFechaI = dayjs(central.fechaInicio).format(
       "YYYY-MM-DDTHH:mm"
     );
@@ -106,14 +86,7 @@ function StatisticsCentral() {
     resumenRecursos(formattedData);
     resumenRango(formattedData);
     //console.log("fecha", formattedFechas);
-  }, [
-    central,
-    selectedOrigen,
-    selectedSector,
-    selectedVehiculo,
-    selectedTipo,
-    selectedRecursos,
-  ]);
+  }, []);
 
   /*useEffect(() => {
     const fetchAllData = async () => {
@@ -198,26 +171,49 @@ function StatisticsCentral() {
     selectedRecursos,
   ]);*/
 
-  const fetchData = async (fecha) => {
-    try {
-      const res = await fetch("http://localhost:3000/estadisticaCentral", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
-      });
+  const fetchData = async () => {
+    let url = "http://localhost:3000/estadisticaCentral?";
+    let params = new URLSearchParams();
 
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((key) => {
+      if (estadoFilter[key]) {
+        params.append("estado", key);
       }
+    });
 
+    try {
+      const res = await fetch(url + params.toString());
       const data = await res.json();
-      //console.log(fecha);
-      setFilter(data);
-
-      console.log("filtro", data);
+      setCentral(data.informe || []);
+      console.log(data.informe);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const generarPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Reportes Central Municipal", 10, 10);
+    let filtros = `Filtros aplicados:\n`;
+    if (fechaInicio && fechaFin)
+      filtros += `Fecha: ${new Date(fechaInicio).toLocaleString(
+        "es-ES"
+      )} - ${new Date(fechaFin).toLocaleString("es-ES")}\n`;
+
+    doc.text(filtros, 10, 20);
+    const tableColumn = ["ID", "Fecha"];
+    const tableRows = central.map((c) => [
+      c.id_informes_central,
+      new Date(c.fecha_informe).toLocaleString("es-ES"),
+    ]);
+
+    autoTable(doc, { head: [tableColumn], body: tableRows, startY: 40 });
+    doc.output("dataurlnewwindow");
   };
 
   const resumenRecursos = async (fecha) => {
@@ -225,9 +221,7 @@ function StatisticsCentral() {
       const res = await fetch(
         "http://localhost:3000/resumen_recursos_central",
         {
-          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(fecha),
         }
       );
 
@@ -248,9 +242,7 @@ function StatisticsCentral() {
   const resumenClasif = async (fecha) => {
     try {
       const res = await fetch("http://localhost:3000/resumen_clasif_central", {
-        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
       });
 
       if (!res.ok) {
@@ -260,7 +252,7 @@ function StatisticsCentral() {
       const data = await res.json();
       //console.log(fecha);
       //setFilter(data);
-      setRecursosFilter(data);
+      setClasifFilter(data);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
@@ -269,9 +261,7 @@ function StatisticsCentral() {
   const resumenOrigen = async (fecha) => {
     try {
       const res = await fetch("http://localhost:3000/resumen_origen_central", {
-        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
       });
 
       if (!res.ok) {
@@ -281,7 +271,7 @@ function StatisticsCentral() {
       const data = await res.json();
       //console.log(fecha);
       //setFilter(data);
-      setRecursosFilter(data);
+      setOrigenFilter(data);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
@@ -290,9 +280,7 @@ function StatisticsCentral() {
   const resumenEstado = async (fecha) => {
     try {
       const res = await fetch("http://localhost:3000/resumen_estado_central", {
-        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
       });
 
       if (!res.ok) {
@@ -302,7 +290,7 @@ function StatisticsCentral() {
       const data = await res.json();
       //console.log(fecha);
       //setFilter(data);
-      setRecursosFilter(data);
+      setEstadoFilter(data);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
@@ -311,9 +299,7 @@ function StatisticsCentral() {
   const resumenRango = async (fecha) => {
     try {
       const res = await fetch("http://localhost:3000/resumen_rango_central", {
-        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fecha),
       });
 
       if (!res.ok) {
@@ -323,41 +309,19 @@ function StatisticsCentral() {
       const data = await res.json();
       //console.log(fecha);
       //setFilter(data);
-      setRecursosFilter(data);
+      setRangoFilter(data);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  // Manejar cambios en los inputs
-  const handleChanges = (e) => {
-    const { name, value, checked, type } = e.target;
-
-    if (name === "estado") {
-      setCentral((prev) => ({
-        ...prev,
-        estado: {
-          ...prev.estado,
-          [value]: checked,
-        },
-      }));
-    } else if (name === "captura") {
-      setCentral((prev) => ({
-        ...prev,
-        captura: {
-          ...prev.captura,
-          [value]: checked,
-        },
-      }));
-    } else {
-      setCentral((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
-    }
-
-    console.log(name, value, checked, type);
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setEstadoFilter((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
   };
 
   return (
@@ -368,16 +332,16 @@ function StatisticsCentral() {
           type="datetime-local"
           name="fechaInicio"
           id=""
-          onChange={handleChanges}
-          value={central.fechaInicio}
+          onChange={(e) => setFechaInicio(e.target.value)}
+          value={fechaInicio}
         />
         <label htmlFor="">Fecha de termino</label>
         <input
           type="datetime-local"
           name="fechaFin"
           id=""
-          onChange={handleChanges}
-          value={central.fechaFin}
+          onChange={(e) => setFechaFin(e.target.value)}
+          value={fechaFin}
         />
       </div>
 
@@ -390,8 +354,8 @@ function StatisticsCentral() {
           name="estado"
           value="atendido"
           id=""
-          onChange={handleChanges}
-          checked={central.estado.atendido}
+          onChange={handleCheckboxChange}
+          checked={estadoFilter.atendido}
         />
         <label htmlFor="">En progreso</label>
         <input
@@ -399,8 +363,8 @@ function StatisticsCentral() {
           name="estado"
           id=""
           value="progreso"
-          onChange={handleChanges}
-          checked={central.estado.progreso}
+          onChange={handleCheckboxChange}
+          checked={estadoFilter.progreso}
         />
         <label htmlFor="">Pendiente</label>
         <input
@@ -408,11 +372,30 @@ function StatisticsCentral() {
           name="estado"
           id=""
           value="pendiente"
-          onChange={handleChanges}
-          checked={central.estado.pendiente}
+          onChange={handleCheckboxChange}
+          checked={estadoFilter.pendiente}
         />
       </div>
 
+      {/*Tabla de datos central municipal*/}
+      <table border="1" style={{ marginTop: "10px" }}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha Informe</th>
+          </tr>
+        </thead>
+        <tbody>
+          {central.map((c) => (
+            <tr key={c.id_informes_central}>
+              <td>{c.id_informes_central}</td>
+              <td>{new Date(c.fecha_informe).toLocaleString("es-ES")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/*
       <div className="clasiInforme">
         <label htmlFor="clasificacion">Clasificación</label>
 
@@ -478,10 +461,6 @@ function StatisticsCentral() {
         />
       </div>
 
-      <div className="recursosInforme">
-        {/*select multiple de recursos con checkbox */}
-      </div>
-
       <div className="sectorInforme">
         <label htmlFor="">Sector:</label>
         <SelectSector
@@ -496,10 +475,6 @@ function StatisticsCentral() {
           selectedVehiculo={selectedVehiculo}
           setSelectedVehiculo={setSelectedVehiculo}
         />
-      </div>
-
-      <div className="operadorInforme">
-        {/*select con centralistas usar react-select */}
       </div>
 
       <div className="tipoReporte">
@@ -518,87 +493,12 @@ function StatisticsCentral() {
           setSelectedRecursos={setSelectedRecursos}
         />
       </div>
-      <div>
-        <BlobProvider document={<CentralStatsPDF data={filter} />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando documento</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Generar PDF
-              </button>
-            )
-          }
-        </BlobProvider>
-      </div>
-      <div>
-        <BlobProvider document={<ClasifCentralPDF data={clasifFilter} />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando documento</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Resumen por Clasificación
-              </button>
-            )
-          }
-        </BlobProvider>
-      </div>
 
-      <div>
-        <BlobProvider document={<OrigenCentralPDF data={origenFilter} />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando documento</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Resumen por Origen
-              </button>
-            )
-          }
-        </BlobProvider>
-      </div>
-
-      <div>
-        <BlobProvider document={<EstadoCentralPDF data={estadoFilter} />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando documento</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Resumen por Estado
-              </button>
-            )
-          }
-        </BlobProvider>
-      </div>
-
-      <div>
-        <BlobProvider document={<RecursosCentralPDF data={recursosFilter} />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando documento</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Resumen Recursos involucrados
-              </button>
-            )
-          }
-        </BlobProvider>
-      </div>
-      <div>
-        <BlobProvider document={<RangoCentralPDF data={rangoFilter} />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando documento</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Resumen Rango Horario
-              </button>
-            )
-          }
-        </BlobProvider>
-      </div>
+        */}
+      <button onClick={fetchData}>Buscar</button>
+      <button onClick={generarPDF} disabled={central.length === 0}>
+        Descargar PDF
+      </button>
     </div>
   );
 }

@@ -5,7 +5,7 @@ function SelectTripulantes({
   setSelectedTripulante,
   edition,
 }) {
-  const loadTripulantes = async (inputValue) => {
+  const loadTripulantes = async () => {
     try {
       const response = await fetch("http://localhost:3000/tripulantes");
       if (!response.ok) {
@@ -30,7 +30,6 @@ function SelectTripulantes({
         isMulti
         closeMenuOnSelect={false}
         cacheOptions
-        defaultOptions
         loadOptions={loadTripulantes}
         onChange={(selectedOptions) => {
           setSelectedTripulante(selectedOptions);

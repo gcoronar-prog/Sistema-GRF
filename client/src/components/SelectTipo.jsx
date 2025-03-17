@@ -34,7 +34,6 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
         key={key}
         isDisabled={edition}
         cacheOptions
-        defaultOptions
         loadOptions={loadTipo}
         onChange={(selectedOptions) => {
           setSelectedTipo(selectedOptions);

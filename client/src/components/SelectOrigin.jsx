@@ -5,7 +5,7 @@ function SelectOrigin({ selectedOrigin, setSelectedOrigin, edition }) {
     try {
       const response = await fetch("http://localhost:3000/origenes");
       if (!response.ok) {
-        throw new Error("Error al cargar los tripulantes");
+        throw new Error("Error al cargar los datos");
       }
       const data = await response.json();
 

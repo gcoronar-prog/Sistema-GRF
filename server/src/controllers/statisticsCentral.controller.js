@@ -14,7 +14,7 @@ const getEstadisticaCentral = async (req, res) => {
     vehiculo,
     centralista,
     tipoReporte,
-  } = req.body;
+  } = req.query;
   try {
     await client.query("BEGIN");
 
@@ -45,15 +45,19 @@ const getEstadisticaCentral = async (req, res) => {
       params.push(fechaInicio, fechaFin);
     }
 
-    if (estado) {
+    if (estado?.length > 0) {
       /*informes += ` AND doi.estado_informe IN $${params.length + 1}`;
       params.push(estado);*/
-      const estadosArray = estado.split(",");
-      if (estadosArray.length > 0) {
-        informes += ` AND doi.estado_informe IN (${estadosArray
-          .map((_, index) => `$${params.length + index + 1}`)
-          .join(", ")})`;
-        params.push(...estadosArray);
+      if (estado === "[]") {
+        estado = null;
+      } else {
+        const estadosArray = estado.split(",");
+        if (estadosArray.length > 0) {
+          informes += ` AND doi.estado_informe IN (${estadosArray
+            .map((_, index) => `$${params.length + index + 1}`)
+            .join(", ")})`;
+          params.push(...estadosArray);
+        }
       }
     }
 
@@ -192,7 +196,6 @@ const getResumenEstado = async (req, res) => {
     return res.status(200).json({
       informe: resultEstado.rows,
     });
-    await client.query("COMMIT");
   } catch (error) {
     console.error(error);
     await client.query("ROLLBACK");

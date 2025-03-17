@@ -1,7 +1,8 @@
+import { useCallback } from "react";
 import AsyncSelect from "react-select/async";
 
 function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo, edition }) {
-  const loadVehiculo = async (inputValue) => {
+  const loadVehiculo = useCallback(async () => {
     try {
       const response = await fetch("http://localhost:3000/vehiculos");
       const data = await response.json();
@@ -14,7 +15,7 @@ function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo, edition }) {
       console.error(error);
       return [];
     }
-  };
+  }, []);
 
   return (
     <div style={{ width: "30%" }}>
@@ -28,7 +29,7 @@ function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo, edition }) {
         onChange={(selectedOptions) => {
           setSelectedVehiculo(selectedOptions);
         }}
-        value={selectedVehiculo}
+        value={selectedVehiculo || "[]"}
       />
     </div>
   );

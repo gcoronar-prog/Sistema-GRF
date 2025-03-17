@@ -165,16 +165,24 @@ const getInformantes = async (req, res) => {
 };
 
 const getVehiculos = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const { rows } = await pool.query("SELECT * FROM vehiculos");
+    await client.query("BEGIN");
+    const { rows } = await client.query("SELECT * FROM vehiculos");
     if (rows.length === 0) {
+      await client.query("COMMIT");
       return res.status(404).json({ message: "No existen registros" });
     }
+    await client.query("COMMIT");
     return res.json(rows);
   } catch (error) {
+    console.error(error);
+    await client.query("ROLLBACK");
     return res
       .status(500)
       .json({ message: "Error de conexión con el servidor" });
+  } finally {
+    client.release();
   }
 };
 
@@ -268,6 +276,7 @@ const getSectores = async (req, res) => {
     }
     return res.json(rows);
   } catch (error) {
+    console.error(error);
     return res
       .status(500)
       .json({ message: "Error de conexión con el servidor" });

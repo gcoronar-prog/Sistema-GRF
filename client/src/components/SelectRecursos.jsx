@@ -18,7 +18,6 @@ const SelectRecursos = ({ selectedRecursos, setSelectedRecursos, edition }) => {
         isDisabled={edition}
         isMulti
         closeMenuOnSelect={false}
-        cacheOptions
         defaultOptions
         loadOptions={loadRecursos}
         onChange={(select) => setSelectedRecursos(select)}

@@ -5,10 +5,10 @@ function SelectSector({ selectedSector, setSelectedSector, edition }) {
     try {
       const response = await fetch("http://localhost:3000/sectores");
       if (!response.ok) {
-        throw new Error("Error al cargar los tripulantes");
+        throw new Error("Error al cargar los sectores");
       }
       const data = await response.json();
-
+      //console.log(data);
       return data.map((item) => ({
         value: item.id_sector,
         label: item.sector,
@@ -26,8 +26,8 @@ function SelectSector({ selectedSector, setSelectedSector, edition }) {
         cacheOptions
         defaultOptions
         loadOptions={loadSector}
-        onChange={(selectedOptions) => {
-          setSelectedSector(selectedOptions);
+        onChange={(selected) => {
+          setSelectedSector(selected);
         }}
         value={selectedSector}
       />
