@@ -51,125 +51,15 @@ function StatisticsCentral() {
     progreso: false,
     pendiente: false,
   });
+  const [capturaFilter, setCapturaFilter] = useState({
+    radios: false,
+    telefono: false,
+    rrss: false,
+    presencial: false,
+    email: false,
+  });
   const [recursosFilter, setRecursosFilter] = useState(defaultValues);
   const [rangoFilter, setRangoFilter] = useState(defaultValues);
-
-  /*useEffect(() => {
-    const formattedFechaI = dayjs(central.fechaInicio).format(
-      "YYYY-MM-DDTHH:mm"
-    );
-    const formattedFechaF = dayjs(central.fechaFin).format("YYYY-MM-DDTHH:mm");
-
-    const formattedData = {
-      ...defaultValues,
-      fechaInicio: formattedFechaI,
-      fechaFin: formattedFechaF,
-      estado: Object.keys(central.estado)
-        .filter((key) => central.estado[key])
-        .join(","),
-      captura: Object.keys(central.captura)
-        .filter((key) => central.captura[key])
-        .join(","),
-      clasificacion: selectedClasif,
-      origen: selectedOrigen,
-      sector: selectedSector,
-      vehiculo: JSON.stringify(selectedVehiculo),
-      tipoReporte: selectedTipo,
-      recursos: JSON.stringify(selectedRecursos),
-    };
-
-    //console.log("recursos", central.captura);
-    fetchData(formattedData);
-    resumenClasif(formattedData);
-    resumenOrigen(formattedData);
-    resumenEstado(formattedData);
-    resumenRecursos(formattedData);
-    resumenRango(formattedData);
-    //console.log("fecha", formattedFechas);
-  }, []);
-
-  /*useEffect(() => {
-    const fetchAllData = async () => {
-      const formattedFechaI = dayjs(central.fechaInicio).format(
-        "YYYY-MM-DDTHH:mm"
-      );
-      const formattedFechaF = dayjs(central.fechaFin).format(
-        "YYYY-MM-DDTHH:mm"
-      );
-
-      const formattedData = {
-        ...defaultValues,
-        fechaInicio: formattedFechaI,
-        fechaFin: formattedFechaF,
-        estado: Object.keys(central.estado)
-          .filter((key) => central.estado[key])
-          .join(","),
-        captura: Object.keys(central.captura)
-          .filter((key) => central.captura[key])
-          .join(","),
-        clasificacion: central.clasificacion,
-        origen: selectedOrigen,
-        sector: selectedSector,
-        vehiculo: JSON.stringify(selectedVehiculo),
-        tipoReporte: selectedTipo,
-        recursos: JSON.stringify(selectedRecursos),
-      };
-
-      try {
-        const [data1, data2, data3, data4, data5, data6] = await Promise.all([
-          fetch("http://localhost:3000/estadisticaCentral", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formattedData),
-          }).then((res) => res.json()),
-          fetch("http://localhost:3000/resumen_clasif_central", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formattedData),
-          }).then((res) => res.json()),
-          fetch("http://localhost:3000/resumen_origen_central", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formattedData),
-          }).then((res) => res.json()),
-          fetch("http://localhost:3000/resumen_estado_central", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formattedData),
-          }).then((res) => res.json()),
-          fetch("http://localhost:3000/resumen_recursos_central", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formattedData),
-          }).then((res) => res.json()),
-          fetch("http://localhost:3000/resumen_rango_central", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formattedData),
-          }).then((res) => res.json()),
-        ]);
-
-        setFilter(data1);
-        setClasifFilter(data2);
-        setOrigenFilter(data3);
-        setEstadoFilter(data4);
-        setRecursosFilter(data5);
-        setRangoFilter(data6);
-       
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchAllData();
-  }, [
-    central,
-    selectedOrigen,
-    selectedSector,
-    selectedVehiculo,
-    selectedTipo,
-    selectedRecursos,
-  ]);*/
 
   const fetchData = async () => {
     let url = "http://localhost:3000/estadisticaCentral?";
@@ -180,11 +70,41 @@ function StatisticsCentral() {
       params.append("fechaFin", fechaFin);
     }
 
-    Object.keys(estadoFilter).forEach((key) => {
-      if (estadoFilter[key]) {
-        params.append("estado", key);
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
       }
     });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
 
     try {
       const res = await fetch(url + params.toString());
@@ -208,7 +128,7 @@ function StatisticsCentral() {
     doc.text(filtros, 10, 20);
     const tableColumn = ["ID", "Fecha"];
     const tableRows = central.map((c) => [
-      c.id_informes_central,
+      c.cod_informes_central,
       new Date(c.fecha_informe).toLocaleString("es-ES"),
     ]);
 
@@ -317,11 +237,22 @@ function StatisticsCentral() {
   };
 
   const handleCheckboxChange = (e) => {
-    const { name, checked } = e.target;
-    setEstadoFilter((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
+    const { name, checked, dataset, value } = e.target;
+
+    if (dataset.type === "estado") {
+      setEstadoFilter((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
+      console.log("estado");
+    } else if (dataset.type === "captura") {
+      setCapturaFilter((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
+      console.log("captura");
+    }
+    console.log(name, checked, value);
   };
 
   return (
@@ -351,51 +282,35 @@ function StatisticsCentral() {
         <label htmlFor="">Atendido</label>
         <input
           type="checkbox"
-          name="estado"
+          name="atendido"
           value="atendido"
           id=""
+          data-type="estado"
           onChange={handleCheckboxChange}
-          checked={estadoFilter.atendido}
+          checked={estadoFilter.atendido || false}
         />
         <label htmlFor="">En progreso</label>
         <input
           type="checkbox"
-          name="estado"
+          name="progreso"
           id=""
           value="progreso"
+          data-type="estado"
           onChange={handleCheckboxChange}
-          checked={estadoFilter.progreso}
+          checked={estadoFilter.progreso || false}
         />
         <label htmlFor="">Pendiente</label>
         <input
           type="checkbox"
-          name="estado"
+          name="pendiente"
           id=""
           value="pendiente"
+          data-type="estado"
           onChange={handleCheckboxChange}
-          checked={estadoFilter.pendiente}
+          checked={estadoFilter.pendiente || false}
         />
       </div>
 
-      {/*Tabla de datos central municipal*/}
-      <table border="1" style={{ marginTop: "10px" }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Fecha Informe</th>
-          </tr>
-        </thead>
-        <tbody>
-          {central.map((c) => (
-            <tr key={c.id_informes_central}>
-              <td>{c.id_informes_central}</td>
-              <td>{new Date(c.fecha_informe).toLocaleString("es-ES")}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/*
       <div className="clasiInforme">
         <label htmlFor="clasificacion">Clasificación</label>
 
@@ -409,47 +324,52 @@ function StatisticsCentral() {
         <label htmlFor="radios">Radio</label>
         <input
           type="checkbox"
-          name="captura"
-          id="radios"
-          value={"radios"}
-          onChange={handleChanges}
-          checked={central.captura.radios}
+          name="radios"
+          id=""
+          value="radios"
+          data-type="captura"
+          onChange={handleCheckboxChange}
+          checked={capturaFilter.radios || false}
         />
         <label htmlFor="telefono">Teléfono</label>
         <input
           type="checkbox"
-          name="captura"
-          id="telefono"
-          value={"telefono"}
-          onChange={handleChanges}
-          checked={central.captura.telefono}
+          name="telefono"
+          id=""
+          value="telefono"
+          data-type="captura"
+          onChange={handleCheckboxChange}
+          checked={capturaFilter.telefono || false}
         />
         <label htmlFor="rrss">RRSS</label>
         <input
           type="checkbox"
-          name="captura"
-          id="rrss"
-          value={"rrss"}
-          onChange={handleChanges}
-          checked={central.captura.rrss}
+          name="rrss"
+          id=""
+          value="rrss"
+          data-type="captura"
+          onChange={handleCheckboxChange}
+          checked={capturaFilter.rrss || false}
         />
         <label htmlFor="presencial">Presencial</label>
         <input
           type="checkbox"
-          name="captura"
-          id="presencial"
-          value={"presencial"}
-          onChange={handleChanges}
-          checked={central.captura.presencial}
+          name="presencial"
+          id=""
+          value="presencial"
+          data-type="captura"
+          onChange={handleCheckboxChange}
+          checked={capturaFilter.presencial || false}
         />
         <label htmlFor="email">E-mail</label>
         <input
           type="checkbox"
-          name="captura"
-          id="email"
-          value={"email"}
-          onChange={handleChanges}
-          checked={central.captura.email}
+          name="email"
+          id=""
+          value="email"
+          data-type="captura"
+          onChange={handleCheckboxChange}
+          checked={capturaFilter.email || false}
         />
       </div>
 
@@ -480,7 +400,7 @@ function StatisticsCentral() {
       <div className="tipoReporte">
         <label htmlFor="">Tipo de informe:</label>
         <SelectTipo
-          tipo={clasif}
+          tipo={selectedClasif}
           selectedTipo={selectedTipo}
           setSelectedTipo={setSelectedTipo}
         />
@@ -494,7 +414,42 @@ function StatisticsCentral() {
         />
       </div>
 
+      {/*Tabla de datos central municipal*/}
+      <table border="1" style={{ marginTop: "10px" }}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha Informe</th>
+          </tr>
+        </thead>
+        <tbody>
+          {central.map((c) => (
+            <tr key={c.id_informes_central}>
+              <td>{c.cod_informes_central}</td>
+              <td>{new Date(c.fecha_informe).toLocaleString("es-ES")}</td>
+              <td>{c.clasificacion_informe}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/*
+ 
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
         */}
+
       <button onClick={fetchData}>Buscar</button>
       <button onClick={generarPDF} disabled={central.length === 0}>
         Descargar PDF

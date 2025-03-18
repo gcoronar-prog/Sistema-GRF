@@ -203,16 +203,18 @@ const getTipoReportes = async (req, res) => {
 };
 
 const getTipoReporte = async (req, res) => {
-  const { grupo } = req.query;
+  const { grupo_reporte } = req.query;
+
   try {
     const { rows } = await pool.query(
       "SELECT * FROM tipo_reportes WHERE grupo_reporte = $1",
-      [grupo]
+      [grupo_reporte]
     );
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
     }
+
     return res.json(rows);
   } catch (error) {
     console.error(error);

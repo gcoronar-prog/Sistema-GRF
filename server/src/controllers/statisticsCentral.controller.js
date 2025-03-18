@@ -45,19 +45,25 @@ const getEstadisticaCentral = async (req, res) => {
       params.push(fechaInicio, fechaFin);
     }
 
-    if (estado?.length > 0) {
-      /*informes += ` AND doi.estado_informe IN $${params.length + 1}`;
-      params.push(estado);*/
-      if (estado === "[]") {
-        estado = null;
-      } else {
+    if (estado && estado.length > 0) {
+      if (Array.isArray(estado)) {
+        // Si estado ya es un array, úsalo directamente
+        const estadosArray = estado;
+
+        informes += ` AND doi.estado_informe IN (${estadosArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...estadosArray);
+      } else if (typeof estado === "string") {
+        // Si estado es una cadena (string), conviértelo en array
         const estadosArray = estado.split(",");
-        if (estadosArray.length > 0) {
-          informes += ` AND doi.estado_informe IN (${estadosArray
-            .map((_, index) => `$${params.length + index + 1}`)
-            .join(", ")})`;
-          params.push(...estadosArray);
-        }
+
+        informes += ` AND doi.estado_informe IN (${estadosArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...estadosArray);
       }
     }
 
@@ -72,9 +78,18 @@ const getEstadisticaCentral = async (req, res) => {
       }
     }
 
-    if (captura) {
-      const capturaArray = captura.split(",");
-      if (capturaArray.length > 0) {
+    if (captura && captura.length > 0) {
+      if (Array.isArray(captura)) {
+        const capturaArray = captura;
+
+        informes += ` AND doi.captura_informe IN (${capturaArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...capturaArray);
+      } else if (typeof captura === "string") {
+        const capturaArray = captura.split(",");
+
         informes += ` AND doi.captura_informe IN (${capturaArray
           .map((_, index) => `$${params.length + index + 1}`)
           .join(", ")})`;
@@ -89,8 +104,8 @@ const getEstadisticaCentral = async (req, res) => {
         informes += ` AND doi.origen_informe::jsonb @> $${
           params.length + 1
         }::jsonb`;
+        params.push(origen);
       }
-      params.push(origen);
     }
 
     if (recursos && Object.keys(recursos).length > 0) {
@@ -146,8 +161,8 @@ const getEstadisticaCentral = async (req, res) => {
       query += ` AND ic.horario = $${params.length + 1}`;
       params.push(horario);
     }*/
-    //console.log("query", informes);
-    //console.log("params:", params);
+    console.log("query", informes);
+    console.log("params:", params);
     const result = await client.query(informes, params);
     await client.query("COMMIT");
     //console.log(result.rows);

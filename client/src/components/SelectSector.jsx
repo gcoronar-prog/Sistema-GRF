@@ -25,6 +25,7 @@ function SelectSector({ selectedSector, setSelectedSector, edition }) {
         isDisabled={edition}
         cacheOptions
         defaultOptions
+        isClearable
         loadOptions={loadSector}
         onChange={(selected) => {
           setSelectedSector(selected);

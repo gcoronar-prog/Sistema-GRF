@@ -11,7 +11,7 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
   const loadTipo = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/tipoReporte?grupo=${tipo}`
+        `http://localhost:3000/tipoReporte?grupo_reporte=${tipo}`
       );
       if (!response.ok) {
         throw new Error("Error al cargar los datos");

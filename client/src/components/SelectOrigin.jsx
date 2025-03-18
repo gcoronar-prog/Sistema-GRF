@@ -25,6 +25,7 @@ function SelectOrigin({ selectedOrigin, setSelectedOrigin, edition }) {
         isDisabled={edition}
         cacheOptions
         defaultOptions
+        isClearable
         loadOptions={loadOrigin}
         onChange={(selectedOptions) => {
           setSelectedOrigin(selectedOptions);
