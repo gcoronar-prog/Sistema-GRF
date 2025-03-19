@@ -26,7 +26,8 @@
     "react-google-places-autocomplete": "^4.1.0",
     "react-router-dom": "^6.28.2",
     "react-select": "^5.10.0",
-    "use-places-autocomplete": "^4.0.1"
+    "use-places-autocomplete": "^4.0.1",
+    "y": "^0.3.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

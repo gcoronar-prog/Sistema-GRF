@@ -117,7 +117,7 @@ function StatisticsCentral() {
   };
 
   const generarPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({ orientation: "landscape" });
     doc.text("Reportes Central Municipal", 10, 10);
     let filtros = `Filtros aplicados:\n`;
     if (fechaInicio && fechaFin)
@@ -126,10 +126,29 @@ function StatisticsCentral() {
       )} - ${new Date(fechaFin).toLocaleString("es-ES")}\n`;
 
     doc.text(filtros, 10, 20);
-    const tableColumn = ["ID", "Fecha"];
+    const tableColumn = [
+      "ID",
+      "Fecha",
+      "Clasificación",
+      "Origen",
+      "Persona",
+      "Fuente Captura",
+      "Tipo de informe",
+      "Descripción",
+      "Sector",
+      "Dirección",
+    ];
     const tableRows = central.map((c) => [
       c.cod_informes_central,
       new Date(c.fecha_informe).toLocaleString("es-ES"),
+      c.clasificacion_informe.label,
+      c.origen_informe.label,
+      c.persona_informante.label,
+      c.captura_informe,
+      c.tipo_informe.label,
+      c.descripcion_informe,
+      c.sector_informe.label,
+      c.direccion_informe,
     ]);
 
     autoTable(doc, { head: [tableColumn], body: tableRows, startY: 40 });
@@ -420,6 +439,14 @@ function StatisticsCentral() {
           <tr>
             <th>ID</th>
             <th>Fecha Informe</th>
+            <th>Clasificación</th>
+            <th>Origen</th>
+            <th>Persona Informante</th>
+            <th>Fuente de captura</th>
+            <th>Tipo de informe</th>
+            <th>Descripción</th>
+            <th>Sector</th>
+            <th>Dirección</th>
           </tr>
         </thead>
         <tbody>
@@ -427,7 +454,14 @@ function StatisticsCentral() {
             <tr key={c.id_informes_central}>
               <td>{c.cod_informes_central}</td>
               <td>{new Date(c.fecha_informe).toLocaleString("es-ES")}</td>
-              <td>{c.clasificacion_informe}</td>
+              <td>{c.clasificacion_informe.label}</td>
+              <td>{c.origen_informe.label}</td>
+              <td>{c.persona_informante.label}</td>
+              <td>{c.captura_informe}</td>
+              <td>{c.tipo_informe.label}</td>
+              <td>{c.descripcion_informe}</td>
+              <td>{c.sector_informe.label}</td>
+              <td>{c.direccion_informe}</td>
             </tr>
           ))}
         </tbody>
