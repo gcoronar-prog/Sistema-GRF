@@ -1,20 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SelectOrigin from "../SelectOrigin";
 import SelectSector from "../SelectSector";
 import SelectVehiculo from "../SelectVehiculo";
 import SelectTipo from "../SelectTipo";
 import SelectRecursos from "../SelectRecursos";
-import { BlobProvider } from "@react-pdf/renderer";
-import CentralStatsPDF from "../PDFs/CentralStatsPDF";
 import dayjs from "dayjs";
-import EstadoCentralPDF from "../PDFs/EstadoCentralPDF";
-import OrigenCentralPDF from "../PDFs/OrigenCentralPDF";
-import ClasifCentralPDF from "../PDFs/ClasifCentralPDF";
-import RecursosCentralPDF from "../PDFs/RecursosCentralPDF";
-import RangoCentralPDF from "../PDFs/RangoCentralPDF";
 import SelectClasifica from "../SelectClasifica";
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
+import { exportExcel } from "../exportExcel.js";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -43,7 +37,7 @@ function StatisticsCentral() {
   const [selectedTipo, setSelectedTipo] = useState([]);
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [selectedClasif, setSelectedClasif] = useState([]);
-  const [clasif, setClasif] = useState("");
+
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
   const [estadoFilter, setEstadoFilter] = useState({
@@ -58,8 +52,6 @@ function StatisticsCentral() {
     presencial: false,
     email: false,
   });
-  const [recursosFilter, setRecursosFilter] = useState(defaultValues);
-  const [rangoFilter, setRangoFilter] = useState(defaultValues);
 
   const fetchData = async () => {
     let url = "http://localhost:3000/estadisticaCentral?";
@@ -274,6 +266,30 @@ function StatisticsCentral() {
     console.log(name, checked, value);
   };
 
+  const handleClearFilter = () => {
+    setFechaInicio(startMonth);
+    setFechaFin(dateNow);
+    setSelectedOrigen([]);
+    setSelectedSector([]);
+    setSelectedVehiculo([]);
+    setSelectedTipo([]);
+    setSelectedRecursos([]);
+    setSelectedClasif([]);
+    setEstadoFilter({
+      atendido: false,
+      progreso: false,
+      pendiente: false,
+    });
+    setCapturaFilter({
+      radios: false,
+      telefono: false,
+      rrss: false,
+      presencial: false,
+      email: false,
+    });
+    setCentral([]);
+  };
+
   return (
     <div>
       <div className="rangoFecha">
@@ -432,40 +448,53 @@ function StatisticsCentral() {
           setSelectedRecursos={setSelectedRecursos}
         />
       </div>
+      {/*BOTONEEEEES! */}
+      <button onClick={fetchData}>Buscar</button>
+      <button onClick={generarPDF} disabled={central.length === 0}>
+        Descargar PDF
+      </button>
+      <button onClick={() => exportExcel(central, "Central.xlsx")}>
+        Exportar a Excel
+      </button>
+      <button onClick={handleClearFilter}>Limpiar filtros</button>
 
       {/*Tabla de datos central municipal*/}
-      <table border="1" style={{ marginTop: "10px" }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Fecha Informe</th>
-            <th>Clasificación</th>
-            <th>Origen</th>
-            <th>Persona Informante</th>
-            <th>Fuente de captura</th>
-            <th>Tipo de informe</th>
-            <th>Descripción</th>
-            <th>Sector</th>
-            <th>Dirección</th>
-          </tr>
-        </thead>
-        <tbody>
-          {central.map((c) => (
-            <tr key={c.id_informes_central}>
-              <td>{c.cod_informes_central}</td>
-              <td>{new Date(c.fecha_informe).toLocaleString("es-ES")}</td>
-              <td>{c.clasificacion_informe.label}</td>
-              <td>{c.origen_informe.label}</td>
-              <td>{c.persona_informante.label}</td>
-              <td>{c.captura_informe}</td>
-              <td>{c.tipo_informe.label}</td>
-              <td>{c.descripcion_informe}</td>
-              <td>{c.sector_informe.label}</td>
-              <td>{c.direccion_informe}</td>
+      {central.length > 0 ? (
+        <table border="1" style={{ marginTop: "10px" }}>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha Informe</th>
+              <th>Clasificación</th>
+              <th>Origen</th>
+              <th>Persona Informante</th>
+              <th>Fuente de captura</th>
+              <th>Tipo de informe</th>
+              <th>Descripción</th>
+              <th>Sector</th>
+              <th>Dirección</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {central.map((c) => (
+              <tr key={c.id_informes_central}>
+                <td>{c.cod_informes_central}</td>
+                <td>{new Date(c.fecha_informe).toLocaleString("es-ES")}</td>
+                <td>{c.clasificacion_informe.label}</td>
+                <td>{c.origen_informe.label}</td>
+                <td>{c.persona_informante.label}</td>
+                <td>{c.captura_informe}</td>
+                <td>{c.tipo_informe.label}</td>
+                <td>{c.descripcion_informe}</td>
+                <td>{c.sector_informe.label}</td>
+                <td>{c.direccion_informe}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        "No se hay datos para mostrar"
+      )}
 
       {/*
  
@@ -483,11 +512,6 @@ function StatisticsCentral() {
       
 
         */}
-
-      <button onClick={fetchData}>Buscar</button>
-      <button onClick={generarPDF} disabled={central.length === 0}>
-        Descargar PDF
-      </button>
     </div>
   );
 }
