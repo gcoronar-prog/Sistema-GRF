@@ -1,98 +1,52 @@
-import React from "react";
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import dayjs from "dayjs";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column",
-    padding: 20,
-  },
-  table: {
-    display: "table",
-    width: "auto",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#000",
-  },
-  tableRow: {
-    flexDirection: "row",
-  },
-  tableColHeader: {
-    width: "12.5%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#000",
-    backgroundColor: "#f0f0f0",
-    padding: 5,
-  },
-  tableCol: {
-    width: "12.5%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#000",
-    padding: 5,
-  },
-  tableCellHeader: {
-    fontWeight: "bold",
-    textAlign: "center",
-    fontSize: "15px",
-  },
-  tableCell: {
-    textAlign: "center",
-    fontSize: "10px",
-  },
-});
+const RecursosCentralPDF = () => {
+  const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
+  const dateNow = dayjs().format("YYYY-MM-DDTHH:mm");
 
-const Table = ({ data }) => {
-  return (
-    <View style={styles.table}>
-      {/* Encabezado de la tabla */}
-      <View style={styles.tableRow}>
-        <View style={styles.tableColHeader}>
-          <Text style={styles.tableCellHeader}>Recursos</Text>
-        </View>
+  const [recursos, setRecursos] = useState([]);
+  const [fechaInicio, setFechaInicio] = useState(startMonth);
+  const [fechaFin, setFechaFin] = useState(dateNow);
 
-        <View style={styles.tableColHeader}>
-          <Text style={styles.tableCellHeader}>Cantidad</Text>
-        </View>
+  const doc = new jsPDF();
+  doc.text("Resumen Recursos involucrados", 10, 10);
+  let filtros = `Filtros aplicados:\n`;
+  if (fechaInicio && fechaFin)
+    filtros += `Fecha: ${new Date(fechaInicio).toLocaleString(
+      "es-ES"
+    )} - ${new Date(fechaFin).toLocaleString("es-ES")}\n`;
 
-        <View style={styles.tableColHeader}>
-          <Text style={styles.tableCellHeader}>%? quizas</Text>
-        </View>
-      </View>
+  doc.text(filtros, 10, 20);
+  const tableColumn = ["Recursos involucrados", "Cantidad"];
+  const tableRows = recursos.map((r) => [r.recurso, r.cantidad]);
 
-      {/* Filas de la tabla */}
-      {data &&
-        data.map((row, index) => {
-          return (
-            <View key={index} style={styles.tableRow}>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{row.recursos}</Text>
-              </View>
-
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{row.cantidad}</Text>
-              </View>
-            </View>
-          );
-        })}
-    </View>
-  );
+  autoTable(doc, { head: [tableColumn], body: tableRows, startY: 40 });
+  doc.output("dataurlnewwindow");
 };
 
-const RecursosCentralPDF = ({ data }) => {
-  return (
-    <Document>
-      <Page size="A4" orientation="landscape" style={styles.page}>
-        <View>
-          <Text style={{ fontSize: 20, marginBottom: 10 }}>
-            Resumen Recursos involucrados
-          </Text>
-          <Table data={data?.informe || []} />
-        </View>
-      </Page>
-    </Document>
-  );
+const resumenRecursos = async () => {
+  try {
+    const res = await fetch("http://localhost:3000/resumen_recursos_central?");
+    let params = new URLSearchParams();
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+    if (!res.ok) {
+      throw new Error("Error al enviar los datos al servidor");
+    }
+
+    const data = await res.json();
+    //console.log(fecha);
+    //setFilter(data);
+    setRecursos(data);
+    console.log("filtro", data);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export default RecursosCentralPDF;
