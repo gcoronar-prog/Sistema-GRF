@@ -9,6 +9,9 @@ import SelectClasifica from "../SelectClasifica";
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
 import { exportExcel } from "../exportExcel.js";
+import RecursosCentralPDF from "../PDFs/RecursosCentralPDF.jsx";
+import ClasifCentralPDF from "../PDFs/ClasifCentralPDF.jsx";
+import OrigenCentralPDF from "../PDFs/OrigenCentralPDF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -40,6 +43,7 @@ function StatisticsCentral() {
 
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
+  const [recursosFilter, setRecursosFilter] = useState([]);
   const [estadoFilter, setEstadoFilter] = useState({
     atendido: false,
     progreso: false,
@@ -147,77 +151,74 @@ function StatisticsCentral() {
     doc.output("dataurlnewwindow");
   };
 
-  const resumenRecursos = async (fecha) => {
+  const resumenRecursosPDF = async () => {
+    const url = "http://localhost:3000/resumen_recursos_central?";
+    let params = new URLSearchParams();
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+
     try {
-      const res = await fetch(
-        "http://localhost:3000/resumen_recursos_central",
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
+      const res = await fetch(url + params.toString());
       const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setRecursosFilter(data);
+      setRecursosFilter(data.informe || []);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
     }
+
+    RecursosCentralPDF(fechaInicio, fechaFin, recursosFilter);
   };
 
-  const resumenClasif = async (fecha) => {
+  const resumenClasifPDF = async () => {
+    const url = "http://localhost:3000/resumen_clasif_central?";
+    const params = new URLSearchParams();
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+
     try {
-      const res = await fetch("http://localhost:3000/resumen_clasif_central", {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
+      const res = await fetch(url + params.toString());
       const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setClasifFilter(data);
-      console.log("filtro", data);
+      setClasifFilter(data.informe || []);
+      console.log("filtroClasif", data.informe);
     } catch (error) {
       console.log(error);
     }
+
+    ClasifCentralPDF(fechaInicio, fechaFin, clasifFilter);
   };
-  const resumenOrigen = async (fecha) => {
+
+  const resumenOrigenPDF = async () => {
+    const url = "http://localhost:3000/resumen_origen_central?";
+    const params = new URLSearchParams();
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+
     try {
-      const res = await fetch("http://localhost:3000/resumen_origen_central", {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
+      const res = await fetch(url + params.toString());
       const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setOrigenFilter(data);
-      console.log("filtro", data);
+      setOrigenFilter(data.informe);
+      console.log("filtro origen", data.informe);
     } catch (error) {
       console.log(error);
     }
+
+    OrigenCentralPDF(fechaInicio, fechaFin, origenFilter);
   };
-  const resumenEstado = async (fecha) => {
+
+  const resumenEstado = async () => {
+    const url = "http://localhost:3000/resumen_estado_central?";
+    const paramas = new URLSearchParams();
+
     try {
-      const res = await fetch("http://localhost:3000/resumen_estado_central", {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
       const data = await res.json();
       //console.log(fecha);
       //setFilter(data);
@@ -448,10 +449,20 @@ function StatisticsCentral() {
           setSelectedRecursos={setSelectedRecursos}
         />
       </div>
+
       {/*BOTONEEEEES! */}
       <button onClick={fetchData}>Buscar</button>
       <button onClick={generarPDF} disabled={central.length === 0}>
         Descargar PDF
+      </button>
+      <button onClick={resumenRecursosPDF} disabled={central.length === 0}>
+        Recursos involucrados
+      </button>
+      <button onClick={resumenClasifPDF} disabled={central.length === 0}>
+        Clasificación
+      </button>
+      <button onClick={resumenOrigenPDF} disabled={central.length === 0}>
+        Origen
       </button>
       <button onClick={() => exportExcel(central, "Central.xlsx")}>
         Exportar a Excel

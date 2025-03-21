@@ -161,8 +161,8 @@ const getEstadisticaCentral = async (req, res) => {
       query += ` AND ic.horario = $${params.length + 1}`;
       params.push(horario);
     }*/
-    console.log("query", informes);
-    console.log("params:", params);
+    //console.log("query", informes);
+    //console.log("params:", params);
     const result = await client.query(informes, params);
     await client.query("COMMIT");
     //console.log(result.rows);
@@ -222,7 +222,7 @@ const getResumenEstado = async (req, res) => {
 
 const getResumenOrigen = async (req, res) => {
   const client = await pool.connect();
-  let { fechaInicio, fechaFin } = req.body;
+  let { fechaInicio, fechaFin } = req.query;
   try {
     await client.query("BEGIN");
     let origenResumen =
@@ -260,7 +260,7 @@ const getResumenOrigen = async (req, res) => {
 
 const getResumenClasi = async (req, res) => {
   const client = await pool.connect();
-  let { fechaInicio, fechaFin } = req.body;
+  let { fechaInicio, fechaFin } = req.query;
   try {
     await client.query("BEGIN");
     let estadoEmergencia =
@@ -303,7 +303,7 @@ const getResumenClasi = async (req, res) => {
 
 const getResumenRecursos = async (req, res) => {
   const client = await pool.connect();
-  let { fechaInicio, fechaFin } = req.body;
+  let { fechaInicio, fechaFin } = req.query;
   try {
     await client.query("BEGIN");
     let recursosResumen =
@@ -323,7 +323,9 @@ const getResumenRecursos = async (req, res) => {
       parameter.push(fechaInicio, fechaFin);
     }
 
-    recursosResumen += "GROUP BY recurso->>'label'";
+    recursosResumen += " GROUP BY recurso->>'label'";
+    console.log("query", recursosResumen);
+    console.log("params:", parameter);
 
     const resultRecursos = await client.query(recursosResumen, parameter);
     await client.query("COMMIT");

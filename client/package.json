@@ -28,7 +28,7 @@
     "react-router-dom": "^6.28.2",
     "react-select": "^5.10.0",
     "use-places-autocomplete": "^4.0.1",
-    "xlsx": "^0.18.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "y": "^0.3.2"
   },
   "devDependencies": {
