@@ -341,7 +341,7 @@ const getResumenRecursos = async (req, res) => {
 
 const getResumenRango = async (req, res) => {
   const client = await pool.connect();
-  let { fechaInicio, fechaFin } = req.body;
+  let { fechaInicio, fechaFin } = req.query;
   try {
     await client.query("BEGIN");
     let rangoResumen =

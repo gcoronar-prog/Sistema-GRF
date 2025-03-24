@@ -203,24 +203,33 @@ const getTipoReportes = async (req, res) => {
 };
 
 const getTipoReporte = async (req, res) => {
-  const { grupo_reporte } = req.query;
+  const client = await pool.connect();
+  let { grupo_reporte } = req.query;
 
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM tipo_reportes WHERE grupo_reporte = $1",
-      [grupo_reporte]
-    );
+    await client.query("BEGIN");
+    let tipo = "SELECT * FROM tipo_reportes WHERE 1=1";
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: "No existen registros" });
+    const parameter = [];
+
+    if (grupo_reporte) {
+      tipo += ` AND grupo_reporte = $${parameter.length + 1}`;
+      parameter.push(grupo_reporte);
     }
 
-    return res.json(rows);
+    const result = await client.query(tipo, parameter);
+    await client.query("COMMIT");
+    return res.status(200).json({
+      tipo: result.rows,
+    });
   } catch (error) {
     console.error(error);
+    await client.query("ROLLBACK");
     return res
       .status(500)
       .json({ message: "Error de conexión con el servidor" });
+  } finally {
+    client.release();
   }
 };
 

@@ -12,6 +12,7 @@ import { exportExcel } from "../exportExcel.js";
 import RecursosCentralPDF from "../PDFs/RecursosCentralPDF.jsx";
 import ClasifCentralPDF from "../PDFs/ClasifCentralPDF.jsx";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF.jsx";
+import RangoCentralPDF from "../PDFs/RangoCentralPDF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -41,6 +42,7 @@ function StatisticsCentral() {
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [selectedClasif, setSelectedClasif] = useState([]);
 
+  const [rangoFilter, setRangoFilter] = useState([]);
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
   const [recursosFilter, setRecursosFilter] = useState([]);
@@ -214,38 +216,39 @@ function StatisticsCentral() {
     OrigenCentralPDF(fechaInicio, fechaFin, origenFilter);
   };
 
-  const resumenEstado = async () => {
+  const resumenEstadoPDF = async () => {
     const url = "http://localhost:3000/resumen_estado_central?";
-    const paramas = new URLSearchParams();
+    const params = new URLSearchParams();
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
 
     try {
+      const res = await fetch(url + params.toString());
       const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setEstadoFilter(data);
+      setEstadoFilter(data.informe || []);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
     }
+
+    EstadoCentralPDF(fechaInicio, fechaFin, estadoFilter);
   };
-  const resumenRango = async (fecha) => {
+
+  const resumenRangoPDF = async () => {
+    const url = "http://localhost:3000/resumen_rango_central?";
+    const params = new URLSearchParams();
     try {
-      const res = await fetch("http://localhost:3000/resumen_rango_central", {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
-
+      const res = await fetch(url + params.toString());
       const data = await res.json();
-      //console.log(fecha);
-      //setFilter(data);
-      setRangoFilter(data);
-      console.log("filtro", data);
+      setRangoFilter(data.informe);
+      console.log("filtro origen", data.informe);
     } catch (error) {
       console.log(error);
     }
+    RangoCentralPDF(fechaInicio, fechaFin, rangoFilter);
   };
 
   const handleCheckboxChange = (e) => {
@@ -463,6 +466,12 @@ function StatisticsCentral() {
       </button>
       <button onClick={resumenOrigenPDF} disabled={central.length === 0}>
         Origen
+      </button>
+      <button onClick={resumenRangoPDF} disabled={central.length === 0}>
+        Rango Horario
+      </button>
+      <button onClick={resumenEstadoPDF} disabled={central.length === 0}>
+        Estado Informe
       </button>
       <button onClick={() => exportExcel(central, "Central.xlsx")}>
         Exportar a Excel
