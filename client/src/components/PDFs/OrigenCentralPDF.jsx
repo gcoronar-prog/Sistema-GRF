@@ -3,7 +3,7 @@ import { autoTable } from "jspdf-autotable";
 
 const OrigenCentralPDF = (fechaInicio, fechaFin, origen) => {
   const doc = new jsPDF();
-  doc.text("Resumen por Clasificación", 10, 10);
+  doc.text("Resumen por Origen", 10, 10);
   let filtros = `Filtros aplicados:\n`;
   if (fechaInicio && fechaFin)
     filtros += `Fecha: ${new Date(fechaInicio).toLocaleString(
@@ -11,10 +11,11 @@ const OrigenCentralPDF = (fechaInicio, fechaFin, origen) => {
     )} - ${new Date(fechaFin).toLocaleString("es-ES")}\n`;
 
   doc.text(filtros, 10, 20);
-  const tableColumn = ["Clasificación", "Tipo de informe", "Cantidad"];
+  const tableColumn = ["Origen", "Clasificación", "Captura", "Cantidad"];
   const tableRows = origen.map((c) => [
-    c.clasificacion_informe,
-    c.tipo_informe,
+    c.origen,
+    c.clasif,
+    c.captura_informe,
     c.cantidad,
   ]);
 

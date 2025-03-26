@@ -19,8 +19,8 @@ const EstadoCentralPDF = (fechaInicio, fechaFin, estado) => {
   ];
   const tableRows = estado.map((e) => [
     e.estado_informe,
-    e.clasificacion_informe,
-    e.tipo_informe,
+    e.clasif,
+    e.tipo,
     e.cantidad,
   ]);
 

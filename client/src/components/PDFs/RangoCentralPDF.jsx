@@ -12,11 +12,7 @@ const RangoCentralPDF = (fechaInicio, fechaFin, rango) => {
 
   doc.text(filtros, 10, 20);
   const tableColumn = ["Rango Horario", "Clasificación", "Cantidad"];
-  const tableRows = rango.map((r) => [
-    r.rango_horario,
-    r.clasificacion_informe,
-    r.cantidad,
-  ]);
+  const tableRows = rango.map((r) => [r.rango_horario, r.clasif, r.cantidad]);
 
   autoTable(doc, { head: [tableColumn], body: tableRows, startY: 40 });
   doc.output("dataurlnewwindow");

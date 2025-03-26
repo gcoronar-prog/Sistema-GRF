@@ -13,6 +13,7 @@ import RecursosCentralPDF from "../PDFs/RecursosCentralPDF.jsx";
 import ClasifCentralPDF from "../PDFs/ClasifCentralPDF.jsx";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF.jsx";
 import RangoCentralPDF from "../PDFs/RangoCentralPDF.jsx";
+import EstadoCentralPDF from "../PDFs/EstadoCentralPDF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -107,14 +108,18 @@ function StatisticsCentral() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      setCentral(data.informe || []);
-      console.log(data.informe);
+      //setCentral(data.informe || []);
+      //console.log(data.informe);
+      generarPDF(data.informe);
+      if (className === "excel") {
+        exportExcel(data.informe, "Central.xlsx");
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const generarPDF = () => {
+  const generarPDF = (dato) => {
     const doc = new jsPDF({ orientation: "landscape" });
     doc.text("Reportes Central Municipal", 10, 10);
     let filtros = `Filtros aplicados:\n`;
@@ -136,7 +141,8 @@ function StatisticsCentral() {
       "Sector",
       "Dirección",
     ];
-    const tableRows = central.map((c) => [
+    console.log(dato);
+    const tableRows = dato.map((c) => [
       c.cod_informes_central,
       new Date(c.fecha_informe).toLocaleString("es-ES"),
       c.clasificacion_informe.label,
@@ -165,13 +171,12 @@ function StatisticsCentral() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      setRecursosFilter(data.informe || []);
+
       console.log("filtro", data);
+      RecursosCentralPDF(fechaInicio, fechaFin, data.informe);
     } catch (error) {
       console.log(error);
     }
-
-    RecursosCentralPDF(fechaInicio, fechaFin, recursosFilter);
   };
 
   const resumenClasifPDF = async () => {
@@ -186,13 +191,12 @@ function StatisticsCentral() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      setClasifFilter(data.informe || []);
+
       console.log("filtroClasif", data.informe);
+      ClasifCentralPDF(fechaInicio, fechaFin, data.informe);
     } catch (error) {
       console.log(error);
     }
-
-    ClasifCentralPDF(fechaInicio, fechaFin, clasifFilter);
   };
 
   const resumenOrigenPDF = async () => {
@@ -207,13 +211,12 @@ function StatisticsCentral() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      setOrigenFilter(data.informe);
+
       console.log("filtro origen", data.informe);
+      OrigenCentralPDF(fechaInicio, fechaFin, data.informe);
     } catch (error) {
       console.log(error);
     }
-
-    OrigenCentralPDF(fechaInicio, fechaFin, origenFilter);
   };
 
   const resumenEstadoPDF = async () => {
@@ -228,13 +231,12 @@ function StatisticsCentral() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      setEstadoFilter(data.informe || []);
+
+      EstadoCentralPDF(fechaInicio, fechaFin, data.informe);
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
     }
-
-    EstadoCentralPDF(fechaInicio, fechaFin, estadoFilter);
   };
 
   const resumenRangoPDF = async () => {
@@ -243,12 +245,12 @@ function StatisticsCentral() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      setRangoFilter(data.informe);
+
+      RangoCentralPDF(fechaInicio, fechaFin, data.informe);
       console.log("filtro origen", data.informe);
     } catch (error) {
       console.log(error);
     }
-    RangoCentralPDF(fechaInicio, fechaFin, rangoFilter);
   };
 
   const handleCheckboxChange = (e) => {
@@ -454,25 +456,13 @@ function StatisticsCentral() {
       </div>
 
       {/*BOTONEEEEES! */}
-      <button onClick={fetchData}>Buscar</button>
-      <button onClick={generarPDF} disabled={central.length === 0}>
-        Descargar PDF
-      </button>
-      <button onClick={resumenRecursosPDF} disabled={central.length === 0}>
-        Recursos involucrados
-      </button>
-      <button onClick={resumenClasifPDF} disabled={central.length === 0}>
-        Clasificación
-      </button>
-      <button onClick={resumenOrigenPDF} disabled={central.length === 0}>
-        Origen
-      </button>
-      <button onClick={resumenRangoPDF} disabled={central.length === 0}>
-        Rango Horario
-      </button>
-      <button onClick={resumenEstadoPDF} disabled={central.length === 0}>
-        Estado Informe
-      </button>
+
+      <button onClick={fetchData}>Descargar PDF</button>
+      <button onClick={resumenRecursosPDF}>Recursos involucrados</button>
+      <button onClick={resumenClasifPDF}>Clasificación</button>
+      <button onClick={resumenOrigenPDF}>Origen</button>
+      <button onClick={resumenRangoPDF}>Rango Horario</button>
+      <button onClick={resumenEstadoPDF}>Estado Informe</button>
       <button onClick={() => exportExcel(central, "Central.xlsx")}>
         Exportar a Excel
       </button>
