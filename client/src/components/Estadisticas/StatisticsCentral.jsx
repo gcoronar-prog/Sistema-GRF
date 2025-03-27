@@ -505,23 +505,6 @@ function StatisticsCentral() {
       ) : (
         "No se hay datos para mostrar"
       )}
-
-      {/*
- 
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-
-        */}
     </div>
   );
 }

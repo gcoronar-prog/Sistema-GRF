@@ -133,6 +133,18 @@ function FormInformes() {
 
     //setSelectedValues(recursosFormateados);
     console.log(data.informe[0].clasificacion_informe);
+
+    CentralPDF(
+      data.informe,
+      selectedClasif,
+      selectedRecursos,
+      selectedVehiculo,
+      selectedTripulante,
+      selectedOrigin,
+      selectedInformante,
+      selectedTipo,
+      selectedSector
+    );
   };
 
   const handleChanges = (e) => {
@@ -575,33 +587,7 @@ function FormInformes() {
           Eliminar
         </button>
       </form>
-      <BlobProvider
-        document={
-          <CentralPDF
-            data={informes}
-            recursos={selectedValues}
-            vehiculos={selectedVehiculo}
-            tripulante={selectedTripulante}
-            origen={selectedOrigin}
-            informante={selectedInformante}
-            tipo={selectedTipo}
-            sector={selectedSector}
-          />
-        }
-      >
-        {({ url, loading }) =>
-          loading ? (
-            <button>Cargando documento</button>
-          ) : (
-            <button
-              style={{ display: editing ? "" : "none" }}
-              onClick={() => window.open(url, "_blank")}
-            >
-              Generar PDF
-            </button>
-          )
-        }
-      </BlobProvider>
+      <button onClick={() => loadInformes(params.id)}>Descargar PDF</button>
       <div>
         <ListPendiente refresh={refresh} />
       </div>
