@@ -502,7 +502,7 @@ function FormAtencion() {
       {params.id ? (
         <div>
           <AttachFiles />
-          <FormAcciones />{" "}
+          <FormAcciones tipo={"seguridad"} />{" "}
         </div>
       ) : (
         ""

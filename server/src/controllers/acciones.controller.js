@@ -16,8 +16,37 @@ const getAccionesId = async (req, res) => {
 
     const accion = await client.query(
       "SELECT * FROM acciones\
-         WHERE id_atencion = \
-         (SELECT id_atencion FROM atencion_ciudadana WHERE id_atencion =$1 )",
+         WHERE cod_document = \
+         (SELECT cod_atencion FROM atencion_ciudadana WHERE id_atencion =$1 )",
+      [id]
+    );
+
+    await client.query("COMMIT");
+    return res.json({
+      acciones: accion.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+const getAccionesCentral = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const { id } = req.params;
+    await client.query("BEGIN");
+
+    const accion = await client.query(
+      "SELECT * FROM acciones\
+         WHERE cod_document = \
+         (SELECT cod_informes_central FROM informes_central WHERE id_informes_central =$1 )",
       [id]
     );
 
@@ -42,14 +71,58 @@ const createAccion = async (req, res) => {
     await client.query("BEGIN");
     const { id } = req.params;
     const data = req.body;
+    const codigoSegC = await client.query(
+      "SELECT cod_atencion FROM atencion_ciudadana WHERE id_atencion =$1",
+      [id]
+    );
+
     const acciones = await client.query(
       "INSERT INTO acciones \
-        (fecha_accion,desc_acciones,id_atencion,estado_accion,fecha_resolucion)\
+        (fecha_accion,desc_acciones,cod_document,estado_accion,fecha_resolucion)\
         VALUES ($1,$2,$3,$4,$5) RETURNING *",
       [
         data.fecha_accion,
         data.desc_acciones,
-        id,
+        codigoSegC.rows[0].cod_atencion,
+        data.estado_accion,
+        data.fecha_resolucion,
+      ]
+    );
+
+    await client.query("COMMIT");
+    return res.json({
+      accion: acciones.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+const createAccionCentral = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const { id } = req.params;
+    const data = req.body;
+    const codigoCentral = await client.query(
+      "SELECT cod_informes_central FROM informes_central WHERE id_informes_central =$1",
+      [id]
+    );
+
+    const acciones = await client.query(
+      "INSERT INTO acciones \
+        (fecha_accion,desc_acciones,cod_document,estado_accion,fecha_resolucion)\
+        VALUES ($1,$2,$3,$4,$5) RETURNING *",
+      [
+        data.fecha_accion,
+        data.desc_acciones,
+        codigoCentral.rows[0].cod_informes_central,
         data.estado_accion,
         data.fecha_resolucion,
       ]
@@ -127,4 +200,12 @@ const deleteAccion = async (req, res) => {
   }
 };
 
-export { getAcciones, getAccionesId, createAccion, updateAccion, deleteAccion };
+export {
+  getAcciones,
+  getAccionesId,
+  getAccionesCentral,
+  createAccion,
+  createAccionCentral,
+  updateAccion,
+  deleteAccion,
+};

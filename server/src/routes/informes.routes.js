@@ -12,6 +12,12 @@ import {
   getProgreso,
   updateInformeCentral,
 } from "../controllers/informes.controller.js";
+import {
+  createAccionCentral,
+  deleteAccion,
+  getAccionesCentral,
+  updateAccion,
+} from "../controllers/acciones.controller.js";
 
 const router = Router();
 
@@ -27,5 +33,10 @@ router.get("/informe/central/last", getLastInformeCentral);
 router.get("/informe/central/first", getFirstInformeCentral);
 router.get("/informe/central/:id/prev", getPrevInformeCentral);
 router.get("/informe/central/:id/next", getNextInformeCentral);
+
+router.get("/acciones/central/:id", getAccionesCentral);
+router.post("/acciones/central/:id", createAccionCentral);
+router.put("/acciones/central/:id", updateAccion);
+router.delete("/acciones/central/:id", deleteAccion);
 
 export default router;

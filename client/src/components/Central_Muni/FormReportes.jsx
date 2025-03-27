@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import CentralPDF from "../PDFs/CentralPDF";
 
 function FormReportes() {
   const defaultReportes = {

@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-function FormAcciones() {
+function FormAcciones({ tipo }) {
   const defaultAccion = {
     cod_accion: "",
     fecha_accion: "",
@@ -25,7 +25,7 @@ function FormAcciones() {
 
   const loadAcciones = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/acciones/${id}`);
+      const res = await fetch(`http://localhost:3000/acciones/${tipo}/${id}`);
       if (!res.ok) throw new Error("Problemas obteniendo datos");
       const data = await res.json();
 
@@ -60,7 +60,7 @@ function FormAcciones() {
     e.preventDefault();
     indi = params.id;
 
-    const method = params.id != "" ? "POST" : "PUT";
+    const method = id ? "PUT" : "POST";
     try {
       const accionToSubmit = acciones.find(
         (accion) => accion.cod_accion === id
@@ -69,11 +69,14 @@ function FormAcciones() {
         indi != ""
           ? `http://localhost:3000/acciones`
           : `http://localhost:3000/acciones/${indi}`;*/
-      const res = await fetch(`http://localhost:3000/acciones/${indi}`, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(accionToSubmit), // Envía solo el registro específico
-      });
+      const res = await fetch(
+        `http://localhost:3000/acciones/${tipo}/${indi}`,
+        {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(accionToSubmit), // Envía solo el registro específico
+        }
+      );
 
       if (!res.ok) {
         throw new Error("Error al guardar la acción");

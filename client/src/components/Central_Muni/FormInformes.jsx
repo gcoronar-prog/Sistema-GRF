@@ -9,10 +9,11 @@ import SelectTipo from "../SelectTipo";
 import SelectSector from "../SelectSector";
 import ListPendiente from "../ListPendiente";
 import AttachFiles from "../AttachFiles";
-import { BlobProvider } from "@react-pdf/renderer";
+
 import CentralPDF from "../PDFs/CentralPDF";
 import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
+import FormAcciones from "../FormAcciones";
 
 function FormInformes() {
   const params = useParams();
@@ -128,23 +129,12 @@ function FormInformes() {
     setSelectedSector(data.informe[0].sector_informe);
     setSelectedVehiculo(data.informe[0].vehiculos_informe);
     setSelectedTripulante(data.informe[0].tripulantes_informe);
-    setSelectedRecursos(data.informe[0].recursos_informe);
     setSelectedClasif(data.informe[0].clasificacion_informe);
+    setSelectedRecursos(data.informe[0].recursos_informe);
 
     //setSelectedValues(recursosFormateados);
-    console.log(data.informe[0].clasificacion_informe);
-
-    CentralPDF(
-      data.informe,
-      selectedClasif,
-      selectedRecursos,
-      selectedVehiculo,
-      selectedTripulante,
-      selectedOrigin,
-      selectedInformante,
-      selectedTipo,
-      selectedSector
-    );
+    console.log("clasificacion", data.informe[0].clasificacion_informe);
+    console.log("recursos", data.informe[0].recursos_informe);
   };
 
   const handleChanges = (e) => {
@@ -174,8 +164,8 @@ function FormInformes() {
       origen_informe: originFormateado,
       vehiculos_informe: vehiculosFormateados,
       tripulantes_informe: tripuFormateado,
-      recursos_informe: recursosFormateado,
       clasificacion_informe: clasificaFormateado,
+      recursos_informe: recursosFormateado,
     };
     //setSelectedValues(arrayFormateado);
     console.log("Datos enviados", informes);
@@ -295,8 +285,9 @@ function FormInformes() {
     setSelectedInformante("");
     setSelectedSector("");
     setSelectedTipo("");
+    setSelectedClasif("");
     setSelectedRecursos("");
-    setSelectedClasif(""), setEditing(false);
+    setEditing(false);
   };
   const handleEdit = async () => {
     setEditing(false);
@@ -306,19 +297,23 @@ function FormInformes() {
     const id = params.id;
 
     try {
-      const res = await fetch("http://localhost:3000/informe/central/last");
+      const res = await fetch(`http://localhost:3000/informes_central/${id}`);
+      /* const res = await fetch("http://localhost:3000/informe/central/last");
+      const lastInforme = await res.json();
 
       if (!id) {
         if (res.ok) {
-          const lastInforme = await res.json();
           const idInforme = lastInforme.informe[0].id_informes_central;
+
           if (lastInforme) {
             navigate(`/informes/central/${idInforme}`);
             console.log("ultima id", idInforme);
+            console.log("clasificacion previa", selectedClasif);
           }
         }
-      }
+      }*/
 
+      console.log("clasificacion cancel", selectedClasif);
       setEditing(true);
     } catch (error) {
       console.error(error);
@@ -587,7 +582,8 @@ function FormInformes() {
           Eliminar
         </button>
       </form>
-      <button onClick={() => loadInformes(params.id)}>Descargar PDF</button>
+      <FormAcciones tipo="central" />{" "}
+      <button onClick={() => CentralPDF(params.id)}>Descargar PDF</button>
       <div>
         <ListPendiente refresh={refresh} />
       </div>

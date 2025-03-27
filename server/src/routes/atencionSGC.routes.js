@@ -40,10 +40,10 @@ router.get("/fileAttach/:id", findArchivosAten);
 router.post("/fileAttach", createArchivoAten);
 router.delete("/fileAttach/:id", deleteArchivoAten);
 
-router.get("/acciones/", getAcciones);
-router.get("/acciones/:id", getAccionesId);
-router.post("/acciones/:id", createAccion);
-router.put("/acciones/:id", updateAccion);
-router.delete("/acciones/:id", deleteAccion);
+router.get("/acciones/seguridad", getAcciones);
+router.get("/acciones/seguridad/:id", getAccionesId);
+router.post("/acciones/seguridad/:id", createAccion);
+router.put("/acciones/seguridad/:id", updateAccion);
+router.delete("/acciones/seguridad/:id", deleteAccion);
 
 export default router;

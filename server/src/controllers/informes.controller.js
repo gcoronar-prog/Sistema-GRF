@@ -210,8 +210,8 @@ const updateInformeCentral = async (req, res) => {
           data.tipo_informe,
           data.otro_tipo,
           data.descripcion_informe,
-          data.clasificacion_informe,
           data.recursos_informe,
+          data.clasificacion_informe,
           idTipos,
         ]
       ),
