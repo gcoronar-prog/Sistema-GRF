@@ -297,23 +297,8 @@ function FormInformes() {
     const id = params.id;
 
     try {
-      const res = await fetch(`http://localhost:3000/informes_central/${id}`);
-      /* const res = await fetch("http://localhost:3000/informe/central/last");
-      const lastInforme = await res.json();
+      loadInformes(id);
 
-      if (!id) {
-        if (res.ok) {
-          const idInforme = lastInforme.informe[0].id_informes_central;
-
-          if (lastInforme) {
-            navigate(`/informes/central/${idInforme}`);
-            console.log("ultima id", idInforme);
-            console.log("clasificacion previa", selectedClasif);
-          }
-        }
-      }*/
-
-      console.log("clasificacion cancel", selectedClasif);
       setEditing(true);
     } catch (error) {
       console.error(error);
