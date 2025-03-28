@@ -14,6 +14,7 @@ import CentralPDF from "../PDFs/CentralPDF";
 import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
 import FormAcciones from "../FormAcciones";
+import NavbarSGF from "../NavbarSGF";
 
 function FormInformes() {
   const params = useParams();
@@ -297,6 +298,7 @@ function FormInformes() {
     const id = params.id;
 
     try {
+      if (!id) handleLastInforme();
       loadInformes(id);
 
       setEditing(true);
@@ -325,6 +327,7 @@ function FormInformes() {
   return (
     <div>
       FormInformes
+      <NavbarSGF />
       <button
         type="button"
         onClick={handleFirstInforme}
@@ -479,7 +482,7 @@ function FormInformes() {
           edition={editing}
           selectedTipo={selectedTipo}
           setSelectedTipo={setSelectedTipo}
-          tipo={informes.clasificacion_informe}
+          tipo={selectedClasif}
         />
 
         {informes.tipo_informe == "Otro" ? (
@@ -567,7 +570,7 @@ function FormInformes() {
           Eliminar
         </button>
       </form>
-      <FormAcciones tipo="central" />{" "}
+      {selectedClasif.value === 1 ? <FormAcciones tipo="central" /> : ""}
       <button onClick={() => CentralPDF(params.id)}>Descargar PDF</button>
       <div>
         <ListPendiente refresh={refresh} />

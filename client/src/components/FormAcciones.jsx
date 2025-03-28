@@ -234,7 +234,7 @@ function FormAcciones({ tipo }) {
         </tbody>
       </table>
       <button type="button" onClick={() => handleNewData("")}>
-        Nueva acción
+        Agregar acción
       </button>
     </div>
   );

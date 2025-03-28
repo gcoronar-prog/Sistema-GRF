@@ -552,33 +552,16 @@ const getPendientes = async (req, res) => {
   try {
     await client.query("BEGIN");
     const pendientes = await client.query(
-      "SELECT * FROM informes_central a join datos_origen_informe b\
-        on a.id_origen_informe=b.id_origen_informe where estado_informe='pendiente' ORDER BY id_informes_central ASC"
+      "SELECT ic.*, doi.* AS origen_informe,dti.* AS tipo_informe\
+        FROM informes_central ic\
+        JOIN datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+        JOIN datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      WHERE doi.estado_informe='pendiente' ORDER BY ic.id_informes_central ASC"
     );
-    const idTipos = pendientes.rows[0].id_tipos_informe;
-    const idUbicacion = pendientes.rows[0].id_ubicacion_informe;
-    const idVehiculo = pendientes.rows[0].id_vehiculo_informe;
 
-    const [tipos, ubicacion, vehiculo] = await Promise.all([
-      await client.query(
-        "SELECT * FROM datos_tipos_informes WHERE id_tipos_informes=$1",
-        [idTipos]
-      ),
-      await client.query(
-        "SELECT * FROM datos_ubicacion_informe WHERE id_ubicacion=$1",
-        [idUbicacion]
-      ),
-      await client.query(
-        "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
-        [idVehiculo]
-      ),
-    ]);
     await client.query("COMMIT");
     return res.status(200).json({
       informe: pendientes.rows,
-      tipos: tipos.rows,
-      ubicacion: ubicacion.rows,
-      vehiculo: vehiculo.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -593,36 +576,16 @@ const getProgreso = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const pendientes = await client.query(
-      "SELECT * FROM informes_central a join datos_origen_informe b\
-        on a.id_origen_informe=b.id_origen_informe \
-        JOIN datos_tipos_informe c ON a.id_tipos_informes = c.id_tipos_informes\
-        where b.estado_informe='progreso' ORDER BY id_informes_central ASC"
+    const progresos = await client.query(
+      "SELECT ic.*, doi.* AS origen_informe,dti.* AS tipo_informe\
+        FROM informes_central ic\
+        JOIN datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+        JOIN datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      WHERE doi.estado_informe='progreso' ORDER BY ic.id_informes_central ASC"
     );
-    const idTipos = pendientes.rows[0].id_tipos_informe;
-    const idUbicacion = pendientes.rows[0].id_ubicacion_informe;
-    const idVehiculo = pendientes.rows[0].id_vehiculo_informe;
-
-    const [tipos, ubicacion, vehiculo] = await Promise.all([
-      await client.query(
-        "SELECT * FROM datos_tipos_informes WHERE id_tipos_informes=$1",
-        [idTipos]
-      ),
-      await client.query(
-        "SELECT * FROM datos_ubicacion_informe WHERE id_ubicacion=$1",
-        [idUbicacion]
-      ),
-      await client.query(
-        "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
-        [idVehiculo]
-      ),
-    ]);
     await client.query("COMMIT");
     return res.status(200).json({
-      informe: pendientes.rows,
-      tipos: tipos.rows,
-      ubicacion: ubicacion.rows,
-      vehiculo: vehiculo.rows,
+      informe: progresos.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");

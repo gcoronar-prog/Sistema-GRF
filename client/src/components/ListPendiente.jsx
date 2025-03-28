@@ -61,7 +61,7 @@ function ListPendiente(refresh) {
                 <td>{p.cod_informes_central}</td>
                 <td>{new Date(p.fecha_informe).toLocaleString()}</td>
                 <td>{p.captura_informe}</td>
-                <td>{p.clasificacion_informe}</td>
+                <td>{p.clasificacion_informe.label}</td>
                 <td>{p.estado_informe}</td>
                 <td>{p.origen_informe.label}</td>
                 <td>{p.persona_informante.label}</td>

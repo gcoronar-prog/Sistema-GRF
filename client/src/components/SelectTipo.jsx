@@ -5,7 +5,6 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
   const [key, setKey] = useState(0);
   useEffect(() => {
     if (tipo?.value) {
-      console.log("Tipo seleccionado:", tipo.label);
       setKey((prevKey) => prevKey + 1);
     }
     //loadTipo();
@@ -26,7 +25,7 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
         value: item.id_tipo,
         label: item.descripcion,
       }));
-      console.log("asyncselect", datos);
+      //console.log("asyncselect", datos);
       return datos;
     } catch (error) {
       console.error("Error:", error);
