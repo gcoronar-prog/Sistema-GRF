@@ -32,20 +32,22 @@ function NavbarSGF() {
                 <a className="nav-link">Central Municipal</a>
                 <ul>
                   <li>
-                    <span
+                    <Link
                       onClick={handleLastInforme}
-                      style={{ cursor: "pointer" }}
+                      //style={{ cursor: "pointer" }}
                     >
                       Informes Central Municipal
-                    </span>
+                    </Link>
                   </li>
                   <li>
-                    <Link>Estadísticas Central Municipal</Link>
+                    <Link to={"/statistics/central/v1"}>
+                      Estadísticas Central Municipal
+                    </Link>
                   </li>
                 </ul>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="/recursos">
+                <a className="nav-link" href="/">
                   Inspección Municipal
                 </a>
                 <ul>
@@ -53,33 +55,7 @@ function NavbarSGF() {
                     <a href="">Expedientes Inspección</a>
                   </li>
                   <li>
-                    <a href="">Estadísticas Insección</a>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/estadocentral">
-                  Seguridad Ciudadana
-                </a>
-                <ul>
-                  <li>
-                    <a href="">Atención de público</a>
-                  </li>
-                  <li>
-                    <a href="">Solicitud de Imágenes</a>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/centralstats">
-                  GRD
-                </a>
-                <ul>
-                  <li>
-                    <a href="">Informes ALFA</a>
-                  </li>
-                  <li>
-                    <a href="">Inventario GRD</a>
+                    <a href="">Estadísticas Inspección</a>
                   </li>
                 </ul>
               </li>

@@ -10,6 +10,7 @@ import {
   getPendientes,
   getPrevInformeCentral,
   getProgreso,
+  searchInformeCentral,
   updateInformeCentral,
 } from "../controllers/informes.controller.js";
 import {
@@ -38,5 +39,7 @@ router.get("/acciones/central/:id", getAccionesCentral);
 router.post("/acciones/central/:id", createAccionCentral);
 router.put("/acciones/central/:id", updateAccion);
 router.delete("/acciones/central/:id", deleteAccion);
+
+router.get("/search_inform", searchInformeCentral);
 
 export default router;

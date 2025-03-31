@@ -36,34 +36,6 @@ const getInformeCentral = async (req, res) => {
   try {
     const { id } = req.params;
     await client.query("BEGIN");
-    /*const informe = await client.query(
-      "SELECT * FROM informes_central WHERE id_informes_central = $1",
-      [id]
-    );
-
-    const idOrigen = informe.rows[0].id_origen_informe;
-    const idTipos = informe.rows[0].id_tipos_informe;
-    const idUbicacion = informe.rows[0].id_ubicacion_informe;
-    const idVehiculo = informe.rows[0].id_vehiculo_informe;
-
-    const [origen, tipo, ubicacion, vehiculo] = await Promise.all([
-      await client.query(
-        "SELECT * FROM datos_origen_informe WHERE id_origen_informe=$1",
-        [idOrigen]
-      ),
-      await client.query(
-        "SELECT * FROM datos_tipos_informes WHERE id_tipos_informes=$1",
-        [idTipos]
-      ),
-      await client.query(
-        "SELECT * FROM datos_ubicacion_informe WHERE id_ubicacion =$1",
-        [idUbicacion]
-      ),
-      await client.query(
-        "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculo = $1",
-        [idVehiculo]
-      ),
-    ]);*/
 
     const informe = await client.query(
       "SELECT \
@@ -83,6 +55,46 @@ const getInformeCentral = async (req, res) => {
       LEFT JOIN \
           datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
         WHERE ic.id_informes_central=$1",
+      [id]
+    );
+
+    await client.query("COMMIT");
+    return res.status(200).json({
+      informe: informe.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+const searchInformeCentral = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.query;
+    await client.query("BEGIN");
+
+    const informe = await client.query(
+      "SELECT \
+          ic.*,\
+          doi.* AS origen_informe,\
+          dti.* AS tipo_informe,\
+          dui.* AS ubicacion_informe,\
+          dvi.* AS vehiculo_informe\
+      FROM \
+          informes_central ic\
+      LEFT JOIN \
+          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+      LEFT JOIN \
+          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      LEFT JOIN \
+          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
+      LEFT JOIN \
+          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
+        WHERE ic.cod_informes_central=$1",
       [id]
     );
 
@@ -704,4 +716,5 @@ export {
   deleteArchivo,
   findArchivos,
   findArchivosById,
+  searchInformeCentral,
 };

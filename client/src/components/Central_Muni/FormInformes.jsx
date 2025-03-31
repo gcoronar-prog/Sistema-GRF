@@ -15,6 +15,7 @@ import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
 import FormAcciones from "../FormAcciones";
 import NavbarSGF from "../NavbarSGF";
+import SearchForm from "../SearchForm";
 
 function FormInformes() {
   const params = useParams();
@@ -576,6 +577,7 @@ function FormInformes() {
         <ListPendiente refresh={refresh} />
       </div>
       <div>{editing ? <AttachFiles /> : ""}</div>
+      <SearchForm />
     </div>
   );
 }

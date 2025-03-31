@@ -14,6 +14,7 @@ import ClasifCentralPDF from "../PDFs/ClasifCentralPDF.jsx";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF.jsx";
 import RangoCentralPDF from "../PDFs/RangoCentralPDF.jsx";
 import EstadoCentralPDF from "../PDFs/EstadoCentralPDF.jsx";
+import NavbarSGF from "../NavbarSGF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -298,6 +299,7 @@ function StatisticsCentral() {
 
   return (
     <div>
+      <NavbarSGF />
       <div className="rangoFecha">
         <label htmlFor="">Fecha de inicio</label>
         <input
