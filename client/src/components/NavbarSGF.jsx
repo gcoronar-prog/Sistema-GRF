@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function NavbarSGF() {
+function NavbarSGF({ central }) {
   const navigate = useNavigate();
   const handleLastInforme = async () => {
     const res = await fetch("http://localhost:3000/informe/central/last");
@@ -16,52 +16,46 @@ function NavbarSGF() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="/">
-            SGF
-          </a>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav">
+      <nav className="navbar">
+        <ul className="navbar-nav">
+          <li className="nav-item">
+            <a className="nav-link active" aria-current="page" href="/">
+              Inicio
+            </a>
+          </li>
+          {central === "central" ? (
+            <>
               <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="/">
-                  Inicio
-                </a>
+                <Link
+                  className="nav-link active"
+                  onClick={handleLastInforme}
+                  //style={{ cursor: "pointer" }}
+                >
+                  Informes Central Municipal
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link">Central Municipal</a>
-                <ul>
-                  <li>
-                    <Link
-                      onClick={handleLastInforme}
-                      //style={{ cursor: "pointer" }}
-                    >
-                      Informes Central Municipal
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/statistics/central/v1"}>
-                      Estadísticas Central Municipal
-                    </Link>
-                  </li>
-                </ul>
+                <Link className="nav-link active" to={"/statistics/central/v1"}>
+                  Estadísticas Central Municipal
+                </Link>
               </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/">
-                  Inspección Municipal
-                </a>
-                <ul>
-                  <li>
-                    <a href="">Expedientes Inspección</a>
-                  </li>
-                  <li>
-                    <a href="">Estadísticas Inspección</a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </div>
+            </>
+          ) : (
+            <>
+              <a className="nav-link" href="/">
+                Inspección Municipal
+              </a>
+
+              <a className="nav-link active" href="">
+                Expedientes Inspección
+              </a>
+
+              <a className="nav-link active" href="">
+                Estadísticas Inspección
+              </a>
+            </>
+          )}
+        </ul>
       </nav>
     </>
   );

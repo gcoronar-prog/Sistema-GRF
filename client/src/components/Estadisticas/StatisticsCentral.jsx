@@ -299,7 +299,7 @@ function StatisticsCentral() {
 
   return (
     <div>
-      <NavbarSGF />
+      <NavbarSGF central={"central"} />
       <div className="rangoFecha">
         <label htmlFor="">Fecha de inicio</label>
         <input

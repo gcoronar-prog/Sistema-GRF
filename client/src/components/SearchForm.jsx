@@ -1,15 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function SearchForm() {
   const [codigo, setCodigo] = useState("");
+  const navigate = useNavigate();
   const buscaInforme = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/search_inform?id=${id}`);
+      const codCentral = "CINF" + id;
+      const res = await fetch(
+        `http://localhost:3000/search_inform?id=${codCentral}`
+      );
       const data = await res.json();
 
-      console.log("Busqueda informe", data.informe);
-
-      //agregar un navigate
+      if (data.informe.length > 0) {
+        navigate(`/informes/central/${id}`);
+      } else {
+        window.alert("No existen registros con este codigo");
+        setCodigo("");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -17,13 +25,19 @@ function SearchForm() {
 
   const handleChanges = (e) => {
     const id = e.target.value.toUpperCase();
+
     setCodigo(id);
   };
 
   return (
     <div>
       <label htmlFor="">Codigo informe</label>
-      <input type="text" onChange={handleChanges} value={codigo} />
+      <input
+        name="codigoBusqueda"
+        type="text"
+        onChange={handleChanges}
+        value={codigo}
+      />
       <button onClick={() => buscaInforme(codigo)}>Buscar</button>
     </div>
   );
