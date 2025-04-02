@@ -19,6 +19,7 @@ import SelectVehiculo from "./components/SelectVehiculo";
 import StatisticsCentral from "./components/Estadisticas/StatisticsCentral";
 import LoginSGF from "./components/Login/LoginSGF";
 import NavbarSGF from "./components/NavbarSGF";
+import SearchForm from "./components/SearchForm";
 
 function App() {
   return (
@@ -62,6 +63,8 @@ function App() {
             path="/statistics/central/v1"
             element={<StatisticsCentral />}
           />
+
+          <Route path="/search/informe" element={<SearchForm />} />
         </Routes>
       </Container>
     </BrowserRouter>
