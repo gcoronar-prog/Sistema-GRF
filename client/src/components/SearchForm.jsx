@@ -30,16 +30,24 @@ function SearchForm() {
   };
 
   return (
-    <div>
-      <label htmlFor="">Codigo informe</label>
+    <>
       <input
+        className="form-control me-2"
+        id="codigoBusqueda"
         name="codigoBusqueda"
-        type="text"
+        type="search"
         onChange={handleChanges}
         value={codigo}
+        placeholder="Código del informe"
+        aria-label="Search"
       />
-      <button onClick={() => buscaInforme(codigo)}>Buscar</button>
-    </div>
+      <button
+        className="btn btn-outline-success"
+        onClick={() => buscaInforme(codigo)}
+      >
+        Buscar
+      </button>
+    </>
   );
 }
 

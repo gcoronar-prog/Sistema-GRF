@@ -330,7 +330,6 @@ function FormInformes() {
     <div>
       FormInformes
       <NavbarSGF central={"central"} />
-      <SearchForm />
       <div className="btn-group" role="group">
         <button
           type="button"
