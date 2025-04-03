@@ -33,36 +33,48 @@ function ListPendiente(refresh) {
 
   return (
     <>
-      <button onClick={() => setEstado(1)}>Pendiente</button>
-      <button onClick={() => setEstado(2)}>Progreso</button>
-      <h3>Listado informes {estado === 1 ? "pendientes" : "en progreso"}</h3>
-      <div>
-        <table>
-          <thead>
+      <div className="btn-group mb-2">
+        <button
+          className="btn btn-outline-success"
+          onClick={() => setEstado(1)}
+        >
+          Pendiente
+        </button>
+        <button
+          className="btn btn-outline-secondary"
+          onClick={() => setEstado(2)}
+        >
+          Progreso
+        </button>
+      </div>
+      <p className="h5">
+        Listado informes {estado === 1 ? "pendientes" : "en progreso"}
+      </p>
+      <div style={{ maxWidth: "600px", margin: "auto" }}>
+        <table className="table table-striped table-hover table-bordered table-sm">
+          <thead className="table-light text-center">
             <tr>
-              <th>ID Informe</th>
               <th>Código Informe</th>
               <th>Fecha Informe</th>
-              <th>Captura</th>
+
               <th>Clasificación</th>
-              <th>Estado</th>
+
               <th>Origen</th>
               <th>Persona Informante</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="table-group-divider text-center">
             {pendientes.map((p) => (
               <tr
                 key={p.id_informes_central}
                 style={{ cursor: "pointer" }}
                 onClick={() => moveToPendiente(p.id_informes_central)}
               >
-                <td>{p.id_informes_central}</td>
                 <td>{p.cod_informes_central}</td>
                 <td>{new Date(p.fecha_informe).toLocaleString()}</td>
-                <td>{p.captura_informe}</td>
+
                 <td>{p.clasificacion_informe.label}</td>
-                <td>{p.estado_informe}</td>
+
                 <td>{p.origen_informe.label}</td>
                 <td>{p.persona_informante.label}</td>
               </tr>

@@ -175,6 +175,7 @@ const updateAccion = async (req, res) => {
     client.release();
   }
 };
+
 const deleteAccion = async (req, res) => {
   const client = await pool.connect();
   try {

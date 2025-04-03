@@ -377,9 +377,9 @@ function FormInformes() {
         </button>
       </div>
       <br />
-      <label className="form-label">
+      <span className="form-label">
         Codigo informe: {informes.cod_informes_central}
-      </label>
+      </span>
       <form action="" onSubmit={handleSubmit}>
         <label htmlFor="fecha_informe" className="form-label">
           Fecha de informe:
