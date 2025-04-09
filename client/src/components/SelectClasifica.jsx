@@ -15,7 +15,7 @@ const SelectClasifica = ({ selectedClasif, setSelectedClasif, edition }) => {
   //const [selectedOption, setSelectedOption] = useState(null);
 
   return (
-    <div style={{ width: "30%" }}>
+    <div>
       <Select
         options={options}
         value={selectedClasif}

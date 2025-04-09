@@ -20,7 +20,7 @@ function SelectOrigin({ selectedOrigin, setSelectedOrigin, edition }) {
   };
 
   return (
-    <div style={{ width: "30%" }}>
+    <div>
       <AsyncSelect
         isDisabled={edition}
         cacheOptions

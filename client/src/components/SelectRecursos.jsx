@@ -13,7 +13,7 @@ const SelectRecursos = ({ selectedRecursos, setSelectedRecursos, edition }) => {
   };
 
   return (
-    <div style={{ width: "30%" }}>
+    <div>
       <AsyncSelect
         isDisabled={edition}
         isMulti

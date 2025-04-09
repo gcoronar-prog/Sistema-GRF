@@ -34,7 +34,7 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
   };
 
   return (
-    <div style={{ width: "30%" }}>
+    <div>
       <AsyncSelect
         key={key}
         isDisabled={edition}

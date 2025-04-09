@@ -15,7 +15,6 @@ import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
 import FormAcciones from "../FormAcciones";
 import NavbarSGF from "../NavbarSGF";
-import SearchForm from "../SearchForm";
 
 function FormInformes() {
   const params = useParams();
@@ -151,6 +150,7 @@ function FormInformes() {
     /*const arrayFormateado = Array.isArray(selectedValues)
       ? selectedValues.join(", ")
       : [];*/
+    window.confirm("a");
     const vehiculosFormateados = JSON.stringify(selectedVehiculo);
     const tripuFormateado = JSON.stringify(selectedTripulante);
     const originFormateado = JSON.stringify(selectedOrigin);
@@ -327,326 +327,390 @@ function FormInformes() {
   };
 
   return (
-    <div>
-      FormInformes
-      <NavbarSGF central={"central"} />
-      <div className="d-flex flex-wrap align-items-center gap-2 my-3">
-        <button
-          type="button"
-          className="btn btn-outline-primary d-flex align-items-center"
-          onClick={handleFirstInforme}
-          disabled={
-            //disabledPrevButton
-            false
-          }
-        >
-          <i className="bi bi-skip-start me-1"></i> Primera Informe
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-primary d-flex align-items-center"
-          onClick={handlePrevious}
-          disabled={
-            //disabledPrevButton
-            false
-          }
-        >
-          <i className="bi bi-chevron-left me-1"></i> Atras
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-primary d-flex align-items-center"
-          onClick={handleNext}
-          disabled={
-            //disabledNextButton
-            false
-          }
-        >
-          Siguiente <i className="bi bi-chevron-right ms-1"></i>
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-primary d-flex align-items-center"
-          onClick={handleLastInforme}
-          disabled={
-            false
-            //disabledNextButton
-          }
-        >
-          Ultimo Informe <i className="bi bi-skip-end ms-1"></i>
-        </button>
-      </div>
-      <br />
-      <div className="container">
-        <div className="mb-3">
-          <span className="form-label fw-bold">
-            Código informe: {informes.cod_informes_central}
-          </span>
+    <>
+      <div className="container-fluid mt-4 w-100">
+        <NavbarSGF central={"central"} />
+        <div className="d-flex flex-wrap align-items-center gap-2 my-3">
+          <button
+            type="button"
+            className="btn btn-outline-primary d-flex align-items-center"
+            onClick={handleFirstInforme}
+            disabled={
+              //disabledPrevButton
+              false
+            }
+          >
+            <i className="bi bi-skip-start me-1"></i> Primera Informe
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline-primary d-flex align-items-center"
+            onClick={handlePrevious}
+            disabled={
+              //disabledPrevButton
+              false
+            }
+          >
+            <i className="bi bi-chevron-left me-1"></i> Atras
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline-primary d-flex align-items-center"
+            onClick={handleNext}
+            disabled={
+              //disabledNextButton
+              false
+            }
+          >
+            Siguiente <i className="bi bi-chevron-right ms-1"></i>
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline-primary d-flex align-items-center"
+            onClick={handleLastInforme}
+            disabled={
+              false
+              //disabledNextButton
+            }
+          >
+            Ultimo Informe <i className="bi bi-skip-end ms-1"></i>
+          </button>
         </div>
-        <form action="" onSubmit={handleSubmit}>
-          <div className="row g-3 mb-4">
-            <div className="col-md-6">
-              <label htmlFor="fecha_informe" className="form-label">
-                Fecha de informe:
-              </label>
-              <input
-                id="fecha_informe"
-                className="form-control"
-                type="datetime-local"
-                name="fecha_informe"
-                onChange={handleChanges}
-                value={informes.fecha_informe}
-                disabled={editing}
-              />
-            </div>
-            <div className="col-md-6">
-              <label htmlFor="origen_informe" className="form-label">
-                Origen de la información
-              </label>
-              <SelectOrigin
-                id="origen_informe"
-                edition={editing}
-                selectedOrigin={selectedOrigin}
-                setSelectedOrigin={setSelectedOrigin}
-              />
-            </div>
+        <br />
 
-            <div className="col-md-6">
-              <label htmlFor="persona_informante" className="form-label">
-                Persona informante
-              </label>
-              <SelectInformante
-                id="persona_informante"
-                edition={editing}
-                selectedInformante={selectedInformante}
-                setSelectedInformante={setSelectedInformante}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="form-label d-block">Captura del informe:</label>
-              <div className="d-flex flex-wrap gap-3">
-                {["radios", "telefono", "rrss", "presencial", "email"].map(
-                  (tipo) => (
-                    <div className="form-check form-check-inline" key={tipo}>
+        <div className="row">
+          <div className="col-md-6">
+            <div className="card">
+              <div className="card-header">
+                <span className="form-label fw-bold">
+                  Informes Central: {informes.cod_informes_central}
+                </span>
+              </div>
+              <div className="card-body">
+                <form action="" onSubmit={handleSubmit}>
+                  <div className="row g-3 mb-4">
+                    <div className="col-md-5">
+                      <label htmlFor="fecha_informe" className="form-label">
+                        Fecha de informe:
+                      </label>
                       <input
-                        className="form-check-input"
-                        type="radio"
-                        name="captura_informe"
-                        id={tipo}
-                        value={tipo}
-                        checked={informes.captura_informe === tipo}
+                        id="fecha_informe"
+                        className="form-control"
+                        type="datetime-local"
+                        name="fecha_informe"
                         onChange={handleChanges}
+                        value={informes.fecha_informe}
                         disabled={editing}
                       />
-                      <label className="form-check-label" htmlFor={tipo}>
-                        {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-                      </label>
                     </div>
-                  )
-                )}
+                    <div className="col-md-6">
+                      <label htmlFor="origen_informe" className="form-label">
+                        Origen de la información
+                      </label>
+                      <SelectOrigin
+                        id="origen_informe"
+                        edition={editing}
+                        selectedOrigin={selectedOrigin}
+                        setSelectedOrigin={setSelectedOrigin}
+                      />
+                    </div>
+
+                    <div className="col-md-6">
+                      <label
+                        htmlFor="persona_informante"
+                        className="form-label"
+                      >
+                        Persona informante
+                      </label>
+                      <SelectInformante
+                        id="persona_informante"
+                        edition={editing}
+                        selectedInformante={selectedInformante}
+                        setSelectedInformante={setSelectedInformante}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label d-block">
+                        Captura del informe:
+                      </label>
+                      <div className="d-flex flex-wrap gap-3">
+                        {[
+                          "radios",
+                          "telefono",
+                          "rrss",
+                          "presencial",
+                          "email",
+                        ].map((tipo) => (
+                          <div className="form-check form-check" key={tipo}>
+                            <input
+                              className="form-check-input"
+                              type="radio"
+                              name="captura_informe"
+                              id={tipo}
+                              value={tipo}
+                              checked={informes.captura_informe === tipo}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                            <label className="form-check-label" htmlFor={tipo}>
+                              {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <label
+                        htmlFor="persona_informante"
+                        className="form-label"
+                      >
+                        Clasificación
+                      </label>
+                      <SelectClasifica
+                        id="clasificacion"
+                        selectedClasif={selectedClasif}
+                        setSelectedClasif={setSelectedClasif}
+                        edition={editing}
+                      />
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label d-block">
+                        Estado del informe:
+                      </label>
+                      <div className="d-flex flex-wrap gap-3">
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_informe"
+                            id="atendido"
+                            onChange={handleChanges}
+                            value={"atendido"}
+                            checked={informes.estado_informe === "atendido"}
+                            disabled={editing}
+                          />
+                          <label
+                            htmlFor="atendido"
+                            className="form-check-label"
+                          >
+                            Atendido
+                          </label>
+                        </div>
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_informe"
+                            id="progreso"
+                            onChange={handleChanges}
+                            value={"progreso"}
+                            checked={informes.estado_informe === "progreso"}
+                            disabled={editing}
+                          />
+                          <label
+                            htmlFor="progreso"
+                            className="form-check-label"
+                          >
+                            En progreso
+                          </label>
+                        </div>
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_informe"
+                            id="pendiente"
+                            onChange={handleChanges}
+                            value={"pendiente"}
+                            checked={informes.estado_informe === "pendiente"}
+                            disabled={editing}
+                          />
+                          <label
+                            htmlFor="pendiente"
+                            className="form-check-label"
+                          >
+                            Pendiente
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-8">
+                      <label htmlFor="tipoInforme" className="form-label">
+                        Tipo de informe
+                      </label>
+                      <SelectTipo
+                        id="tipoInforme"
+                        edition={editing}
+                        selectedTipo={selectedTipo}
+                        setSelectedTipo={setSelectedTipo}
+                        tipo={selectedClasif}
+                      />
+                    </div>
+
+                    {informes.tipo_informe == "Otro" ? (
+                      <>
+                        <label htmlFor="otroTipo" className="form-label">
+                          Otro tipo de informe:
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="otro_tipo"
+                          id="otroTipo"
+                          onChange={handleChanges}
+                          value={informes.otro_tipo}
+                          disabled={editing}
+                        />
+                      </>
+                    ) : (
+                      ""
+                    )}
+
+                    <div className="w-25,">
+                      <label htmlFor="descripcion" className="form-label">
+                        Descripción:
+                      </label>
+                      <textarea
+                        className="form-control"
+                        name="descripcion_informe"
+                        id="descripcion"
+                        onChange={handleChanges}
+                        value={informes.descripcion_informe}
+                        disabled={editing}
+                      ></textarea>
+                    </div>
+
+                    <div className="col-md-9">
+                      <label htmlFor="recursosInvo" className="form-label">
+                        Recursos Involucrados:
+                      </label>
+                      <SelectRecursos
+                        id="recursosInvo"
+                        edition={editing}
+                        selectedRecursos={selectedRecursos}
+                        setSelectedRecursos={setSelectedRecursos}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label htmlFor="sector" className="form-label">
+                        Sector:
+                      </label>
+                      <SelectSector
+                        id="sector"
+                        edition={editing}
+                        selectedSector={selectedSector}
+                        setSelectedSector={setSelectedSector}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label htmlFor="direccion" className="form-label">
+                        Dirección:
+                      </label>
+                      <input
+                        className="form-control"
+                        type="text"
+                        name="direccion_informe"
+                        id="direccion"
+                        onChange={handleChanges}
+                        value={informes.direccion_informe}
+                        disabled={editing}
+                      />
+                    </div>
+
+                    <div className="col-md-8">
+                      <label htmlFor="vehiculos" className="form-label">
+                        Ingrese vehículos
+                      </label>
+                      <SelectVehiculo
+                        id="vehiculos"
+                        edition={editing}
+                        selectedVehiculo={selectedVehiculo}
+                        setSelectedVehiculo={setSelectedVehiculo}
+                      />
+                    </div>
+
+                    <div className="col-md-8">
+                      <label htmlFor="tripu" className="form-label">
+                        Ingrese Tripulantes
+                      </label>
+                      <SelectTripulantes
+                        id="tripu"
+                        edition={editing}
+                        selectedTripulante={selectedTripulante}
+                        setSelectedTripulante={setSelectedTripulante}
+                      />
+                    </div>
+                  </div>
+
+                  {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+                  <div className="d-flex flex-wrap gap-2 mt-3">
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={handleNewInform}
+                    >
+                      Nuevo Expediente
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleEdit}
+                      style={{ display: editing ? "" : "none" }}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      style={{ display: editing ? "none" : "" }}
+                    >
+                      Guardar Informe
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      style={{ display: editing ? "none" : "" }}
+                      onClick={handleCancel}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      style={{ display: editing ? "" : "none" }}
+                      onClick={handleDeleteInforme}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div className="card-footer">
+                {" "}
+                <button
+                  className="btn btn-info"
+                  onClick={() => CentralPDF(params.id)}
+                >
+                  Descargar PDF
+                </button>
               </div>
             </div>
-            <div className="col-md-6">
-              <label htmlFor="persona_informante" className="form-label">
-                Clasificación
-              </label>
-              <SelectClasifica
-                id="clasificacion"
-                selectedClasif={selectedClasif}
-                setSelectedClasif={setSelectedClasif}
-                edition={editing}
-              />
-            </div>
           </div>
+          <div className="col-md-6">
+            {selectedClasif.value === 1 ? <FormAcciones tipo="central" /> : ""}
 
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="estado_informe"
-              id="atendido"
-              onChange={handleChanges}
-              value={"atendido"}
-              checked={informes.estado_informe === "atendido"}
-              disabled={editing}
-            />
-            <label htmlFor="atendido" className="form-check-label">
-              Atendido
-            </label>
+            <ListPendiente refresh={refresh} />
           </div>
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="estado_informe"
-              id="progreso"
-              onChange={handleChanges}
-              value={"progreso"}
-              checked={informes.estado_informe === "progreso"}
-              disabled={editing}
-            />
-            <label htmlFor="progreso" className="form-check-label">
-              En progreso
-            </label>
-          </div>
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="estado_informe"
-              id="pendiente"
-              onChange={handleChanges}
-              value={"pendiente"}
-              checked={informes.estado_informe === "pendiente"}
-              disabled={editing}
-            />
-            <label htmlFor="pendiente" className="form-check-label">
-              Pendiente
-            </label>
-          </div>
-
-          <label htmlFor="tipoInforme" className="form-label">
-            Tipo de informe
-          </label>
-          <SelectTipo
-            id="tipoInforme"
-            edition={editing}
-            selectedTipo={selectedTipo}
-            setSelectedTipo={setSelectedTipo}
-            tipo={selectedClasif}
-          />
-
-          {informes.tipo_informe == "Otro" ? (
-            <>
-              <label htmlFor="otroTipo" className="form-label">
-                Otro tipo de informe:
-              </label>
-              <input
-                className="form-control"
-                type="text"
-                name="otro_tipo"
-                id="otroTipo"
-                onChange={handleChanges}
-                value={informes.otro_tipo}
-                disabled={editing}
-              />
-            </>
-          ) : (
-            ""
-          )}
-          <label htmlFor="descripcion" className="form-label">
-            Descripción:
-          </label>
-          <textarea
-            className="form-control"
-            name="descripcion_informe"
-            id="descripcion"
-            onChange={handleChanges}
-            value={informes.descripcion_informe}
-            disabled={editing}
-          ></textarea>
-
-          <label htmlFor="recursosInvo" className="form-label">
-            Recursos Involucrados:
-          </label>
-          <SelectRecursos
-            id="recursosInvo"
-            edition={editing}
-            selectedRecursos={selectedRecursos}
-            setSelectedRecursos={setSelectedRecursos}
-          />
-          <label htmlFor="sector" className="form-label">
-            Sector:
-          </label>
-          <SelectSector
-            id="sector"
-            edition={editing}
-            selectedSector={selectedSector}
-            setSelectedSector={setSelectedSector}
-          />
-          <label htmlFor="direccion" className="form-label">
-            Dirección:
-          </label>
-          <input
-            className="form-control"
-            type="text"
-            name="direccion_informe"
-            id="direccion"
-            onChange={handleChanges}
-            value={informes.direccion_informe}
-            disabled={editing}
-          />
-
-          <label htmlFor="vehiculos" className="form-label">
-            Ingrese vehículos
-          </label>
-          <SelectVehiculo
-            id="vehiculos"
-            edition={editing}
-            selectedVehiculo={selectedVehiculo}
-            setSelectedVehiculo={setSelectedVehiculo}
-          />
-
-          <label htmlFor="tripu" className="form-label">
-            Ingrese Tripulantes
-          </label>
-          <SelectTripulantes
-            id="tripu"
-            edition={editing}
-            selectedTripulante={selectedTripulante}
-            setSelectedTripulante={setSelectedTripulante}
-          />
-
-          {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
-
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={handleNewInform}
-          >
-            Nuevo Expediente
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleEdit}
-            style={{ display: editing ? "" : "none" }}
-          >
-            Editar
-          </button>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ display: editing ? "none" : "" }}
-          >
-            Guardar Informe
-          </button>
-          <button
-            type="button"
-            className="btn btn-danger"
-            style={{ display: editing ? "none" : "" }}
-            onClick={handleCancel}
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            className="btn btn-danger"
-            onClick={handleDeleteInforme}
-          >
-            Eliminar
-          </button>
-        </form>
+        </div>
+        <div>
+          <div></div>
+          <div>{editing ? <AttachFiles /> : ""}</div>
+        </div>
       </div>
-      {selectedClasif.value === 1 ? <FormAcciones tipo="central" /> : ""}
-      <button className="btn btn-info" onClick={() => CentralPDF(params.id)}>
-        Descargar PDF
-      </button>
-      <div>
-        <ListPendiente refresh={refresh} />
-      </div>
-      <div>{editing ? <AttachFiles /> : ""}</div>
-    </div>
+    </>
   );
 }
 

@@ -20,7 +20,7 @@ function SelectSector({ selectedSector, setSelectedSector, edition }) {
   };
 
   return (
-    <div style={{ width: "30%" }}>
+    <div>
       <AsyncSelect
         isDisabled={edition}
         cacheOptions

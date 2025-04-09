@@ -24,7 +24,7 @@ function SelectInformante({
   };
 
   return (
-    <div style={{ width: "30%" }}>
+    <div>
       <AsyncSelect
         isDisabled={edition}
         cacheOptions
