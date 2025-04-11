@@ -5,7 +5,9 @@ import SearchForm from "./SearchForm";
 function NavbarSGF({ central }) {
   const navigate = useNavigate();
   const handleLastInforme = async () => {
-    const res = await fetch("http://localhost:3000/informe/central/last");
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
+    );
 
     const lastInforme = await res.json();
 
@@ -28,23 +30,7 @@ function NavbarSGF({ central }) {
                 Inicio
               </a>
             </li>
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                role="button"
-                aria-expanded="false"
-              >
-                Menu
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Action
-                  </a>
-                </li>
-              </ul>
-            </li>
+
             {central === "central" ? (
               <>
                 <li className="nav-item">

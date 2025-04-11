@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, Select, MenuItem } from "@mui/material";
-import { LoadScript, Autocomplete } from "@react-google-maps/api";
+
 import { useParams } from "react-router-dom";
 
 function ReportList() {
@@ -20,13 +20,17 @@ function ReportList() {
   }, [params.id]);
 
   const loadVehiculo = async () => {
-    const response = await fetch("http://localhost:3000/vehiculos");
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/vehiculos`
+    );
     const data = await response.json();
     setVehiculo(data);
   };
 
   const loadReportes = async (id) => {
-    const res = await fetch(`http://localhost:3000/central/${id}`);
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/central/${id}`
+    );
     const data = await res.json();
     const repo = data[0];
     //setVehiculo(JSON.parse(repo.vehiculo));

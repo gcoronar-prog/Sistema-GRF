@@ -3,10 +3,10 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { Button, IconButton, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 
-const AttachFiles = () => {
+const AttachFiles = ({ idInforme }) => {
   const params = useParams();
   const location = useLocation();
 
@@ -23,10 +23,20 @@ const AttachFiles = () => {
   const [listImagen, setListImagen] = useState([]);
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
-    loadListaImagen(params.id);
-  }, [params.id]);
+    setListImagen([]);
+    setSelectedId(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    if (idInforme) {
+      loadListaImagen(idInforme);
+    }
+  }, [idInforme]);
 
   const handleClick = (id) => {
     setSelectedId(id === selectedId ? null : id); // Alterna el color al hacer clic
@@ -47,7 +57,9 @@ const AttachFiles = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/upload/${entityType}/${params.id}`,
+        `${
+          import.meta.env.VITE_SERVER_ROUTE_BACK
+        }/api/upload/${entityType}/${idInforme}`,
         {
           method: "POST",
           body: formData,
@@ -62,7 +74,7 @@ const AttachFiles = () => {
         setUploadStatus("Error al subir el archivo.");
       }
 
-      loadListaImagen(params.id);
+      loadListaImagen(idInforme);
     } catch (error) {
       console.error("Error de red:", error);
       setUploadStatus("Error de red al subir el archivo.");
@@ -70,19 +82,32 @@ const AttachFiles = () => {
   };
 
   const handleDeleteFile = async (id) => {
-    await fetch(`http://localhost:3000/api/galeria/${entityType}/${id}`, {
-      method: "DELETE",
-    });
+    const confirmar = window.confirm("¿Desea eliminar la imagen?");
+    if (!confirmar) return;
+    await fetch(
+      `${
+        import.meta.env.VITE_SERVER_ROUTE_BACK
+      }/api/galeria/${entityType}/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
     setListImagen(listImagen.filter((lista) => lista.id_adjunto !== id));
   };
 
   const loadListaImagen = async (id) => {
-    const res = await fetch(
-      `http://localhost:3000/api/imagenes/${entityType}/${id}`
-    );
-    const data = await res.json();
-    setListImagen(data);
-    console.log(data);
+    try {
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_SERVER_ROUTE_BACK
+        }/api/imagenes/${entityType}/${id}`
+      );
+      const data = await res.json();
+      setListImagen(data);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleFileRemove = () => {
@@ -91,97 +116,89 @@ const AttachFiles = () => {
   };
 
   return (
-    <div style={{ margin: "20px" }}>
-      <Typography variant="h5">Subir Archivo</Typography>
-      <input
-        type="file"
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-        id="file-upload"
-      />
-      <label htmlFor="file-upload">
-        <Button
-          variant="contained"
-          component="span"
-          startIcon={<FormatListBulletedIcon />}
-        >
-          Seleccionar Archivo
-        </Button>
-      </label>
-      {file && (
-        <div>
-          <Typography variant="body1" style={{ marginTop: "10px" }}>
-            Archivo seleccionado: {file.name}
-          </Typography>
-          <IconButton
-            variant="outlined"
-            color="error"
-            onClick={handleFileRemove}
-            style={{ marginLeft: "10px" }}
-          >
-            <CancelIcon />
-          </IconButton>
+    <>
+      <div className="card">
+        <div className="card-header">
+          <h5 htmlFor="formFileMultiple" className="h5">
+            Adjuntar fotos
+          </h5>
         </div>
-      )}
-      <Button
-        variant="contained"
-        color="success"
-        onClick={handleFileUpload}
-        startIcon={<CloudUpload />}
-        style={{ marginLeft: "10px" }}
-      >
-        Subir Archivo
-      </Button>
-      {uploadStatus && <Typography>{uploadStatus}</Typography>}
+        <div className="card-body ">
+          <input
+            className="form-control"
+            type="file"
+            id="formFileMultiple"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            multiple
+          ></input>
+          <br />
+          <button
+            className="btn btn-success d-flex align-items-center"
+            onClick={handleFileUpload}
+          >
+            <i
+              className="bi bi-cloud-arrow-up"
+              style={{ fontSize: "2rem" }}
+            ></i>{" "}
+            &nbsp; Subir Archivo
+          </button>
+          {uploadStatus && <p>{uploadStatus}</p>}
 
-      <div>
-        {listImagen.length > 0 ? (
-          <ul>
-            {listImagen.map((l) => (
-              <li
-                key={l.id_adjunto}
-                onClick={() => handleClick(l.id_adjunto)}
-                style={{
-                  color: l.id_adjunto === selectedId ? "red" : "black", // Cambia el color si el ID está seleccionado
-                  cursor: "pointer", // Cambia el cursor al pasar sobre el texto
-                }}
-              >
-                {l.path_document}
+          <div>
+            {listImagen.length > 0 ? (
+              <ul>
+                {listImagen.map((l) => (
+                  <li
+                    key={l.id_adjunto}
+                    onClick={() => handleClick(l.id_adjunto)}
+                    style={{
+                      color: l.id_adjunto === selectedId ? "red" : "black", // Cambia el color si el ID está seleccionado
+                      cursor: "pointer", // Cambia el cursor al pasar sobre el texto
+                    }}
+                  >
+                    {l.path_document}
+                    <button className="btn">
+                      <i
+                        className="bi bi-trash"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteFile(l.id_adjunto);
+                        }}
+                      ></i>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No hay imágenes disponibles.</p>
+            )}
+          </div>
 
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteFile(l.id_adjunto);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <Typography variant="body2" color="textSecondary">
-            No hay imágenes disponibles.
-          </Typography>
-        )}
+          {selectedId && listImagen ? (
+            <a
+              href={`${
+                import.meta.env.VITE_SERVER_ROUTE_BACK
+              }/api/galeria/${entityType}/${selectedId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src={`${
+                  import.meta.env.VITE_SERVER_ROUTE_BACK
+                }/api/galeria/${entityType}/${selectedId}`}
+                alt={`Imagen con id ${selectedId}`}
+                style={{ width: "200px" }}
+              />
+            </a>
+          ) : (
+            <p>Haz clic en una fila para ver la imagen</p>
+          )}
+        </div>
       </div>
 
-      {selectedId ? (
-        <a
-          href={`http://localhost:3000/api/galeria/${entityType}/${selectedId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src={`http://localhost:3000/api/galeria/${entityType}/${selectedId}`}
-            alt={`Imagen con id ${selectedId}`}
-            style={{ width: "200px" }}
-          />
-        </a>
-      ) : (
-        <p>Haz clic en una fila para ver la imagen</p>
-      )}
-    </div>
+      {/*//////////////////////////////////////////////////////////////*/}
+    </>
   );
 };
 

@@ -7,7 +7,9 @@ function SelectInformante({
 }) {
   const loadInformante = async (inputValue) => {
     try {
-      const response = await fetch("http://localhost:3000/informantes");
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informantes`
+      );
       if (!response.ok) {
         throw new Error("Error al cargar los tripulantes");
       }
@@ -34,7 +36,11 @@ function SelectInformante({
           setSelectedInformante(selectedOptions);
         }}
         value={selectedInformante}
+        required
       />
+      {selectedInformante?.length === 0 && (
+        <p style={{ color: "red" }}>Este campo es obligatorio</p>
+      )}
     </div>
   );
 }

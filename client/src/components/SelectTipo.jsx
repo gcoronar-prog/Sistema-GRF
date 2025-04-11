@@ -14,7 +14,9 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
     if (!tipo?.value) return [];
     try {
       const response = await fetch(
-        `http://localhost:3000/tipoReporte?grupo_reporte=${tipo.label}`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/tipoReporte?grupo_reporte=${
+          tipo.label
+        }`
       );
       if (!response.ok) {
         throw new Error("Error al cargar los datos");
@@ -45,7 +47,11 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
           setSelectedTipo(selectedOptions);
         }}
         value={selectedTipo || null}
+        required
       />
+      {selectedTipo?.length === 0 && (
+        <p style={{ color: "red" }}>Este campo es obligatorio</p>
+      )}
     </div>
   );
 }

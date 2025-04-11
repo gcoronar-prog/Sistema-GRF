@@ -3,7 +3,9 @@ import AsyncSelect from "react-select/async";
 function SelectSector({ selectedSector, setSelectedSector, edition }) {
   const loadSector = async () => {
     try {
-      const response = await fetch("http://localhost:3000/sectores");
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/sectores`
+      );
       if (!response.ok) {
         throw new Error("Error al cargar los sectores");
       }
@@ -31,7 +33,11 @@ function SelectSector({ selectedSector, setSelectedSector, edition }) {
           setSelectedSector(selected);
         }}
         value={selectedSector}
+        required
       />
+      {selectedSector?.length === 0 && (
+        <p style={{ color: "red" }}>Este campo es obligatorio</p>
+      )}
     </div>
   );
 }

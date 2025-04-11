@@ -4,7 +4,9 @@ import AsyncSelect from "react-select/async";
 function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo, edition }) {
   const loadVehiculo = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:3000/vehiculos");
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/vehiculos`
+      );
       const data = await response.json();
 
       return data.map((item) => ({

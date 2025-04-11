@@ -22,6 +22,7 @@ const SelectClasifica = ({ selectedClasif, setSelectedClasif, edition }) => {
         onChange={(selectedOption) => setSelectedClasif(selectedOption)}
         isClearable
         isDisabled={edition}
+        required
       />
     </div>
   );

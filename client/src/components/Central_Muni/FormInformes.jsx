@@ -77,7 +77,7 @@ function FormInformes() {
 
   const loadInformes = async (id) => {
     const response = await fetch(
-      `http://localhost:3000/informes_central/${id}`
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${id}`
     );
     const data = await response.json();
 
@@ -146,11 +146,19 @@ function FormInformes() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    /*const form = e.target;
+    if (!form.checkValidity()) {
+      // Activa los estilos de validación de Bootstrap
+      form.classList.add("was-validated");
+      return;
+    }*/
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) return; // Si el usuario cancela, no sigue
     setRefresh((prev) => !prev);
     /*const arrayFormateado = Array.isArray(selectedValues)
       ? selectedValues.join(", ")
       : [];*/
-    window.confirm("a");
+
     const vehiculosFormateados = JSON.stringify(selectedVehiculo);
     const tripuFormateado = JSON.stringify(selectedTripulante);
     const originFormateado = JSON.stringify(selectedOrigin);
@@ -176,8 +184,10 @@ function FormInformes() {
 
     try {
       const url = params.id
-        ? `http://localhost:3000/informes_central/${params.id}`
-        : "http://localhost:3000/informes_central";
+        ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${
+            params.id
+          }`
+        : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central`;
 
       const method = params.id ? "PUT" : "POST";
 
@@ -192,7 +202,7 @@ function FormInformes() {
 
       if (!params.id) {
         const lastData = await fetch(
-          "http://localhost:3000/informe/central/last"
+          `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
         );
         const lastInforme = await lastData.json();
 
@@ -211,7 +221,9 @@ function FormInformes() {
   };
 
   const handleFirstInforme = async () => {
-    const res = await fetch("http://localhost:3000/informe/central/first");
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/first`
+    );
     if (res.ok) {
       const firstInforme = await res.json();
       if (firstInforme) {
@@ -227,7 +239,9 @@ function FormInformes() {
   };
 
   const handleLastInforme = async () => {
-    const res = await fetch("http://localhost:3000/informe/central/last");
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
+    );
     if (res.ok) {
       const lastInforme = await res.json();
       if (lastInforme) {
@@ -245,7 +259,7 @@ function FormInformes() {
     const id = params.id;
     try {
       const res = await fetch(
-        `http://localhost:3000/informe/central/${id}/prev`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/${id}/prev`
       );
       const data = await res.json();
       //console.log(data.informe[0].id_informes_central);
@@ -264,7 +278,7 @@ function FormInformes() {
     const id = params.id;
     try {
       const res = await fetch(
-        `http://localhost:3000/informe/central/${id}/next`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/${id}/next`
       );
       const data = await res.json();
       const idInforme = data.informe[0].id_informes_central;
@@ -280,6 +294,7 @@ function FormInformes() {
   };
 
   const handleNewInform = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     navigate("/informes/new");
     setSelectedTripulante("");
     setSelectedVehiculo("");
@@ -293,6 +308,7 @@ function FormInformes() {
     setEditing(false);
   };
   const handleEdit = async () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(false);
   };
 
@@ -311,16 +327,25 @@ function FormInformes() {
   };
 
   const handleDeleteInforme = async () => {
+    const eliminar = window.confirm("¿Deseas eliminar el informe?");
+    if (!eliminar) return;
+
     const id = params.id;
-    await fetch(`http://localhost:3000/informes_central/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
+
+    await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${id}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
     const updatedInforme = { ...informes };
     delete updatedInforme[id];
     setInformes(updatedInforme);
 
-    const res = await fetch("http://localhost:3000/informe/central/last");
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
+    );
     const data = await res.json();
     const idInforme = data.informe[0].id_informes_central;
     navigate(`/informes/central/${idInforme}`);
@@ -401,7 +426,11 @@ function FormInformes() {
                         onChange={handleChanges}
                         value={informes.fecha_informe}
                         disabled={editing}
+                        required
                       />
+                      <div className="invalid-feedback">
+                        Ingrese una fecha valida
+                      </div>
                     </div>
                     <div className="col-md-6">
                       <label htmlFor="origen_informe" className="form-label">
@@ -413,6 +442,9 @@ function FormInformes() {
                         selectedOrigin={selectedOrigin}
                         setSelectedOrigin={setSelectedOrigin}
                       />
+                      <div className="invalid-feedback">
+                        Seleccione un origen
+                      </div>
                     </div>
 
                     <div className="col-md-6">
@@ -428,6 +460,9 @@ function FormInformes() {
                         selectedInformante={selectedInformante}
                         setSelectedInformante={setSelectedInformante}
                       />
+                      <div className="invalid-feedback">
+                        Seleccione informante
+                      </div>
                     </div>
                     <div className="col-md-6">
                       <label className="form-label d-block">
@@ -451,6 +486,7 @@ function FormInformes() {
                               checked={informes.captura_informe === tipo}
                               onChange={handleChanges}
                               disabled={editing}
+                              required
                             />
                             <label className="form-check-label" htmlFor={tipo}>
                               {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
@@ -458,6 +494,7 @@ function FormInformes() {
                           </div>
                         ))}
                       </div>
+                      <div className="invalid-feedback">Elija un medio</div>
                     </div>
                     <div className="col-md-6">
                       <label
@@ -472,6 +509,9 @@ function FormInformes() {
                         setSelectedClasif={setSelectedClasif}
                         edition={editing}
                       />
+                      <div className="invalid-feedback">
+                        Seleccione clasificación
+                      </div>
                     </div>
 
                     <div className="col-md-6">
@@ -489,6 +529,7 @@ function FormInformes() {
                             value={"atendido"}
                             checked={informes.estado_informe === "atendido"}
                             disabled={editing}
+                            required
                           />
                           <label
                             htmlFor="atendido"
@@ -534,6 +575,9 @@ function FormInformes() {
                           </label>
                         </div>
                       </div>
+                      <div className="invalid-feedback">
+                        Seleccione un estado
+                      </div>
                     </div>
                   </div>
                   <div className="row">
@@ -548,6 +592,9 @@ function FormInformes() {
                         setSelectedTipo={setSelectedTipo}
                         tipo={selectedClasif}
                       />
+                      <div className="invalid-feedback">
+                        Seleccione un tipo de informe
+                      </div>
                     </div>
 
                     {informes.tipo_informe == "Otro" ? (
@@ -593,6 +640,9 @@ function FormInformes() {
                         selectedRecursos={selectedRecursos}
                         setSelectedRecursos={setSelectedRecursos}
                       />
+                      <div className="invalid-feedback">
+                        Seleccione al menos un recurso
+                      </div>
                     </div>
                     <div className="col-md-6">
                       <label htmlFor="sector" className="form-label">
@@ -604,6 +654,9 @@ function FormInformes() {
                         selectedSector={selectedSector}
                         setSelectedSector={setSelectedSector}
                       />
+                      <div className="invalid-feedback">
+                        Seleccione un sector
+                      </div>
                     </div>
                     <div className="col-md-6">
                       <label htmlFor="direccion" className="form-label">
@@ -705,9 +758,11 @@ function FormInformes() {
             <ListPendiente refresh={refresh} />
           </div>
         </div>
-        <div>
-          <div></div>
-          <div>{editing ? <AttachFiles /> : ""}</div>
+        <hr />
+        <div className="row">
+          <div className="col-md-6">
+            {editing ? <AttachFiles idInforme={params.id} /> : ""}
+          </div>
         </div>
       </div>
     </>

@@ -152,7 +152,7 @@ app.get("/api/imagenes/:entityType/:id", async (req, res) => {
 
 app.get("/api/galeria/:entityType/:id", async (req, res) => {
   const { entityType, id } = req.params;
-  console.log(`Buscando imágenes con ID: ${id}`);
+  console.log(`Buscando imágenes con ID de imagen: ${id}`);
   try {
     if (entityType === "informes") {
       const images = await findArchivosById(id); // Asegúrate de implementar esta función

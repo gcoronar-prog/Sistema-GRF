@@ -14,8 +14,8 @@ function ListPendiente(refresh) {
     try {
       const url =
         estado === 1
-          ? "http://localhost:3000/informes/pendientes"
-          : "http://localhost:3000/informes/progreso";
+          ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/pendientes`
+          : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/progreso`;
 
       const res = await fetch(url);
       const data = await res.json();
@@ -58,7 +58,7 @@ function ListPendiente(refresh) {
           </div>
           <div style={{ maxWidth: "600px", margin: "auto" }}>
             <table className="table table-striped table-hover table-bordered table-sm">
-              <thead className="table-success text-center">
+              <thead className="table-success text-center align-middle">
                 <tr>
                   <th>Código Informe</th>
                   <th>Fecha Informe</th>

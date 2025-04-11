@@ -8,7 +8,9 @@ function SearchForm() {
     try {
       const codCentral = "CINF" + id;
       const res = await fetch(
-        `http://localhost:3000/search_inform?id=${codCentral}`
+        `${
+          import.meta.env.VITE_SERVER_ROUTE_BACK
+        }/search_inform?id=${codCentral}`
       );
       const data = await res.json();
 

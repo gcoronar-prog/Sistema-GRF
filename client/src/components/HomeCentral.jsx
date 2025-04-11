@@ -16,9 +16,12 @@ function HomeCentral() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3000/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/profile`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (!res.ok) {
         throw new Error("No autorizado");
       }

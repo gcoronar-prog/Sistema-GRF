@@ -7,7 +7,8 @@ function SelectTripulantes({
 }) {
   const loadTripulantes = async () => {
     try {
-      const response = await fetch("http://localhost:3000/tripulantes");
+      const response = await fetch(`http://192.168.3.233:3000/tripulantes`);
+      console.log(response);
       if (!response.ok) {
         throw new Error("Error al cargar los tripulantes");
       }
@@ -29,8 +30,9 @@ function SelectTripulantes({
         isDisabled={edition}
         isMulti
         closeMenuOnSelect={false}
-        cacheOptions
         loadOptions={loadTripulantes}
+        cacheOptions
+        defaultOptions
         onChange={(selectedOptions) => {
           setSelectedTripulante(selectedOptions);
         }}

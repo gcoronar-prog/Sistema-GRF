@@ -25,7 +25,9 @@ function FormAcciones({ tipo }) {
 
   const loadAcciones = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/acciones/${tipo}/${id}`);
+      const res = await fetch(
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${id}`
+      );
       if (!res.ok) throw new Error("Problemas obteniendo datos");
       const data = await res.json();
 
@@ -58,6 +60,8 @@ function FormAcciones({ tipo }) {
 
   const handleSubmit = async (e, id) => {
     e.preventDefault();
+    const confirmar = window.confirm("¿Deseas guardar la acción?");
+    if (!confirmar) return;
     const indi = params.id;
 
     const method = id.toString().startsWith("temp") ? "POST" : "PUT";
@@ -70,7 +74,7 @@ function FormAcciones({ tipo }) {
           ? `http://localhost:3000/acciones`
           : `http://localhost:3000/acciones/${indi}`;*/
       const res = await fetch(
-        `http://localhost:3000/acciones/${tipo}/${indi}`,
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${indi}`,
         {
           method,
           headers: { "Content-Type": "application/json" },
@@ -95,10 +99,15 @@ function FormAcciones({ tipo }) {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`http://localhost:3000/acciones/${tipo}/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
+    const confirmar = window.confirm("¿Deseas eliminar la acción?");
+    if (!confirmar) return;
+    await fetch(
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${id}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
     //const updateAccion = { ...acciones };
     //delete updateAccion[id];
     setAcciones(acciones.filter((a) => a.cod_accion !== id));
@@ -151,11 +160,7 @@ function FormAcciones({ tipo }) {
         <div className="card-body table-responsive">
           <div style={{ maxWidth: "600px", margin: "auto" }}>
             <table className="table table-striped table-hover table-bordered align-middle caption-top table-sm">
-              <caption className="text-center fw-bold">
-                Lista de acciones
-              </caption>
-
-              <thead className="table-primary text-center">
+              <thead className="table-primary text-center align-middle">
                 <tr>
                   <th>Fecha</th>
                   {tipo === "SGC" ? <th>Estado acción</th> : ""}
@@ -166,7 +171,7 @@ function FormAcciones({ tipo }) {
                     {" "}
                     <button
                       type="button"
-                      className="btn btn-outline-secondary"
+                      className="btn btn-outline-secondary btn-sm"
                       onClick={() => handleNewData("")}
                       style={{ backgroundColor: "white", color: "black" }}
                     >
