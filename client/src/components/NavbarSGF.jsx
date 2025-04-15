@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchForm from "./SearchForm";
 
-function NavbarSGF({ central }) {
+function NavbarSGF({ formulario }) {
   const navigate = useNavigate();
   const handleLastInforme = async () => {
     const res = await fetch(
@@ -31,7 +31,7 @@ function NavbarSGF({ central }) {
               </a>
             </li>
 
-            {central === "central" ? (
+            {formulario === "central" ? (
               <>
                 <li className="nav-item">
                   <Link
@@ -68,7 +68,7 @@ function NavbarSGF({ central }) {
             )}
           </ul>
           <div className="d-flex">
-            <SearchForm central={"central"} />
+            <SearchForm formulario={formulario} />
           </div>
         </div>
       </nav>

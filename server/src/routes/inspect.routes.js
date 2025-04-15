@@ -77,4 +77,6 @@ router.get("/fileAttach/:id", findArchivosExp);
 router.post("/fileAttach", createArchivoExp);
 router.delete("/fileAttach/:id", deleteArchivoExp);
 
+router.get("/search_exped", getExpedientes);
+
 export default router;

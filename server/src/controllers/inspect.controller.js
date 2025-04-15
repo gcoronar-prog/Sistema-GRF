@@ -399,7 +399,8 @@ const createExpediente = async (req, res) => {
     );
     const idExpediente = rows[0].id_expediente;
     const infra = await client.query(
-      "INSERT INTO infracciones (sector_infraccion,direccion_infraccion,fecha_citacion,juzgado,observaciones,fecha_infraccion,id_expediente) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+      "INSERT INTO infracciones (sector_infraccion,direccion_infraccion,\
+      fecha_citacion,juzgado,observaciones,fecha_infraccion,id_expediente) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
       [
         data.sector_infraccion,
         data.direccion_infraccion,
@@ -957,6 +958,36 @@ const getNextExpediente = async (req, res) => {
   }
 };
 
+const searchInformeInspeccion = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.query;
+    await client.query("BEGIN");
+
+    const expediente = await client.query(
+      "SELECT expe.*, inf.* as infracciones,\
+        contri.* as contribuyentes, vehi.* as vehiculos_contri\
+        FROM expedientes expe\
+        left join infracciones inf on expe.id_expediente = inf.id_expediente\
+        left join contribuyentes contri on expe.id_expediente = contri.id_expediente\
+        left join vehiculos_contri vehi on expe.id_expediente = vehi.id_expediente\
+        where expe.id_expediente = $1",
+      [id]
+    );
+
+    await client.query("COMMIT");
+    return res.status(200).json({
+      expediente: expediente.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 export {
   getExpedientes,
   getExpediente,
@@ -990,4 +1021,5 @@ export {
   getFirstExpediente,
   getPrevExpediente,
   getNextExpediente,
+  searchInformeInspeccion,
 };

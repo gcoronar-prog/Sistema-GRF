@@ -432,7 +432,7 @@ function FormInspeccion() {
   return (
     <>
       <div className="container-fluid mt-4 w-100">
-        <NavbarSGF central={"inspeccion"} />
+        <NavbarSGF formulario={"inspeccion"} />
         <div className="d-flex flex-wrap align-items-center gap-2 my-3">
           <button
             className="btn btn-outline-primary d-flex align-items-center"
