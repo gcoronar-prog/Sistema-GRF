@@ -365,7 +365,7 @@ function FormInformes() {
               false
             }
           >
-            <i className="bi bi-skip-start me-1"></i> Primera Informe
+            <i className="bi bi-skip-start me-1"></i> Primer Informe
           </button>
           <button
             type="button"
