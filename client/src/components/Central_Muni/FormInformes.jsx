@@ -146,18 +146,10 @@ function FormInformes() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    /*const form = e.target;
-    if (!form.checkValidity()) {
-      // Activa los estilos de validación de Bootstrap
-      form.classList.add("was-validated");
-      return;
-    }*/
+
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) return; // Si el usuario cancela, no sigue
     setRefresh((prev) => !prev);
-    /*const arrayFormateado = Array.isArray(selectedValues)
-      ? selectedValues.join(", ")
-      : [];*/
 
     const vehiculosFormateados = JSON.stringify(selectedVehiculo);
     const tripuFormateado = JSON.stringify(selectedTripulante);

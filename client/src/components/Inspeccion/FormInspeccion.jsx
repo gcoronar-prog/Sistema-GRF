@@ -6,6 +6,7 @@ import AttachFiles from "../AttachFiles";
 import { BlobProvider } from "@react-pdf/renderer";
 import InspeccionPDF from "../PDFs/InspeccionPDF";
 import NavbarSGF from "../NavbarSGF";
+import SearchExpediente from "./SearchExpediente";
 
 function FormInspeccion() {
   const navigate = useNavigate();
@@ -254,7 +255,6 @@ function FormInspeccion() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos enviados: ", expedientes);
 
     if (params.id) {
       const res = await fetch(`${servidor_local}/exped/${params.id}`, {
@@ -472,7 +472,9 @@ function FormInspeccion() {
           <div className="col-md-9">
             <div className="card">
               <div className="card-header">
-                <span className="form-label fw-bold">N° Expediente</span>
+                <span className="form-label fw-bold">
+                  N° Expediente: {expedientes.id_expediente}
+                </span>
               </div>
               <div className="card-body">
                 <form action="" onSubmit={handleSubmit}>
@@ -656,9 +658,6 @@ function FormInspeccion() {
                       </select>
                     </div>
                     <div className="col-md-5">
-                      <label htmlFor="patr_mixto" className="form-label">
-                        Patrullaje Mixto
-                      </label>
                       <div className="form-check">
                         <input
                           className="form-check-input"
@@ -942,12 +941,20 @@ function FormInspeccion() {
                       </button>
                       <button
                         className="btn btn-primary"
+                        type="submit"
+                        style={{ display: editing ? "none" : "" }}
+                      >
+                        Guardar Expediente
+                      </button>
+                      <button
+                        className="btn btn-primary"
                         type="button"
                         onClick={handleEdit}
                         style={{ display: editing ? "" : "none" }}
                       >
                         Editar
                       </button>
+
                       <button
                         className="btn btn-danger"
                         type="button"
@@ -957,16 +964,10 @@ function FormInspeccion() {
                         Cancelar
                       </button>
                       <button
-                        className="btn btn-primary"
-                        type="submit"
-                        style={{ display: editing ? "none" : "" }}
-                      >
-                        Guardar Expediente
-                      </button>
-                      <button
                         className="btn btn-danger"
                         type="button"
                         onClick={handleDeleteExpediente}
+                        style={{ display: editing ? "" : "none" }}
                       >
                         Eliminar
                       </button>
@@ -990,6 +991,9 @@ function FormInspeccion() {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="col-md-3">
+            <SearchExpediente />
           </div>
         </div>
         <br />

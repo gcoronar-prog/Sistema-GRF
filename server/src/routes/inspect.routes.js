@@ -27,6 +27,7 @@ import {
   getPrevExpediente,
   getVehiculoContri,
   getVehInfrac,
+  searchInformeInspeccion,
   updateEXfiles,
   updateExpediente,
   updateInfraccion,
@@ -77,6 +78,6 @@ router.get("/fileAttach/:id", findArchivosExp);
 router.post("/fileAttach", createArchivoExp);
 router.delete("/fileAttach/:id", deleteArchivoExp);
 
-router.get("/search_exped", getExpedientes);
+router.get("/search_exped", searchInformeInspeccion);
 
 export default router;

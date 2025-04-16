@@ -8,24 +8,34 @@ function SearchForm({ formulario }) {
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
   const buscaInforme = async (id) => {
+    const codCentral = "CINF" + id;
+    const codInspect = "IPC" + id;
     try {
-      const codCentral = "CINF" + id;
-      const codInspect = "IPC" + id;
       const res = await fetch(
         formulario === "central"
           ? `${servidor_local}/search_inform?id=${codCentral}`
           : `${servidor_local}/search_exped?id=${codInspect}`
       );
       const data = await res.json();
-
-      if (data.informe.length > 0) {
-        navigate(`/informes/central/${id}`);
-      } else if (data.expediente.length > 0) {
-        navigate(`/expedientes/${id}`);
+      if (formulario === "central") {
+        if (data.informe.length > 0) {
+          navigate(`/informes/central/${id}`);
+        } else {
+          window.alert("No existen registros con este codigo");
+          setCodigo("");
+        }
       } else {
-        window.alert("No existen registros con este codigo");
-        setCodigo("");
+        if (data.expedientes.length > 0) {
+          navigate(`/inspect/${codInspect}/edit`);
+        } else {
+          window.alert("No existen registros con este codigo");
+          setCodigo("");
+        }
       }
+
+      console.log(data.expedientes, "expediente");
+
+      console.log(codInspect, "inspector");
     } catch (error) {
       console.error(error);
     }
@@ -46,7 +56,11 @@ function SearchForm({ formulario }) {
         type="search"
         onChange={handleChanges}
         value={codigo}
-        placeholder="Código del informe"
+        placeholder={
+          formulario === "central"
+            ? "Código del informe"
+            : "Codigo del expediente"
+        }
         aria-label="Search"
       />
       <button

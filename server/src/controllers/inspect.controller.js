@@ -962,22 +962,24 @@ const searchInformeInspeccion = async (req, res) => {
   const client = await pool.connect();
   try {
     const { id } = req.query;
+
     await client.query("BEGIN");
 
     const expediente = await client.query(
       "SELECT expe.*, inf.* as infracciones,\
         contri.* as contribuyentes, vehi.* as vehiculos_contri\
         FROM expedientes expe\
-        left join infracciones inf on expe.id_expediente = inf.id_expediente\
-        left join contribuyentes contri on expe.id_expediente = contri.id_expediente\
-        left join vehiculos_contri vehi on expe.id_expediente = vehi.id_expediente\
-        where expe.id_expediente = $1",
+        LEFT JOIN infracciones inf on expe.id_expediente = inf.id_expediente\
+        LEFT JOIN contribuyentes contri on expe.id_expediente = contri.id_expediente\
+        LEFT JOIN vehiculos_contri vehi on expe.id_expediente = vehi.id_expediente\
+        WHERE expe.id_expediente = $1",
       [id]
     );
 
     await client.query("COMMIT");
+
     return res.status(200).json({
-      expediente: expediente.rows,
+      expedientes: expediente.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");
