@@ -1,7 +1,33 @@
 import React, { useState } from "react";
 
 function SearchExpediente() {
-  const [valorBusqueda, setValorBusqueda] = useState([]);
+  const [valorBusqueda, setValorBusqueda] = useState({
+    rut_contri: "",
+    ppu: "",
+  });
+
+  const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+
+  const buscaExpediente = async (rut, ppu) => {
+    try {
+      const res = await fetch(
+        `${servidor_local}/search_expediente?rut=${rut}&ppu=${ppu}`
+      );
+
+      const data = await res.json();
+      console.log(data, "expediente busqueda");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleChanges = (e) => {
+    const { name, value } = e.target;
+    setValorBusqueda((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <>
@@ -18,12 +44,14 @@ function SearchExpediente() {
           </div>
 
           <div className="gap-2 mt-3">
-            <label htmlFor="rutContribuyente" className="form-label">
+            <label htmlFor="rut_contri" className="form-label">
               RUT de Contribuyente:
             </label>
             <input
-              name="rutContribuyente"
+              name="rut_contri"
               className="form-control"
+              onChange={handleChanges}
+              value={valorBusqueda.rut}
               type="text"
             />
           </div>
@@ -32,12 +60,26 @@ function SearchExpediente() {
             <label htmlFor="ppu" className="form-label">
               PPU:
             </label>
-            <input name="ppu" type="text" className="form-control" />
+            <input
+              name="ppu"
+              type="text"
+              className="form-control"
+              onChange={handleChanges}
+              value={valorBusqueda.ppu}
+            />
           </div>
 
           <div className="d-flex flex-wrap gap-2 mt-3">
-            <button className="btn btn-primary">
+            <button
+              className="btn btn-primary"
+              onClick={() =>
+                buscaExpediente(valorBusqueda.rut_contri, valorBusqueda.ppu)
+              }
+            >
               <i className="bi bi-search"></i> Buscar
+            </button>
+            <button onClick={() => console.log(valorBusqueda, "busqueda")}>
+              prueba
             </button>
           </div>
         </div>

@@ -24,6 +24,7 @@ import SearchForm from "./components/SearchForm";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import SearchExpediente from "./components/Inspeccion/SearchExpediente";
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
           />
 
           <Route path="/search/informe" element={<SearchForm />} />
+          <Route path="/search/expediente" element={<SearchExpediente />} />
         </Routes>
       </Container>
     </BrowserRouter>

@@ -990,6 +990,53 @@ const searchInformeInspeccion = async (req, res) => {
   }
 };
 
+const searchExpedientes = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { rut, ppu } = req.query;
+
+    await client.query("BEGIN");
+    let whereClauses = [];
+    let values = [];
+
+    if (rut) {
+      whereClauses.push("contri.rut_contri = $" + (values.length + 1));
+      values.push(rut);
+    }
+
+    if (ppu) {
+      whereClauses.push("vehi.ppu = $" + (values.length + 1));
+      values.push(ppu);
+    }
+
+    const whereSQL =
+      whereClauses.length > 0 ? "WHERE " + whereClauses.join(" OR ") : "";
+
+    const expediente = await client.query(
+      `SELECT expe.*, inf.* as infracciones,
+              contri.* as contribuyentes, vehi.* as vehiculos_contri
+       FROM expedientes expe
+       LEFT JOIN infracciones inf on expe.id_expediente = inf.id_expediente
+       LEFT JOIN contribuyentes contri on expe.id_expediente = contri.id_expediente
+       LEFT JOIN vehiculos_contri vehi on expe.id_expediente = vehi.id_expediente
+       ${whereSQL}`,
+      values
+    );
+
+    await client.query("COMMIT");
+
+    return res.status(200).json({
+      expedientes: expediente.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 export {
   getExpedientes,
   getExpediente,
@@ -1024,4 +1071,5 @@ export {
   getPrevExpediente,
   getNextExpediente,
   searchInformeInspeccion,
+  searchExpedientes,
 };

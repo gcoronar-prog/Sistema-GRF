@@ -20,6 +20,7 @@ function SearchForm({ formulario }) {
       if (formulario === "central") {
         if (data.informe.length > 0) {
           navigate(`/informes/central/${id}`);
+          setCodigo("");
         } else {
           window.alert("No existen registros con este codigo");
           setCodigo("");
@@ -27,6 +28,7 @@ function SearchForm({ formulario }) {
       } else {
         if (data.expedientes.length > 0) {
           navigate(`/inspect/${codInspect}/edit`);
+          setCodigo("");
         } else {
           window.alert("No existen registros con este codigo");
           setCodigo("");
