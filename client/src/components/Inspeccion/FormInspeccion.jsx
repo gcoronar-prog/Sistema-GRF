@@ -469,7 +469,7 @@ function FormInspeccion() {
         </div>
 
         <div className="row">
-          <div className="col-md-9">
+          <div className="col-md-8">
             <div className="card">
               <div className="card-header">
                 <span className="form-label fw-bold">
@@ -992,7 +992,7 @@ function FormInspeccion() {
               </div>
             </div>
           </div>
-          <div className="col-md-3">
+          <div className="col-md-4">
             <SearchExpediente />
           </div>
         </div>

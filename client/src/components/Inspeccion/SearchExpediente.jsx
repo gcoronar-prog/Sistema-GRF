@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import ListSearchExpe from "./ListSearchExpe";
 
 function SearchExpediente() {
   const [valorBusqueda, setValorBusqueda] = useState({
     rut_contri: "",
     ppu: "",
   });
+  const [expediente, setExpediente] = useState([]);
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
@@ -13,9 +15,12 @@ function SearchExpediente() {
       const res = await fetch(
         `${servidor_local}/search_expediente?rut=${rut}&ppu=${ppu}`
       );
-
       const data = await res.json();
+
       console.log(data, "expediente busqueda");
+
+      // Guardar en el estado
+      setExpediente(data.expedientes || []);
     } catch (error) {
       console.error(error);
     }
@@ -51,7 +56,7 @@ function SearchExpediente() {
               name="rut_contri"
               className="form-control"
               onChange={handleChanges}
-              value={valorBusqueda.rut}
+              value={valorBusqueda.rut_contri}
               type="text"
             />
           </div>
@@ -78,10 +83,8 @@ function SearchExpediente() {
             >
               <i className="bi bi-search"></i> Buscar
             </button>
-            <button onClick={() => console.log(valorBusqueda, "busqueda")}>
-              prueba
-            </button>
           </div>
+          <ListSearchExpe expediente={expediente} />
         </div>
       </div>
     </>
