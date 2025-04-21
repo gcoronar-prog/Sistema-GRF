@@ -1044,6 +1044,29 @@ const searchExpedientes = async (req, res) => {
   }
 };
 
+const getImgExpedientes = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const imgExped = await client.query(
+      "SELECT * FROM doc_adjuntos WHERE id_expediente IS NOT NULL LIMIT 1"
+    );
+    if (imgExped.rows.length === 0) {
+      return res.status(404).json({ message: "No se encuentran registros" });
+    }
+    await client.query("COMMIT");
+    return res.status(200).json({
+      imgExpedientes: imgExped.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error del servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 export {
   getExpedientes,
   getExpediente,
@@ -1078,4 +1101,5 @@ export {
   getNextExpediente,
   searchInformeInspeccion,
   searchExpedientes,
+  getImgExpedientes,
 };

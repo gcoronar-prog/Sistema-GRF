@@ -18,6 +18,7 @@ import {
   getExpedientes,
   getFirstExpediente,
   getGlosaLey,
+  getImgExpedientes,
   getInfracciones,
   getInspectores,
   getLastExpediente,
@@ -80,5 +81,7 @@ router.delete("/fileAttach/:id", deleteArchivoExp);
 
 router.get("/search_exped", searchInformeInspeccion);
 router.get("/search_expediente", searchExpedientes);
+
+router.get("/listaImagen", getImgExpedientes);
 
 export default router;

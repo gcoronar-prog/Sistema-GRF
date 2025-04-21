@@ -1,8 +1,3 @@
-import CloudUpload from "@mui/icons-material/CloudUpload";
-import CancelIcon from "@mui/icons-material/Cancel";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import { Button, IconButton, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 
@@ -10,6 +5,7 @@ const AttachFiles = ({ idInforme }) => {
   const params = useParams();
   const location = useLocation();
 
+  const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   // Define entityType basado en la ruta
   const entityType = location.pathname.includes("informes")
     ? "informes"
@@ -57,9 +53,7 @@ const AttachFiles = ({ idInforme }) => {
 
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_SERVER_ROUTE_BACK
-        }/api/upload/${entityType}/${idInforme}`,
+        `${servidor_local}/api/upload/${entityType}/${idInforme}`,
         {
           method: "POST",
           body: formData,
@@ -84,23 +78,16 @@ const AttachFiles = ({ idInforme }) => {
   const handleDeleteFile = async (id) => {
     const confirmar = window.confirm("¿Desea eliminar la imagen?");
     if (!confirmar) return;
-    await fetch(
-      `${
-        import.meta.env.VITE_SERVER_ROUTE_BACK
-      }/api/galeria/${entityType}/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    await fetch(`${servidor_local}/api/galeria/${entityType}/${id}`, {
+      method: "DELETE",
+    });
     setListImagen(listImagen.filter((lista) => lista.id_adjunto !== id));
   };
 
   const loadListaImagen = async (id) => {
     try {
       const res = await fetch(
-        `${
-          import.meta.env.VITE_SERVER_ROUTE_BACK
-        }/api/imagenes/${entityType}/${id}`
+        `${servidor_local}/api/imagenes/${entityType}/${id}`
       );
       const data = await res.json();
       setListImagen(data);

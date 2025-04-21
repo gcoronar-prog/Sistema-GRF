@@ -4,10 +4,11 @@ import SearchForm from "./SearchForm";
 
 function NavbarSGF({ formulario }) {
   const navigate = useNavigate();
+
+  const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+
   const handleLastInforme = async () => {
-    const res = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
-    );
+    const res = await fetch(`${servidor_local}/informe/central/last`);
 
     const lastInforme = await res.json();
 
@@ -15,6 +16,17 @@ function NavbarSGF({ formulario }) {
 
     console.log(lastInforme);
     navigate(`/informes/central/${id_informe}`);
+  };
+
+  const handleLastExpediente = async () => {
+    const res = await fetch(`${servidor_local}/last/exped`);
+
+    const lastExpediente = await res.json();
+
+    const id_informe = lastExpediente.expediente.id_expediente;
+
+    console.log(lastExpediente);
+    navigate(`/inspect/${id_informe}/edit`);
   };
 
   return (
@@ -53,17 +65,25 @@ function NavbarSGF({ formulario }) {
               </>
             ) : (
               <>
-                <a className="nav-link" href="/">
-                  Inspección Municipal
-                </a>
-
-                <a className="nav-link active" href="">
-                  Expedientes Inspección
-                </a>
-
-                <a className="nav-link active" href="">
-                  Estadísticas Inspección
-                </a>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link active"
+                    onClick={handleLastExpediente}
+                    //style={{ cursor: "pointer" }}
+                  >
+                    Expedientes Municipales
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link active" to={"/"}>
+                    Estadísticas Inspección Municipal
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link active" to={"/"}>
+                    Galeria de Imágenes
+                  </Link>
+                </li>
               </>
             )}
           </ul>

@@ -18,7 +18,7 @@ function ListSearchExpe({ expediente }) {
         <table className="table table-striped table-hover table-bordered table-sm">
           <thead className="table-dark">
             <tr>
-              <th>Expediente ID</th>
+              <th>ID</th>
               <th>Contribuyente</th>
               <th>PPU</th>
               <th>Fecha</th>
