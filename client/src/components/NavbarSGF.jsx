@@ -80,7 +80,7 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" to={"/"}>
+                  <Link className="nav-link active" to={"/galeriaImgExp"}>
                     Galeria de Imágenes
                   </Link>
                 </li>

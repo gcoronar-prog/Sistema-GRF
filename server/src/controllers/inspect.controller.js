@@ -1049,7 +1049,7 @@ const getImgExpedientes = async (req, res) => {
   try {
     await client.query("BEGIN");
     const imgExped = await client.query(
-      "SELECT * FROM doc_adjuntos WHERE id_expediente IS NOT NULL LIMIT 1"
+      "SELECT * FROM doc_adjuntos WHERE id_expediente IS NOT NULL"
     );
     if (imgExped.rows.length === 0) {
       return res.status(404).json({ message: "No se encuentran registros" });
