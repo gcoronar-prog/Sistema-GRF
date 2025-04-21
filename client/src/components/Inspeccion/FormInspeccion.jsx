@@ -19,10 +19,9 @@ function FormInspeccion() {
     empadronado: "",
     inspector: "",
     testigo: "",
-    patr_mixto: "",
-    patrullero: "",
+
     id_inspector: "",
-    id_patrullero: "",
+
     id_leyes: "",
     id_glosas: "",
 
@@ -48,7 +47,7 @@ function FormInspeccion() {
   });
 
   const [inspectores, setInspectores] = useState([]);
-  const [patrulleros, setPatrulleros] = useState([]);
+
   const [ley, setLey] = useState([]);
   const [glosas, setGlosas] = useState([]);
   const [datosVehiculos, setDatosVehiculos] = useState([]);
@@ -81,10 +80,9 @@ function FormInspeccion() {
       empadronado: exped.expediente.empadronado,
       inspector: exped.expediente.inspector,
       testigo: exped.expediente.testigo,
-      patr_mixto: exped.expediente.patr_mixto,
-      patrullero: exped.expediente.patrullero,
+
       id_inspector: exped.expediente.id_inspector,
-      id_patrullero: exped.expediente.id_patrullero,
+
       id_leyes: exped.expediente.id_leyes,
       id_glosas: exped.expediente.id_glosas,
 
@@ -130,17 +128,6 @@ function FormInspeccion() {
       setTestigos(data);
     } catch (error) {
       console.error("Error cargando testigos:", error);
-    }
-  };
-
-  const loadPatrulleros = async () => {
-    try {
-      const res = await fetch(`${servidor_local}/patrulleros`);
-      if (!res.ok) throw new Error("Problemas obteniendo patrulleros");
-      const data = await res.json();
-      setPatrulleros(data);
-    } catch (error) {
-      console.error("Error cargando patrulleros:", error);
     }
   };
 
@@ -207,10 +194,9 @@ function FormInspeccion() {
     empadronado: "",
     inspector: "",
     testigo: "",
-    patr_mixto: false,
-    patrullero: "",
+
     id_inspector: "",
-    id_patrullero: "",
+
     id_leyes: "",
     id_glosas: "",
 
@@ -237,7 +223,7 @@ function FormInspeccion() {
 
   useEffect(() => {
     loadInspectores();
-    loadPatrulleros();
+
     loadLeyes();
     loadGlosas();
     loadDatosVeh();
@@ -255,47 +241,64 @@ function FormInspeccion() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) handleCancel(); // Si el usuario cancela, no sigue
+    try {
+      const url = params.id
+        ? `${servidor_local}/exped/${params.id}`
+        : `${servidor_local}/exped`;
+      const method = params.id ? "PUT" : "POST";
 
-    if (params.id) {
-      const res = await fetch(`${servidor_local}/exped/${params.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(expedientes),
-      });
-      setEditing(true);
-      if (!res.ok) {
-        throw new Error("Error de envio de datos");
-      }
-      navigate(`/inspect/${params.id}/edit`);
-    } else {
-      const res = await fetch(`${servidor_local}/exped`, {
-        method: "POST",
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(expedientes),
       });
       if (!res.ok) {
-        throw new Error("Error de envio de datos");
+        throw new Error("Error al enviar los datos al servidor");
       }
-      const data = await res.json();
-      console.log(data);
-      navigate("/inspect/new");
+
+      if (!params.id) {
+        const lastData = await fetch(`${servidor_local}/last/exped`);
+        const lastExpediente = await lastData.json();
+
+        if (lastExpediente && lastExpediente.expediente) {
+          const lastIdInfo = lastExpediente.expediente.id_expediente;
+          setLastIdExp(lastIdInfo); // Actualizar el estado (aunque es asíncrono)
+
+          // Navegar a la nueva ruta
+          navigate(`/inspect/${lastIdInfo}/edit`);
+        }
+      }
+    } catch (error) {
+      console.error("Error al enviar datos:", error);
     }
+    setEditing(true);
   };
 
   const handleDeleteExpediente = async () => {
-    const id = params.id;
+    const eliminar = window.confirm("¿Deseas eliminar el informe?");
+    if (!eliminar) return;
 
-    await fetch(`${servidor_local}/exped/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
-    const updateExpedientes = { ...expedientes };
-    delete updateExpedientes[id];
-    setExpedientes(updateExpedientes);
-    navigate(`/inspect/${lastIdExp}/edit`);
+    const id = params.id;
+    try {
+      await fetch(`${servidor_local}/exped/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      const updateExpedientes = { ...expedientes };
+      delete updateExpedientes[id];
+      setExpedientes(updateExpedientes);
+      handleLastExpediente();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("Error al eliminar el expediente:", error);
+      return;
+    }
   };
 
   const handleNewExpediente = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setDisabledNextButton(true);
     setDisabledPrevButton(true);
     setEditing(false);
@@ -309,9 +312,9 @@ function FormInspeccion() {
       [name]: type === "checkbox" ? checked : value,
     });
 
-    console.log(name);
-    console.log(value);
-    console.log(checked);
+    //console.log(name);
+    //console.log(value);
+    //console.log(checked);
   };
 
   const handleLastExpediente = async () => {
@@ -345,9 +348,9 @@ function FormInspeccion() {
 
       if (response.ok) {
         const firstExpediente = await response.json();
-        console.log(firstExpediente.expediente.id_expediente);
+        //console.log(firstExpediente.expediente.id_expediente);
         if (firstExpediente) {
-          console.log("Primer expediente:", firstExpediente);
+          //console.log("Primer expediente:", firstExpediente);
           navigate(`/inspect/${firstExpediente.expediente.id_expediente}/edit`);
           setDisabledPrevButton(true);
           setDisabledNextButton(false);
@@ -395,6 +398,7 @@ function FormInspeccion() {
   };
 
   const handleEdit = async () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(false);
   };
 
@@ -657,43 +661,7 @@ function FormInspeccion() {
                         ))}
                       </select>
                     </div>
-                    <div className="col-md-5">
-                      <div className="form-check">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          name="patr_mixto"
-                          id="mixta"
-                          checked={expedientes.patr_mixto === true}
-                          onChange={handleChanges}
-                          disabled={editing}
-                        />
-                        <label htmlFor="mixta" className="form-check-label">
-                          Patrullaje Mixto
-                        </label>
-                      </div>
-                      <label htmlFor="patrullero" className="form-label">
-                        Patrullero
-                      </label>
-                      <select
-                        className="form-select"
-                        name="id_patrullero"
-                        id="patrullero"
-                        value={expedientes.id_patrullero || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Seleccione Patrullero</option>
-                        {patrulleros.map((p) => (
-                          <option
-                            key={p.id_funcionario}
-                            value={p.id_funcionario}
-                          >
-                            {p.funcionario}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+
                     <div className="col-md-5">
                       <label htmlFor="rut_contri" className="form-label">
                         Rut Contribuyente

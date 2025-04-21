@@ -36,7 +36,8 @@ const createEXfiles = async (req, res) => {
     console.log("datos body", req.body);
     const data = req.body;
     const { rows } = await pool.query(
-      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,empadronado,inspector,testigo,patr_mixto,patrullero,id_inspector,id_patrullero,id_leyes,id_vehiculos,id_infracciones) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *",
+      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,empadronado,inspector,testigo,id_inspector,id_leyes,id_vehiculos,id_infracciones) \
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -44,10 +45,9 @@ const createEXfiles = async (req, res) => {
         data.empadronado,
         data.inspector,
         data.testigo,
-        data.patr_mixto,
-        data.patrullero,
+
         data.id_inspector,
-        data.id_patrullero,
+
         data.id_leyes,
         data.id_vehiculos,
         data.id_infracciones,
@@ -67,7 +67,9 @@ const updateEXfiles = async (req, res) => {
     const { id } = req.params;
     const data = req.body;
     const { rows } = await pool.query(
-      "UPDATE expedientes SET fecha_resolucion=$1,user_creador=$2,tipo_procedimiento=$3,empadronado=$4,inspector=$5,testigo=$6,patr_mixto=$7,patrullero=$8,id_inspector=$9,id_patrullero=$10,id_leyes=$11,id_vehiculos=$12,id_infracciones=$13 WHERE id_expediente =$14 RETURNING *",
+      "UPDATE expedientes SET\
+       fecha_resolucion=$1,user_creador=$2,tipo_procedimiento=$3,empadronado=$4,inspector=$5,testigo=$6,\
+       id_inspector=$7,id_leyes=$8,id_vehiculos=$9,id_infracciones=$10 WHERE id_expediente =$11 RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -75,10 +77,9 @@ const updateEXfiles = async (req, res) => {
         data.empadronado,
         data.inspector,
         data.testigo,
-        data.patr_mixto,
-        data.patrullero,
+
         data.id_inspector,
-        data.id_patrullero,
+
         data.id_leyes,
         data.id_vehiculos,
         data.id_infracciones,
@@ -130,7 +131,7 @@ const getInspectores = async (req, res) => {
   }
 };
 
-const getPatrulleros = async (req, res) => {
+/*const getPatrulleros = async (req, res) => {
   try {
     const { rows } = await pool.query(
       "SELECT * FROM funcionarios WHERE rol_func='PPRV'"
@@ -145,7 +146,7 @@ const getPatrulleros = async (req, res) => {
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
   }
-};
+};*/
 
 const getLeyes = async (req, res) => {
   try {
@@ -381,7 +382,8 @@ const createExpediente = async (req, res) => {
     await client.query("BEGIN");
 
     const { rows } = await client.query(
-      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,empadronado,inspector,testigo,patr_mixto,patrullero,id_inspector,id_patrullero,id_leyes,id_glosas) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *",
+      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,empadronado,inspector,testigo,id_inspector,id_leyes,id_glosas) \
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -389,10 +391,9 @@ const createExpediente = async (req, res) => {
         data.empadronado,
         data.inspector,
         data.testigo,
-        data.patr_mixto,
-        data.patrullero,
+
         data.id_inspector,
-        data.id_patrullero,
+
         data.id_leyes,
         data.id_glosas,
       ]
@@ -466,7 +467,8 @@ const updateExpediente = async (req, res) => {
     const data = req.body;
     await client.query("BEGIN");
     const { rows } = await client.query(
-      "UPDATE expedientes SET fecha_resolucion=$1,user_creador=$2,tipo_procedimiento=$3,empadronado=$4,inspector=$5,testigo=$6,patr_mixto=$7,patrullero=$8,id_inspector=$9,id_patrullero=$10,id_leyes=$11,id_glosas=$12 WHERE id_expediente =$13 RETURNING *",
+      "UPDATE expedientes SET fecha_resolucion=$1,user_creador=$2,tipo_procedimiento=$3,empadronado=$4,inspector=$5,testigo=$6,\
+     id_inspector=$7,id_leyes=$8,id_glosas=$9 WHERE id_expediente =$10 RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -474,10 +476,9 @@ const updateExpediente = async (req, res) => {
         data.empadronado,
         data.inspector,
         data.testigo,
-        data.patr_mixto,
-        data.patrullero,
+
         data.id_inspector,
-        data.id_patrullero,
+
         data.id_leyes,
         data.id_glosas,
         id,
@@ -569,6 +570,11 @@ const deleteExpediente = async (req, res) => {
       [id]
     );
 
+    const deleteImgAdjunta = await client.query(
+      "DELETE FROM doc_adjuntos WHERE id_expediente=$1 RETURNING *",
+      [id]
+    );
+
     const { rows } = await client.query(
       "DELETE FROM expedientes WHERE id_expediente=$1 RETURNING *",
       [id]
@@ -582,6 +588,7 @@ const deleteExpediente = async (req, res) => {
       deleteInfra: deleteInfra.rows[0],
       deleteContri: deleteContri.rows[0],
       deleteVehiculo: deleteVehiInfra.rows[0],
+      deleteAdjunto: deleteImgAdjunta.rows[0],
     });
   } catch (error) {
     console.log(error);
@@ -1044,7 +1051,6 @@ export {
   updateEXfiles,
   deleteExFile,
   getInspectores,
-  getPatrulleros,
   getLeyes,
   getVehInfrac,
   createVehiInfra,

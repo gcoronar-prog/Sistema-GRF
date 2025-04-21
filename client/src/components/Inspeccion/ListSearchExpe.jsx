@@ -1,9 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function ListSearchExpe({ expediente }) {
+  const navigate = useNavigate();
   if (!expediente || expediente.length === 0) {
     return <p>No hay resultados para mostrar.</p>;
   }
+
+  const moveToExpediente = (id) => {
+    navigate(`/inspect/${id}/edit`);
+  };
 
   return (
     <div className="mt-3">
@@ -20,7 +26,11 @@ function ListSearchExpe({ expediente }) {
           </thead>
           <tbody>
             {expediente.map((item, index) => (
-              <tr key={index}>
+              <tr
+                key={index}
+                style={{ cursor: "pointer" }}
+                onClick={() => moveToExpediente(item.id_expediente)}
+              >
                 <td>{item.id_expediente}</td>
                 <td>{item.rut_contri}</td>
                 <td>{item.ppu}</td>

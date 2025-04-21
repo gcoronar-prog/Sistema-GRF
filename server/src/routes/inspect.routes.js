@@ -23,7 +23,6 @@ import {
   getLastExpediente,
   getLeyes,
   getNextExpediente,
-  getPatrulleros,
   getPrevExpediente,
   getVehiculoContri,
   getVehInfrac,
@@ -45,7 +44,7 @@ router.delete("/expedientes/:id", deleteExFile);
 
 router.get("/inspectores", getInspectores); //solo para devolver datos y rellenar campos
 
-router.get("/patrulleros", getPatrulleros); //solo para devolver datos y rellenar campos
+//router.get("/patrulleros", getPatrulleros); //solo para devolver datos y rellenar campos
 
 router.get("/leyes", getLeyes); //solo para devolver datos y rellenar campos
 
