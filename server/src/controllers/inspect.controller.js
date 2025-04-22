@@ -36,8 +36,8 @@ const createEXfiles = async (req, res) => {
     console.log("datos body", req.body);
     const data = req.body;
     const { rows } = await pool.query(
-      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,empadronado,inspector,testigo,id_inspector,id_leyes,id_vehiculos,id_infracciones) \
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
+      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,empadronado,inspector,testigo,id_inspector,id_leyes,id_vehiculos,id_infracciones,num_control) \
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -45,12 +45,11 @@ const createEXfiles = async (req, res) => {
         data.empadronado,
         data.inspector,
         data.testigo,
-
         data.id_inspector,
-
         data.id_leyes,
         data.id_vehiculos,
         data.id_infracciones,
+        data.num_control,
       ]
     );
     return res.json(rows[0]);
@@ -69,7 +68,7 @@ const updateEXfiles = async (req, res) => {
     const { rows } = await pool.query(
       "UPDATE expedientes SET\
        fecha_resolucion=$1,user_creador=$2,tipo_procedimiento=$3,empadronado=$4,inspector=$5,testigo=$6,\
-       id_inspector=$7,id_leyes=$8,id_vehiculos=$9,id_infracciones=$10 WHERE id_expediente =$11 RETURNING *",
+       id_inspector=$7,id_leyes=$8,id_vehiculos=$9,id_infracciones=$10, num_control=$11 WHERE id_expediente =$12 RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -77,12 +76,11 @@ const updateEXfiles = async (req, res) => {
         data.empadronado,
         data.inspector,
         data.testigo,
-
         data.id_inspector,
-
         data.id_leyes,
         data.id_vehiculos,
         data.id_infracciones,
+        data.num_control,
         id,
       ]
     );
@@ -1013,6 +1011,11 @@ const searchExpedientes = async (req, res) => {
 
     if (ppu) {
       whereClauses.push("vehi.ppu = $" + (values.length + 1));
+      values.push(ppu);
+    }
+
+    if (num_control) {
+      whereClauses.push("expe.num_control = $" + (values.length + 1));
       values.push(ppu);
     }
 

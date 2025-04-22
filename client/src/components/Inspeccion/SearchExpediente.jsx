@@ -5,15 +5,16 @@ function SearchExpediente() {
   const [valorBusqueda, setValorBusqueda] = useState({
     rut_contri: "",
     ppu: "",
+    num_control: "",
   });
   const [expediente, setExpediente] = useState([]);
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
-  const buscaExpediente = async (rut, ppu) => {
+  const buscaExpediente = async (rut, ppu, num_control) => {
     try {
       const res = await fetch(
-        `${servidor_local}/search_expediente?rut=${rut}&ppu=${ppu}`
+        `${servidor_local}/search_expediente?rut=${rut}&ppu=${ppu}&num_control=${num_control}`
       );
       const data = await res.json();
 
@@ -42,10 +43,16 @@ function SearchExpediente() {
         </div>
         <div className="card-body">
           <div className=" gap-2 mt-3">
-            <label htmlFor="control" className="form-label">
+            <label htmlFor="num_control" className="form-label">
               Número de control:
             </label>
-            <input name="control" type="text" className="form-control" />
+            <input
+              name="num_control"
+              type="text"
+              className="form-control"
+              onChange={handleChanges}
+              value={valorBusqueda.num_control}
+            />
           </div>
 
           <div className="gap-2 mt-3">

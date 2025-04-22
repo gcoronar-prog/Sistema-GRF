@@ -111,6 +111,20 @@ function GaleriaInspeccion() {
           <p>Cargando imágenes...</p>
         )}
       </div>
+
+      <div>
+        {listaImagen.length > 0 ? (
+          <ul>
+            {listaImagen.map((l) => (
+              <li key={l.id_adjunto} onClick={() => handleClick(l.id_adjunto)}>
+                {l.path_document}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No hay imágenes disponibles.</p>
+        )}
+      </div>
     </>
   );
 }

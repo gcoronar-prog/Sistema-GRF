@@ -44,6 +44,8 @@ function FormInspeccion() {
     nombre: "",
     direccion: "",
     rol_contri: "",
+
+    num_control: "",
   });
 
   const [inspectores, setInspectores] = useState([]);
@@ -74,6 +76,7 @@ function FormInspeccion() {
 
     setExpedientes({
       id_expediente: params.id,
+      num_control: exped.expediente.num_control,
       fecha_resolucion: formattedDate, //exped.expediente.fecha_resolucion,
       user_creador: exped.expediente.user_creador,
       tipo_procedimiento: exped.expediente.tipo_procedimiento,
@@ -484,6 +487,19 @@ function FormInspeccion() {
                 <form action="" onSubmit={handleSubmit}>
                   <div className="row g-3 mb-4">
                     <div className="col-md-5">
+                      <label htmlFor="num_control" className="form-label">
+                        Número de control
+                      </label>
+                      <input
+                        name="num_control"
+                        className="form-control"
+                        type="text"
+                        value={expedientes.num_control}
+                        placeholder="Número de control"
+                        onChange={handleChanges}
+                        disabled={editing}
+                        required
+                      />
                       <label htmlFor="fecha_infraccion" className="form-label">
                         Fecha Infracción
                       </label>

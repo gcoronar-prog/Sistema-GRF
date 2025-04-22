@@ -25,7 +25,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import SearchExpediente from "./components/Inspeccion/SearchExpediente";
-import GaleriaInspeccion from "./components/Inspeccion/galeriaInspeccion";
+import GaleriaInspeccion from "./components/Inspeccion/GaleriaInspeccion";
 
 function App() {
   return (
