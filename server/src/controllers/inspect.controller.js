@@ -1052,7 +1052,12 @@ const getImgExpedientes = async (req, res) => {
   try {
     await client.query("BEGIN");
     const imgExped = await client.query(
-      "SELECT * FROM doc_adjuntos WHERE id_expediente IS NOT NULL"
+      "SELECT expe.num_control,expe.id_expediente,docu.*,contri.rut_contri\
+      FROM doc_adjuntos docu\
+      JOIN expedientes expe \
+      ON docu.id_expediente=expe.id_expediente\
+      JOIN contribuyentes contri\
+      ON expe.id_expediente=contri.id_expediente"
     );
     if (imgExped.rows.length === 0) {
       return res.status(404).json({ message: "No se encuentran registros" });

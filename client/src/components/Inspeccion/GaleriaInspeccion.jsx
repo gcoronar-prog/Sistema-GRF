@@ -1,23 +1,25 @@
 import { useState, useEffect } from "react";
 
-const GaleriaVisual = ({ idInforme }) => {
+const GaleriaVisual = () => {
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
   const [listImagen, setListImagen] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [filtro, setFiltro] = useState("");
+  const [filtro, setFiltro] = useState({
+    rut_contri: "",
+    num_control: "",
+    id_expediente: "",
+  });
 
   useEffect(() => {
-    if (idInforme) {
-      loadListaImagen(idInforme);
-    }
-  }, [idInforme]);
+    loadListaImagen();
+  }, []);
 
   const loadListaImagen = async (id) => {
     try {
-      const res = await fetch(`${servidor_local}/api/imagenes/inspect/${id}`);
+      const res = await fetch(`${servidor_local}/listaImagen`);
       const data = await res.json();
-      setListImagen(data);
+      setListImagen(data.imgExpedientes);
     } catch (error) {
       console.error(error);
     }
@@ -28,9 +30,19 @@ const GaleriaVisual = ({ idInforme }) => {
   };
 
   const filtrarImagenes = () => {
-    return listImagen.filter((img) =>
-      img.id_expediente.toLowerCase().includes(filtro.toLowerCase())
-    );
+    return listImagen.filter((img) => {
+      return (
+        img.id_expediente?.toLowerCase() ===
+          filtro.id_expediente.toLowerCase() ||
+        img.num_control?.toLowerCase() === filtro.num_control?.toLowerCase() ||
+        img.rut_contri?.toLowerCase() === filtro.rut_contri?.toLowerCase()
+      );
+    });
+  };
+
+  const handleChanges = (e) => {
+    const { name, value } = e.target;
+    setFiltro((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -40,9 +52,26 @@ const GaleriaVisual = ({ idInforme }) => {
         <input
           className="form-control mt-2"
           type="text"
+          name="id_expediente"
           placeholder="Filtrar por expediente"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
+          value={filtro.id_expediente}
+          onChange={handleChanges}
+        />
+        <input
+          className="form-control mt-2"
+          type="text"
+          name="num_control"
+          placeholder="Filtrar por Número de control"
+          value={filtro.num_control}
+          onChange={handleChanges}
+        />
+        <input
+          className="form-control mt-2"
+          type="text"
+          name="rut_contri"
+          placeholder="Filtrar por RUT contribuyente"
+          value={filtro.rut_contri}
+          onChange={handleChanges}
         />
       </div>
 
