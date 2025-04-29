@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import AsyncSelect from "react-select/async";
 
-function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
+function SelectTipo({
+  selectedTipo,
+  setSelectedTipo,
+  edition,
+  tipo,
+  selectRef,
+  error,
+}) {
   const [key, setKey] = useState(0);
   useEffect(() => {
     if (tipo?.value) {
@@ -47,11 +54,15 @@ function SelectTipo({ selectedTipo, setSelectedTipo, edition, tipo }) {
           setSelectedTipo(selectedOptions);
         }}
         value={selectedTipo || null}
-        required
+        ref={selectRef}
+        styles={{
+          control: (base) => ({
+            ...base,
+            borderColor: error ? "red" : base.borderColor,
+          }),
+        }}
       />
-      {selectedTipo?.length === 0 && (
-        <p style={{ color: "red" }}>Este campo es obligatorio</p>
-      )}
+      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
     </div>
   );
 }

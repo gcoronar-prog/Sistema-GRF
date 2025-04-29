@@ -1,7 +1,13 @@
 import AsyncSelect from "react-select/async";
 import React from "react";
 
-const SelectRecursos = ({ selectedRecursos, setSelectedRecursos, edition }) => {
+const SelectRecursos = ({
+  selectedRecursos,
+  setSelectedRecursos,
+  edition,
+  error,
+  selectRef,
+}) => {
   const loadRecursos = async () => {
     const res = await fetch(
       `${import.meta.env.VITE_SERVER_ROUTE_BACK}/recursos`
@@ -24,11 +30,15 @@ const SelectRecursos = ({ selectedRecursos, setSelectedRecursos, edition }) => {
         loadOptions={loadRecursos}
         onChange={(select) => setSelectedRecursos(select)}
         value={selectedRecursos}
-        required
+        ref={selectRef}
+        styles={{
+          control: (base) => ({
+            ...base,
+            borderColor: error ? "red" : base.borderColor,
+          }),
+        }}
       />
-      {selectedRecursos?.length === 0 && (
-        <p style={{ color: "red" }}>Seleccione al menos un recurso</p>
-      )}
+      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
     </div>
   );
 };

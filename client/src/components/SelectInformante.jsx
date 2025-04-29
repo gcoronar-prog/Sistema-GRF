@@ -4,6 +4,8 @@ function SelectInformante({
   selectedInformante,
   setSelectedInformante,
   edition,
+  selectRef,
+  error
 }) {
   const loadInformante = async (inputValue) => {
     try {
@@ -36,11 +38,15 @@ function SelectInformante({
           setSelectedInformante(selectedOptions);
         }}
         value={selectedInformante}
-        required
+        ref={selectRef}
+        styles={{
+          control: (base) => ({
+            ...base,
+            borderColor: error ? "red" : base.borderColor,
+          }),
+        }}
       />
-      {selectedInformante?.length === 0 && (
-        <p style={{ color: "red" }}>Este campo es obligatorio</p>
-      )}
+      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
     </div>
   );
 }

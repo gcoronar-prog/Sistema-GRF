@@ -1,6 +1,12 @@
 import AsyncSelect from "react-select/async";
 
-function SelectOrigin({ selectedOrigin, setSelectedOrigin, edition }) {
+function SelectOrigin({
+  selectedOrigin,
+  setSelectedOrigin,
+  edition,
+  error,
+  selectRef,
+}) {
   const loadOrigin = async (inputValue) => {
     try {
       const response = await fetch(
@@ -15,8 +21,8 @@ function SelectOrigin({ selectedOrigin, setSelectedOrigin, edition }) {
         value: item.id_origen,
         label: item.origen,
       }));
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (err) {
+      console.error("Error:", err);
       return [];
     }
   };
@@ -27,17 +33,20 @@ function SelectOrigin({ selectedOrigin, setSelectedOrigin, edition }) {
         isDisabled={edition}
         cacheOptions
         defaultOptions
-        isClearable
         loadOptions={loadOrigin}
         onChange={(selectedOptions) => {
           setSelectedOrigin(selectedOptions);
         }}
-        value={selectedOrigin}
-        required
+        value={selectedOrigin || null}
+        ref={selectRef}
+        styles={{
+          control: (base) => ({
+            ...base,
+            borderColor: error ? "red" : base.borderColor,
+          }),
+        }}
       />
-      {selectedOrigin?.length === 0 && (
-        <p style={{ color: "red" }}>Este campo es obligatorio</p>
-      )}
+      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
     </div>
   );
 }

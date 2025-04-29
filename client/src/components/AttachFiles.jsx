@@ -174,8 +174,8 @@ const AttachFiles = ({ idInforme }) => {
                 src={`${
                   import.meta.env.VITE_SERVER_ROUTE_BACK
                 }/api/galeria/${entityType}/${selectedId}`}
+                className="img-thumbnail"
                 alt={`Imagen con id ${selectedId}`}
-                style={{ width: "200px" }}
               />
             </a>
           ) : (

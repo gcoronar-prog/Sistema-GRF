@@ -1,6 +1,12 @@
 import AsyncSelect from "react-select/async";
 
-function SelectSector({ selectedSector, setSelectedSector, edition }) {
+function SelectSector({
+  selectedSector,
+  setSelectedSector,
+  edition,
+  error,
+  selectRef,
+}) {
   const loadSector = async () => {
     try {
       const response = await fetch(
@@ -33,11 +39,15 @@ function SelectSector({ selectedSector, setSelectedSector, edition }) {
           setSelectedSector(selected);
         }}
         value={selectedSector}
-        required
+        ref={selectRef}
+        styles={{
+          control: (base) => ({
+            ...base,
+            borderColor: error ? "red" : base.borderColor,
+          }),
+        }}
       />
-      {selectedSector?.length === 0 && (
-        <p style={{ color: "red" }}>Este campo es obligatorio</p>
-      )}
+      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
     </div>
   );
 }

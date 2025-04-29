@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SelectVehiculo from "../SelectVehiculo";
 import SelectTripulantes from "../SelectTripulantes";
@@ -65,7 +65,9 @@ function FormInformes() {
   const [selectedClasif, setSelectedClasif] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [editing, setEditing] = useState(true);
-  const [estado, setEstado] = useState(1);
+  const [errors, setErrors] = useState({});
+  const { originRef, clasiRef, informanteRef, tipoRef, recursoRef, sectorRef } =
+    useRef(null);
 
   useEffect(() => {
     if (params.id) {
@@ -147,69 +149,92 @@ function FormInformes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const confirmar = window.confirm("¿Deseas guardar los cambios?");
-    if (!confirmar) return; // Si el usuario cancela, no sigue
-    setRefresh((prev) => !prev);
+    const newErrors = {};
 
-    const vehiculosFormateados = JSON.stringify(selectedVehiculo);
-    const tripuFormateado = JSON.stringify(selectedTripulante);
-    const originFormateado = JSON.stringify(selectedOrigin);
-    const informanteFormateado = JSON.stringify(selectedInformante);
-    const tipoFormateado = JSON.stringify(selectedTipo);
-    const sectorFormateado = JSON.stringify(selectedSector);
-    const recursosFormateado = JSON.stringify(selectedRecursos);
-    const clasificaFormateado = JSON.stringify(selectedClasif);
-    const datosActualizados = {
-      ...informes,
-      sector_informe: sectorFormateado,
-      tipo_informe: tipoFormateado,
-      persona_informante: informanteFormateado,
-      origen_informe: originFormateado,
-      vehiculos_informe: vehiculosFormateados,
-      tripulantes_informe: tripuFormateado,
-      clasificacion_informe: clasificaFormateado,
-      recursos_informe: recursosFormateado,
-    };
-    //setSelectedValues(arrayFormateado);
-    console.log("Datos enviados", informes);
-    console.log("Datos a enviar:", JSON.stringify(datosActualizados, null, 2));
+    if (!selectedOrigin) newErrors.origin = true;
+    if (!selectedClasif) newErrors.clasif = true;
+    if (!selectedInformante) newErrors.informante = true;
+    if (!selectedTipo) newErrors.tipo = true;
+    if (!selectedRecursos) newErrors.recurso = true;
+    if (!selectedSector) newErrors.sector = true;
 
-    try {
-      const url = params.id
-        ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${
-            params.id
-          }`
-        : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central`;
+    setErrors(newErrors);
 
-      const method = params.id ? "PUT" : "POST";
+    if (Object.keys(newErrors).length === 0) {
+      const confirmar = window.confirm("¿Deseas guardar los cambios?");
+      if (!confirmar) return; // Si el usuario cancela, no sigue
+      setRefresh((prev) => !prev);
 
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datosActualizados),
-      });
-      if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
-      }
+      const vehiculosFormateados = JSON.stringify(selectedVehiculo);
+      const tripuFormateado = JSON.stringify(selectedTripulante);
+      const originFormateado = JSON.stringify(selectedOrigin);
+      const informanteFormateado = JSON.stringify(selectedInformante);
+      const tipoFormateado = JSON.stringify(selectedTipo);
+      const sectorFormateado = JSON.stringify(selectedSector);
+      const recursosFormateado = JSON.stringify(selectedRecursos);
+      const clasificaFormateado = JSON.stringify(selectedClasif);
+      const datosActualizados = {
+        ...informes,
+        sector_informe: sectorFormateado,
+        tipo_informe: tipoFormateado,
+        persona_informante: informanteFormateado,
+        origen_informe: originFormateado,
+        vehiculos_informe: vehiculosFormateados,
+        tripulantes_informe: tripuFormateado,
+        clasificacion_informe: clasificaFormateado,
+        recursos_informe: recursosFormateado,
+      };
+      //setSelectedValues(arrayFormateado);
+      console.log("Datos enviados", informes);
+      console.log(
+        "Datos a enviar:",
+        JSON.stringify(datosActualizados, null, 2)
+      );
 
-      if (!params.id) {
-        const lastData = await fetch(
-          `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
-        );
-        const lastInforme = await lastData.json();
+      try {
+        const url = params.id
+          ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${
+              params.id
+            }`
+          : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central`;
 
-        if (lastInforme && lastInforme.informe[0]) {
-          const lastIdInfo = lastInforme.informe[0].id_informes_central;
-          setLastId(lastIdInfo); // Actualizar el estado (aunque es asíncrono)
+        const method = params.id ? "PUT" : "POST";
 
-          // Navegar a la nueva ruta
-          navigate(`/informes/central/${lastIdInfo}`);
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datosActualizados),
+        });
+        if (!res.ok) {
+          throw new Error("Error al enviar los datos al servidor");
         }
+
+        if (!params.id) {
+          const lastData = await fetch(
+            `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
+          );
+          const lastInforme = await lastData.json();
+
+          if (lastInforme && lastInforme.informe[0]) {
+            const lastIdInfo = lastInforme.informe[0].id_informes_central;
+            setLastId(lastIdInfo); // Actualizar el estado (aunque es asíncrono)
+
+            // Navegar a la nueva ruta
+            navigate(`/informes/central/${lastIdInfo}`);
+          }
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
+      setEditing(true);
+    } else {
+      if (newErrors.origin) originRef.current?.focus();
+      else if (newErrors.clasif) clasiRef.current?.focus();
+      else if (newErrors.informante) informanteRef.current?.focus();
+      else if (newErrors.tipo) tipoRef.current?.focus();
+      else if (newErrors.recurso) recursoRef.current?.focus();
+      else if (newErrors.sector) sectorRef.current?.focus();
     }
-    setEditing(true);
   };
 
   const handleFirstInforme = async () => {
@@ -433,6 +458,8 @@ function FormInformes() {
                         edition={editing}
                         selectedOrigin={selectedOrigin}
                         setSelectedOrigin={setSelectedOrigin}
+                        error={errors.origin}
+                        selectRef={originRef}
                       />
                       <div className="invalid-feedback">
                         Seleccione un origen
@@ -451,6 +478,8 @@ function FormInformes() {
                         edition={editing}
                         selectedInformante={selectedInformante}
                         setSelectedInformante={setSelectedInformante}
+                        error={errors.informante}
+                        selectRef={informanteRef}
                       />
                       <div className="invalid-feedback">
                         Seleccione informante
@@ -500,6 +529,8 @@ function FormInformes() {
                         selectedClasif={selectedClasif}
                         setSelectedClasif={setSelectedClasif}
                         edition={editing}
+                        error={errors.clasif}
+                        selectRef={clasiRef}
                       />
                       <div className="invalid-feedback">
                         Seleccione clasificación
@@ -583,6 +614,8 @@ function FormInformes() {
                         selectedTipo={selectedTipo}
                         setSelectedTipo={setSelectedTipo}
                         tipo={selectedClasif}
+                        error={errors.tipo}
+                        selectRef={tipoRef}
                       />
                       <div className="invalid-feedback">
                         Seleccione un tipo de informe
@@ -631,6 +664,8 @@ function FormInformes() {
                         edition={editing}
                         selectedRecursos={selectedRecursos}
                         setSelectedRecursos={setSelectedRecursos}
+                        error={errors.recurso}
+                        selectRef={recursoRef}
                       />
                       <div className="invalid-feedback">
                         Seleccione al menos un recurso
@@ -645,6 +680,8 @@ function FormInformes() {
                         edition={editing}
                         selectedSector={selectedSector}
                         setSelectedSector={setSelectedSector}
+                        error={errors.sector}
+                        selectRef={sectorRef}
                       />
                       <div className="invalid-feedback">
                         Seleccione un sector
@@ -696,6 +733,7 @@ function FormInformes() {
                       type="button"
                       className="btn btn-success"
                       onClick={handleNewInform}
+                      style={{ display: editing ? "" : "none" }}
                     >
                       Nuevo Expediente
                     </button>
@@ -745,7 +783,11 @@ function FormInformes() {
             </div>
           </div>
           <div className="col-md-6">
-            {selectedClasif.value === 1 ? <FormAcciones tipo="central" /> : ""}
+            {selectedClasif.value === 1 && params.id ? (
+              <FormAcciones tipo="central" />
+            ) : (
+              ""
+            )}
 
             <ListPendiente refresh={refresh} />
           </div>

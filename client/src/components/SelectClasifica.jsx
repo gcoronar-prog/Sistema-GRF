@@ -11,7 +11,13 @@ const options = [
   { value: 3, label: "Factor de riesgo" },
   { value: 4, label: "Novedad" },
 ];
-const SelectClasifica = ({ selectedClasif, setSelectedClasif, edition }) => {
+const SelectClasifica = ({
+  selectedClasif,
+  setSelectedClasif,
+  edition,
+  error,
+  selectRef,
+}) => {
   //const [selectedOption, setSelectedOption] = useState(null);
 
   return (
@@ -20,10 +26,16 @@ const SelectClasifica = ({ selectedClasif, setSelectedClasif, edition }) => {
         options={options}
         value={selectedClasif}
         onChange={(selectedOption) => setSelectedClasif(selectedOption)}
-        isClearable
         isDisabled={edition}
-        required
+        ref={selectRef}
+        styles={{
+          control: (base) => ({
+            ...base,
+            borderColor: error ? "red" : base.borderColor,
+          }),
+        }}
       />
+      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
     </div>
   );
 };
