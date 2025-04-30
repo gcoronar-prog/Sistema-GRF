@@ -222,6 +222,7 @@ function FormInspeccion() {
     nombre: "",
     direccion: "",
     rol_contri: "",
+    num_control: "",
   };
 
   useEffect(() => {
@@ -315,8 +316,8 @@ function FormInspeccion() {
       [name]: type === "checkbox" ? checked : value,
     });
 
-    //console.log(name);
-    //console.log(value);
+    console.log(name);
+    console.log(value);
     //console.log(checked);
   };
 
@@ -438,8 +439,8 @@ function FormInspeccion() {
 
   return (
     <>
+      <NavbarSGF formulario={"inspeccion"} />
       <div className="container-fluid mt-4 w-100">
-        <NavbarSGF formulario={"inspeccion"} />
         <div className="d-flex flex-wrap align-items-center gap-2 my-3">
           <button
             className="btn btn-outline-primary d-flex align-items-center"
@@ -920,6 +921,7 @@ function FormInspeccion() {
                         className="btn btn-success"
                         type="button"
                         onClick={handleNewExpediente}
+                        style={{ display: editing ? "" : "none" }}
                       >
                         Nuevo Expediente
                       </button>

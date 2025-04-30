@@ -700,6 +700,30 @@ const deleteArchivo = async (req, res) => {
   }
 };
 
+const getEmergencias = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+    const emergencia = await client.query(
+      "SELECT ic.*, doi.* AS origen_informe,dti.* AS tipo_informe\
+        FROM informes_central ic\
+        JOIN datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+        JOIN datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
+      WHERE (dti.clasificacion_informe->>'value')::int = 1 ORDER BY ic.id_informes_central ASC"
+    );
+
+    await client.query("COMMIT");
+    return res.status(200).json({ informe: emergencia.rows });
+  } catch (error) {
+    console.log(error);
+    await client.query("ROLLBACK");
+    return res.status(500).json({ message: "Problemas con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 export {
   getInformes,
   getInformeCentral,
@@ -717,4 +741,5 @@ export {
   findArchivos,
   findArchivosById,
   searchInformeCentral,
+  getEmergencias,
 };

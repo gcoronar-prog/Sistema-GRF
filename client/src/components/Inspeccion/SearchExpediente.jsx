@@ -85,7 +85,11 @@ function SearchExpediente() {
             <button
               className="btn btn-primary"
               onClick={() =>
-                buscaExpediente(valorBusqueda.rut_contri, valorBusqueda.ppu)
+                buscaExpediente(
+                  valorBusqueda.rut_contri,
+                  valorBusqueda.ppu,
+                  valorBusqueda.num_control
+                )
               }
             >
               <i className="bi bi-search"></i> Buscar

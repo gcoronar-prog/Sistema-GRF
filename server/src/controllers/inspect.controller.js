@@ -380,8 +380,9 @@ const createExpediente = async (req, res) => {
     await client.query("BEGIN");
 
     const { rows } = await client.query(
-      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,empadronado,inspector,testigo,id_inspector,id_leyes,id_glosas) \
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
+      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,\
+      empadronado,inspector,testigo,id_inspector,id_leyes,id_glosas,num_control) \
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -389,11 +390,10 @@ const createExpediente = async (req, res) => {
         data.empadronado,
         data.inspector,
         data.testigo,
-
         data.id_inspector,
-
         data.id_leyes,
         data.id_glosas,
+        data.num_control,
       ]
     );
     const idExpediente = rows[0].id_expediente;
@@ -413,7 +413,8 @@ const createExpediente = async (req, res) => {
     const idInfraccion = infra.rows[0].id_infraccion;
 
     const contri = await client.query(
-      "INSERT INTO contribuyentes (rut_contri,nombre,direccion,rol_contri,giro_contri,id_infraccion,id_expediente) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+      "INSERT INTO contribuyentes (rut_contri,nombre,direccion,rol_contri,giro_contri,id_infraccion,id_expediente)\
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
       [
         data.rut_contri,
         data.nombre,
@@ -466,7 +467,7 @@ const updateExpediente = async (req, res) => {
     await client.query("BEGIN");
     const { rows } = await client.query(
       "UPDATE expedientes SET fecha_resolucion=$1,user_creador=$2,tipo_procedimiento=$3,empadronado=$4,inspector=$5,testigo=$6,\
-     id_inspector=$7,id_leyes=$8,id_glosas=$9 WHERE id_expediente =$10 RETURNING *",
+     id_inspector=$7,id_leyes=$8,id_glosas=$9,num_control=$10 WHERE id_expediente =$11 RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
@@ -479,6 +480,7 @@ const updateExpediente = async (req, res) => {
 
         data.id_leyes,
         data.id_glosas,
+        data.num_control,
         id,
       ]
     );
@@ -998,7 +1000,7 @@ const searchInformeInspeccion = async (req, res) => {
 const searchExpedientes = async (req, res) => {
   const client = await pool.connect();
   try {
-    const { rut, ppu } = req.query;
+    const { rut, ppu, num_control } = req.query;
 
     await client.query("BEGIN");
     let whereClauses = [];
@@ -1016,7 +1018,7 @@ const searchExpedientes = async (req, res) => {
 
     if (num_control) {
       whereClauses.push("expe.num_control = $" + (values.length + 1));
-      values.push(ppu);
+      values.push(num_control);
     }
 
     const whereSQL =
@@ -1050,14 +1052,46 @@ const searchExpedientes = async (req, res) => {
 const getImgExpedientes = async (req, res) => {
   const client = await pool.connect();
   try {
+    const { id_expe, rut, ppu, num_control } = req.query;
     await client.query("BEGIN");
+
+    let whereClauses = [];
+    let values = [];
+
+    if (id_expe) {
+      whereClauses.push("expe.id_exp = $" + (values.length + 1));
+      values.push(id_expe);
+    }
+
+    if (rut) {
+      whereClauses.push("contri.rut_contri = $" + (values.length + 1));
+      values.push(rut);
+    }
+
+    if (ppu) {
+      whereClauses.push("vehi.ppu = $" + (values.length + 1));
+      values.push(ppu);
+    }
+
+    if (num_control) {
+      whereClauses.push("expe.num_control = $" + (values.length + 1));
+      values.push(num_control);
+    }
+
+    const whereSQL =
+      whereClauses.length > 0 ? "WHERE " + whereClauses.join(" OR ") : "";
+
     const imgExped = await client.query(
-      "SELECT expe.num_control,expe.id_expediente,docu.*,contri.rut_contri\
-      FROM doc_adjuntos docu\
-      JOIN expedientes expe \
-      ON docu.id_expediente=expe.id_expediente\
-      JOIN contribuyentes contri\
-      ON expe.id_expediente=contri.id_expediente"
+      `SELECT expe.num_control,expe.id_expediente,docu.*,contri.rut_contri
+      FROM doc_adjuntos docu
+      JOIN expedientes expe 
+      ON docu.id_expediente=expe.id_expediente
+      JOIN contribuyentes contri
+      ON expe.id_expediente=contri.id_expediente 
+      JOIN vehiculos_contri vehi 
+      ON expe.id_expediente = vehi.id_expediente
+      ${whereSQL}`,
+      values
     );
     if (imgExped.rows.length === 0) {
       return res.status(404).json({ message: "No se encuentran registros" });

@@ -370,8 +370,8 @@ function FormInformes() {
 
   return (
     <>
+      <NavbarSGF formulario={"central"} />
       <div className="container-fluid mt-4 w-100">
-        <NavbarSGF formulario={"central"} />
         <div className="d-flex flex-wrap align-items-center gap-2 my-3">
           <button
             type="button"

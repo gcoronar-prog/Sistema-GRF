@@ -12,10 +12,23 @@ function ListPendiente(refresh) {
 
   const loadPendiente = async () => {
     try {
-      const url =
-        estado === 1
-          ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/pendientes`
-          : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/progreso`;
+      let url;
+
+      switch (estado) {
+        case 1:
+          url = `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/pendientes`;
+          break;
+        case 2:
+          url = `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/progreso`;
+          break;
+        case 3:
+          url = `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/emergencia`;
+        default:
+          break;
+      }
+      /* estado === 1
+        ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/pendientes`
+        : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/progreso`;*/
 
       const res = await fetch(url);
       const data = await res.json();
@@ -28,16 +41,16 @@ function ListPendiente(refresh) {
 
   const moveToPendiente = (id) => {
     navigate(`/informes/central/${id}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
     //console.log(id);
   };
 
+  const estados = { 1: "pendientes", 2: "en progreso", 3: " - Emergencias -" };
   return (
     <>
       <div className="card">
         <div className="card-header text-center">
-          <p className="h5">
-            Listado informes {estado === 1 ? "pendientes" : "en progreso"}
-          </p>
+          <p className="h5">Listado informes {estados[estado]}</p>
         </div>
         <div className="card-body">
           <div className="text-center">
@@ -53,6 +66,9 @@ function ListPendiente(refresh) {
                 onClick={() => setEstado(2)}
               >
                 Progreso
+              </button>
+              <button className="btn btn-danger" onClick={() => setEstado(3)}>
+                Emergencias
               </button>
             </div>
           </div>
