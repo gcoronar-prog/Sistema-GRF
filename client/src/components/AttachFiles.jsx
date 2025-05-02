@@ -104,92 +104,105 @@ const AttachFiles = ({ idInforme }) => {
 
   return (
     <>
-      <div className="card">
-        <div className="row">
-          <div className="card-header">
-            <h5 htmlFor="formFileMultiple" className="h5">
-              Adjuntar fotos
-            </h5>
-          </div>
-          <div className="card-body ">
-            <input
-              className="form-control"
-              type="file"
-              id="formFileMultiple"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-              multiple
-            ></input>
-            <br />
-            <button
-              className="btn btn-success d-flex align-items-center"
-              onClick={handleFileUpload}
-            >
-              <i className="bi bi-cloud-arrow-up"></i>
-              &nbsp; Subir Archivo
-            </button>
-            {uploadStatus && <p>{uploadStatus}</p>}
-            <br />
-            <div>
-              {listImagen.length > 0 ? (
-                <table className="table table-bordered table-hover">
-                  <thead>
-                    <tr>
-                      <th>Nombre del archivo</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listImagen.map((l) => (
-                      <tr
-                        key={l.id_adjunto}
-                        onClick={() => handleClick(l.id_adjunto)}
-                        style={{
-                          color: l.id_adjunto === selectedId ? "red" : "black",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <td>{l.path_document}</td>
-                        <td className="text-center align-middle">
-                          <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteFile(l.id_adjunto);
+      <div className="row">
+        <div className="col-md-7">
+          <div className="card">
+            <div className="card-header">
+              <h5 htmlFor="formFileMultiple" className="h5">
+                Adjuntar fotos
+              </h5>
+            </div>
+            <div className="card-body ">
+              <input
+                className="form-control"
+                type="file"
+                id="formFileMultiple"
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                multiple
+              ></input>
+              <br />
+              <button
+                className="btn btn-success d-flex align-items-center"
+                onClick={handleFileUpload}
+              >
+                <i className="bi bi-cloud-arrow-up"></i>
+                &nbsp; Subir Archivo
+              </button>
+              {uploadStatus && <p>{uploadStatus}</p>}
+              <br />
+              <div>
+                {listImagen.length > 0 ? (
+                  <table className="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Nombre del archivo</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listImagen.map((l) => (
+                        <tr
+                          key={l.id_adjunto}
+                          onClick={() => handleClick(l.id_adjunto)}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                        >
+                          <td
+                            style={{
+                              color:
+                                l.id_adjunto === selectedId ? "red" : "black",
                             }}
                           >
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>No hay imágenes disponibles.</p>
-              )}
+                            {l.path_document}
+                          </td>
+                          <td className="text-center align-middle">
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteFile(l.id_adjunto);
+                              }}
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p>No hay imágenes disponibles.</p>
+                )}
+              </div>
             </div>
-
-            <div className="text-center">
-              {selectedId && listImagen ? (
-                <a
-                  href={`${
-                    import.meta.env.VITE_SERVER_ROUTE_BACK
-                  }/api/galeria/${entityType}/${selectedId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    src={`${
+          </div>
+        </div>
+        <div className="col-md-5">
+          <div className="card">
+            <div className="card-body">
+              <div className="text-center">
+                {selectedId && listImagen ? (
+                  <a
+                    href={`${
                       import.meta.env.VITE_SERVER_ROUTE_BACK
                     }/api/galeria/${entityType}/${selectedId}`}
-                    className="img-thumbnail border border-primary-subtle w-50 h-auto"
-                    alt={`Imagen con id ${selectedId}`}
-                  />
-                </a>
-              ) : (
-                <p>Haz clic en una fila para ver la imagen</p>
-              )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={`${
+                        import.meta.env.VITE_SERVER_ROUTE_BACK
+                      }/api/galeria/${entityType}/${selectedId}`}
+                      className="img-thumbnail border border-primary-subtle w-75 h-auto"
+                      alt={`Imagen con id ${selectedId}`}
+                    />
+                  </a>
+                ) : (
+                  <p>Haz clic en una fila para ver la imagen</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -39,118 +39,143 @@ const GaleriaVisual = () => {
   return (
     <>
       <NavbarSGF />
-      <div className="card">
-        <div className="card-header">
-          <h5>Galería de Imágenes</h5>
-          <input
-            className="form-control mt-2"
-            type="text"
-            name="id_expe"
-            placeholder="Filtrar por expediente"
-            value={filtro.id_expe}
-            onChange={handleChanges}
-          />
-          <input
-            className="form-control mt-2"
-            type="text"
-            name="num_control"
-            placeholder="Filtrar por Número de control"
-            value={filtro.num_control}
-            onChange={handleChanges}
-          />
-          <input
-            className="form-control mt-2"
-            type="text"
-            name="rut_contri"
-            placeholder="Filtrar por RUT contribuyente"
-            value={filtro.rut_contri}
-            onChange={handleChanges}
-          />
-          <input
-            className="form-control mt-2"
-            type="text"
-            name="ppu"
-            placeholder="Filtrar por PPU"
-            value={filtro.ppu}
-            onChange={handleChanges}
-          />
+      <hr />
+      <div className="row">
+        <div className="col">
+          <div className="align-middle text-center">
+            {selectedId && (
+              <a
+                href={`${servidor_local}/api/galeria/inspect/${selectedId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  className="img-thumbnail"
+                  src={`${servidor_local}/api/galeria/inspect/${selectedId}`}
+                  alt={`Imagen con id ${selectedId}`}
+                  style={{ width: "500px" }}
+                />
+              </a>
+            )}
+          </div>
         </div>
-
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-8">
-              {listImagen.length > 0 ? (
-                <table className="table table-bordered table-hover">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Nombre del archivo</th>
-                      <th className="text-center">Id expediente</th>
-                      <th className="text-center">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listImagen.map((l) => (
-                      <tr
-                        key={l.id_adjunto}
-                        onClick={() => handleClick(l.id_adjunto)}
-                        style={{
-                          cursor: "pointer",
-                          color: l.id_adjunto === selectedId ? "red" : "black",
-                        }}
-                      >
-                        <td> {l.path_document}</td>
-                        <td>{l.id_expediente}</td>
-                        <td className="text-center align-middle">
-                          <button
-                            className="btn btn-primary"
-                            onClick={() =>
-                              navigate(`/inspect/${l.id_expediente}/edit`)
-                            }
-                          >
-                            <i className="bi bi-arrow-right-square"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>No hay imágenes para mostrar.</p>
-              )}
+        <div className="col">
+          <div className="card">
+            <div className="card-header">
+              <h5>Galería de Imágenes</h5>
             </div>
-            <div className="col align-middle text-center">
-              {selectedId && (
-                <a
-                  href={`${servidor_local}/api/galeria/inspect/${selectedId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    className="img-thumbnail"
-                    src={`${servidor_local}/api/galeria/inspect/${selectedId}`}
-                    alt={`Imagen con id ${selectedId}`}
-                    style={{ width: "350px" }}
+
+            <div className="card-body">
+              <div className="row">
+                <div>
+                  <input
+                    className="form-control mt-2"
+                    type="text"
+                    name="id_expe"
+                    placeholder="Filtrar por expediente"
+                    value={filtro.id_expe}
+                    onChange={handleChanges}
                   />
-                </a>
-              )}
+                  <input
+                    className="form-control mt-2"
+                    type="text"
+                    name="num_control"
+                    placeholder="Filtrar por Número de control"
+                    value={filtro.num_control}
+                    onChange={handleChanges}
+                  />
+                  <input
+                    className="form-control mt-2"
+                    type="text"
+                    name="rut_contri"
+                    placeholder="Filtrar por RUT contribuyente"
+                    value={filtro.rut_contri}
+                    onChange={handleChanges}
+                  />
+                  <input
+                    className="form-control mt-2"
+                    type="text"
+                    name="ppu"
+                    placeholder="Filtrar por PPU"
+                    value={filtro.ppu}
+                    onChange={handleChanges}
+                  />
+                </div>
+              </div>
+              <div className="d-flex flex-wrap gap-2 mt-3">
+                <button
+                  className="btn btn-primary"
+                  onClick={() =>
+                    loadListaImagen(
+                      filtro.id_expe,
+                      filtro.rut_contri,
+                      filtro.ppu,
+                      filtro.num_control
+                    )
+                  }
+                >
+                  <i className="bi bi-search"></i> Buscar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header">
+              <h5>Listado imágenes</h5>
+            </div>
+            <div className="card-body">
+              <div className="col">
+                {listImagen.length > 0 ? (
+                  <table className="table table-bordered table-hover">
+                    <thead className="table-light align-middle">
+                      <tr>
+                        <th>Nombre del archivo</th>
+                        <th className="text-center">Expediente</th>
+                        <th className="text-center">Ir a...</th>
+                      </tr>
+                    </thead>
+                    <tbody className="align-middle">
+                      {listImagen.map((l) => (
+                        <tr
+                          key={l.id_adjunto}
+                          onClick={() => handleClick(l.id_adjunto)}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                        >
+                          <td
+                            style={{
+                              color:
+                                l.id_adjunto === selectedId ? "red" : "black",
+                            }}
+                          >
+                            {" "}
+                            {l.path_document}
+                          </td>
+                          <td>{l.id_expediente}</td>
+                          <td className="text-center align-middle">
+                            <button
+                              className="btn btn-primary"
+                              onClick={() =>
+                                navigate(`/inspect/${l.id_expediente}/edit`)
+                              }
+                            >
+                              <i className="bi bi-arrow-right-square"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p>No hay imágenes para mostrar.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="d-flex flex-wrap gap-2 mt-3">
-        <button
-          className="btn btn-primary"
-          onClick={() =>
-            loadListaImagen(
-              filtro.id_expe,
-              filtro.rut_contri,
-              filtro.ppu,
-              filtro.num_control
-            )
-          }
-        >
-          <i className="bi bi-search"></i> Buscar
-        </button>
+
+        <br />
       </div>
     </>
   );

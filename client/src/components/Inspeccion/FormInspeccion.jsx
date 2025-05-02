@@ -46,6 +46,7 @@ function FormInspeccion() {
     rol_contri: "",
 
     num_control: "",
+    estado_exp: "",
   });
 
   const [inspectores, setInspectores] = useState([]);
@@ -486,8 +487,8 @@ function FormInspeccion() {
               </div>
               <div className="card-body">
                 <form action="" onSubmit={handleSubmit}>
-                  <div className="row g-3 mb-4">
-                    <div className="col-md-5">
+                  <div className="row g-4">
+                    <div className="col-md-6">
                       <label htmlFor="num_control" className="form-label">
                         Número de control
                       </label>
@@ -501,6 +502,71 @@ function FormInspeccion() {
                         disabled={editing}
                         required
                       />
+                      <div className="">
+                        <label htmlFor="" className="d-flex form-label">
+                          Estado
+                        </label>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_exp"
+                            id="pendiente"
+                            value={"Pendiente"}
+                            checked={expedientes.estado_exp === "Pendiente"}
+                            onChange={handleChanges}
+                            disabled={editing}
+                            required
+                          />
+                          <label htmlFor="pendiente">Pendiente</label>
+                        </div>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_exp"
+                            id="resuelto"
+                            value={"Resuelto"}
+                            checked={expedientes.estado_exp === "Resuelto"}
+                            onChange={handleChanges}
+                            disabled={editing}
+                            required
+                          />
+                          <label htmlFor="resuelto">Resuelto</label>
+                        </div>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_exp"
+                            id="despachado"
+                            value={"Despachado"}
+                            checked={expedientes.estado_exp === "Despachado"}
+                            onChange={handleChanges}
+                            disabled={editing}
+                            required
+                          />
+                          <label htmlFor="despachado">Despachado</label>
+                        </div>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_exp"
+                            id="nulo"
+                            value={"Nulo"}
+                            checked={expedientes.estado_exp === "Nulo"}
+                            onChange={handleChanges}
+                            disabled={editing}
+                            required
+                          />
+                          <label htmlFor="nulo">Nulo</label>
+                          <br />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-6">
                       <label htmlFor="fecha_infraccion" className="form-label">
                         Fecha Infracción
                       </label>
@@ -513,8 +579,7 @@ function FormInspeccion() {
                         disabled={editing}
                         required
                       />
-                    </div>
-                    <div className="col-md-5">
+
                       <label htmlFor="fecha_resolucion" className="form-label">
                         Fecha Resolución
                       </label>
@@ -528,6 +593,7 @@ function FormInspeccion() {
                         disabled={editing}
                       />
                     </div>
+
                     {/*user creador sera valor del token de inicio sesion hay que quitar este input al configurar todo */}
                     <input
                       hidden
@@ -538,7 +604,7 @@ function FormInspeccion() {
                       onChange={handleChanges}
                       disabled={editing}
                     />
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label
                         htmlFor="tipo_procedimiento"
                         className="form-label"
@@ -563,7 +629,7 @@ function FormInspeccion() {
                         </option>
                       </select>
                     </div>
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label
                         htmlFor="fecha_citacion"
                         className="fecha_citacion"
@@ -580,7 +646,7 @@ function FormInspeccion() {
                         disabled={editing}
                       />
                     </div>
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="juzgado" className="form-label">
                         Juzgado
                       </label>
@@ -597,14 +663,14 @@ function FormInspeccion() {
                         <option value="JPL 2">JPL 2</option>
                       </select>
                     </div>
-                    <div className=" col-md-7">
+                    <div className=" col-md-6 ">
                       <label
                         htmlFor="empadronado"
                         className="d-flex form-label"
                       >
                         ¿Empadronado?
                       </label>
-                      <div className="form-check">
+                      <div className="form-check form-check-inline">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -618,7 +684,7 @@ function FormInspeccion() {
                         />
                         <label htmlFor="si">Sí</label>
                       </div>
-                      <div className="form-check">
+                      <div className="form-check form-check-inline">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -633,7 +699,7 @@ function FormInspeccion() {
                       </div>
                     </div>
 
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="inspector" className="form-label">
                         Inspector
                       </label>
@@ -655,7 +721,9 @@ function FormInspeccion() {
                           </option>
                         ))}
                       </select>
+                    </div>
 
+                    <div className="col-md-6">
                       <label htmlFor="testigo" className="">
                         Testigo
                       </label>
@@ -679,7 +747,7 @@ function FormInspeccion() {
                       </select>
                     </div>
 
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="rut_contri" className="form-label">
                         Rut Contribuyente
                       </label>
@@ -692,8 +760,6 @@ function FormInspeccion() {
                         onChange={handleChanges}
                         disabled={editing}
                       />
-                    </div>
-                    <div className="col-md-5">
                       <label htmlFor="giro_contri" className="form-label">
                         Giro Contribuyente
                       </label>
@@ -707,8 +773,7 @@ function FormInspeccion() {
                         disabled={editing}
                       />
                     </div>
-
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="nombre" className="form-label">
                         Nombre contribuyente
                       </label>
@@ -721,8 +786,6 @@ function FormInspeccion() {
                         onChange={handleChanges}
                         disabled={editing}
                       />
-                    </div>
-                    <div className="col-md-5">
                       <label htmlFor="direccion" className="form-label">
                         Dirección contribuyente
                       </label>
@@ -736,7 +799,8 @@ function FormInspeccion() {
                         disabled={editing}
                       />
                     </div>
-                    <div className="col-md-5">
+
+                    <div className="col-md-6">
                       <label htmlFor="rol_contri" className="form-label">
                         Rol Contribuyente
                       </label>
@@ -750,7 +814,10 @@ function FormInspeccion() {
                         disabled={editing}
                       />
                     </div>
-                    <div className="col-md-5">
+                    <div className="col-md-6">
+                      {/*Nací para rellenar la columna :P*/}
+                    </div>
+                    <div className="col-md-6">
                       <label
                         htmlFor="direccion_infraccion"
                         className="form-label"
@@ -768,7 +835,7 @@ function FormInspeccion() {
                       />
                     </div>
 
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="sector_infraccion" className="form-label">
                         Sector de infracción
                       </label>
@@ -791,7 +858,7 @@ function FormInspeccion() {
                       </select>
                     </div>
 
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="id_leyes">Ley aplicada</label>
                       <select
                         className="form-select"
@@ -809,7 +876,7 @@ function FormInspeccion() {
                         ))}
                       </select>
                     </div>
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="id_glosas">Glosa</label>
                       <select
                         className="form-select"
@@ -827,7 +894,7 @@ function FormInspeccion() {
                         ))}
                       </select>
                     </div>
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="tipo_vehi" className="form-label">
                         Tipo de Vehiculo
                       </label>
@@ -848,7 +915,7 @@ function FormInspeccion() {
                       </select>
                     </div>
 
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="marca_vehi" className="form-label">
                         Marca de Vehiculo
                       </label>
@@ -868,7 +935,7 @@ function FormInspeccion() {
                         ))}
                       </select>
                     </div>
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="color_vehi" className="form-label">
                         Color de Vehiculo
                       </label>
@@ -889,7 +956,7 @@ function FormInspeccion() {
                       </select>
                     </div>
 
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                       <label htmlFor="ppu" className="form-label">
                         P.P.U de Vehiculo
                       </label>
@@ -903,12 +970,13 @@ function FormInspeccion() {
                         disabled={editing}
                       />
                     </div>
-                    <div className="col-md-5">
+                    <div className="col-md-12">
                       <label htmlFor="observaciones">Observaciones</label>
                       <textarea
                         className="form-control"
                         name="observaciones"
                         id=""
+                        rows={4}
                         placeholder="Observaciones"
                         value={expedientes.observaciones}
                         onChange={handleChanges}
@@ -984,9 +1052,7 @@ function FormInspeccion() {
         </div>
         <br />
         <div className="row">
-          <div className="col-md-6">
-            {editing ? <AttachFiles idInforme={params.id} /> : ""}
-          </div>
+          {editing ? <AttachFiles idInforme={params.id} /> : ""}
         </div>
       </div>
     </>
