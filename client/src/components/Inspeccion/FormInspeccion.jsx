@@ -78,6 +78,7 @@ function FormInspeccion() {
     setExpedientes({
       id_expediente: params.id,
       num_control: exped.expediente.num_control,
+      estado_exp: exped.expediente.estado_exp,
       fecha_resolucion: formattedDate, //exped.expediente.fecha_resolucion,
       user_creador: exped.expediente.user_creador,
       tipo_procedimiento: exped.expediente.tipo_procedimiento,

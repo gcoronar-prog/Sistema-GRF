@@ -1,32 +1,31 @@
 import AsyncSelect from "react-select/async";
 
-function SelectSector({
-  selectedSector,
-  setSelectedSector,
+function SelectInspect({
+  selectedInspect,
+  setSelectInspect,
   edition,
   error,
   selectRef,
 }) {
-  const loadSector = async () => {
+  const loadInspect = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/sectores`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/inspectores`
       );
       if (!response.ok) {
-        throw new Error("Error al cargar los sectores");
+        throw new Error("Error al cargar leyes");
       }
       const data = await response.json();
       //console.log(data);
       return data.map((item) => ({
-        value: item.id_sector,
-        label: item.sector,
+        value: item.id_funcionario,
+        label: item.funcionario,
       }));
     } catch (error) {
       console.error("Error:", error);
       return [];
     }
   };
-
   return (
     <div>
       <AsyncSelect
@@ -34,11 +33,11 @@ function SelectSector({
         cacheOptions
         defaultOptions
         isClearable
-        loadOptions={loadSector}
-        onChange={(s) => {
-          setSelectedSector(s);
+        loadOptions={loadInspect}
+        onChange={(selected) => {
+          setSelectInspect(selected);
         }}
-        value={selectedSector}
+        value={selectedInspect}
         ref={selectRef}
         styles={{
           control: (base) => ({
@@ -51,5 +50,4 @@ function SelectSector({
     </div>
   );
 }
-
-export default SelectSector;
+export default SelectInspect;

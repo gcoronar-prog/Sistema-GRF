@@ -298,7 +298,7 @@ function StatisticsCentral() {
   };
 
   return (
-    <div>
+    <>
       <NavbarSGF central={"central"} />
       <div className="rangoFecha">
         <label htmlFor="">Fecha de inicio</label>
@@ -507,7 +507,7 @@ function StatisticsCentral() {
       ) : (
         "No se hay datos para mostrar"
       )}
-    </div>
+    </>
   );
 }
 

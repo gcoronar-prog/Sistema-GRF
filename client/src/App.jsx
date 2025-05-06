@@ -26,6 +26,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import SearchExpediente from "./components/Inspeccion/SearchExpediente";
 import GaleriaInspeccion from "./components/Inspeccion/GaleriaInspeccion";
+import StatisticsInspect from "./components/Estadisticas/StatisticsInspect";
 
 function App() {
   return (
@@ -73,6 +74,11 @@ function App() {
           <Route path="/search/informe" element={<SearchForm />} />
           <Route path="/search/expediente" element={<SearchExpediente />} />
           <Route path="/galeriaImgExp" element={<GaleriaInspeccion />} />
+
+          <Route
+            path="/statistics/inspeccion/v1"
+            element={<StatisticsInspect />}
+          />
         </Routes>
       </Container>
     </BrowserRouter>

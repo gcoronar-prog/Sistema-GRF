@@ -1,32 +1,39 @@
 import AsyncSelect from "react-select/async";
 
-function SelectSector({
-  selectedSector,
-  setSelectedSector,
+function SelectVehContri({
+  selectedVeh,
+  setSelectVeh,
   edition,
   error,
   selectRef,
+  tipo,
 }) {
-  const loadSector = async () => {
+  const loadVehi = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/sectores`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/datos_vehi`
       );
       if (!response.ok) {
-        throw new Error("Error al cargar los sectores");
+        throw new Error("Error al cargar leyes");
       }
       const data = await response.json();
       //console.log(data);
-      return data.map((item) => ({
-        value: item.id_sector,
-        label: item.sector,
-      }));
+      if (tipo === "marca") {
+        return data.map((item) => ({
+          value: item.marca,
+          label: item.marca,
+        }));
+      } else if (tipo === "tipo") {
+        return data.map((item) => ({
+          value: item.tipo,
+          label: item.tipo,
+        }));
+      }
     } catch (error) {
       console.error("Error:", error);
       return [];
     }
   };
-
   return (
     <div>
       <AsyncSelect
@@ -34,11 +41,11 @@ function SelectSector({
         cacheOptions
         defaultOptions
         isClearable
-        loadOptions={loadSector}
-        onChange={(s) => {
-          setSelectedSector(s);
+        loadOptions={loadVehi}
+        onChange={(selected) => {
+          setSelectVeh(selected);
         }}
-        value={selectedSector}
+        value={selectedVeh}
         ref={selectRef}
         styles={{
           control: (base) => ({
@@ -51,5 +58,4 @@ function SelectSector({
     </div>
   );
 }
-
-export default SelectSector;
+export default SelectVehContri;

@@ -75,7 +75,10 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" to={"/"}>
+                  <Link
+                    className="nav-link active"
+                    to={"/statistics/inspeccion/v1"}
+                  >
                     Estadísticas Inspección Municipal
                   </Link>
                 </li>
