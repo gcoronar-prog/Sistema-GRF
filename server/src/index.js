@@ -9,6 +9,7 @@ import solicitudImagenesRoutes from "./routes/imagenes.routes.js";
 import atencionSGC from "./routes/atencionSGC.routes.js";
 import loginUser from "./routes/login.routes.js";
 import statisticsCentral from "./routes/statisticsCentral.routes.js";
+import StatisticsInspect from "./routes/statisticsInspect.routes.js";
 
 import informesCentral from "./routes/informes.routes.js";
 
@@ -70,7 +71,8 @@ app.use(
   atencionSGC,
   informesCentral,
   loginUser,
-  statisticsCentral
+  statisticsCentral,
+  StatisticsInspect
 );
 
 app.post(
