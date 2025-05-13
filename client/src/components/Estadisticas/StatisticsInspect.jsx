@@ -9,6 +9,11 @@ import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
 import estadoInspeccionPDF from "../PDFs/estadoInspeccionPDF";
 import TipoProceInspPDF from "../PDFs/TipoProceInspPDF";
+import LeyInspeccionPDF from "../PDFs/LeyInspeccionPDF";
+import InspectResumenPDF from "../PDFs/InspectResumenPDF";
+import VehiInspectPDF from "../PDFs/VehiInspectPDF";
+import SesctorInspectPDF from "../PDFs/SectorInspectPDF";
+import GlosaInspectPDF from "../PDFs/GlosaInspectPDF";
 
 function StatisticsInspect() {
   const server_back = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -327,8 +332,343 @@ function StatisticsInspect() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      console.log(data);
-      //TipoProceInspPDF(data.expedientes);
+      //console.log(data);
+      TipoProceInspPDF(data.expedientes);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenLeyInspec = async () => {
+    const url = "http://localhost:3000/resumen_ley_inspe?";
+    let params = new URLSearchParams();
+
+    if (fechaInicioInfrac && fechaFinInfrac) {
+      params.append("fechaInicioInfrac", fechaInicioInfrac);
+      params.append("fechaFinInfrac", fechaFinInfrac);
+    }
+
+    if (fechaInicioCitacion && fechaFinCitacion) {
+      params.append("fechaInicioCitacion", fechaInicioCitacion);
+      params.append("fechaFinCitacion", fechaFinCitacion);
+    }
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio);
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado_exp) => {
+      if (estadoFilter[estado_exp]) {
+        params.append("estado_exp", estado_exp);
+      }
+    });
+
+    Object.keys(tipoProced).forEach((tipo_proce) => {
+      if (tipoProced[tipo_proce]) {
+        params.append("tipo_proce", tipo_proce);
+      }
+    });
+
+    Object.keys(jplFilter).forEach((jpl) => {
+      if (jplFilter[jpl]) {
+        params.append("jpl", jpl);
+      }
+    });
+
+    if (selectedInspect) {
+      params.append("inspector", JSON.stringify(selectedInspect.value));
+    }
+
+    if (selectedLey) {
+      params.append("leyes", JSON.stringify(selectedLey.value));
+    }
+
+    if (selectedSector) {
+      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
+    }
+
+    if (selectedTipoVeh) {
+      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
+    }
+
+    if (selectedVeh) {
+      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
+    }
+
+    try {
+      const res = await fetch(url + params.toString());
+      const data = await res.json();
+      //console.log(data);
+      LeyInspeccionPDF(data.expedientes);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenInspector = async () => {
+    const url = "http://localhost:3000/resumen_inspector_inspe?";
+    let params = new URLSearchParams();
+
+    if (fechaInicioInfrac && fechaFinInfrac) {
+      params.append("fechaInicioInfrac", fechaInicioInfrac);
+      params.append("fechaFinInfrac", fechaFinInfrac);
+    }
+
+    if (fechaInicioCitacion && fechaFinCitacion) {
+      params.append("fechaInicioCitacion", fechaInicioCitacion);
+      params.append("fechaFinCitacion", fechaFinCitacion);
+    }
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio);
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado_exp) => {
+      if (estadoFilter[estado_exp]) {
+        params.append("estado_exp", estado_exp);
+      }
+    });
+
+    Object.keys(tipoProced).forEach((tipo_proce) => {
+      if (tipoProced[tipo_proce]) {
+        params.append("tipo_proce", tipo_proce);
+      }
+    });
+
+    Object.keys(jplFilter).forEach((jpl) => {
+      if (jplFilter[jpl]) {
+        params.append("jpl", jpl);
+      }
+    });
+
+    if (selectedInspect) {
+      params.append("inspector", JSON.stringify(selectedInspect.value));
+    }
+
+    if (selectedLey) {
+      params.append("leyes", JSON.stringify(selectedLey.value));
+    }
+
+    if (selectedSector) {
+      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
+    }
+
+    if (selectedTipoVeh) {
+      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
+    }
+
+    if (selectedVeh) {
+      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
+    }
+
+    try {
+      const res = await fetch(url + params.toString());
+      const data = await res.json();
+      //console.log(data);
+      InspectResumenPDF(data.expedientes);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenVehi = async () => {
+    const url = "http://localhost:3000/resumen_vehi_inspe?";
+    let params = new URLSearchParams();
+
+    if (fechaInicioInfrac && fechaFinInfrac) {
+      params.append("fechaInicioInfrac", fechaInicioInfrac);
+      params.append("fechaFinInfrac", fechaFinInfrac);
+    }
+
+    if (fechaInicioCitacion && fechaFinCitacion) {
+      params.append("fechaInicioCitacion", fechaInicioCitacion);
+      params.append("fechaFinCitacion", fechaFinCitacion);
+    }
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio);
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado_exp) => {
+      if (estadoFilter[estado_exp]) {
+        params.append("estado_exp", estado_exp);
+      }
+    });
+
+    Object.keys(tipoProced).forEach((tipo_proce) => {
+      if (tipoProced[tipo_proce]) {
+        params.append("tipo_proce", tipo_proce);
+      }
+    });
+
+    Object.keys(jplFilter).forEach((jpl) => {
+      if (jplFilter[jpl]) {
+        params.append("jpl", jpl);
+      }
+    });
+
+    if (selectedInspect) {
+      params.append("inspector", JSON.stringify(selectedInspect.value));
+    }
+
+    if (selectedLey) {
+      params.append("leyes", JSON.stringify(selectedLey.value));
+    }
+
+    if (selectedSector) {
+      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
+    }
+
+    if (selectedTipoVeh) {
+      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
+    }
+
+    if (selectedVeh) {
+      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
+    }
+
+    try {
+      const res = await fetch(url + params.toString());
+      const data = await res.json();
+      //console.log(data);
+      VehiInspectPDF(data.expedientes);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenSector = async () => {
+    const url = "http://localhost:3000/resumen_sector_inspe?";
+    let params = new URLSearchParams();
+
+    if (fechaInicioInfrac && fechaFinInfrac) {
+      params.append("fechaInicioInfrac", fechaInicioInfrac);
+      params.append("fechaFinInfrac", fechaFinInfrac);
+    }
+
+    if (fechaInicioCitacion && fechaFinCitacion) {
+      params.append("fechaInicioCitacion", fechaInicioCitacion);
+      params.append("fechaFinCitacion", fechaFinCitacion);
+    }
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio);
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado_exp) => {
+      if (estadoFilter[estado_exp]) {
+        params.append("estado_exp", estado_exp);
+      }
+    });
+
+    Object.keys(tipoProced).forEach((tipo_proce) => {
+      if (tipoProced[tipo_proce]) {
+        params.append("tipo_proce", tipo_proce);
+      }
+    });
+
+    Object.keys(jplFilter).forEach((jpl) => {
+      if (jplFilter[jpl]) {
+        params.append("jpl", jpl);
+      }
+    });
+
+    if (selectedInspect) {
+      params.append("inspector", JSON.stringify(selectedInspect.value));
+    }
+
+    if (selectedLey) {
+      params.append("leyes", JSON.stringify(selectedLey.value));
+    }
+
+    if (selectedSector) {
+      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
+    }
+
+    if (selectedTipoVeh) {
+      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
+    }
+
+    if (selectedVeh) {
+      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
+    }
+
+    try {
+      const res = await fetch(url + params.toString());
+      const data = await res.json();
+      //console.log(data);
+      SesctorInspectPDF(data.expedientes);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenGlosa = async () => {
+    const url = "http://localhost:3000/resumen_glosa_inspe?";
+    let params = new URLSearchParams();
+
+    if (fechaInicioInfrac && fechaFinInfrac) {
+      params.append("fechaInicioInfrac", fechaInicioInfrac);
+      params.append("fechaFinInfrac", fechaFinInfrac);
+    }
+
+    if (fechaInicioCitacion && fechaFinCitacion) {
+      params.append("fechaInicioCitacion", fechaInicioCitacion);
+      params.append("fechaFinCitacion", fechaFinCitacion);
+    }
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio);
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado_exp) => {
+      if (estadoFilter[estado_exp]) {
+        params.append("estado_exp", estado_exp);
+      }
+    });
+
+    Object.keys(tipoProced).forEach((tipo_proce) => {
+      if (tipoProced[tipo_proce]) {
+        params.append("tipo_proce", tipo_proce);
+      }
+    });
+
+    Object.keys(jplFilter).forEach((jpl) => {
+      if (jplFilter[jpl]) {
+        params.append("jpl", jpl);
+      }
+    });
+
+    if (selectedInspect) {
+      params.append("inspector", JSON.stringify(selectedInspect.value));
+    }
+
+    if (selectedLey) {
+      params.append("leyes", JSON.stringify(selectedLey.value));
+    }
+
+    if (selectedSector) {
+      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
+    }
+
+    if (selectedTipoVeh) {
+      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
+    }
+
+    if (selectedVeh) {
+      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
+    }
+
+    try {
+      const res = await fetch(url + params.toString());
+      const data = await res.json();
+      //console.log(data);
+      GlosaInspectPDF(data.expedientes);
     } catch (error) {
       console.log(error);
     }
@@ -669,6 +1009,21 @@ function StatisticsInspect() {
             </button>
             <button className="btn btn-primary" onClick={resumenTipoExp}>
               Resumen tipo
+            </button>
+            <button className="btn btn-primary" onClick={resumenLeyInspec}>
+              Resumen por Ley
+            </button>
+            <button className="btn btn-primary" onClick={resumenInspector}>
+              Resumen por Inspector
+            </button>
+            <button className="btn btn-primary" onClick={resumenVehi}>
+              Resumen por Vehiculo
+            </button>
+            <button className="btn btn-primary" onClick={resumenSector}>
+              Resumen por Sector
+            </button>
+            <button className="btn btn-primary" onClick={resumenGlosa}>
+              Resumen por Glosa
             </button>
           </div>
         </div>

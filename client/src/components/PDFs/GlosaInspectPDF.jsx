@@ -1,14 +1,15 @@
 import { jsPDF } from "jspdf";
 import { autoTable } from "jspdf-autotable";
 
-const TipoProceInspPDF = (datos) => {
+const GlosaInspectPDF = (datos) => {
   const doc = new jsPDF();
   doc.text("Resumen por Estado", 10, 10);
 
-  const tableColumn = ["Tipo de proceso", "Inspector", "Cantidad"];
+  const tableColumn = ["Tipo de procedimiento", "Glosa", "Ley", "Cantidad"];
   const tableRows = datos.map((e) => [
     e.tipo_procedimiento,
-    e.funcionario,
+    e.glosa_ley,
+    e.ley,
     e.cantidad,
   ]);
 
@@ -16,4 +17,4 @@ const TipoProceInspPDF = (datos) => {
   doc.output("dataurlnewwindow");
 };
 
-export default TipoProceInspPDF;
+export default GlosaInspectPDF;
