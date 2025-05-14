@@ -34,6 +34,7 @@ function SelectOrigin({
         cacheOptions
         defaultOptions
         loadOptions={loadOrigin}
+        isClearable
         onChange={(selectedOptions) => {
           setSelectedOrigin(selectedOptions);
         }}

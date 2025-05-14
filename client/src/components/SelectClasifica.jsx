@@ -1,11 +1,6 @@
-import { useState } from "react";
 import Select from "react-select";
 
 const options = [
-  {
-    value: 0,
-    label: "Seleccione opción",
-  },
   { value: 1, label: "Emergencia" },
   { value: 2, label: "Incidente" },
   { value: 3, label: "Factor de riesgo" },
@@ -27,6 +22,7 @@ const SelectClasifica = ({
         value={selectedClasif}
         onChange={(selectedOption) => setSelectedClasif(selectedOption)}
         isDisabled={edition}
+        isClearable
         ref={selectRef}
         styles={{
           control: (base) => ({

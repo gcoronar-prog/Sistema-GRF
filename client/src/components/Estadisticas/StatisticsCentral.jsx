@@ -112,9 +112,9 @@ function StatisticsCentral() {
       //setCentral(data.informe || []);
       //console.log(data.informe);
       generarPDF(data.informe);
-      if (className === "excel") {
+      /* if (className === "excel") {
         exportExcel(data.informe, "Central.xlsx");
-      }
+      }*/
     } catch (error) {
       console.log(error);
     }
@@ -302,12 +302,14 @@ function StatisticsCentral() {
       <NavbarSGF formulario={"central"} />
       <hr />
       <div className="card">
-        <div className="card-header">Estadisticas Inspección Municipal</div>
+        <div className="card-header text-bg-success">
+          <span className="fw-bold">Estadisticas Inspección Municipal </span>
+        </div>
         <div className="card-body">
           <div className="rangoFecha">
-            <div className="row">
+            <div className="row p-2">
               <div className="col-md-3">
-                <label htmlFor="fechaInicio" className="form-label">
+                <label htmlFor="fechaInicio" className="form-label fw-bold">
                   Fecha de inicio
                 </label>
                 <input
@@ -320,7 +322,7 @@ function StatisticsCentral() {
                 />
               </div>
               <div className="col-md-3">
-                <label htmlFor="fechaFin" className="form-label">
+                <label htmlFor="fechaFin" className="form-label fw-bold">
                   Fecha de termino
                 </label>
                 <input
@@ -334,27 +336,29 @@ function StatisticsCentral() {
               </div>
               <div className="col-md-3">
                 <div className="estadoInforme">
-                  <label htmlFor="estado">Estados</label>
+                  <label htmlFor="estado" className="form-label fw-bold">
+                    Estado informes
+                  </label>
                   <div className="form-check">
-                    <label htmlFor="">Atendido</label>
+                    <label htmlFor="atendido">Atendido</label>
                     <input
                       className="form-check-input"
                       type="checkbox"
                       name="atendido"
                       value="atendido"
-                      id=""
+                      id="atendido"
                       data-type="estado"
                       onChange={handleCheckboxChange}
                       checked={estadoFilter.atendido || false}
                     />
                   </div>
                   <div className="form-check">
-                    <label htmlFor="">En progreso</label>
+                    <label htmlFor="progreso">En progreso</label>
                     <input
                       type="checkbox"
                       className="form-check-input"
                       name="progreso"
-                      id=""
+                      id="progreso"
                       value="progreso"
                       data-type="estado"
                       onChange={handleCheckboxChange}
@@ -362,12 +366,12 @@ function StatisticsCentral() {
                     />
                   </div>
                   <div className="form-check">
-                    <label htmlFor="">Pendiente</label>
+                    <label htmlFor="pendiente">Pendiente</label>
                     <input
                       type="checkbox"
                       className="form-check-input"
                       name="pendiente"
-                      id=""
+                      id="pendiente"
                       value="pendiente"
                       data-type="estado"
                       onChange={handleCheckboxChange}
@@ -377,7 +381,9 @@ function StatisticsCentral() {
                 </div>
               </div>
               <div className="col-md-3">
-                Captura de información
+                <label htmlFor="" className="form-label fw-bold">
+                  Captura de información
+                </label>
                 <div className="capturaInforme">
                   <div className="form-check">
                     <label htmlFor="radios">Radio</label>
@@ -385,7 +391,7 @@ function StatisticsCentral() {
                       type="checkbox"
                       className="form-check-input"
                       name="radios"
-                      id=""
+                      id="radios"
                       value="radios"
                       data-type="captura"
                       onChange={handleCheckboxChange}
@@ -398,7 +404,7 @@ function StatisticsCentral() {
                       type="checkbox"
                       className="form-check-input"
                       name="telefono"
-                      id=""
+                      id="telefono"
                       value="telefono"
                       data-type="captura"
                       onChange={handleCheckboxChange}
@@ -411,7 +417,7 @@ function StatisticsCentral() {
                       type="checkbox"
                       className="form-check-input"
                       name="rrss"
-                      id=""
+                      id="rrss"
                       value="rrss"
                       data-type="captura"
                       onChange={handleCheckboxChange}
@@ -424,7 +430,7 @@ function StatisticsCentral() {
                       type="checkbox"
                       className="form-check-input"
                       name="presencial"
-                      id=""
+                      id="presencial"
                       value="presencial"
                       data-type="captura"
                       onChange={handleCheckboxChange}
@@ -437,7 +443,7 @@ function StatisticsCentral() {
                       type="checkbox"
                       className="form-check-input"
                       name="email"
-                      id=""
+                      id="email"
                       value="email"
                       data-type="captura"
                       onChange={handleCheckboxChange}
@@ -448,10 +454,13 @@ function StatisticsCentral() {
               </div>
             </div>
           </div>
-          <div className="row">
+
+          <div className="row p-2">
             <div className="col">
               <div className="clasiInforme">
-                <label htmlFor="clasificacion">Clasificación</label>
+                <label htmlFor="clasificacion" className="form-label fw-bold">
+                  Clasificación
+                </label>
 
                 <SelectClasifica
                   id="clasificacion"
@@ -460,11 +469,11 @@ function StatisticsCentral() {
                 />
               </div>
             </div>
-          </div>
-          <div className="row">
             <div className="col">
               <div className="origenInforme">
-                <label htmlFor="">Origen:</label>
+                <label htmlFor="" className="form-label fw-bold">
+                  Origen:
+                </label>
                 <SelectOrigin
                   selectedOrigin={selectedOrigen}
                   setSelectedOrigin={setSelectedOrigen}
@@ -473,27 +482,22 @@ function StatisticsCentral() {
             </div>
             <div className="col">
               <div className="sectorInforme">
-                <label htmlFor="">Sector:</label>
+                <label htmlFor="" className="form-label fw-bold">
+                  Sector:
+                </label>
                 <SelectSector
                   selectedSector={selectedSector}
                   setSelectedSector={setSelectedSector}
                 />
               </div>
             </div>
-            <div className="col">
-              <div className="vechiculoInforme">
-                <label htmlFor="">Vehículos:</label>
-                <SelectVehiculo
-                  selectedVehiculo={selectedVehiculo}
-                  setSelectedVehiculo={setSelectedVehiculo}
-                />
-              </div>
-            </div>
           </div>
-          <div className="row">
+          <div className="row p-2">
             <div className="col">
               <div className="tipoReporte">
-                <label htmlFor="">Tipo de informe:</label>
+                <label htmlFor="" className="form-label fw-bold">
+                  Tipo de informe:
+                </label>
                 <SelectTipo
                   tipo={selectedClasif}
                   selectedTipo={selectedTipo}
@@ -503,10 +507,23 @@ function StatisticsCentral() {
             </div>
             <div className="col">
               <div className="recursosInvolucrados">
-                <label htmlFor="">Recursos</label>
+                <label htmlFor="" className="form-label fw-bold">
+                  Recursos
+                </label>
                 <SelectRecursos
                   selectedRecursos={selectedRecursos}
                   setSelectedRecursos={setSelectedRecursos}
+                />
+              </div>
+            </div>
+            <div className="col">
+              <div className="vechiculoInforme">
+                <label htmlFor="" className="form-label fw-bold">
+                  Vehículos:
+                </label>
+                <SelectVehiculo
+                  selectedVehiculo={selectedVehiculo}
+                  setSelectedVehiculo={setSelectedVehiculo}
                 />
               </div>
             </div>
@@ -518,7 +535,7 @@ function StatisticsCentral() {
       <div className="row">
         <div className="col">
           <div className="card">
-            <div className="card-header">
+            <div className="card-header text-bg-success">
               <span className="fw-bold">Acciones</span>
             </div>
             <div className="card-body">
@@ -544,7 +561,7 @@ function StatisticsCentral() {
         </div>
         <div className="col">
           <div className="card">
-            <div className="card-header">
+            <div className="card-header text-bg-success">
               <span className="fw-bold">Resumen estadisticas</span>
             </div>
             <div className="card-body">

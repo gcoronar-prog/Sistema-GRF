@@ -50,6 +50,7 @@ function SelectTipo({
         cacheOptions
         loadOptions={loadTipo}
         defaultOptions
+        isClearable
         onChange={(selectedOptions) => {
           setSelectedTipo(selectedOptions);
         }}
