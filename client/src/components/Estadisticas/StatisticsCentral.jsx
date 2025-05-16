@@ -61,7 +61,7 @@ function StatisticsCentral() {
     email: false,
   });
 
-  const fetchData = async () => {
+  const fetchData = async (tipoDoc) => {
     let url = "http://localhost:3000/estadisticaCentral?";
     let params = new URLSearchParams();
 
@@ -111,10 +111,11 @@ function StatisticsCentral() {
       const data = await res.json();
       //setCentral(data.informe || []);
       //console.log(data.informe);
-      generarPDF(data.informe);
-      /* if (className === "excel") {
-        exportExcel(data.informe, "Central.xlsx");
-      }*/
+      if (tipoDoc === 1) {
+        generarPDF(data.informe);
+      } else if (tipoDoc === 2) {
+        exportExcel(central, "Central.xlsx");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -303,38 +304,49 @@ function StatisticsCentral() {
       <hr />
       <div className="card">
         <div className="card-header text-bg-success">
-          <span className="fw-bold">Estadisticas Inspección Municipal </span>
+          <span className="fw-bold">Estadisticas Central Municipal </span>
         </div>
         <div className="card-body">
           <div className="rangoFecha">
             <div className="row p-2">
-              <div className="col-md-3">
-                <label htmlFor="fechaInicio" className="form-label fw-bold">
-                  Fecha de inicio
-                </label>
-                <input
-                  className="form-control"
-                  type="datetime-local"
-                  name="fechaInicio"
-                  id="fechaInicio"
-                  onChange={(e) => setFechaInicio(e.target.value)}
-                  value={fechaInicio}
-                />
+              <div className="col-4">
+                <div className="card">
+                  <div className="card-header">
+                    <span className="fw-bold">Fecha de infomes</span>
+                  </div>
+                  <div className="card-body">
+                    <label
+                      htmlFor="fechaInicio"
+                      className="form-label fw-bold p-1"
+                    >
+                      Inicio
+                    </label>
+                    <input
+                      className="form-control"
+                      type="datetime-local"
+                      name="fechaInicio"
+                      id="fechaInicio"
+                      onChange={(e) => setFechaInicio(e.target.value)}
+                      value={fechaInicio}
+                    />
+                    <label
+                      htmlFor="fechaFin"
+                      className="form-label fw-bold p-1"
+                    >
+                      Término
+                    </label>
+                    <input
+                      className="form-control"
+                      type="datetime-local"
+                      name="fechaFin"
+                      id="fechaFin"
+                      onChange={(e) => setFechaFin(e.target.value)}
+                      value={fechaFin}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="col-md-3">
-                <label htmlFor="fechaFin" className="form-label fw-bold">
-                  Fecha de termino
-                </label>
-                <input
-                  className="form-control"
-                  type="datetime-local"
-                  name="fechaFin"
-                  id="fechaFin"
-                  onChange={(e) => setFechaFin(e.target.value)}
-                  value={fechaFin}
-                />
-              </div>
-              <div className="col-md-3">
+              <div className="col-3">
                 <div className="estadoInforme">
                   <label htmlFor="estado" className="form-label fw-bold">
                     Estado informes
@@ -380,7 +392,7 @@ function StatisticsCentral() {
                   </div>
                 </div>
               </div>
-              <div className="col-md-3">
+              <div className="col-5">
                 <label htmlFor="" className="form-label fw-bold">
                   Captura de información
                 </label>
@@ -540,12 +552,15 @@ function StatisticsCentral() {
             </div>
             <div className="card-body">
               <div className="d-flex flex-column gap-2 align-items-center">
-                <button className="btn btn-danger w-50" onClick={fetchData}>
+                <button
+                  className="btn btn-danger w-50"
+                  onClick={() => fetchData(1)}
+                >
                   <i className="bi bi-file-pdf"></i> Descargar PDF
                 </button>
                 <button
                   className="btn btn-success w-50"
-                  onClick={() => exportExcel(central, "Central.xlsx")}
+                  onClick={() => fetchData(2)}
                 >
                   <i className="bi bi-file-earmark-text"></i> Exportar a Excel
                 </button>
@@ -605,6 +620,7 @@ function StatisticsCentral() {
           </div>
         </div>
       </div>
+      <br />
     </>
   );
 }

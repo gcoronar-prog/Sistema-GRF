@@ -67,8 +67,9 @@ function StatisticsInspect() {
   const [selectedVeh, setSelectedVeh] = useState("");
   const [selectedTipoVeh, setSelectedTipoVeh] = useState("");
   const [selectedSector, setSelectedSector] = useState("");
+  //const [tipoDoc, setTipoDoc] = useState(0);
 
-  const fetchData = async () => {
+  const fetchData = async (tipoDoc) => {
     let url = `${server_back}/estadisticaInspeccion?`;
     let params = new URLSearchParams();
 
@@ -128,9 +129,14 @@ function StatisticsInspect() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      generarPDF(data.expedientes);
 
-      exportExcel(data.expedientes, "Expedientes.xlsx");
+      if (tipoDoc === 1) {
+        generarPDF(data.expedientes);
+      } else if (tipoDoc === 2) {
+        exportExcel(data.expedientes, "Expedientes.xlsx");
+      }
+
+      //exportExcel(data.expedientes, "Expedientes.xlsx");
       setInspeccion(data.expedientes);
       console.log(data);
     } catch (error) {
@@ -733,7 +739,7 @@ function StatisticsInspect() {
                       className="form-control"
                       type="datetime-local"
                       name="fechaInicioInfrac"
-                      id=""
+                      id="fechaInicioInfrac"
                       onChange={(e) => setFechaInicioInfrac(e.target.value)}
                       value={fechaInicioInfrac}
                     />
@@ -1105,11 +1111,18 @@ function StatisticsInspect() {
                 name="botones"
                 className="d-flex flex-column gap-2 align-items-center"
               >
-                <button onClick={fetchData} className="btn btn-danger w-50">
+                <button
+                  onClick={() => {
+                    fetchData(1);
+                  }}
+                  className="btn btn-danger w-50"
+                >
                   <i className="bi bi-file-pdf"></i> Descargar PDF
                 </button>
                 <button
-                  onClick={() => exportExcel(inspeccion, "Expedientes.xlsx")}
+                  onClick={() => {
+                    fetchData(2);
+                  }}
                   className="btn btn-success w-50 excel"
                 >
                   <i className="bi bi-file-earmark-text"></i> Descargar Excel
