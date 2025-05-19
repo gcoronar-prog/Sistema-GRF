@@ -59,16 +59,16 @@ function ListPendiente(refresh) {
                 className="btn btn-outline-success"
                 onClick={() => setEstado(1)}
               >
-                Pendiente
+                <i className="bi bi-hourglass-split"></i> Pendiente
               </button>
               <button
                 className="btn btn-outline-secondary"
                 onClick={() => setEstado(2)}
               >
-                Progreso
+                <i className="bi bi-arrow-repeat"></i> Progreso
               </button>
               <button className="btn btn-danger" onClick={() => setEstado(3)}>
-                Emergencias
+                <i className="bi bi-exclamation-circle"></i> Emergencias
               </button>
             </div>
           </div>

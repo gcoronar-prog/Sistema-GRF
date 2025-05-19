@@ -111,10 +111,15 @@ function StatisticsCentral() {
       const data = await res.json();
       //setCentral(data.informe || []);
       //console.log(data.informe);
-      if (tipoDoc === 1) {
-        generarPDF(data.informe);
-      } else if (tipoDoc === 2) {
-        exportExcel(central, "Central.xlsx");
+      if (data.informe.length !== 0) {
+        if (tipoDoc === 1) {
+          generarPDF(data.informe);
+          console.log(data.informe.length);
+        } else if (tipoDoc === 2) {
+          exportExcel(central, "Central.xlsx");
+        }
+      } else {
+        alert("No hay datos para mostrar");
       }
     } catch (error) {
       console.log(error);
@@ -170,12 +175,51 @@ function StatisticsCentral() {
       params.append("fechaFin", fechaFin);
     }
 
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
+      }
+    });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
 
-      console.log("filtro", data);
-      RecursosCentralPDF(fechaInicio, fechaFin, data.informe);
+      if (data.informe.length === 0) {
+        alert("No existen registros");
+      } else {
+        RecursosCentralPDF(fechaInicio, fechaFin, data.informe);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -190,12 +234,51 @@ function StatisticsCentral() {
       params.append("fechaFin", fechaFin);
     }
 
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
+      }
+    });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
 
-      console.log("filtroClasif", data.informe);
-      ClasifCentralPDF(fechaInicio, fechaFin, data.informe);
+      if (data.informe.length === 0) {
+        alert("No existen registros");
+      } else {
+        ClasifCentralPDF(fechaInicio, fechaFin, data.informe);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -210,12 +293,51 @@ function StatisticsCentral() {
       params.append("fechaFin", fechaFin);
     }
 
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
+      }
+    });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
 
-      console.log("filtro origen", data.informe);
-      OrigenCentralPDF(fechaInicio, fechaFin, data.informe);
+      if (condition) {
+        alert("No existen registros");
+      } else {
+        OrigenCentralPDF(fechaInicio, fechaFin, data.informe);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -230,11 +352,51 @@ function StatisticsCentral() {
       params.append("fechaFin", fechaFin);
     }
 
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
+      }
+    });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
 
-      EstadoCentralPDF(fechaInicio, fechaFin, data.informe);
+      if (data.informe.length === 0) {
+        alert("No existen registros");
+      } else {
+        EstadoCentralPDF(fechaInicio, fechaFin, data.informe);
+      }
       console.log("filtro", data);
     } catch (error) {
       console.log(error);
@@ -244,11 +406,56 @@ function StatisticsCentral() {
   const resumenRangoPDF = async () => {
     const url = "http://localhost:3000/resumen_rango_central?";
     const params = new URLSearchParams();
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
+      }
+    });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
 
-      RangoCentralPDF(fechaInicio, fechaFin, data.informe);
+      if (data.informe.length === 0) {
+        alert("No existen registros ");
+      } else {
+        RangoCentralPDF(fechaInicio, fechaFin, data.informe);
+      }
       console.log("filtro origen", data.informe);
     } catch (error) {
       console.log(error);
@@ -346,6 +553,7 @@ function StatisticsCentral() {
                   </div>
                 </div>
               </div>
+              <div className="col-1">{/*hago puro espacio jejejeje >:D */}</div>
               <div className="col-3">
                 <div className="estadoInforme">
                   <label htmlFor="estado" className="form-label fw-bold">
@@ -392,7 +600,7 @@ function StatisticsCentral() {
                   </div>
                 </div>
               </div>
-              <div className="col-5">
+              <div className="col-3">
                 <label htmlFor="" className="form-label fw-bold">
                   Captura de información
                 </label>

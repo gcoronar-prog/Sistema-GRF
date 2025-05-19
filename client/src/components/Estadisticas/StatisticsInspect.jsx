@@ -130,10 +130,14 @@ function StatisticsInspect() {
       const res = await fetch(url + params.toString());
       const data = await res.json();
 
-      if (tipoDoc === 1) {
-        generarPDF(data.expedientes);
-      } else if (tipoDoc === 2) {
-        exportExcel(data.expedientes, "Expedientes.xlsx");
+      if (data.expedientes.length !== 0) {
+        if (tipoDoc === 1) {
+          generarPDF(data.expedientes);
+        } else if (tipoDoc === 2) {
+          exportExcel(data.expedientes, "Expedientes.xlsx");
+        }
+      } else {
+        alert("No hay datos para mostrar");
       }
 
       //exportExcel(data.expedientes, "Expedientes.xlsx");
@@ -276,8 +280,11 @@ function StatisticsInspect() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-
-      estadoInspeccionPDF(data.expedientes);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        estadoInspeccionPDF(data.expedientes);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -343,8 +350,11 @@ function StatisticsInspect() {
     try {
       const res = await fetch(url + params.toString());
       const data = await res.json();
-      //console.log(data);
-      TipoProceInspPDF(data.expedientes);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        TipoProceInspPDF(data.expedientes);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -411,7 +421,11 @@ function StatisticsInspect() {
       const res = await fetch(url + params.toString());
       const data = await res.json();
       //console.log(data);
-      LeyInspeccionPDF(data.expedientes);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        LeyInspeccionPDF(data.expedientes);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -478,7 +492,11 @@ function StatisticsInspect() {
       const res = await fetch(url + params.toString());
       const data = await res.json();
       //console.log(data);
-      InspectResumenPDF(data.expedientes);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        InspectResumenPDF(data.expedientes);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -545,7 +563,11 @@ function StatisticsInspect() {
       const res = await fetch(url + params.toString());
       const data = await res.json();
       //console.log(data);
-      VehiInspectPDF(data.expedientes);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        VehiInspectPDF(data.expedientes);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -612,7 +634,11 @@ function StatisticsInspect() {
       const res = await fetch(url + params.toString());
       const data = await res.json();
       //console.log(data);
-      SesctorInspectPDF(data.expedientes);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        SesctorInspectPDF(data.expedientes);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -679,7 +705,11 @@ function StatisticsInspect() {
       const res = await fetch(url + params.toString());
       const data = await res.json();
       //console.log(data);
-      GlosaInspectPDF(data.expedientes);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        GlosaInspectPDF(data.expedientes);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -845,7 +875,7 @@ function StatisticsInspect() {
                         className="form-check-input"
                         type="checkbox"
                         name="pendiente"
-                        value="pendiente"
+                        value="Pendiente"
                         id="pendiente"
                         data-type="estado"
                         onChange={handleCheckboxChange}
