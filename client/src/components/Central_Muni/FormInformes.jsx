@@ -379,7 +379,7 @@ function FormInformes() {
             onClick={handleFirstInforme}
             disabled={
               //disabledPrevButton
-              false
+              !editing
             }
           >
             <i className="bi bi-skip-start me-1"></i> Primer Informe
@@ -390,7 +390,7 @@ function FormInformes() {
             onClick={handlePrevious}
             disabled={
               //disabledPrevButton
-              false
+              !editing
             }
           >
             <i className="bi bi-chevron-left me-1"></i> Atras
@@ -401,7 +401,7 @@ function FormInformes() {
             onClick={handleNext}
             disabled={
               //disabledNextButton
-              false
+              !editing
             }
           >
             Siguiente <i className="bi bi-chevron-right ms-1"></i>
@@ -411,7 +411,7 @@ function FormInformes() {
             className="btn btn-outline-primary d-flex align-items-center"
             onClick={handleLastInforme}
             disabled={
-              false
+              !editing
               //disabledNextButton
             }
           >
@@ -442,7 +442,7 @@ function FormInformes() {
                         name="fecha_informe"
                         onChange={handleChanges}
                         value={informes.fecha_informe}
-                        disabled={editing}
+                        readOnly={editing}
                         required
                       />
                       <div className="invalid-feedback">
@@ -634,7 +634,7 @@ function FormInformes() {
                           id="otroTipo"
                           onChange={handleChanges}
                           value={informes.otro_tipo}
-                          disabled={editing}
+                          readOnly={editing}
                         />
                       </>
                     ) : (
@@ -651,7 +651,7 @@ function FormInformes() {
                         id="descripcion"
                         onChange={handleChanges}
                         value={informes.descripcion_informe}
-                        disabled={editing}
+                        readOnly={editing}
                       ></textarea>
                     </div>
 
@@ -698,7 +698,7 @@ function FormInformes() {
                         id="direccion"
                         onChange={handleChanges}
                         value={informes.direccion_informe}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
 
@@ -735,7 +735,7 @@ function FormInformes() {
                       onClick={handleNewInform}
                       style={{ display: editing ? "" : "none" }}
                     >
-                      Nuevo Expediente
+                      <i className="bi bi-clipboard2-plus"></i> Nuevo Expediente
                     </button>
                     <button
                       type="button"
@@ -743,7 +743,7 @@ function FormInformes() {
                       onClick={handleEdit}
                       style={{ display: editing ? "" : "none" }}
                     >
-                      Editar
+                      <i className="bi bi-pencil-square"></i> Editar
                     </button>
                     <button
                       type="submit"
@@ -758,7 +758,7 @@ function FormInformes() {
                       style={{ display: editing ? "none" : "" }}
                       onClick={handleCancel}
                     >
-                      Cancelar
+                      <i className="bi bi-x-octagon"></i> Cancelar
                     </button>
                     <button
                       type="button"
@@ -766,18 +766,17 @@ function FormInformes() {
                       style={{ display: editing ? "" : "none" }}
                       onClick={handleDeleteInforme}
                     >
-                      Eliminar
+                      <i className="bi bi-trash"></i> Eliminar
                     </button>
                   </div>
                 </form>
               </div>
               <div className="card-footer">
-                {" "}
                 <button
-                  className="btn btn-info"
+                  className="btn btn-danger"
                   onClick={() => CentralPDF(params.id)}
                 >
-                  Descargar PDF
+                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
                 </button>
               </div>
             </div>
@@ -794,9 +793,7 @@ function FormInformes() {
         </div>
         <hr />
         <div className="row">
-          <div className="col-md-6">
-            {editing ? <AttachFiles idInforme={params.id} /> : ""}
-          </div>
+          {editing ? <AttachFiles idInforme={params.id} /> : ""}
         </div>
       </div>
     </>

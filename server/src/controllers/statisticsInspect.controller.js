@@ -230,10 +230,10 @@ const getEstadoExpe = async (req, res) => {
 
     // fecha de creacion del expediente. Se agrega automaticamente desde un trigger.
     if (fechaInicio && fechaFin) {
-      estadoInspeccion += ` AND infra.fecha_citacion BETWEEN $${
+      estadoInspeccion += ` AND infra.fecha_resolucion BETWEEN $${
         params.length + 1
       } AND $${params.length + 2}`;
-      params.push(fechaInicioInfrac, fechaFinInfrac);
+      params.push(fechaInicio, fechaFin);
     }
 
     if (estado_exp && estado_exp.length > 0) {

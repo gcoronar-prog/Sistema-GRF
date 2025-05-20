@@ -7,6 +7,7 @@ import { BlobProvider } from "@react-pdf/renderer";
 import InspeccionPDF from "../PDFs/InspeccionPDF";
 import NavbarSGF from "../NavbarSGF";
 import SearchExpediente from "./SearchExpediente";
+import InspectPDF from "../PDFs/InspectPDF";
 
 function FormInspeccion() {
   const navigate = useNavigate();
@@ -409,7 +410,7 @@ function FormInspeccion() {
   };
 
   const handleCancel = async () => {
-    const id = params.id;
+    /*const id = params.id;
     try {
       const response = await fetch(`${servidor_local}/last/exped`);
 
@@ -436,6 +437,17 @@ function FormInspeccion() {
     } catch (error) {
       console.error("Error de red al obtener el último expediente:", error);
     }
+    setEditing(true);*/
+    const id = params.id;
+
+    try {
+      if (!id) handleLastExpediente();
+      loadExpedientes(id);
+
+      setEditing(true);
+    } catch (error) {
+      console.error(error);
+    }
     setEditing(true);
   };
 
@@ -448,7 +460,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handleFirstExpediente}
-            disabled={disabledPrevButton}
+            disabled={disabledPrevButton || !editing}
           >
             <i className="bi bi-skip-start me-1"></i> Primer Expediente
           </button>
@@ -456,7 +468,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handlePrevious}
-            disabled={disabledPrevButton}
+            disabled={disabledPrevButton || !editing}
           >
             <i className="bi bi-chevron-left me-1"></i> Atras
           </button>
@@ -464,7 +476,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handleNext}
-            disabled={disabledNextButton}
+            disabled={disabledNextButton || !editing}
           >
             Siguiente <i className="bi bi-chevron-right ms-1"></i>
           </button>
@@ -472,7 +484,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handleLastExpediente}
-            disabled={disabledNextButton}
+            disabled={disabledNextButton || !editing}
           >
             Ultimo Expediente <i className="bi bi-skip-end ms-1"></i>
           </button>
@@ -500,70 +512,82 @@ function FormInspeccion() {
                         value={expedientes.num_control}
                         placeholder="Número de control"
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                         required
                       />
                       <div className="">
                         <label htmlFor="" className="d-flex form-label">
                           Estado
                         </label>
-                        <div className="form-check form-check-inline">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="estado_exp"
-                            id="pendiente"
-                            value={"Pendiente"}
-                            checked={expedientes.estado_exp === "Pendiente"}
-                            onChange={handleChanges}
-                            disabled={editing}
-                            required
-                          />
-                          <label htmlFor="pendiente">Pendiente</label>
+                        <div className="row">
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="pendiente"
+                                value={"Pendiente"}
+                                checked={expedientes.estado_exp === "Pendiente"}
+                                onChange={handleChanges}
+                                disabled={editing}
+                                required
+                              />
+                              <label htmlFor="pendiente">Pendiente</label>
+                            </div>
+                          </div>
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="resuelto"
+                                value={"Resuelto"}
+                                checked={expedientes.estado_exp === "Resuelto"}
+                                onChange={handleChanges}
+                                disabled={editing}
+                                required
+                              />
+                              <label htmlFor="resuelto">Resuelto</label>
+                            </div>
+                          </div>
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="despachado"
+                                value={"Despachado"}
+                                checked={
+                                  expedientes.estado_exp === "Despachado"
+                                }
+                                onChange={handleChanges}
+                                disabled={editing}
+                                required
+                              />
+                              <label htmlFor="despachado">Despachado</label>
+                            </div>
+                          </div>
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="nulo"
+                                value={"Nulo"}
+                                checked={expedientes.estado_exp === "Nulo"}
+                                onChange={handleChanges}
+                                disabled={editing}
+                                required
+                              />
+                              <label htmlFor="nulo">Nulo</label>
+                            </div>
+                          </div>
                         </div>
-                        <div className="form-check form-check-inline">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="estado_exp"
-                            id="resuelto"
-                            value={"Resuelto"}
-                            checked={expedientes.estado_exp === "Resuelto"}
-                            onChange={handleChanges}
-                            disabled={editing}
-                            required
-                          />
-                          <label htmlFor="resuelto">Resuelto</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="estado_exp"
-                            id="despachado"
-                            value={"Despachado"}
-                            checked={expedientes.estado_exp === "Despachado"}
-                            onChange={handleChanges}
-                            disabled={editing}
-                            required
-                          />
-                          <label htmlFor="despachado">Despachado</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="estado_exp"
-                            id="nulo"
-                            value={"Nulo"}
-                            checked={expedientes.estado_exp === "Nulo"}
-                            onChange={handleChanges}
-                            disabled={editing}
-                            required
-                          />
-                          <label htmlFor="nulo">Nulo</label>
-                          <br />
-                        </div>
+                        <br />
                       </div>
                     </div>
 
@@ -577,7 +601,7 @@ function FormInspeccion() {
                         name="fecha_infraccion"
                         value={expedientes.fecha_infraccion}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                         required
                       />
 
@@ -588,10 +612,10 @@ function FormInspeccion() {
                         className="form-control"
                         type="datetime-local"
                         name="fecha_resolucion"
-                        id=""
+                        id="fecha_resolucion"
                         value={expedientes.fecha_resolucion}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
 
@@ -603,7 +627,7 @@ function FormInspeccion() {
                       placeholder="Usuario digitador"
                       value={expedientes.user_creador}
                       onChange={handleChanges}
-                      disabled={editing}
+                      readOnly={editing}
                     />
                     <div className="col-md-6">
                       <label
@@ -615,13 +639,12 @@ function FormInspeccion() {
                       <select
                         className="form-select"
                         name="tipo_procedimiento"
-                        id=""
+                        id="tipo_procedimiento"
                         value={expedientes.tipo_procedimiento || ""}
                         onChange={handleChanges}
                         disabled={editing}
                         required
                       >
-                        <option value="">Seleccione procedimiento</option>
                         <option value="notificación">Notificación</option>
                         <option value="citación">Citación</option>
                         <option value="causas">Causas JPL</option>
@@ -641,10 +664,10 @@ function FormInspeccion() {
                         className="form-control"
                         type="datetime-local"
                         name="fecha_citacion"
-                        id=""
+                        id="fecha_citacion"
                         value={expedientes.fecha_citacion}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
                     <div className="col-md-6">
@@ -707,7 +730,7 @@ function FormInspeccion() {
                       <select
                         className="form-select"
                         name="id_inspector"
-                        id=""
+                        id="inspector"
                         value={expedientes.id_inspector || ""}
                         onChange={handleChanges}
                         disabled={editing}
@@ -725,13 +748,13 @@ function FormInspeccion() {
                     </div>
 
                     <div className="col-md-6">
-                      <label htmlFor="testigo" className="">
+                      <label htmlFor="testigo" className="form-label">
                         Testigo
                       </label>
                       <select
                         className="form-select"
                         name="testigo"
-                        id=""
+                        id="testigo"
                         value={expedientes.testigo || ""}
                         onChange={handleChanges}
                         disabled={editing}
@@ -759,7 +782,7 @@ function FormInspeccion() {
                         placeholder="Rut Contribuyente"
                         value={expedientes.rut_contri}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                       <label htmlFor="giro_contri" className="form-label">
                         Giro Contribuyente
@@ -771,7 +794,7 @@ function FormInspeccion() {
                         placeholder="Giro del Contribuyente"
                         value={expedientes.giro_contri}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
                     <div className="col-md-6">
@@ -785,7 +808,7 @@ function FormInspeccion() {
                         placeholder="Nombre del Contribuyente"
                         value={expedientes.nombre}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                       <label htmlFor="direccion" className="form-label">
                         Dirección contribuyente
@@ -797,7 +820,7 @@ function FormInspeccion() {
                         placeholder="Dirección del Contribuyente"
                         value={expedientes.direccion}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
 
@@ -812,7 +835,7 @@ function FormInspeccion() {
                         placeholder="Rol del Contribuyente"
                         value={expedientes.rol_contri}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
                     <div className="col-md-6">
@@ -832,7 +855,7 @@ function FormInspeccion() {
                         placeholder="Direccion infraccion"
                         value={expedientes.direccion_infraccion}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
 
@@ -968,20 +991,22 @@ function FormInspeccion() {
                         placeholder="PPU"
                         value={expedientes.ppu}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       />
                     </div>
                     <div className="col-md-12">
-                      <label htmlFor="observaciones">Observaciones</label>
+                      <label htmlFor="observaciones" className="form-label">
+                        Observaciones
+                      </label>
                       <textarea
                         className="form-control"
                         name="observaciones"
-                        id=""
+                        id="observaciones"
                         rows={4}
-                        placeholder="Observaciones"
+                        placeholder="Escriba aquí..."
                         value={expedientes.observaciones}
                         onChange={handleChanges}
-                        disabled={editing}
+                        readOnly={editing}
                       ></textarea>
                     </div>
 
@@ -992,14 +1017,15 @@ function FormInspeccion() {
                         onClick={handleNewExpediente}
                         style={{ display: editing ? "" : "none" }}
                       >
-                        Nuevo Expediente
+                        <i className="bi bi-clipboard2-plus"></i> Nuevo
+                        Expediente
                       </button>
                       <button
                         className="btn btn-primary"
                         type="submit"
                         style={{ display: editing ? "none" : "" }}
                       >
-                        Guardar Expediente
+                        <i className="bi bi-floppy2"></i> Guardar Expediente
                       </button>
                       <button
                         className="btn btn-primary"
@@ -1007,7 +1033,7 @@ function FormInspeccion() {
                         onClick={handleEdit}
                         style={{ display: editing ? "" : "none" }}
                       >
-                        Editar
+                        <i className="bi bi-pencil-square"></i> Editar
                       </button>
 
                       <button
@@ -1016,7 +1042,7 @@ function FormInspeccion() {
                         onClick={handleCancel}
                         style={{ display: editing ? "none" : "" }}
                       >
-                        Cancelar
+                        <i className="bi bi-x-octagon"></i> Cancelar
                       </button>
                       <button
                         className="btn btn-danger"
@@ -1024,26 +1050,19 @@ function FormInspeccion() {
                         onClick={handleDeleteExpediente}
                         style={{ display: editing ? "" : "none" }}
                       >
-                        Eliminar
+                        <i className="bi bi-trash"></i> Eliminar
                       </button>
                     </div>
                   </div>
                 </form>
               </div>
               <div className="card-footer">
-                <div>
-                  <BlobProvider document={<InspeccionPDF />}>
-                    {({ url, loading }) =>
-                      loading ? (
-                        <button>Cargando...</button>
-                      ) : (
-                        <button onClick={() => window.open(url, "_blank")}>
-                          Generar PDF
-                        </button>
-                      )
-                    }
-                  </BlobProvider>
-                </div>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => InspectPDF(params.id)}
+                >
+                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                </button>
               </div>
             </div>
           </div>

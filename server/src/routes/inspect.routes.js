@@ -15,6 +15,7 @@ import {
   getArchivosExp,
   getDatosVehi,
   getExpediente,
+  getExpediente2,
   getExpedientes,
   getFirstExpediente,
   getGlosaLey,
@@ -83,5 +84,7 @@ router.get("/search_exped", searchInformeInspeccion);
 router.get("/search_expediente", searchExpedientes);
 
 router.get("/listaImagen", getImgExpedientes);
+
+router.get("/expedi/:id", getExpediente2);
 
 export default router;
