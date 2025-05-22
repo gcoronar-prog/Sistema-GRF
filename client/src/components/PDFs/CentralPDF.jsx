@@ -1,95 +1,132 @@
 import jsPDF from "jspdf";
-import { autoTable } from "jspdf-autotable";
+import autoTable from "jspdf-autotable";
+
+// Opcional: importar logo (base64)
+// import logo from './logoBase64.js'; // si tienes un logotipo en base64
 
 const CentralPDF = async (id) => {
   const response = await fetch(`http://localhost:3000/informes_central/${id}`);
   const data = await response.json();
 
-  const recurso = data.informe[0].recursos_informe;
-  const listRecurso = recurso.map((r) => r.label);
-  console.log("recursos central pdf", listRecurso);
-  //console.log("id pdf", data.informe[0].id_informes_central);
-  const doc = new jsPDF();
-  doc.text("Informe Central Municipal", 10, 10);
+  const informe = data.informe[0];
+  const acciones = data.acciones;
 
-  const tableColumn = [
-    "Codigo Reporte",
-    "Fecha y hora",
-    "Clasificación",
-    "Fuente de captura",
-    "Origen",
-    "Informante",
-    "Vehiculo",
-    "Tripulantes",
-    "Tipo de reporte",
-    "Direccion",
-    "Sector",
-    "Tipo de ubicacion",
-    "Descripcion",
-    "Recursos involucrados",
-    "Otros recursos",
-    "Acciones",
+  const recursos =
+    informe.recursos_informe?.map((r) => r.label).join(", ") || "-";
+  const otrosRecursos = informe.otros_recursos || "-";
+
+  const doc = new jsPDF();
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 14;
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString("es-CL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // === Función para encabezado ===
+  const addHeader = (title, subtitle = "") => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(title, pageWidth / 2, 20, { align: "center" });
+
+    if (subtitle) {
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(subtitle, pageWidth / 2, 27, { align: "center" });
+    }
+
+    // Opcional: logotipo (si tienes uno en base64)
+    // doc.addImage(logo, "PNG", margin, 10, 30, 15);
+  };
+
+  // === Función para pie de página ===
+  const addFooter = () => {
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(150);
+      doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin, 290, {
+        align: "right",
+      });
+      doc.text(`Generado el: ${formatDate(new Date())}`, margin, 290);
+    }
+  };
+
+  // === Página 1: Informe principal ===
+  addHeader("Informe Central Municipal", "Datos generales del reporte");
+
+  const rows = [
+    ["Fecha y hora", formatDate(informe.fecha_informe)],
+    ["Clasificación", informe.clasificacion_informe?.label || "-"],
+    ["Fuente de captura", informe.captura_informe || "-"],
+    ["Origen", informe.origen_informe?.label || "-"],
+    ["Informante", informe.persona_informante?.label || "-"],
+    ["Vehículo", informe.vehiculos_informe?.label || "-"],
+    ["Tripulantes", informe.tripulantes_informe?.label || "-"],
+    ["Tipo de reporte", informe.tipo_informe?.label || "-"],
+    ["Dirección", informe.direccion_informe || "-"],
+    ["Sector", informe.sector_informe?.label || "-"],
+    ["Tipo de ubicación", informe.tipo_ubicacion || "-"],
+    ["Descripción", informe.descripcion_informe || "-"],
+    ["Recursos involucrados", recursos],
+    ["Otros recursos", otrosRecursos],
   ];
 
-  let y = 40;
-  const saltoLinea = 10;
+  autoTable(doc, {
+    startY: 35,
+    head: [
+      [
+        {
+          content: "Datos de Informe cód." + informe.cod_informes_central,
+          colSpan: 2,
+        },
+      ],
+    ],
+    body: rows,
+    styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
+    headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    margin: { left: margin, right: margin },
+  });
 
-  doc.text(`Codigo informe: ${data.informe[0].id_informes_central}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Fecha y hora:  ${data.informe[0].fecha_informe}`, 10, y);
-  y += saltoLinea;
-  doc.text(
-    `Clasificación: ${data.informe[0].clasificacion_informe.label}`,
-    10,
-    y
-  );
-  y += saltoLinea;
-  doc.text(`Fuente de captura: ${data.informe[0].captura_informe}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Origen: ${data.informe[0].origen_informe.label}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Informante: ${data.informe[0].persona_informante.label}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Vehiculo: ${data.informe[0].vehiculos_informe.label}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Tripulantes: ${data.informe[0].tripulantes_informe.label}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Tipo de reporte: ${data.informe[0].tipo_informe.label}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Dirección: ${data.informe[0].direccion_informe}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Sector: ${data.informe[0].sector_informe.label}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Descripción: ${data.informe[0].descripcion_informe}`, 10, y);
-  y += saltoLinea;
-  doc.text(`Recursos involucrados: ${listRecurso}`, 10, y);
+  // === Página 2: Acciones realizadas ===
+  doc.addPage();
+  addHeader("Acciones Realizadas", "Detalle cronológico de intervenciones");
 
+  const accionesRows = acciones.map((accion) => [
+    accion.cod_accion || "-",
+    formatDate(accion.fecha_accion),
+    accion.desc_acciones || "-",
+  ]);
+
+  autoTable(doc, {
+    startY: 35,
+    head: [["Código acción", "Fecha y hora", "Descripción"]],
+    body: accionesRows,
+    styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
+    headStyles: { fillColor: [39, 174, 96], textColor: 255, halign: "center" },
+    columnStyles: {
+      0: { cellWidth: 30 },
+      1: { cellWidth: 50 },
+      2: { cellWidth: 110 },
+    },
+    alternateRowStyles: { fillColor: [250, 250, 250] },
+    margin: { left: margin, right: margin },
+  });
+
+  // === Pie de página ===
+  addFooter();
+
+  // === Abrir PDF ===
   doc.output("dataurlnewwindow");
-  /* 
-  codigo reporte
-  fecha y hora
-  turno (pendiente)
-  centralista (pendiente)
-  
-  clasificacion
-  fuente de captura
-  origen
-  informante
-  vehiculo si es que hay
-  tripulantes si es que hay
-  tipo de reporte
-  direccion
-  sector
-  tipo de ubicacion 
-  descripcion
-  
-  recursos involucrados
-  otros recursos si es que hay
-  resolucion (pendiente)
-
-  acciones si es que aparecen
-  
-  */
 };
 
 export default CentralPDF;

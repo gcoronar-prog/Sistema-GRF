@@ -58,9 +58,15 @@ const getInformeCentral = async (req, res) => {
       [id]
     );
 
+    const acciones = await client.query(
+      `SELECT * FROM acciones WHERE cod_document=$1`,
+      [informe.rows[0].cod_informes_central]
+    );
     await client.query("COMMIT");
+
     return res.status(200).json({
       informe: informe.rows,
+      acciones: acciones.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -724,6 +730,29 @@ const getEmergencias = async (req, res) => {
   }
 };
 
+const getAcciones = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const acciones = await client.query(
+      `SELECT * FROM acciones ac 
+      JOIN informes_central ic 
+      ON ac.cod_document=ic.cod_informes_central WHERE ic.id_informes_central=$1`,
+      [id]
+    );
+
+    await client.query("COMMIT");
+    console.log(acciones.rows);
+    return res.status(200).json({ acciones: acciones.rows });
+  } catch (error) {
+    console.error(error);
+    await client.query("ROLLBACK");
+    return res.status(500).json({ message: "Problemas con el servidor" });
+  } finally {
+    client.release();
+  }
+};
 export {
   getInformes,
   getInformeCentral,
@@ -742,4 +771,5 @@ export {
   findArchivosById,
   searchInformeCentral,
   getEmergencias,
+  getAcciones,
 };

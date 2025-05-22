@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createInformeCentral,
   deleteInformeCentral,
+  getAcciones,
   getEmergencias,
   getFirstInformeCentral,
   getInformeCentral,
@@ -43,5 +44,7 @@ router.put("/acciones/central/:id", updateAccion);
 router.delete("/acciones/central/:id", deleteAccion);
 
 router.get("/search_inform", searchInformeCentral);
+
+router.get("/acciones_pdf/:id", getAcciones);
 
 export default router;
