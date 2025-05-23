@@ -32,13 +32,15 @@ function NavbarSGF({ formulario }) {
   return (
     <>
       <nav
-        className="navbar  navbar-expand-lg border-bottom border-body"
-        style={{ backgroundColor: "#e3f2fd" }}
+        className="navbar navbar-expand-lg navbar-dark border-bottom shadow-sm"
+        style={{
+          backgroundColor: "#343a40",
+        }}
       >
         <div className="container-fluid">
-          <ul className="navbar-nav">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="/">
+              <a className="nav-link active fw-semibold" href="/">
                 Inicio
               </a>
             </li>
@@ -46,19 +48,12 @@ function NavbarSGF({ formulario }) {
             {formulario === "central" ? (
               <>
                 <li className="nav-item">
-                  <Link
-                    className="nav-link active"
-                    onClick={handleLastInforme}
-                    //style={{ cursor: "pointer" }}
-                  >
+                  <Link className="nav-link" onClick={handleLastInforme}>
                     Informes Central Municipal
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link
-                    className="nav-link active"
-                    to={"/statistics/central/v1"}
-                  >
+                  <Link className="nav-link" to="/statistics/central/v1">
                     Estadísticas Central Municipal
                   </Link>
                 </li>
@@ -66,31 +61,25 @@ function NavbarSGF({ formulario }) {
             ) : (
               <>
                 <li className="nav-item">
-                  <Link
-                    className="nav-link active"
-                    onClick={handleLastExpediente}
-                    //style={{ cursor: "pointer" }}
-                  >
+                  <Link className="nav-link" onClick={handleLastExpediente}>
                     Expedientes Municipales
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link
-                    className="nav-link active"
-                    to={"/statistics/inspeccion/v1"}
-                  >
+                  <Link className="nav-link" to="/statistics/inspeccion/v1">
                     Estadísticas Inspección Municipal
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" to={"/galeriaImgExp"}>
-                    Galeria de Imágenes
+                  <Link className="nav-link" to="/galeriaImgExp">
+                    Galería de Imágenes
                   </Link>
                 </li>
               </>
             )}
           </ul>
-          <div className="d-flex">
+
+          <div className="d-flex align-items-center border-start ps-3">
             <SearchForm formulario={formulario} />
           </div>
         </div>

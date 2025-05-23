@@ -49,7 +49,7 @@ function ListPendiente(refresh) {
   return (
     <>
       <div className="card">
-        <div className="card-header text-center">
+        <div className="card-header text-center text-bg-light">
           <p className="h5">Listado informes {estados[estado]}</p>
         </div>
         <div className="card-body">

@@ -154,7 +154,7 @@ function FormAcciones({ tipo }) {
   return (
     <>
       <div className="card mb-3">
-        <div className="card-header">
+        <div className="card-header text-bg-success">
           <p className="h5"> Lista de acciones</p>
         </div>
         <div className="card-body table-responsive">

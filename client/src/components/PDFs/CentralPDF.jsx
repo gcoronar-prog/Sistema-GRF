@@ -67,13 +67,13 @@ const CentralPDF = async (id) => {
     ["Fecha y hora", formatDate(informe.fecha_informe)],
     ["Clasificación", informe.clasificacion_informe?.label || "-"],
     ["Fuente de captura", informe.captura_informe || "-"],
-    ["Origen", informe.origen_informe?.label || "-"],
+    ["Origen información", informe.origen_informe?.label || "-"],
     ["Informante", informe.persona_informante?.label || "-"],
-    ["Vehículo", informe.vehiculos_informe?.label || "-"],
+    ["Vehículos utilizados", informe.vehiculos_informe?.label || "-"],
     ["Tripulantes", informe.tripulantes_informe?.label || "-"],
     ["Tipo de reporte", informe.tipo_informe?.label || "-"],
-    ["Dirección", informe.direccion_informe || "-"],
-    ["Sector", informe.sector_informe?.label || "-"],
+    ["Dirección evento", informe.direccion_informe || "-"],
+    ["Sector evento", informe.sector_informe?.label || "-"],
     ["Tipo de ubicación", informe.tipo_ubicacion || "-"],
     ["Descripción", informe.descripcion_informe || "-"],
     ["Recursos involucrados", recursos],
@@ -85,7 +85,7 @@ const CentralPDF = async (id) => {
     head: [
       [
         {
-          content: "Datos de Informe cód." + informe.cod_informes_central,
+          content: "Datos de Informe cód. " + informe.cod_informes_central,
           colSpan: 2,
         },
       ],
@@ -98,31 +98,37 @@ const CentralPDF = async (id) => {
   });
 
   // === Página 2: Acciones realizadas ===
-  doc.addPage();
-  addHeader("Acciones Realizadas", "Detalle cronológico de intervenciones");
+  if (acciones && acciones.length > 0) {
+    doc.addPage();
+    addHeader("Acciones Realizadas", "Detalle cronológico de intervenciones");
 
-  const accionesRows = acciones.map((accion) => [
-    accion.cod_accion || "-",
-    formatDate(accion.fecha_accion),
-    accion.desc_acciones || "-",
-  ]);
+    const accionesRows = acciones.map((accion) => [
+      accion.cod_accion || "-",
+      formatDate(accion.fecha_accion),
+      accion.desc_acciones || "-",
+    ]);
 
-  autoTable(doc, {
-    startY: 35,
-    head: [["Código acción", "Fecha y hora", "Descripción"]],
-    body: accionesRows,
-    styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
-    headStyles: { fillColor: [39, 174, 96], textColor: 255, halign: "center" },
-    columnStyles: {
-      0: { cellWidth: 30 },
-      1: { cellWidth: 50 },
-      2: { cellWidth: 110 },
-    },
-    alternateRowStyles: { fillColor: [250, 250, 250] },
-    margin: { left: margin, right: margin },
-  });
+    autoTable(doc, {
+      startY: 35,
+      head: [["Código", "Fecha y hora", "Descripción"]],
+      body: accionesRows,
+      styles: { fontSize: 10, cellPadding: 3, lineWidth: 0.3 },
+      headStyles: {
+        fillColor: [39, 174, 96],
+        textColor: 255,
+        halign: "center",
+      },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 110 },
+      },
+      alternateRowStyles: { fillColor: [250, 250, 250] },
+      margin: { left: margin, right: margin },
+    });
 
-  // === Pie de página ===
+    // === Pie de página ===
+  }
   addFooter();
 
   // === Abrir PDF ===

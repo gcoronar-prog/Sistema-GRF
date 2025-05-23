@@ -451,6 +451,7 @@ function FormInspeccion() {
     setEditing(true);
   };
 
+  document.body.style = "background:rgb(236, 241, 241);";
   return (
     <>
       <NavbarSGF formulario={"inspeccion"} />
@@ -493,7 +494,7 @@ function FormInspeccion() {
         <div className="row">
           <div className="col-md-8">
             <div className="card">
-              <div className="card-header">
+              <div className="card-header text-bg-success">
                 <span className="form-label fw-bold">
                   N° Expediente: {expedientes.id_expediente}
                 </span>

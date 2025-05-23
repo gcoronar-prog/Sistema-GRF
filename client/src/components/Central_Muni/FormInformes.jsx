@@ -423,7 +423,7 @@ function FormInformes() {
         <div className="row">
           <div className="col-md-6">
             <div className="card">
-              <div className="card-header">
+              <div className="card-header text-bg-success">
                 <span className="form-label fw-bold">
                   Informes Central: {informes.cod_informes_central}
                 </span>

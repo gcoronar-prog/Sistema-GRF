@@ -107,7 +107,7 @@ const AttachFiles = ({ idInforme }) => {
       <div className="row">
         <div className="col-md-7">
           <div className="card">
-            <div className="card-header">
+            <div className="card-header text-bg-success">
               <h5 htmlFor="formFileMultiple" className="h5">
                 Adjuntar fotos
               </h5>
