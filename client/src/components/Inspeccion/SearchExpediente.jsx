@@ -38,8 +38,8 @@ function SearchExpediente() {
   return (
     <>
       <div className="card">
-        <div className="card-header">
-          <span className="form-label fw-bold">Busqueda de expedientes</span>
+        <div className="card-header text-bg-success">
+          <span className="form-label fw-bold">Búsqueda de expedientes</span>
         </div>
         <div className="card-body">
           <div className=" gap-2 mt-3">

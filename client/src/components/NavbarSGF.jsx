@@ -32,9 +32,9 @@ function NavbarSGF({ formulario }) {
   return (
     <>
       <nav
-        className="navbar navbar-expand-lg navbar-dark border-bottom shadow-sm"
+        className="navbar navbar-expand-lg border-bottom shadow-sm "
         style={{
-          backgroundColor: "#343a40",
+          backgroundColor: "white",
         }}
       >
         <div className="container-fluid">

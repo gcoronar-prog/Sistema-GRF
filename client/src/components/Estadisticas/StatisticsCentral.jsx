@@ -116,7 +116,7 @@ function StatisticsCentral() {
           generarPDF(data.informe);
           console.log(data.informe.length);
         } else if (tipoDoc === 2) {
-          exportExcel(central, "Central.xlsx");
+          exportExcel(data.informe, "Central.xlsx");
         }
       } else {
         alert("No hay datos para mostrar");
@@ -128,14 +128,24 @@ function StatisticsCentral() {
 
   const generarPDF = (dato) => {
     const doc = new jsPDF({ orientation: "landscape" });
-    doc.text("Reportes Central Municipal", 10, 10);
+
+    // Título
+    doc.setFontSize(18);
+    doc.setTextColor(40, 40, 40);
+    doc.text("Reportes Central Municipal", 14, 15);
+
+    // Filtros
     let filtros = `Filtros aplicados:\n`;
-    if (fechaInicio && fechaFin)
+    if (fechaInicio && fechaFin) {
       filtros += `Fecha: ${new Date(fechaInicio).toLocaleString(
         "es-ES"
-      )} - ${new Date(fechaFin).toLocaleString("es-ES")}\n`;
+      )} - ${new Date(fechaFin).toLocaleString("es-ES")}`;
+    }
+    doc.setFontSize(11);
+    doc.setTextColor(80);
+    doc.text(filtros, 14, 25);
 
-    doc.text(filtros, 10, 20);
+    // Columnas
     const tableColumn = [
       "ID",
       "Fecha",
@@ -143,26 +153,57 @@ function StatisticsCentral() {
       "Origen",
       "Persona",
       "Fuente Captura",
-      "Tipo de informe",
+      "Tipo de Informe",
       "Descripción",
       "Sector",
       "Dirección",
     ];
-    console.log(dato);
+
+    // Filas
     const tableRows = dato.map((c) => [
       c.cod_informes_central,
       new Date(c.fecha_informe).toLocaleString("es-ES"),
-      c.clasificacion_informe.label,
-      c.origen_informe.label,
-      c.persona_informante.label,
-      c.captura_informe,
-      c.tipo_informe.label,
-      c.descripcion_informe,
-      c.sector_informe.label,
-      c.direccion_informe,
+      c.clasificacion_informe?.label || "-",
+      c.origen_informe?.label || "-",
+      c.persona_informante?.label || "-",
+      c.captura_informe || "-",
+      c.tipo_informe?.label || "-",
+      c.descripcion_informe || "-",
+      c.sector_informe?.label || "-",
+      c.direccion_informe || "-",
     ]);
 
-    autoTable(doc, { head: [tableColumn], body: tableRows, startY: 40 });
+    // Tabla con estilo profesional
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: "grid",
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        valign: "middle",
+        textColor: 33,
+        lineColor: [200, 200, 200],
+        lineWidth: 0.2,
+      },
+      headStyles: {
+        fillColor: [33, 37, 41],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245],
+      },
+      columnStyles: {
+        0: { cellWidth: 18 },
+        1: { cellWidth: 35 },
+        7: { cellWidth: 50 },
+        9: { cellWidth: 40 },
+      },
+    });
+
     doc.output("dataurlnewwindow");
   };
 
@@ -333,7 +374,7 @@ function StatisticsCentral() {
       const res = await fetch(url + params.toString());
       const data = await res.json();
 
-      if (condition) {
+      if (data.informe.length === 0) {
         alert("No existen registros");
       } else {
         OrigenCentralPDF(fechaInicio, fechaFin, data.informe);
