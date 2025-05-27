@@ -116,7 +116,7 @@ function StatisticsCentral() {
           generarPDF(data.informe);
           console.log(data.informe.length);
         } else if (tipoDoc === 2) {
-          exportExcel(data.informe, "Central.xlsx");
+          exportExcel(data.informe, "Central.xlsx", "central");
         }
       } else {
         alert("No hay datos para mostrar");

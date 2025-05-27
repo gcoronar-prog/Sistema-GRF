@@ -381,14 +381,13 @@ const createExpediente = async (req, res) => {
 
     const { rows } = await client.query(
       "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,\
-      empadronado,inspector,testigo,id_inspector,id_leyes,id_glosas,num_control,estado_exp) \
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
+      empadronado,testigo,id_inspector,id_leyes,id_glosas,num_control,estado_exp) \
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
       [
         data.fecha_resolucion,
         data.user_creador,
         data.tipo_procedimiento,
         data.empadronado,
-        data.inspector,
         data.testigo,
         data.id_inspector,
         data.id_leyes,

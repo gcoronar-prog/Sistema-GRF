@@ -15,6 +15,12 @@ const CentralPDF = async (id) => {
     informe.recursos_informe?.map((r) => r.label).join(", ") || "-";
   const otrosRecursos = informe.otros_recursos || "-";
 
+  const vehiculos =
+    informe.vehiculos_informe?.map((v) => v.label).join(", ") || "-";
+
+  const tripulantes =
+    informe.tripulantes_informe?.map((v) => v.label).join(", ") || "-";
+
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -69,12 +75,12 @@ const CentralPDF = async (id) => {
     ["Fuente de captura", informe.captura_informe || "-"],
     ["Origen información", informe.origen_informe?.label || "-"],
     ["Informante", informe.persona_informante?.label || "-"],
-    ["Vehículos utilizados", informe.vehiculos_informe?.label || "-"],
-    ["Tripulantes", informe.tripulantes_informe?.label || "-"],
+    ["Vehículos utilizados", vehiculos],
+    ["Tripulantes", tripulantes],
     ["Tipo de reporte", informe.tipo_informe?.label || "-"],
     ["Dirección evento", informe.direccion_informe || "-"],
     ["Sector evento", informe.sector_informe?.label || "-"],
-    ["Tipo de ubicación", informe.tipo_ubicacion || "-"],
+    // ["Tipo de ubicación", informe.tipo_ubicacion || "-"],
     ["Descripción", informe.descripcion_informe || "-"],
     ["Recursos involucrados", recursos],
     ["Otros recursos", otrosRecursos],

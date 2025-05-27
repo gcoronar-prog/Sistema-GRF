@@ -15,6 +15,7 @@ import VehiInspectPDF from "../PDFs/VehiInspectPDF";
 import SesctorInspectPDF from "../PDFs/SectorInspectPDF";
 import GlosaInspectPDF from "../PDFs/GlosaInspectPDF";
 import { exportExcel } from "../exportExcel";
+import SectorInspectPDF from "../PDFs/SectorInspectPDF";
 
 function StatisticsInspect() {
   const server_back = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -43,8 +44,8 @@ function StatisticsInspect() {
   };
 
   const [inspeccion, setInspeccion] = useState([]);
-  const [fechaInicioInfrac, setFechaInicioInfrac] = useState(startDate);
-  const [fechaFinInfrac, setFechaFinInfrac] = useState(datenow);
+  const [fechaInicioInfrac, setFechaInicioInfrac] = useState("");
+  const [fechaFinInfrac, setFechaFinInfrac] = useState("");
   const [fechaInicioCitacion, setFechaInicioCitacion] = useState("");
   const [fechaFinCitacion, setFechaFinCitacion] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
@@ -134,7 +135,7 @@ function StatisticsInspect() {
         if (tipoDoc === 1) {
           generarPDF(data.expedientes);
         } else if (tipoDoc === 2) {
-          exportExcel(data.expedientes, "Expedientes.xlsx");
+          exportExcel(data.expedientes, "Expedientes.xlsx", "inspect");
         }
       } else {
         alert("No hay datos para mostrar");
@@ -150,14 +151,21 @@ function StatisticsInspect() {
 
   const generarPDF = (dato) => {
     const doc = new jsPDF({ orientation: "landscape" });
-    doc.text("Expedientes Inspección Municipal", 10, 10);
-    let filtros = `Filtros aplicados:\n`;
-    if (fechaInicioInfrac && fechaFinInfrac)
-      filtros += `Fecha: ${new Date(fechaInicioInfrac).toLocaleString(
-        "es-ES"
-      )} - ${new Date(fechaFinInfrac).toLocaleString("es-ES")}\n`;
 
-    doc.text(filtros, 10, 20);
+    doc.setFontSize(18);
+    doc.setTextColor(40, 40, 40);
+    doc.text("Expedientes Inspección Municipal", 14, 15);
+
+    let filtros = `Filtros aplicados:\n`;
+    if (fechaInicio && fechaFin) {
+      filtros += `Fecha: ${new Date(fechaInicio).toLocaleString(
+        "es-ES"
+      )} - ${new Date(fechaFin).toLocaleString("es-ES")}`;
+    }
+    doc.setFontSize(11);
+    doc.setTextColor(80);
+    doc.text(filtros, 14, 25);
+
     const tableColumn = [
       "ID Expediente",
       "N° Control",
@@ -176,21 +184,45 @@ function StatisticsInspect() {
     const tableRows = dato.map((c) => [
       c.id_expediente,
       c.num_control,
-      new Date(c.fecha_infraccion).toLocaleString("es-ES"),
-      new Date(c.fecha_citacion).toLocaleString("es-ES"),
-      c.rut_contri,
-      c.nombre,
-      c.funcionario,
-      c.tipo_procedimiento,
-      c.estado_exp,
-      c.direccion_infraccion,
-      c.sector_infraccion,
+      new Date(c.fecha_infraccion).toLocaleString("es-ES") || "-",
+      new Date(c.fecha_citacion).toLocaleString("es-ES") || "-",
+      c.rut_contri || "-",
+      c.nombre || "-",
+      c.funcionario || "-",
+      c.tipo_procedimiento || "-",
+      c.estado_exp || "-",
+      c.direccion_infraccion || "-",
+      c.sector_infraccion || "-",
     ]);
 
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 40,
+      startY: 35,
+      theme: "grid",
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        valign: "middle",
+        textColor: 33,
+        lineColor: [200, 200, 200],
+        lineWidth: 0.2,
+      },
+      headStyles: {
+        fillColor: [33, 37, 41],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245],
+      },
+      columnStyles: {
+        0: { cellWidth: 18 },
+        1: { cellWidth: 18 },
+        7: { cellWidth: 35 },
+        9: { cellWidth: 30 },
+      },
     });
     doc.output("dataurlnewwindow");
   };
@@ -283,7 +315,15 @@ function StatisticsInspect() {
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
-        estadoInspeccionPDF(data.expedientes);
+        estadoInspeccionPDF(
+          data.expedientes,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
       }
     } catch (error) {
       console.log(error);
@@ -353,7 +393,15 @@ function StatisticsInspect() {
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
-        TipoProceInspPDF(data.expedientes);
+        TipoProceInspPDF(
+          data.expedientes,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
       }
     } catch (error) {
       console.log(error);
@@ -424,7 +472,15 @@ function StatisticsInspect() {
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
-        LeyInspeccionPDF(data.expedientes);
+        LeyInspeccionPDF(
+          data.expedientes,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
       }
     } catch (error) {
       console.log(error);
@@ -495,7 +551,15 @@ function StatisticsInspect() {
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
-        InspectResumenPDF(data.expedientes);
+        InspectResumenPDF(
+          data.expedientes,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
       }
     } catch (error) {
       console.log(error);
@@ -566,7 +630,15 @@ function StatisticsInspect() {
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
-        VehiInspectPDF(data.expedientes);
+        VehiInspectPDF(
+          data.expedientes,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
       }
     } catch (error) {
       console.log(error);
@@ -637,7 +709,15 @@ function StatisticsInspect() {
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
-        SesctorInspectPDF(data.expedientes);
+        SectorInspectPDF(
+          data.expedientes,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
       }
     } catch (error) {
       console.log(error);
@@ -708,7 +788,15 @@ function StatisticsInspect() {
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
-        GlosaInspectPDF(data.expedientes);
+        GlosaInspectPDF(
+          data.expedientes,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
       }
     } catch (error) {
       console.log(error);

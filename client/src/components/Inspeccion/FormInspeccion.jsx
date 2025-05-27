@@ -95,7 +95,7 @@ function FormInspeccion() {
       id_infraccion: exped.detallesInfraccion.id_infraccion,
       sector_infraccion: exped.detallesInfraccion.sector_infraccion,
       direccion_infraccion: exped.detallesInfraccion.direccion_infraccion,
-      fecha_citacion: formattedCitacion, //exped.detallesInfraccion.fecha_citacion,
+      fecha_citacion: exped.detallesInfraccion.fecha_citacion,
       juzgado: exped.detallesInfraccion.juzgado,
       observaciones: exped.detallesInfraccion.observaciones,
       fecha_infraccion: exped.detallesInfraccion.fecha_infraccion,
@@ -450,7 +450,15 @@ function FormInspeccion() {
     }
     setEditing(true);
   };
-
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString("es-CL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
   document.body.style = "background:rgb(236, 241, 241);";
   return (
     <>
@@ -606,7 +614,7 @@ function FormInspeccion() {
                         required
                       />
 
-                      <label htmlFor="fecha_resolucion" className="form-label">
+                      {/* <label htmlFor="fecha_resolucion" className="form-label">
                         Fecha Resolución
                       </label>
                       <input
@@ -614,10 +622,13 @@ function FormInspeccion() {
                         type="datetime-local"
                         name="fecha_resolucion"
                         id="fecha_resolucion"
-                        value={expedientes.fecha_resolucion}
+                        value={
+                          expedientes.fecha_resolucion ===
+                          Date.now().toLocaleString()
+                        }
                         onChange={handleChanges}
                         readOnly={editing}
-                      />
+                      />*/}
                     </div>
 
                     {/*user creador sera valor del token de inicio sesion hay que quitar este input al configurar todo */}
@@ -646,18 +657,24 @@ function FormInspeccion() {
                         disabled={editing}
                         required
                       >
-                        <option value="notificación">Notificación</option>
-                        <option value="citación">Citación</option>
-                        <option value="causas">Causas JPL</option>
-                        <option value="solicitudes">
+                        <option value="Notificación">Notificación</option>
+                        <option value="Citación">Citación</option>
+                        <option value="Causas">Causas JPL</option>
+                        <option value="Solicitudes">
                           Solicitudes Generales
                         </option>
                       </select>
                     </div>
+
                     <div className="col-md-6">
                       <label
                         htmlFor="fecha_citacion"
-                        className="fecha_citacion"
+                        className="form-label"
+                        hidden={
+                          expedientes.tipo_procedimiento !== "Citación"
+                            ? true
+                            : false
+                        }
                       >
                         Fecha de citacion
                       </label>
@@ -669,6 +686,11 @@ function FormInspeccion() {
                         value={expedientes.fecha_citacion}
                         onChange={handleChanges}
                         readOnly={editing}
+                        hidden={
+                          expedientes.tipo_procedimiento !== "Citación"
+                            ? true
+                            : false
+                        }
                       />
                     </div>
                     <div className="col-md-6">

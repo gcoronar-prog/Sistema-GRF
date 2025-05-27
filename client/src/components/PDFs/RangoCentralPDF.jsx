@@ -72,6 +72,8 @@ const RangoCentralPDF = (fechaInicio, fechaFin, rango) => {
       2: { halign: "center" },
     },
   });
+
+  addFooter();
   doc.output("dataurlnewwindow");
 };
 
