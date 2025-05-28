@@ -380,11 +380,10 @@ const createExpediente = async (req, res) => {
     await client.query("BEGIN");
 
     const { rows } = await client.query(
-      "INSERT INTO expedientes(fecha_resolucion,user_creador,tipo_procedimiento,\
+      "INSERT INTO expedientes(user_creador,tipo_procedimiento,\
       empadronado,testigo,id_inspector,id_leyes,id_glosas,num_control,estado_exp) \
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *",
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
       [
-        data.fecha_resolucion,
         data.user_creador,
         data.tipo_procedimiento,
         data.empadronado,
@@ -466,14 +465,13 @@ const updateExpediente = async (req, res) => {
     const data = req.body;
     await client.query("BEGIN");
     const { rows } = await client.query(
-      "UPDATE expedientes SET fecha_resolucion=$1,user_creador=$2,tipo_procedimiento=$3,empadronado=$4,inspector=$5,testigo=$6,\
-     id_inspector=$7,id_leyes=$8,id_glosas=$9,num_control=$10,estado_exp=$11 WHERE id_expediente =$12 RETURNING *",
+      "UPDATE expedientes SET user_creador=$1,tipo_procedimiento=$2,empadronado=$3,testigo=$4,id_inspector=$5,\
+     id_leyes=$6,id_glosas=$7,num_control=$8,estado_exp=$9 WHERE id_expediente =$10 RETURNING *",
       [
-        data.fecha_resolucion,
         data.user_creador,
         data.tipo_procedimiento,
         data.empadronado,
-        data.inspector,
+
         data.testigo,
 
         data.id_inspector,

@@ -14,13 +14,12 @@ function FormInspeccion() {
   const params = useParams();
 
   const [expedientes, setExpedientes] = useState({
-    fecha_resolucion: "",
     user_creador: "",
     tipo_procedimiento: "",
     empadronado: "",
     inspector: "",
     testigo: "",
-
+    fecha_resolucion: "",
     id_inspector: "",
 
     id_leyes: "",
@@ -61,6 +60,7 @@ function FormInspeccion() {
   const [disabledPrevButton, setDisabledPrevButton] = useState(false);
   const [disabledNextButton, setDisabledNextButton] = useState(false);
   const [lastIdExp, setLastIdExp] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
@@ -71,21 +71,17 @@ function FormInspeccion() {
     const formattedDate = dayjs(exped.expediente.fecha_resolucion).format(
       "YYYY-MM-DDTHH:mm"
     );
-    const formattedCitacion = dayjs(
-      exped.detallesInfraccion.fecha_citacion
-    ).format("YYYY-MM-DDTHH:mm");
-    console.log(data.detallesInfraccion.fecha_citacion);
 
     setExpedientes({
       id_expediente: params.id,
       num_control: exped.expediente.num_control,
       estado_exp: exped.expediente.estado_exp,
-      fecha_resolucion: formattedDate, //exped.expediente.fecha_resolucion,
       user_creador: exped.expediente.user_creador,
       tipo_procedimiento: exped.expediente.tipo_procedimiento,
       empadronado: exped.expediente.empadronado,
       inspector: exped.expediente.inspector,
       testigo: exped.expediente.testigo,
+      fecha_resolucion: exped.expediente.fecha_resolucion,
 
       id_inspector: exped.expediente.id_inspector,
 
@@ -194,7 +190,7 @@ function FormInspeccion() {
 
   const defaultExpediente = {
     id_expediente: "",
-    fecha_resolucion: "",
+
     user_creador: "",
     tipo_procedimiento: "",
     empadronado: "",
@@ -248,6 +244,7 @@ function FormInspeccion() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) handleCancel(); // Si el usuario cancela, no sigue
     try {
@@ -410,34 +407,6 @@ function FormInspeccion() {
   };
 
   const handleCancel = async () => {
-    /*const id = params.id;
-    try {
-      const response = await fetch(`${servidor_local}/last/exped`);
-
-      if (!id) {
-        if (response.ok) {
-          const lastExpediente = await response.json();
-          console.log(lastExpediente.expediente.id_expediente);
-          if (lastExpediente) {
-            console.log("Último expediente:", lastExpediente);
-            navigate(
-              `/inspect/${lastExpediente.expediente.id_expediente}/edit`
-            );
-            setDisabledNextButton(true);
-            setDisabledPrevButton(false);
-            setEditing(true);
-            setLastIdExp(lastExpediente.expediente.id_expediente);
-          } else {
-            console.log("No se encontró ningún expediente.");
-          }
-        } else {
-          console.error("Error al obtener el último expediente.");
-        }
-      }
-    } catch (error) {
-      console.error("Error de red al obtener el último expediente:", error);
-    }
-    setEditing(true);*/
     const id = params.id;
 
     try {
@@ -450,14 +419,17 @@ function FormInspeccion() {
     }
     setEditing(true);
   };
+
   const formatDate = (date) => {
-    return new Date(date).toLocaleString("es-CL", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    if (date != null) {
+      return new Date(date).toLocaleString("es-CL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
   };
   document.body.style = "background:rgb(236, 241, 241);";
   return (
@@ -469,7 +441,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handleFirstExpediente}
-            disabled={disabledPrevButton || !editing}
+            disabled={!editing}
           >
             <i className="bi bi-skip-start me-1"></i> Primer Expediente
           </button>
@@ -477,7 +449,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handlePrevious}
-            disabled={disabledPrevButton || !editing}
+            disabled={!editing}
           >
             <i className="bi bi-chevron-left me-1"></i> Atras
           </button>
@@ -485,7 +457,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handleNext}
-            disabled={disabledNextButton || !editing}
+            disabled={!editing}
           >
             Siguiente <i className="bi bi-chevron-right ms-1"></i>
           </button>
@@ -493,7 +465,7 @@ function FormInspeccion() {
             className="btn btn-outline-primary d-flex align-items-center"
             type="button"
             onClick={handleLastExpediente}
-            disabled={disabledNextButton || !editing}
+            disabled={!editing}
           >
             Ultimo Expediente <i className="bi bi-skip-end ms-1"></i>
           </button>
@@ -502,104 +474,37 @@ function FormInspeccion() {
         <div className="row">
           <div className="col-md-8">
             <div className="card">
-              <div className="card-header text-bg-success">
+              <div className="card-header text-bg-success d-flex">
                 <span className="form-label fw-bold">
                   N° Expediente: {expedientes.id_expediente}
                 </span>
+                &nbsp; &nbsp; &nbsp; &nbsp;
+                <p className="mb-0 fw-semibold">{expedientes.estado_exp}:</p>
+                &nbsp;
+                <p className="mb-0 fst-italic">
+                  {formatDate(expedientes.fecha_resolucion)}
+                </p>
               </div>
               <div className="card-body">
-                <form action="" onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="was-validated">
                   <div className="row g-4">
                     <div className="col-md-6">
                       <label htmlFor="num_control" className="form-label">
-                        Número de control
+                        Número Control/Boleta
                       </label>
                       <input
-                        name="num_control"
                         className="form-control"
                         type="text"
+                        name="num_control"
                         value={expedientes.num_control}
-                        placeholder="Número de control"
                         onChange={handleChanges}
                         readOnly={editing}
                         required
                       />
-                      <div className="">
-                        <label htmlFor="" className="d-flex form-label">
-                          Estado
-                        </label>
-                        <div className="row">
-                          <div className="col">
-                            <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                name="estado_exp"
-                                id="pendiente"
-                                value={"Pendiente"}
-                                checked={expedientes.estado_exp === "Pendiente"}
-                                onChange={handleChanges}
-                                disabled={editing}
-                                required
-                              />
-                              <label htmlFor="pendiente">Pendiente</label>
-                            </div>
-                          </div>
-                          <div className="col">
-                            <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                name="estado_exp"
-                                id="resuelto"
-                                value={"Resuelto"}
-                                checked={expedientes.estado_exp === "Resuelto"}
-                                onChange={handleChanges}
-                                disabled={editing}
-                                required
-                              />
-                              <label htmlFor="resuelto">Resuelto</label>
-                            </div>
-                          </div>
-                          <div className="col">
-                            <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                name="estado_exp"
-                                id="despachado"
-                                value={"Despachado"}
-                                checked={
-                                  expedientes.estado_exp === "Despachado"
-                                }
-                                onChange={handleChanges}
-                                disabled={editing}
-                                required
-                              />
-                              <label htmlFor="despachado">Despachado</label>
-                            </div>
-                          </div>
-                          <div className="col">
-                            <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                name="estado_exp"
-                                id="nulo"
-                                value={"Nulo"}
-                                checked={expedientes.estado_exp === "Nulo"}
-                                onChange={handleChanges}
-                                disabled={editing}
-                                required
-                              />
-                              <label htmlFor="nulo">Nulo</label>
-                            </div>
-                          </div>
-                        </div>
-                        <br />
+                      <div className="invalid-feedback">
+                        Ingrese número de control
                       </div>
                     </div>
-
                     <div className="col-md-6">
                       <label htmlFor="fecha_infraccion" className="form-label">
                         Fecha Infracción
@@ -613,34 +518,10 @@ function FormInspeccion() {
                         readOnly={editing}
                         required
                       />
-
-                      {/* <label htmlFor="fecha_resolucion" className="form-label">
-                        Fecha Resolución
-                      </label>
-                      <input
-                        className="form-control"
-                        type="datetime-local"
-                        name="fecha_resolucion"
-                        id="fecha_resolucion"
-                        value={
-                          expedientes.fecha_resolucion ===
-                          Date.now().toLocaleString()
-                        }
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />*/}
+                      <div className="invalid-feedback">
+                        Ingrese fecha de infracción
+                      </div>
                     </div>
-
-                    {/*user creador sera valor del token de inicio sesion hay que quitar este input al configurar todo */}
-                    <input
-                      hidden
-                      name="user_creador"
-                      type="text"
-                      placeholder="Usuario digitador"
-                      value={expedientes.user_creador}
-                      onChange={handleChanges}
-                      readOnly={editing}
-                    />
                     <div className="col-md-6">
                       <label
                         htmlFor="tipo_procedimiento"
@@ -655,8 +536,10 @@ function FormInspeccion() {
                         value={expedientes.tipo_procedimiento || ""}
                         onChange={handleChanges}
                         disabled={editing}
+                        placeholder="Seleccione tipo"
                         required
                       >
+                        <option value="">Seleccione...</option>
                         <option value="Notificación">Notificación</option>
                         <option value="Citación">Citación</option>
                         <option value="Causas">Causas JPL</option>
@@ -664,53 +547,11 @@ function FormInspeccion() {
                           Solicitudes Generales
                         </option>
                       </select>
-                    </div>
-
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="fecha_citacion"
-                        className="form-label"
-                        hidden={
-                          expedientes.tipo_procedimiento !== "Citación"
-                            ? true
-                            : false
-                        }
-                      >
-                        Fecha de citacion
-                      </label>
-                      <input
-                        className="form-control"
-                        type="datetime-local"
-                        name="fecha_citacion"
-                        id="fecha_citacion"
-                        value={expedientes.fecha_citacion}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                        hidden={
-                          expedientes.tipo_procedimiento !== "Citación"
-                            ? true
-                            : false
-                        }
-                      />
+                      <div className="invalid-feedback">
+                        Ingrese tipo de procedimiento
+                      </div>
                     </div>
                     <div className="col-md-6">
-                      <label htmlFor="juzgado" className="form-label">
-                        Juzgado
-                      </label>
-                      <select
-                        className="form-select"
-                        name="juzgado"
-                        id=""
-                        value={expedientes.juzgado || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Seleccione JPL</option>
-                        <option value="JPL 1">JPL 1</option>
-                        <option value="JPL 2">JPL 2</option>
-                      </select>
-                    </div>
-                    <div className=" col-md-6 ">
                       <label
                         htmlFor="empadronado"
                         className="d-flex form-label"
@@ -744,8 +585,47 @@ function FormInspeccion() {
                         />
                         <label htmlFor="no">No</label>
                       </div>
+                      <div className="invalid-feedback">
+                        Ingrese estado documento
+                      </div>
                     </div>
-
+                  </div>
+                  <div className="col-md-6">
+                    <label
+                      htmlFor="fecha_citacion"
+                      className="form-label"
+                      hidden={
+                        expedientes.tipo_procedimiento !== "Citación"
+                          ? true
+                          : false
+                      }
+                    >
+                      Fecha de citacion
+                    </label>
+                    <input
+                      className="form-control"
+                      type="datetime-local"
+                      name="fecha_citacion"
+                      id="fecha_citacion"
+                      value={expedientes.fecha_citacion || ""}
+                      onChange={handleChanges}
+                      readOnly={editing}
+                      hidden={
+                        expedientes.tipo_procedimiento !== "Citación"
+                          ? true
+                          : false
+                      }
+                      required={
+                        expedientes.tipo_procedimiento !== "Citación"
+                          ? false
+                          : true
+                      }
+                    />
+                    <div className="invalid-feedback">
+                      Ingrese fecha de citación
+                    </div>
+                  </div>
+                  <div className="row g-4">
                     <div className="col-md-6">
                       <label htmlFor="inspector" className="form-label">
                         Inspector
@@ -757,6 +637,7 @@ function FormInspeccion() {
                         value={expedientes.id_inspector || ""}
                         onChange={handleChanges}
                         disabled={editing}
+                        required
                       >
                         <option value="">Seleccione Inspector</option>
                         {inspectores.map((i) => (
@@ -768,8 +649,10 @@ function FormInspeccion() {
                           </option>
                         ))}
                       </select>
+                      <div className="invalid-feedback">
+                        Seleccione un Inspector
+                      </div>
                     </div>
-
                     <div className="col-md-6">
                       <label htmlFor="testigo" className="form-label">
                         Testigo
@@ -793,7 +676,110 @@ function FormInspeccion() {
                         ))}
                       </select>
                     </div>
+                  </div>
 
+                  <div className="row g-4">
+                    <div className="col-md-6">
+                      <label
+                        htmlFor="direccion_infraccion"
+                        className="form-label"
+                      >
+                        Dirección Infracción
+                      </label>
+                      <input
+                        className="form-control"
+                        type="text"
+                        name="direccion_infraccion"
+                        placeholder="Direccion infraccion"
+                        value={expedientes.direccion_infraccion}
+                        onChange={handleChanges}
+                        readOnly={editing}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label htmlFor="sector_infraccion" className="form-label">
+                        Sector de infracción
+                      </label>
+                      <select
+                        className="form-select"
+                        name="sector_infraccion"
+                        id=""
+                        value={expedientes.sector_infraccion || ""}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      >
+                        <option value="">
+                          Seleccione sector de la infraccion
+                        </option>
+                        {sectores.map((s) => (
+                          <option key={s.id_sector} value={s.sector}>
+                            {s.sector}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <label htmlFor="juzgado" className="form-label">
+                        Juzgado
+                      </label>
+                      <select
+                        className="form-select"
+                        name="juzgado"
+                        id=""
+                        value={expedientes.juzgado || ""}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      >
+                        <option value="">Seleccione JPL</option>
+                        <option value="JPL 1">JPL 1</option>
+                        <option value="JPL 2">JPL 2</option>
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <label htmlFor="id_leyes">Ley aplicada</label>
+                      <select
+                        className="form-select"
+                        name="id_leyes"
+                        id=""
+                        value={expedientes.id_leyes || ""}
+                        onChange={handleChanges}
+                        disabled={editing}
+                        required
+                      >
+                        <option value="">Seleccione ley</option>
+                        {ley.map((l) => (
+                          <option key={l.id_ley} value={l.id_ley}>
+                            {l.ley}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="invalid-feedback">
+                        Seleccione ley aplicada
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <label htmlFor="id_glosas">Glosa</label>
+                      <select
+                        className="form-select"
+                        name="id_glosas"
+                        id=""
+                        value={expedientes.id_glosas || ""}
+                        onChange={handleChanges}
+                        disabled={editing}
+                        required
+                      >
+                        <option value="">Seleccione glosa de ley</option>
+                        {glosas.map((g) => (
+                          <option key={g.id_glosa} value={g.id_glosa}>
+                            {g.glosa_ley}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="invalid-feedback">Seleccione glosa</div>
+                    </div>
+                  </div>
+
+                  <div className="row g-4">
                     <div className="col-md-6">
                       <label htmlFor="rut_contri" className="form-label">
                         Rut Contribuyente
@@ -861,86 +847,9 @@ function FormInspeccion() {
                         readOnly={editing}
                       />
                     </div>
-                    <div className="col-md-6">
-                      {/*Nací para rellenar la columna :P*/}
-                    </div>
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="direccion_infraccion"
-                        className="form-label"
-                      >
-                        Dirección Infracción
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="direccion_infraccion"
-                        placeholder="Direccion infraccion"
-                        value={expedientes.direccion_infraccion}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
-                    </div>
+                  </div>
 
-                    <div className="col-md-6">
-                      <label htmlFor="sector_infraccion" className="form-label">
-                        Sector de infracción
-                      </label>
-                      <select
-                        className="form-select"
-                        name="sector_infraccion"
-                        id=""
-                        value={expedientes.sector_infraccion || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">
-                          Seleccione sector de la infraccion
-                        </option>
-                        {sectores.map((s) => (
-                          <option key={s.id_sector} value={s.sector}>
-                            {s.sector}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="col-md-6">
-                      <label htmlFor="id_leyes">Ley aplicada</label>
-                      <select
-                        className="form-select"
-                        name="id_leyes"
-                        id=""
-                        value={expedientes.id_leyes || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Seleccione ley</option>
-                        {ley.map((l) => (
-                          <option key={l.id_ley} value={l.id_ley}>
-                            {l.ley}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="id_glosas">Glosa</label>
-                      <select
-                        className="form-select"
-                        name="id_glosas"
-                        id=""
-                        value={expedientes.id_glosas || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Seleccione glosa de ley</option>
-                        {glosas.map((g) => (
-                          <option key={g.id_glosa} value={g.id_glosa}>
-                            {g.glosa_ley}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="row g-4">
                     <div className="col-md-6">
                       <label htmlFor="tipo_vehi" className="form-label">
                         Tipo de Vehiculo
@@ -1017,6 +926,19 @@ function FormInspeccion() {
                         readOnly={editing}
                       />
                     </div>
+                  </div>
+                  <div className="row g-4">
+                    {/*user creador sera valor del token de inicio sesion hay que quitar este input al configurar todo */}
+                    <input
+                      hidden
+                      name="user_creador"
+                      type="text"
+                      placeholder="Usuario digitador"
+                      value={expedientes.user_creador}
+                      onChange={handleChanges}
+                      readOnly={editing}
+                    />
+
                     <div className="col-md-12">
                       <label htmlFor="observaciones" className="form-label">
                         Observaciones
