@@ -502,13 +502,15 @@ const updateExpediente = async (req, res) => {
     console.log("id_infraccion", idInfraccion);
 
     const contriRows = await client.query(
-      "UPDATE contribuyentes SET rut_contri=$1,nombre=$2,direccion=$3,rol_contri=$4,giro_contri=$5 WHERE id_infraccion=$6 RETURNING *",
+      "UPDATE contribuyentes SET rut_contri=$1,nombre=$2,direccion=$3,rol_contri=$4,giro_contri=$5,\
+      sector_contri=$6 WHERE id_infraccion=$7 RETURNING *",
       [
         data.rut_contri,
         data.nombre,
         data.direccion,
         data.rol_contri,
         data.giro_contri,
+        data.sector_contri,
         idInfraccion,
       ]
     );

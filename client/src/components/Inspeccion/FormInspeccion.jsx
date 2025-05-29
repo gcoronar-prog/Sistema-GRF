@@ -252,10 +252,11 @@ function FormInspeccion() {
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) handleCancel(); // Si el usuario cancela, no sigue
 
-    const sectorFormatted = JSON.stringify(selectedSector);
+    const sectorFormatted = JSON.stringify(selectedSector.label);
+    console.log(selectedSector.label);
     const datosActualizados = {
       ...expedientes,
-      sector_contri: sectorFormatted,
+      sector_contri: selectedSector,
     };
     try {
       const url = params.id
@@ -843,7 +844,11 @@ function FormInspeccion() {
                       />
                     </div>
                     <div className="col-md-6">
+                      <label htmlFor="sector_contri">
+                        Sector Contribuyente
+                      </label>
                       <SelectSector
+                        id="sector_contri"
                         selectedSector={selectedSector}
                         setSelectedSector={setSelectedSector}
                         edition={editing}
