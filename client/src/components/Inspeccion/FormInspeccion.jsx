@@ -8,6 +8,7 @@ import InspeccionPDF from "../PDFs/InspeccionPDF";
 import NavbarSGF from "../NavbarSGF";
 import SearchExpediente from "./SearchExpediente";
 import InspectPDF from "../PDFs/InspectPDF";
+import SelectSector from "../SelectSector";
 
 function FormInspeccion() {
   const navigate = useNavigate();
@@ -60,7 +61,8 @@ function FormInspeccion() {
   const [disabledPrevButton, setDisabledPrevButton] = useState(false);
   const [disabledNextButton, setDisabledNextButton] = useState(false);
   const [lastIdExp, setLastIdExp] = useState(null);
-  const [errors, setErrors] = useState({});
+
+  const [selectedSector, setSelectedSector] = useState(null);
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
@@ -108,6 +110,8 @@ function FormInspeccion() {
       direccion: exped.contribuyente.direccion,
       rol_contri: exped.contribuyente.rol_contri,
     });
+
+    setSelectedSector(exped.contribuyente.sector_contri);
   };
 
   const loadInspectores = async () => {
@@ -247,6 +251,12 @@ function FormInspeccion() {
 
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) handleCancel(); // Si el usuario cancela, no sigue
+
+    const sectorFormatted = JSON.stringify(selectedSector);
+    const datosActualizados = {
+      ...expedientes,
+      sector_contri: sectorFormatted,
+    };
     try {
       const url = params.id
         ? `${servidor_local}/exped/${params.id}`
@@ -256,7 +266,7 @@ function FormInspeccion() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(expedientes),
+        body: JSON.stringify(datosActualizados),
       });
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
@@ -832,7 +842,13 @@ function FormInspeccion() {
                         readOnly={editing}
                       />
                     </div>
-
+                    <div className="col-md-6">
+                      <SelectSector
+                        selectedSector={selectedSector}
+                        setSelectedSector={setSelectedSector}
+                        edition={editing}
+                      />
+                    </div>
                     <div className="col-md-6">
                       <label htmlFor="rol_contri" className="form-label">
                         Rol Contribuyente

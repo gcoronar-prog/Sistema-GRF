@@ -412,8 +412,8 @@ const createExpediente = async (req, res) => {
     const idInfraccion = infra.rows[0].id_infraccion;
 
     const contri = await client.query(
-      "INSERT INTO contribuyentes (rut_contri,nombre,direccion,rol_contri,giro_contri,id_infraccion,id_expediente)\
-       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+      "INSERT INTO contribuyentes (rut_contri,nombre,direccion,rol_contri,giro_contri,id_infraccion,id_expediente,sector_contri)\
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *",
       [
         data.rut_contri,
         data.nombre,
@@ -422,6 +422,7 @@ const createExpediente = async (req, res) => {
         data.giro_contri,
         idInfraccion,
         idExpediente,
+        data.sector_contri,
       ]
     );
     const idContri = contri.rows[0].id_contri;
