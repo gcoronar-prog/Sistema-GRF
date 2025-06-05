@@ -14,13 +14,15 @@ function FormInspeccion() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [expedientes, setExpedientes] = useState({
+  const defaultExpediente = {
+    id_expediente: "",
+
     user_creador: "",
     tipo_procedimiento: "",
     empadronado: "",
     inspector: "",
     testigo: "",
-    fecha_resolucion: "",
+
     id_inspector: "",
 
     id_leyes: "",
@@ -45,9 +47,10 @@ function FormInspeccion() {
     nombre: "",
     direccion: "",
     rol_contri: "",
-
     num_control: "",
-    estado_exp: "",
+  };
+  const [expedientes, setExpedientes] = useState({
+    defaultExpediente,
   });
 
   const [inspectores, setInspectores] = useState([]);
@@ -61,6 +64,7 @@ function FormInspeccion() {
   const [disabledPrevButton, setDisabledPrevButton] = useState(false);
   const [disabledNextButton, setDisabledNextButton] = useState(false);
   const [lastIdExp, setLastIdExp] = useState(null);
+  const [numControl, setNumControl] = useState("");
 
   const [selectedSector, setSelectedSector] = useState(null);
 
@@ -70,6 +74,8 @@ function FormInspeccion() {
     const res = await fetch(`${servidor_local}/exped/${id}`);
     const data = await res.json();
     const exped = data;
+
+    setNumControl(data.expediente.num_control);
     const formattedDate = dayjs(exped.expediente.fecha_resolucion).format(
       "YYYY-MM-DDTHH:mm"
     );
@@ -192,42 +198,6 @@ function FormInspeccion() {
     }
   };
 
-  const defaultExpediente = {
-    id_expediente: "",
-
-    user_creador: "",
-    tipo_procedimiento: "",
-    empadronado: "",
-    inspector: "",
-    testigo: "",
-
-    id_inspector: "",
-
-    id_leyes: "",
-    id_glosas: "",
-
-    id_infraccion: "",
-    sector_infraccion: "",
-    direccion_infraccion: "",
-    fecha_citacion: "",
-    juzgado: "",
-    observaciones: "",
-    fecha_infraccion: "",
-
-    tipo_vehi: "",
-    marca_vehi: "",
-    ppu: "",
-    color_vehi: "",
-    id_vehiculos: "",
-
-    rut_contri: "",
-    giro_contri: "",
-    nombre: "",
-    direccion: "",
-    rol_contri: "",
-    num_control: "",
-  };
-
   useEffect(() => {
     loadInspectores();
 
@@ -250,8 +220,12 @@ function FormInspeccion() {
     e.preventDefault();
 
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
-    if (!confirmar) handleCancel(); // Si el usuario cancela, no sigue
+    if (!confirmar) handleCancel();
 
+    if (expedientes.num_control == numControl && !params.id) {
+      alert("Número de control ya existe, por favor ingrese otro.");
+      return;
+    }
     const sectorFormatted = JSON.stringify(selectedSector.label);
     console.log(selectedSector.label);
     const datosActualizados = {
@@ -289,6 +263,7 @@ function FormInspeccion() {
       console.error("Error al enviar datos:", error);
     }
     setEditing(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteExpediente = async () => {
@@ -428,6 +403,7 @@ function FormInspeccion() {
     } catch (error) {
       console.error(error);
     }
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(true);
   };
 
@@ -486,11 +462,12 @@ function FormInspeccion() {
           <div className="col-md-8">
             <div className="card">
               <div className="card-header text-bg-success d-flex">
-                <span className="form-label fw-bold">
+                <span className="form-label fw-bold fst-italic">
                   N° Expediente: {expedientes.id_expediente}
                 </span>
-                &nbsp; &nbsp; &nbsp; &nbsp;
-                <p className="mb-0 fw-semibold">{expedientes.estado_exp}:</p>
+                &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+                &nbsp; &nbsp; &nbsp;
+                <p className="mb-0 fw-semibold">{expedientes.estado_exp}</p>
                 &nbsp;
                 <p className="mb-0 fst-italic">
                   {formatDate(expedientes.fecha_resolucion)}
@@ -498,456 +475,569 @@ function FormInspeccion() {
               </div>
               <div className="card-body">
                 <form onSubmit={handleSubmit} className="was-validated">
-                  <div className="row g-4">
-                    <div className="col-md-6">
-                      <label htmlFor="num_control" className="form-label">
-                        Número Control/Boleta
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="num_control"
-                        value={expedientes.num_control}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                        required
-                      />
-                      <div className="invalid-feedback">
-                        Ingrese número de control
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="fecha_infraccion" className="form-label">
-                        Fecha Infracción
-                      </label>
-                      <input
-                        className="form-control"
-                        type="datetime-local"
-                        name="fecha_infraccion"
-                        value={expedientes.fecha_infraccion}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                        required
-                      />
-                      <div className="invalid-feedback">
-                        Ingrese fecha de infracción
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="tipo_procedimiento"
-                        className="form-label"
-                      >
-                        Tipo de procedimiento
-                      </label>
-                      <select
-                        className="form-select"
-                        name="tipo_procedimiento"
-                        id="tipo_procedimiento"
-                        value={expedientes.tipo_procedimiento || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                        placeholder="Seleccione tipo"
-                        required
-                      >
-                        <option value="">Seleccione...</option>
-                        <option value="Notificación">Notificación</option>
-                        <option value="Citación">Citación</option>
-                        <option value="Causas">Causas JPL</option>
-                        <option value="Solicitudes">
-                          Solicitudes Generales
-                        </option>
-                      </select>
-                      <div className="invalid-feedback">
-                        Ingrese tipo de procedimiento
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="empadronado"
-                        className="d-flex form-label"
-                      >
-                        ¿Empadronado?
-                      </label>
-                      <div className="form-check form-check-inline">
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Datos expediente
+                    </legend>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label htmlFor="num_control" className="form-label">
+                          Número Control/Boleta
+                        </label>
                         <input
-                          className="form-check-input"
-                          type="radio"
-                          name="empadronado"
-                          id="si"
-                          value={"Sí"}
-                          checked={expedientes.empadronado === "Sí"}
+                          className="form-control"
+                          type="text"
+                          name="num_control"
+                          value={expedientes.num_control}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                          required
+                        />
+                        <div className="invalid-feedback">
+                          Ingrese número de control
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <label
+                          htmlFor="fecha_infraccion"
+                          className="form-label"
+                        >
+                          Fecha Infracción
+                        </label>
+                        <input
+                          className="form-control"
+                          type="datetime-local"
+                          name="fecha_infraccion"
+                          value={expedientes.fecha_infraccion}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                          required
+                        />
+                        <div className="invalid-feedback">
+                          Ingrese fecha de infracción
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <label
+                          htmlFor="tipo_procedimiento"
+                          className="form-label"
+                        >
+                          Tipo de procedimiento
+                        </label>
+                        <select
+                          className="form-select"
+                          name="tipo_procedimiento"
+                          id="tipo_procedimiento"
+                          value={expedientes.tipo_procedimiento || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                          placeholder="Seleccione tipo"
+                          required
+                        >
+                          <option value="">Seleccione...</option>
+                          <option value="Notificación">Notificación</option>
+                          <option value="Citación">Citación</option>
+                          <option value="Causas">Causas JPL</option>
+                          <option value="Solicitudes">
+                            Solicitudes Generales
+                          </option>
+                        </select>
+                        <div className="invalid-feedback">
+                          Ingrese tipo de procedimiento
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <label
+                          htmlFor="empadronado"
+                          className="d-flex form-label"
+                        >
+                          ¿Empadronado?
+                        </label>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="empadronado"
+                            id="si"
+                            value={"Sí"}
+                            checked={expedientes.empadronado === "Sí"}
+                            onChange={handleChanges}
+                            disabled={editing}
+                            required
+                          />
+                          <label htmlFor="si">Sí</label>
+                        </div>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="empadronado"
+                            id="no"
+                            value={"No"}
+                            checked={expedientes.empadronado === "No"}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                          <label htmlFor="no">No</label>
+                        </div>
+                        <div className="invalid-feedback">
+                          Ingrese si esta empadronado
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <label
+                          htmlFor="fecha_citacion"
+                          className="form-label"
+                          hidden={
+                            expedientes.tipo_procedimiento !== "Citación"
+                              ? true
+                              : false
+                          }
+                        >
+                          Fecha de citacion
+                        </label>
+                        <input
+                          className="form-control"
+                          type="datetime-local"
+                          name="fecha_citacion"
+                          value={expedientes.fecha_citacion}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                          hidden={
+                            expedientes.tipo_procedimiento !== "Citación"
+                              ? true
+                              : false
+                          }
+                          required={
+                            expedientes.tipo_procedimiento !== "Citación"
+                              ? false
+                              : true
+                          }
+                        />
+                        <div className="invalid-feedback">
+                          Ingrese fecha de citación
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <label
+                          htmlFor="estado_exp"
+                          className="d-flex form-label"
+                        >
+                          Estado del documento
+                        </label>
+                        <div className="row">
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="pendiente"
+                                value={"Pendiente"}
+                                checked={expedientes.estado_exp === "Pendiente"}
+                                onChange={handleChanges}
+                                disabled={editing}
+                                required
+                              />
+                              <label htmlFor="pendiente">Pendiente</label>
+                            </div>
+                          </div>
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="resuelto"
+                                value={"Resuelto"}
+                                checked={expedientes.estado_exp === "Resuelto"}
+                                onChange={handleChanges}
+                                disabled={editing}
+                              />
+                              <label htmlFor="resuelto">Resuelto</label>
+                            </div>
+                          </div>
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="despachado"
+                                value={"Despachado"}
+                                checked={
+                                  expedientes.estado_exp === "Despachado"
+                                }
+                                onChange={handleChanges}
+                                disabled={editing}
+                                required
+                              />
+                              <label htmlFor="despachado">Despachado</label>
+                            </div>
+                          </div>
+                          <div className="col">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="estado_exp"
+                                id="nulo"
+                                value={"Nulo"}
+                                checked={expedientes.estado_exp === "Nulo"}
+                                onChange={handleChanges}
+                                disabled={editing}
+                                required
+                              />
+                              <label htmlFor="nulo">Nulo</label>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="invalid-feedback">
+                          Ingrese estado del documento
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Datos infracción
+                    </legend>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label htmlFor="inspector" className="form-label">
+                          Inspector
+                        </label>
+                        <select
+                          className="form-select"
+                          name="id_inspector"
+                          id="inspector"
+                          value={expedientes.id_inspector || ""}
                           onChange={handleChanges}
                           disabled={editing}
                           required
-                        />
-                        <label htmlFor="si">Sí</label>
+                        >
+                          <option value="">Seleccione Inspector</option>
+                          {inspectores.map((i) => (
+                            <option
+                              key={i.id_funcionario}
+                              value={i.id_funcionario}
+                            >
+                              {i.funcionario}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="invalid-feedback">
+                          Seleccione un Inspector
+                        </div>
                       </div>
-                      <div className="form-check form-check-inline">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="empadronado"
-                          id="no"
-                          value={"No"}
-                          checked={expedientes.empadronado === "No"}
+                      <div className="col-md-6">
+                        <label htmlFor="testigo" className="form-label">
+                          Testigo
+                        </label>
+                        <select
+                          className="form-select"
+                          name="testigo"
+                          id="testigo"
+                          value={expedientes.testigo || ""}
                           onChange={handleChanges}
                           disabled={editing}
+                        >
+                          <option value="">Seleccione Testigo</option>
+                          {testigos.map((insp) => (
+                            <option
+                              key={insp.id_funcionario}
+                              value={insp.funcionario}
+                            >
+                              {insp.funcionario}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label
+                          htmlFor="direccion_infraccion"
+                          className="form-label"
+                        >
+                          Dirección Infracción
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="direccion_infraccion"
+                          placeholder="Direccion infraccion"
+                          value={expedientes.direccion_infraccion}
+                          onChange={handleChanges}
+                          readOnly={editing}
                         />
-                        <label htmlFor="no">No</label>
                       </div>
-                      <div className="invalid-feedback">
-                        Ingrese estado documento
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <label
-                      htmlFor="fecha_citacion"
-                      className="form-label"
-                      hidden={
-                        expedientes.tipo_procedimiento !== "Citación"
-                          ? true
-                          : false
-                      }
-                    >
-                      Fecha de citacion
-                    </label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fecha_citacion"
-                      id="fecha_citacion"
-                      value={expedientes.fecha_citacion || ""}
-                      onChange={handleChanges}
-                      readOnly={editing}
-                      hidden={
-                        expedientes.tipo_procedimiento !== "Citación"
-                          ? true
-                          : false
-                      }
-                      required={
-                        expedientes.tipo_procedimiento !== "Citación"
-                          ? false
-                          : true
-                      }
-                    />
-                    <div className="invalid-feedback">
-                      Ingrese fecha de citación
-                    </div>
-                  </div>
-                  <div className="row g-4">
-                    <div className="col-md-6">
-                      <label htmlFor="inspector" className="form-label">
-                        Inspector
-                      </label>
-                      <select
-                        className="form-select"
-                        name="id_inspector"
-                        id="inspector"
-                        value={expedientes.id_inspector || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                        required
-                      >
-                        <option value="">Seleccione Inspector</option>
-                        {inspectores.map((i) => (
-                          <option
-                            key={i.id_funcionario}
-                            value={i.id_funcionario}
-                          >
-                            {i.funcionario}
+                      <div className="col-md-6">
+                        <label
+                          htmlFor="sector_infraccion"
+                          className="form-label"
+                        >
+                          Sector de infracción
+                        </label>
+                        <select
+                          className="form-select"
+                          name="sector_infraccion"
+                          id=""
+                          value={expedientes.sector_infraccion || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        >
+                          <option value="">
+                            Seleccione sector de la infraccion
                           </option>
-                        ))}
-                      </select>
-                      <div className="invalid-feedback">
-                        Seleccione un Inspector
+                          {sectores.map((s) => (
+                            <option key={s.id_sector} value={s.sector}>
+                              {s.sector}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
-                    <div className="col-md-6">
-                      <label htmlFor="testigo" className="form-label">
-                        Testigo
-                      </label>
-                      <select
-                        className="form-select"
-                        name="testigo"
-                        id="testigo"
-                        value={expedientes.testigo || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Seleccione Testigo</option>
-                        {testigos.map((insp) => (
-                          <option
-                            key={insp.id_funcionario}
-                            value={insp.funcionario}
-                          >
-                            {insp.funcionario}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+                  </fieldset>
 
-                  <div className="row g-4">
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="direccion_infraccion"
-                        className="form-label"
-                      >
-                        Dirección Infracción
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="direccion_infraccion"
-                        placeholder="Direccion infraccion"
-                        value={expedientes.direccion_infraccion}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="sector_infraccion" className="form-label">
-                        Sector de infracción
-                      </label>
-                      <select
-                        className="form-select"
-                        name="sector_infraccion"
-                        id=""
-                        value={expedientes.sector_infraccion || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">
-                          Seleccione sector de la infraccion
-                        </option>
-                        {sectores.map((s) => (
-                          <option key={s.id_sector} value={s.sector}>
-                            {s.sector}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="juzgado" className="form-label">
-                        Juzgado
-                      </label>
-                      <select
-                        className="form-select"
-                        name="juzgado"
-                        id=""
-                        value={expedientes.juzgado || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Seleccione JPL</option>
-                        <option value="JPL 1">JPL 1</option>
-                        <option value="JPL 2">JPL 2</option>
-                      </select>
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="id_leyes">Ley aplicada</label>
-                      <select
-                        className="form-select"
-                        name="id_leyes"
-                        id=""
-                        value={expedientes.id_leyes || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                        required
-                      >
-                        <option value="">Seleccione ley</option>
-                        {ley.map((l) => (
-                          <option key={l.id_ley} value={l.id_ley}>
-                            {l.ley}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="invalid-feedback">
-                        Seleccione ley aplicada
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Ley aplicada
+                    </legend>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label htmlFor="juzgado" className="form-label">
+                          Juzgado
+                        </label>
+                        <select
+                          className="form-select"
+                          name="juzgado"
+                          id=""
+                          value={expedientes.juzgado || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        >
+                          <option value="">Seleccione JPL</option>
+                          <option value="JPL 1">JPL 1</option>
+                          <option value="JPL 2">JPL 2</option>
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="id_leyes" className="form-label">
+                          Ley aplicada
+                        </label>
+                        <select
+                          className="form-select"
+                          name="id_leyes"
+                          id=""
+                          value={expedientes.id_leyes || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                          required
+                        >
+                          <option value="">Seleccione ley</option>
+                          {ley.map((l) => (
+                            <option key={l.id_ley} value={l.id_ley}>
+                              {l.ley}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="invalid-feedback">
+                          Seleccione ley aplicada
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="id_glosas">Glosa</label>
+                        <select
+                          className="form-select"
+                          name="id_glosas"
+                          id=""
+                          value={expedientes.id_glosas || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                          required
+                        >
+                          <option value="">Seleccione glosa de ley</option>
+                          {glosas.map((g) => (
+                            <option key={g.id_glosa} value={g.id_glosa}>
+                              {g.glosa_ley}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="invalid-feedback">Seleccione glosa</div>
                       </div>
                     </div>
-                    <div className="col-md-6">
-                      <label htmlFor="id_glosas">Glosa</label>
-                      <select
-                        className="form-select"
-                        name="id_glosas"
-                        id=""
-                        value={expedientes.id_glosas || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                        required
-                      >
-                        <option value="">Seleccione glosa de ley</option>
-                        {glosas.map((g) => (
-                          <option key={g.id_glosa} value={g.id_glosa}>
-                            {g.glosa_ley}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="invalid-feedback">Seleccione glosa</div>
-                    </div>
-                  </div>
+                  </fieldset>
 
-                  <div className="row g-4">
-                    <div className="col-md-6">
-                      <label htmlFor="rut_contri" className="form-label">
-                        Rut Contribuyente
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="rut_contri"
-                        placeholder="Rut Contribuyente"
-                        value={expedientes.rut_contri}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
-                      <label htmlFor="giro_contri" className="form-label">
-                        Giro Contribuyente
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="giro_contri"
-                        placeholder="Giro del Contribuyente"
-                        value={expedientes.giro_contri}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="nombre" className="form-label">
-                        Nombre contribuyente
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="nombre"
-                        placeholder="Nombre del Contribuyente"
-                        value={expedientes.nombre}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
-                      <label htmlFor="direccion" className="form-label">
-                        Dirección contribuyente
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="direccion"
-                        placeholder="Dirección del Contribuyente"
-                        value={expedientes.direccion}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="sector_contri">
-                        Sector Contribuyente
-                      </label>
-                      <SelectSector
-                        id="sector_contri"
-                        selectedSector={selectedSector}
-                        setSelectedSector={setSelectedSector}
-                        edition={editing}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="rol_contri" className="form-label">
-                        Rol Contribuyente
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="rol_contri"
-                        placeholder="Rol del Contribuyente"
-                        value={expedientes.rol_contri}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
-                    </div>
-                  </div>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Datos Contribuyente
+                    </legend>
 
-                  <div className="row g-4">
-                    <div className="col-md-6">
-                      <label htmlFor="tipo_vehi" className="form-label">
-                        Tipo de Vehiculo
-                      </label>
-                      <select
-                        className="form-select"
-                        name="tipo_vehi"
-                        id=""
-                        value={expedientes.tipo_vehi}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Tipo de Vehiculo</option>
-                        {datosVehiculos.map((tipo) => (
-                          <option key={tipo.id_veh} value={tipo.tipo}>
-                            {tipo.tipo}
-                          </option>
-                        ))}
-                      </select>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label htmlFor="rut_contri" className="form-label">
+                          Rut Contribuyente
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="rut_contri"
+                          placeholder="Rut Contribuyente"
+                          value={expedientes.rut_contri}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                        />
+                        <label htmlFor="giro_contri" className="form-label">
+                          Giro Contribuyente
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="giro_contri"
+                          placeholder="Giro del Contribuyente"
+                          value={expedientes.giro_contri}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="nombre" className="form-label">
+                          Nombre contribuyente
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="nombre"
+                          placeholder="Nombre del Contribuyente"
+                          value={expedientes.nombre}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                        />
+                        <label htmlFor="direccion" className="form-label">
+                          Dirección contribuyente
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="direccion"
+                          placeholder="Dirección del Contribuyente"
+                          value={expedientes.direccion}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="sector_contri">
+                          Sector Contribuyente
+                        </label>
+                        <SelectSector
+                          id="sector_contri"
+                          selectedSector={selectedSector}
+                          setSelectedSector={setSelectedSector}
+                          edition={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="rol_contri" className="form-label">
+                          Rol Contribuyente
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="rol_contri"
+                          placeholder="Rol del Contribuyente"
+                          value={expedientes.rol_contri}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                        />
+                      </div>
                     </div>
+                  </fieldset>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Vehículo infraccionado
+                    </legend>
 
-                    <div className="col-md-6">
-                      <label htmlFor="marca_vehi" className="form-label">
-                        Marca de Vehiculo
-                      </label>
-                      <select
-                        className="form-select"
-                        name="marca_vehi"
-                        id=""
-                        value={expedientes.marca_vehi}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Marca del Vehiculo</option>
-                        {datosVehiculos.map((tipo) => (
-                          <option key={tipo.marca} value={tipo.marca}>
-                            {tipo.marca}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="color_vehi" className="form-label">
-                        Color de Vehiculo
-                      </label>
-                      <select
-                        className="form-select"
-                        name="color_vehi"
-                        id=""
-                        value={expedientes.color_vehi}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      >
-                        <option value="">Color del Vehiculo</option>
-                        {datosVehiculos.map((tipo) => (
-                          <option key={tipo.color} value={tipo.color}>
-                            {tipo.color}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label htmlFor="tipo_vehi" className="form-label">
+                          Tipo de Vehiculo
+                        </label>
+                        <select
+                          className="form-select"
+                          name="tipo_vehi"
+                          id=""
+                          value={expedientes.tipo_vehi}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        >
+                          <option value="">Tipo de Vehiculo</option>
+                          {datosVehiculos.map((tipo) => (
+                            <option key={tipo.id_veh} value={tipo.tipo}>
+                              {tipo.tipo}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-                    <div className="col-md-6">
-                      <label htmlFor="ppu" className="form-label">
-                        P.P.U de Vehiculo
-                      </label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        name="ppu"
-                        placeholder="PPU"
-                        value={expedientes.ppu}
-                        onChange={handleChanges}
-                        readOnly={editing}
-                      />
+                      <div className="col-md-6">
+                        <label htmlFor="marca_vehi" className="form-label">
+                          Marca de Vehiculo
+                        </label>
+                        <select
+                          className="form-select"
+                          name="marca_vehi"
+                          id=""
+                          value={expedientes.marca_vehi}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        >
+                          <option value="">Marca del Vehiculo</option>
+                          {datosVehiculos.map((tipo) => (
+                            <option key={tipo.marca} value={tipo.marca}>
+                              {tipo.marca}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="color_vehi" className="form-label">
+                          Color de Vehiculo
+                        </label>
+                        <select
+                          className="form-select"
+                          name="color_vehi"
+                          id=""
+                          value={expedientes.color_vehi}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        >
+                          <option value="">Color del Vehiculo</option>
+                          {datosVehiculos.map((tipo) => (
+                            <option key={tipo.color} value={tipo.color}>
+                              {tipo.color}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="col-md-6">
+                        <label htmlFor="ppu" className="form-label">
+                          P.P.U de Vehiculo
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="ppu"
+                          placeholder="PPU"
+                          value={expedientes.ppu}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  </fieldset>
                   <div className="row g-4">
                     {/*user creador sera valor del token de inicio sesion hay que quitar este input al configurar todo */}
                     <input

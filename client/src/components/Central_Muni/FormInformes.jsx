@@ -341,6 +341,7 @@ function FormInformes() {
       console.error(error);
     }
     setEditing(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteInforme = async () => {
@@ -367,7 +368,7 @@ function FormInformes() {
     const idInforme = data.informe[0].id_informes_central;
     navigate(`/informes/central/${idInforme}`);
   };
-
+  document.body.style = "background:rgb(236, 241, 241);";
   return (
     <>
       <NavbarSGF formulario={"central"} />

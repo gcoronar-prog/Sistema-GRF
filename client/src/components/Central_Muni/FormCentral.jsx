@@ -516,7 +516,7 @@ function FormCentral() {
     navigate(`/reports/${lastIds}/edit`);
     //window.location.reload();
   };
-
+  document.body.style = "background:rgb(236, 241, 241);";
   return (
     <Grid2 container>
       <Typography variant="h3">Reportes de Central Municipal</Typography>

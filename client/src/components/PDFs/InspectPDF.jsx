@@ -14,6 +14,7 @@ const InspectPDF = async (id) => {
   const margin = 12;
 
   const formatDate = (date) => {
+    if (!date) return "-";
     return new Date(date).toLocaleString("es-CL", {
       day: "2-digit",
       month: "2-digit",
@@ -55,7 +56,8 @@ const InspectPDF = async (id) => {
 
   const rows = [
     ["N° Boleta/Control", expediente.num_control],
-    ["Fecha documento", formatDate(expediente.fecha_resolucion)],
+    ["Fecha documento", formatDate(expediente.fecha_documento)],
+    ["Fecha cierre documento", formatDate(expediente.fecha_resolucion)],
     ["Estado", expediente.estado_exp || "-"],
     ["Juzgado", expediente.juzgado || "-"],
     [
@@ -91,7 +93,12 @@ const InspectPDF = async (id) => {
     ["Dirección infracción", expediente.direccion_infraccion || "-"],
     ["Sector infracción", expediente.sector_infraccion || "-"],
     ["Observaciones", expediente.observaciones || "-"],
-    ["Fecha de citación", formatDate(expediente.fecha_citacion) || "-"],
+    [
+      "Fecha de citación",
+      formatDate(expediente.fecha_citacion) != null
+        ? formatDate(expediente.fecha_citacion)
+        : "-",
+    ],
     ["Ley que se aplica", expediente.ley || "-"],
     ["Glosa de ley", expediente.glosa_ley || "-"],
   ];
