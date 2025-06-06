@@ -5,7 +5,7 @@ function SelectInformante({
   setSelectedInformante,
   edition,
   selectRef,
-  error
+  error,
 }) {
   const loadInformante = async (inputValue) => {
     try {
@@ -17,10 +17,14 @@ function SelectInformante({
       }
       const data = await response.json();
 
-      return data.map((item) => ({
-        value: item.id_informante,
-        label: item.informante,
-      }));
+      return data
+        .filter((item) =>
+          item.informante.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .map((item) => ({
+          value: item.id_informante,
+          label: item.informante,
+        }));
     } catch (error) {
       console.error("Error:", error);
       return [];

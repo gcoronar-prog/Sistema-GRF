@@ -7,10 +7,7 @@ import {
   profile,
   updateUser,
 } from "../controllers/login.controller.js";
-import {
-  verifySuperAdmin,
-  verifyToken,
-} from "../middlewares/jwt.middleware.js";
+import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 
 const router = Router();
 
@@ -20,6 +17,14 @@ router.put("/update/user/:id", updateUser);
 router.delete("/delete/user/:id", deleteuser);
 
 router.post("/login", login);
-router.get("/profile", verifyToken, verifySuperAdmin, profile);
+router.get(
+  "/profile",
+  verifyToken,
+  verifyGroup("superadmin"),
+  profile,
+  (req, res) => {
+    res.json({ msg: "Acceso a superadmin" });
+  }
+);
 
 export default router;

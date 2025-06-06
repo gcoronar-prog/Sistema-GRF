@@ -30,10 +30,14 @@ function SelectTipo({
       }
       const data = await response.json();
       //console.log("select tipo", data.tipo);
-      const datos = data.tipo.map((item) => ({
-        value: item.id_tipo,
-        label: item.descripcion,
-      }));
+      const datos = data.tipo
+        .map((item) => ({
+          value: item.id_tipo,
+          label: item.descripcion,
+        }))
+        .filter((item) =>
+          item.label.toLowerCase().includes(inputValue.toLowerCase())
+        );
       //console.log("asyncselect", datos);
       return datos;
     } catch (error) {

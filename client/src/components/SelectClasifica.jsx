@@ -22,7 +22,6 @@ const SelectClasifica = ({
         value={selectedClasif}
         onChange={(selectedOption) => setSelectedClasif(selectedOption)}
         isDisabled={edition}
-        isClearable
         ref={selectRef}
         styles={{
           control: (base) => ({

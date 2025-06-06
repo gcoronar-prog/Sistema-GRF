@@ -17,10 +17,14 @@ function SelectOrigin({
       }
       const data = await response.json();
 
-      return data.map((item) => ({
-        value: item.id_origen,
-        label: item.origen,
-      }));
+      return data
+        .filter((item) =>
+          item.origen.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .map((item) => ({
+          value: item.id_origen,
+          label: item.origen,
+        }));
     } catch (err) {
       console.error("Error:", err);
       return [];

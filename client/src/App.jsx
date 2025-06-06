@@ -18,7 +18,6 @@ import SelectTripulantes from "./components/SelectTripulantes";
 import SelectVehiculo from "./components/SelectVehiculo";
 import StatisticsCentral from "./components/Estadisticas/StatisticsCentral";
 import LoginSGF from "./components/Login/LoginSGF";
-import NavbarSGF from "./components/NavbarSGF";
 import SearchForm from "./components/SearchForm";
 
 import "bootstrap/dist/css/bootstrap.min.css";

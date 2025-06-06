@@ -7,7 +7,7 @@ function SelectSector({
   error,
   selectRef,
 }) {
-  const loadSector = async () => {
+  const loadSector = async (inputValue) => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_ROUTE_BACK}/sectores`
@@ -17,10 +17,14 @@ function SelectSector({
       }
       const data = await response.json();
       //console.log(data);
-      return data.map((item) => ({
-        value: item.id_sector,
-        label: item.sector,
-      }));
+      return data
+        .filter((item) =>
+          item.sector.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .map((item) => ({
+          value: item.id_sector,
+          label: item.sector,
+        }));
     } catch (error) {
       console.error("Error:", error);
       return [];

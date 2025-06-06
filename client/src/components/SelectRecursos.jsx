@@ -8,16 +8,20 @@ const SelectRecursos = ({
   error,
   selectRef,
 }) => {
-  const loadRecursos = async () => {
+  const loadRecursos = async (inputValue) => {
     const res = await fetch(
       `${import.meta.env.VITE_SERVER_ROUTE_BACK}/recursos`
     );
     const data = await res.json();
 
-    return data.map((item) => ({
-      value: item.id_recursos,
-      label: item.recursos,
-    }));
+    return data
+      .filter((item) =>
+        item.recursos.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .map((item) => ({
+        value: item.id_recursos,
+        label: item.recursos,
+      }));
   };
 
   return (

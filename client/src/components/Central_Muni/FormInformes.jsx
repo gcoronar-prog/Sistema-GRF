@@ -98,6 +98,7 @@ function FormInformes() {
       id_ubicacion_informe: data.informe[0].id_ubicacion_informe,
       id_vehiculo_informe: data.informe[0].id_vehiculo_informe,
       cod_informes_central: data.informe[0].cod_informes_central,
+      fecha_doc_central: data.informe[0].fecha_doc_central,
 
       //origen informe
       fecha_informe: dayjs(data.informe[0].fecha_informe).format(
@@ -341,6 +342,7 @@ function FormInformes() {
       console.error(error);
     }
     setEditing(true);
+    setErrors(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -426,11 +428,20 @@ function FormInformes() {
             <div className="card">
               <div className="card-header text-bg-success">
                 <span className="form-label fw-bold">
-                  Informes Central: {informes.cod_informes_central}
+                  Código informe: {informes.cod_informes_central}
+                </span>
+                {"      ||      "}
+                <span className="form-label fw-bold">
+                  Fecha creación:{" "}
+                  {dayjs(informes.fecha_doc_central).format("DD-MM-YYYY HH:mm")}
                 </span>
               </div>
               <div className="card-body">
-                <form action="" onSubmit={handleSubmit}>
+                <form
+                  action=""
+                  onSubmit={handleSubmit}
+                  className="was-validated"
+                >
                   <div className="row g-3 mb-4">
                     <div className="col-md-5">
                       <label htmlFor="fecha_informe" className="form-label">
@@ -446,9 +457,6 @@ function FormInformes() {
                         readOnly={editing}
                         required
                       />
-                      <div className="invalid-feedback">
-                        Ingrese una fecha valida
-                      </div>
                     </div>
                     <div className="col-md-6">
                       <label htmlFor="origen_informe" className="form-label">
@@ -462,9 +470,6 @@ function FormInformes() {
                         error={errors.origin}
                         selectRef={originRef}
                       />
-                      <div className="invalid-feedback">
-                        Seleccione un origen
-                      </div>
                     </div>
 
                     <div className="col-md-6">
@@ -482,41 +487,44 @@ function FormInformes() {
                         error={errors.informante}
                         selectRef={informanteRef}
                       />
-                      <div className="invalid-feedback">
-                        Seleccione informante
-                      </div>
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label d-block">
-                        Captura del informe:
-                      </label>
-                      <div className="d-flex flex-wrap gap-3">
-                        {[
-                          "radios",
-                          "telefono",
-                          "rrss",
-                          "presencial",
-                          "email",
-                        ].map((tipo) => (
-                          <div className="form-check form-check" key={tipo}>
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="captura_informe"
-                              id={tipo}
-                              value={tipo}
-                              checked={informes.captura_informe === tipo}
-                              onChange={handleChanges}
-                              disabled={editing}
-                              required
-                            />
-                            <label className="form-check-label" htmlFor={tipo}>
-                              {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-                            </label>
-                          </div>
-                        ))}
+                      <div className="row">
+                        <label className="form-label d-block">
+                          Captura del informe:
+                        </label>
+                        <div className="d-flex flex-wrap gap-3">
+                          {[
+                            "radios",
+                            "telefono",
+                            "rrss",
+                            "presencial",
+                            "email",
+                          ].map((tipo) => (
+                            <div className="col">
+                              <div className="form-check form-check" key={tipo}>
+                                <input
+                                  className="form-check-input"
+                                  type="radio"
+                                  name="captura_informe"
+                                  id={tipo}
+                                  value={tipo}
+                                  checked={informes.captura_informe === tipo}
+                                  onChange={handleChanges}
+                                  disabled={editing}
+                                  required
+                                />
+                                <label
+                                  className="form-check-label"
+                                  htmlFor={tipo}
+                                >
+                                  {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                                </label>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="invalid-feedback">Elija un medio</div>
                     </div>
                     <div className="col-md-6">
                       <label
@@ -533,9 +541,6 @@ function FormInformes() {
                         error={errors.clasif}
                         selectRef={clasiRef}
                       />
-                      <div className="invalid-feedback">
-                        Seleccione clasificación
-                      </div>
                     </div>
 
                     <div className="col-md-6">
@@ -599,9 +604,6 @@ function FormInformes() {
                           </label>
                         </div>
                       </div>
-                      <div className="invalid-feedback">
-                        Seleccione un estado
-                      </div>
                     </div>
                   </div>
                   <div className="row">
@@ -618,9 +620,6 @@ function FormInformes() {
                         error={errors.tipo}
                         selectRef={tipoRef}
                       />
-                      <div className="invalid-feedback">
-                        Seleccione un tipo de informe
-                      </div>
                     </div>
 
                     {informes.tipo_informe == "Otro" ? (
@@ -668,9 +667,6 @@ function FormInformes() {
                         error={errors.recurso}
                         selectRef={recursoRef}
                       />
-                      <div className="invalid-feedback">
-                        Seleccione al menos un recurso
-                      </div>
                     </div>
                     <div className="col-md-6">
                       <label htmlFor="sector" className="form-label">
@@ -684,9 +680,6 @@ function FormInformes() {
                         error={errors.sector}
                         selectRef={sectorRef}
                       />
-                      <div className="invalid-feedback">
-                        Seleccione un sector
-                      </div>
                     </div>
                     <div className="col-md-6">
                       <label htmlFor="direccion" className="form-label">

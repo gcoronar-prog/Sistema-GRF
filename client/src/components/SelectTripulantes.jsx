@@ -5,19 +5,25 @@ function SelectTripulantes({
   setSelectedTripulante,
   edition,
 }) {
-  const loadTripulantes = async () => {
+  const loadTripulantes = async (inputValue) => {
     try {
-      const response = await fetch(`http://192.168.3.233:3000/tripulantes`);
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/tripulantes`
+      );
       console.log(response);
       if (!response.ok) {
         throw new Error("Error al cargar los tripulantes");
       }
       const data = await response.json();
       console.log(data);
-      return data.map((item) => ({
-        value: item.id_funcionario,
-        label: item.funcionario,
-      }));
+      return data
+        .filter((item) =>
+          item.funcionario.toLowerCase().includes(inputValue.toLowerCase())
+        )
+        .map((item) => ({
+          value: item.id_funcionario,
+          label: item.funcionario,
+        }));
     } catch (error) {
       console.error("Error:", error);
       return [];
