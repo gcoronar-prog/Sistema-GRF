@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
 function LoginSGF() {
@@ -15,16 +16,26 @@ function LoginSGF() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(login),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(login),
+        }
+      );
       if (res.ok) {
         const data = await res.json();
-        console.log(data);
+
         localStorage.setItem("token", data.msg);
-        navigate("/");
+        const decode = jwtDecode(data.msg);
+        const userRole = decode.user_rol;
+
+        if (userRole === "superadmin") {
+          navigate("/home/admin");
+        } else if (userRole === "admin") {
+          navigate("/");
+        }
       }
     } catch (error) {
       console.error(error);

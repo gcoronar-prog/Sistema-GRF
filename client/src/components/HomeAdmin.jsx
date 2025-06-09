@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import NavbarSGF from "./NavbarSGF";
 import ListPendiente from "./ListPendiente";
 
-function HomeCentral() {
+function HomeAdmin() {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,8 +37,9 @@ function HomeCentral() {
   return (
     <>
       <NavbarSGF />
+      <ListPendiente />
     </>
   );
 }
 
-export default HomeCentral;
+export default HomeAdmin;

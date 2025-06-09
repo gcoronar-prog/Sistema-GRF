@@ -29,6 +29,11 @@ function NavbarSGF({ formulario }) {
     navigate(`/inspect/${id_informe}/edit`);
   };
 
+  const handleLogOut = async () => {
+    localStorage.removeItem("token");
+    navigate("/sgf/v1/login/");
+  };
+
   return (
     <>
       <nav
@@ -58,7 +63,7 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
               </>
-            ) : (
+            ) : formulario === "inspeccion" ? (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" onClick={handleLastExpediente}>
@@ -76,12 +81,72 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
               </>
+            ) : (
+              <>
+                <li className="nav-item dropdown">
+                  <a
+                    className="nav-link dropdown-toggle"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    href="#"
+                  >
+                    Formularios
+                  </a>
+                  <ul className="dropdown-menu">
+                    <li key="1" className="dropdown-item">
+                      <Link className="nav-link" onClick={handleLastExpediente}>
+                        Expedientes Municipales
+                      </Link>
+                    </li>
+                    <li key="2" className="dropdown-item">
+                      <Link className="nav-link" onClick={handleLastInforme}>
+                        Informes Central Municipal
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+                <li className="nav-item dropdown">
+                  <a
+                    className="nav-link dropdown-toggle"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    href="#"
+                  >
+                    Estadísticas
+                  </a>
+                  <ul className="dropdown-menu">
+                    <li key="1" className="dropdown-item">
+                      <Link className="nav-link" to="/statistics/inspeccion/v1">
+                        Estadísticas Inspección Municipal
+                      </Link>
+                    </li>
+                    <li key="2" className="dropdown-item">
+                      <Link className="nav-link" to="/statistics/central/v1">
+                        Estadísticas Central Municipal
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+                <li key="1" className="dropdown-item">
+                  <Link className="nav-link" to="/galeriaImgExp">
+                    Galería Inspección
+                  </Link>
+                </li>
+              </>
             )}
           </ul>
 
           <div className="d-flex align-items-center border-start ps-3">
             <SearchForm formulario={formulario} />
           </div>
+        </div>
+
+        <div>
+          <button className="btn btn-danger" onClick={handleLogOut}>
+            Cerrar sesión
+          </button>
         </div>
       </nav>
     </>

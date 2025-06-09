@@ -26,6 +26,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import SearchExpediente from "./components/Inspeccion/SearchExpediente";
 import GaleriaInspeccion from "./components/Inspeccion/GaleriaInspeccion";
 import StatisticsInspect from "./components/Estadisticas/StatisticsInspect";
+import HomeAdmin from "./components/HomeAdmin";
 
 function App() {
   return (
@@ -34,7 +35,9 @@ function App() {
         <Routes>
           <Route path="/sgf/v1/login/" element={<LoginSGF />} />
 
+          <Route path="/home/admin" element={<HomeAdmin />} />
           <Route path="/" element={<HomeCentral />} />
+
           <Route path="/Reports/new" element={<FormCentral />} />
           <Route path="/Reports/:id/edit" element={<FormCentral />} />
           <Route path="/ListReports" element={<ReportList />} />

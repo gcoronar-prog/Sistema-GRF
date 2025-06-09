@@ -8,7 +8,7 @@ const getUsers = async (req, res) => {
     await client.query("BEGIN");
     const usuarios = await client.query("SELECT * FROM users_system");
     await client.query("COMMIT");
-    return res.json({ usuarios: usuarios.rows });
+    return res.status(200).json({ usuarios: usuarios.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -30,7 +30,7 @@ const getUser = async (req, res) => {
       [id]
     );
     await client.query("COMMIT");
-    return res.json({ usuarios: usuarios.rows });
+    return res.status(200).json({ usuarios: usuarios.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -63,7 +63,7 @@ const createUser = async (req, res) => {
       ]
     );
     await client.query("COMMIT");
-    return res.json({ usuario: usuarios.rows });
+    return res.status(200).json({ usuario: usuarios.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -95,7 +95,7 @@ const updateUser = async (req, res) => {
       ]
     );
     await client.query("COMMIT");
-    return res.json({ usuario: usuarios.rows });
+    return res.status(200).json({ usuario: usuarios.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -148,10 +148,6 @@ const login = async (req, res) => {
       usuario.rows[0].user_password
     );
 
-    if (!isMatch) {
-      return res.status(400).json({ msg: "Usuario o contraseña incorrectos" });
-    }
-
     const payload = {
       user_name: usuario.rows[0].user_name,
       user_rol: usuario.rows[0].user_rol,
@@ -160,7 +156,10 @@ const login = async (req, res) => {
       expiresIn: "1m",
     });
 
-    return res.json({ ok: true, msg: token });
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Usuario o contraseña incorrectos" });
+    }
+    return res.status(200).json({ msg: token });
   } catch (error) {
     console.error(error);
     return res
@@ -177,7 +176,7 @@ const profile = async (req, res) => {
       [usuario]
     );
 
-    return res.json({ ok: true, msg: users.rows });
+    return res.status(200).json({ ok: true, msg: users.rows });
   } catch (error) {
     console.error(error);
     return res

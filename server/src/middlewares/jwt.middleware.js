@@ -22,15 +22,17 @@ export const verifyToken = (req, res, next) => {
   }
 };
 
-export const verifyGroup = (groupName) => {
+export const verifyGroup = (...groups) => {
   return (req, res, next) => {
-    const allowedRoles = rolesGrupo[groupName];
-    if (!allowedRoles) {
-      return res.status(500).json({ msg: "Grupo de roles no definido" });
-    }
+    const allowedRoles = groups
+      .map((group) => rolesGrupo[group])
+      .filter(Boolean)
+      .flat();
+
     if (!allowedRoles.includes(req.rol)) {
       return res.status(403).json({ msg: "Usuario no autorizado" });
     }
+
     next();
   };
 };
