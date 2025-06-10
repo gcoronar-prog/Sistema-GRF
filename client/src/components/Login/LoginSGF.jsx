@@ -33,8 +33,14 @@ function LoginSGF() {
 
         if (userRole === "superadmin") {
           navigate("/home/admin");
-        } else if (userRole === "admin") {
-          navigate("/");
+        } else if (userRole === "usercentral") {
+          navigate("/home/central");
+        } else if (userRole === "userinspeccion") {
+          navigate("/home/central");
+        } else if (userRole === "userseguridad") {
+          navigate("/home/central");
+        } else if (userRole === "usergrd") {
+          navigate("/home/central");
         }
       }
     } catch (error) {

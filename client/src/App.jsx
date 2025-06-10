@@ -36,7 +36,7 @@ function App() {
           <Route path="/sgf/v1/login/" element={<LoginSGF />} />
 
           <Route path="/home/admin" element={<HomeAdmin />} />
-          <Route path="/" element={<HomeCentral />} />
+          <Route path="/home/central" element={<HomeCentral />} />
 
           <Route path="/Reports/new" element={<FormCentral />} />
           <Route path="/Reports/:id/edit" element={<FormCentral />} />

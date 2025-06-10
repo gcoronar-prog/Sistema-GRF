@@ -18,6 +18,9 @@ export const verifyToken = (req, res, next) => {
     next();
   } catch (error) {
     console.error(error);
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ msg: "Tiempo de token terminado" });
+    }
     return res.status(401).json({ msg: "No autorizado" });
   }
 };
