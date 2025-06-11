@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarSGF from "./NavbarSGF";
+import { jwtDecode } from "jwt-decode";
 import ListPendiente from "./ListPendiente";
 
 function HomeCentral() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState([]);
+  const [userData, setUserData] = useState({});
   useEffect(() => {
     loadProfile();
   }, []);
@@ -13,11 +14,21 @@ function HomeCentral() {
   const loadProfile = async () => {
     const token = localStorage.getItem("token");
     //console.log("token", token);
-    if (!token) {
+    /*if (!token) {
       alert("devulevete!");
       localStorage.removeItem("token");
       navigate("/sgf/v1/login/");
       return;
+    }*/
+    if (token) {
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000; // tiempo actual en segundos
+
+      if (decoded.exp < currentTime) {
+        alert("Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.");
+        localStorage.removeItem("token");
+        navigate("/sgf/v1/login/");
+      }
     }
     try {
       const res = await fetch(
@@ -26,17 +37,16 @@ function HomeCentral() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (!res.ok) {
-        throw new Error("No autorizado");
-      }
-      const data = await res.json();
-
-      if (res.status === 401) {
+      if (res.status === 401 || !res.ok) {
         alert("devulevete!");
         localStorage.removeItem("token");
         navigate("/sgf/v1/login/");
+
         return;
       }
+
+      const data = await res.json();
+
       console.log(res.status);
       setUserData(data.msg[0]);
     } catch (error) {
@@ -58,7 +68,7 @@ function HomeCentral() {
       ) : (
         <p>cargando la pagina</p>
       )}
-      <div className="toast-container position-fixed bottom-0 end-0 p-3">
+      {/*<div className="toast-container position-fixed bottom-0 end-0 p-3">
         <div
           className="toast show position-relative"
           role="alert"
@@ -77,7 +87,8 @@ function HomeCentral() {
           </div>
           <div className="toast-body">{"Usuario: " + userData.user_name}</div>
         </div>
-      </div>
+      </div>*/}
+      {new Date().toLocaleTimeString()}
     </>
   );
 }
