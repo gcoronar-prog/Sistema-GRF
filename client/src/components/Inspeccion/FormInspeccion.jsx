@@ -467,11 +467,13 @@ function FormInspeccion() {
                 </span>
                 &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
                 &nbsp; &nbsp; &nbsp;
-                <p className="mb-0 fw-semibold">{expedientes.estado_exp}</p>
+                <small className="mb-0 fw-semibold">
+                  {expedientes.estado_exp}
+                </small>
                 &nbsp;
-                <p className="mb-0 fst-italic">
+                <small className="mb-0 fst-italic">
                   {formatDate(expedientes.fecha_resolucion)}
-                </p>
+                </small>
               </div>
               <div className="card-body">
                 <form onSubmit={handleSubmit} className="was-validated">

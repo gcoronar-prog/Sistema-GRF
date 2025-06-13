@@ -1141,6 +1141,66 @@ const getExpediente2 = async (req, res) => {
   }
 };
 
+const getExpedEstado = async (req, res) => {
+  const client = await pool.connect();
+  const { estado } = req.query;
+  try {
+    await client.query("BEGIN");
+    const expediente = await client.query(
+      `SELECT * FROM expedientes expe
+                          JOIN funcionarios func 
+                          ON func.id_funcionario=expe.id_inspector
+                          JOIN leyes l ON l.id_ley=expe.id_leyes
+                          JOIN glosas_ley gl ON gl.id_glosa=expe.id_glosas
+                          JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
+                          JOIN contribuyentes contri ON contri.id_expediente=expe.id_expediente
+                          JOIN vehiculos_contri vehi ON vehi.id_expediente=expe.id_expediente
+                        WHERE expe.estado_exp=$1`,
+      [estado]
+    );
+    await client.query("COMMIT");
+    return res.status(200).json({
+      expediente: expediente.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    await client.query("ROLLBACK");
+    return res.status(500).json({ message: "Problemas con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
+const getExpedTipo = async (req, res) => {
+  const client = await pool.connect();
+  const { tipo } = req.query;
+  try {
+    await client.query("BEGIN");
+    const expediente = await client.query(
+      `SELECT * FROM expedientes expe
+                          JOIN funcionarios func 
+                          ON func.id_funcionario=expe.id_inspector
+                          JOIN leyes l ON l.id_ley=expe.id_leyes
+                          JOIN glosas_ley gl ON gl.id_glosa=expe.id_glosas
+                          JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
+                          JOIN contribuyentes contri ON contri.id_expediente=expe.id_expediente
+                          JOIN vehiculos_contri vehi ON vehi.id_expediente=expe.id_expediente
+                        WHERE expe.tipo_procedimiento=$1`,
+      [tipo]
+    );
+    await client.query("COMMIT");
+    return res.status(200).json({
+      expediente: expediente.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    await client.query("ROLLBACK");
+    return res.status(500).json({ message: "Problemas con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 export {
   getExpedientes,
   getExpediente,
@@ -1177,4 +1237,6 @@ export {
   searchExpedientes,
   getImgExpedientes,
   getExpediente2,
+  getExpedEstado,
+  getExpedTipo,
 };
