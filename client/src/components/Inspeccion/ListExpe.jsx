@@ -153,7 +153,7 @@ function ListExpe() {
                           className="btn btn-success"
                           onClick={() => handleNavigateExpe(e.id_expediente)}
                         >
-                          IR
+                          IR <i className="bi bi-box-arrow-in-right"></i>
                         </button>
                       </td>
                     </tr>

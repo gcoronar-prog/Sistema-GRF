@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthHome } from "../../../server/src/middlewares/AuthHome";
 
 function ListPendiente(refresh) {
   const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
   const [estado, setEstado] = useState(1);
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
+    AuthHome({ navigate, setUserData });
     loadPendiente();
   }, [refresh, estado]);
 

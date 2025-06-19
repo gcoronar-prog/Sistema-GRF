@@ -12,43 +12,74 @@ function HomeAdmin() {
     AuthHome({ navigate, setUserData });
   }, []);
 
-  const loadProfile = async () => {
-    const token = localStorage.getItem("token");
-    //console.log("token", token);
-    if (!token) {
-      navigate("/sgf/v1/login/");
-      return;
-    }
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/profile`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!res.ok) {
-        throw new Error("No autorizado");
-      }
-    } catch (error) {
-      console.error(error);
-      localStorage.removeItem("token");
-      navigate("/sgf/v1/login/");
-    }
-  };
-
   return (
     <>
       <NavbarSGF />
+      <div className="accordion" id="accordion-admin">
+        <div className="accordion-item">
+          <h2 className="accordion-header">
+            <button
+              className="accordion-button"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseCentral"
+              aria-expanded="true"
+              aria-controls="collapseCentral"
+            >
+              Listado Central Municipal
+            </button>
+          </h2>
+          <div
+            id="collapseCentral"
+            className="accordion-collapse collapse"
+            data-bs-parent="#accordion-admin"
+          >
+            <div className="accordion-body">
+              {userData.user_rol ? (
+                userData?.user_rol === "superadmin" ? (
+                  <ListPendiente />
+                ) : (
+                  "soy de otra oficina"
+                )
+              ) : (
+                <p>cargando la pagina</p>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="accordion-item">
+          <h2 className="accordion-header">
+            <button
+              className="accordion-button"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseInspeccion"
+              aria-expanded="true"
+              aria-controls="collapseInspeccion"
+            >
+              Listado Inspección Municipal
+            </button>
+          </h2>
+          <div
+            id="collapseInspeccion"
+            className="accordion-collapse collapse"
+            data-bs-parent="#accordion-admin"
+          >
+            <div className="accordion-body">
+              {userData.user_rol ? (
+                userData?.user_rol === "superadmin" ? (
+                  <ListExpe />
+                ) : (
+                  "soy de otra oficina"
+                )
+              ) : (
+                <p>cargando la pagina</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
-      {userData.user_rol ? (
-        userData?.user_rol === "superadmin" ? (
-          <ListExpe />
-        ) : (
-          "soy de otra oficina"
-        )
-      ) : (
-        <p>cargando la pagina</p>
-      )}
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         <div
           className="toast show position-relative"

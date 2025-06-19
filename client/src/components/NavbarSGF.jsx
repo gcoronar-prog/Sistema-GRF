@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchForm from "./SearchForm";
+import { AuthHome } from "../../../server/src/middlewares/AuthHome";
 
 function NavbarSGF({ formulario }) {
   const navigate = useNavigate();

@@ -15,6 +15,7 @@ import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
 import FormAcciones from "../FormAcciones";
 import NavbarSGF from "../NavbarSGF";
+import { AuthHome } from "../../../../server/src/middlewares/AuthHome";
 
 function FormInformes() {
   const params = useParams();
@@ -66,10 +67,14 @@ function FormInformes() {
   const [refresh, setRefresh] = useState(false);
   const [editing, setEditing] = useState(true);
   const [errors, setErrors] = useState({});
+  const [userData, setUserData] = useState({});
+
   const { originRef, clasiRef, informanteRef, tipoRef, recursoRef, sectorRef } =
     useRef(null);
 
   useEffect(() => {
+    AuthHome({ navigate, setUserData });
+
     if (params.id) {
       loadInformes(params.id);
     } else {

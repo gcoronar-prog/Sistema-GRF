@@ -25,7 +25,7 @@ function SearchForm({ formulario }) {
           window.alert("No existen registros con este codigo");
           setCodigo("");
         }
-      } else {
+      } else if (formulario === "inspeccion") {
         if (data.expedientes.length > 0) {
           navigate(`/inspect/${codInspect}/edit`);
           setCodigo("");
@@ -35,7 +35,7 @@ function SearchForm({ formulario }) {
         }
       }
 
-      console.log(data.expedientes, "expediente");
+      console.log(formulario, "formulario");
 
       console.log(codInspect, "inspector");
     } catch (error) {
@@ -51,26 +51,33 @@ function SearchForm({ formulario }) {
 
   return (
     <>
-      <input
-        className="form-control me-2"
-        id="codigoBusqueda"
-        name="codigoBusqueda"
-        type="search"
-        onChange={handleChanges}
-        value={codigo}
-        placeholder={
-          formulario === "central"
-            ? "Código del informe"
-            : "Codigo del expediente"
-        }
-        aria-label="Search"
-      />
-      <button
-        className="btn btn-outline-success"
-        onClick={() => buscaInforme(codigo)}
-      >
-        Buscar
-      </button>
+      {formulario === "central" || formulario === "inspeccion" ? (
+        <>
+          <input
+            className="form-control me-2"
+            id="codigoBusqueda"
+            name="codigoBusqueda"
+            type="search"
+            onChange={handleChanges}
+            value={codigo}
+            placeholder={
+              formulario === "central"
+                ? "Código del informe"
+                : "Codigo del expediente"
+            }
+            aria-label="Search"
+          />
+          <button
+            className="btn btn-outline-success"
+            onClick={() => buscaInforme(codigo)}
+            type="button"
+          >
+            Buscar
+          </button>
+        </>
+      ) : (
+        ""
+      )}
     </>
   );
 }
