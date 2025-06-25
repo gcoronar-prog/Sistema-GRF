@@ -84,7 +84,13 @@ function FormInformes() {
 
   const loadInformes = async (id) => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${id}`
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     );
     const data = await response.json();
 
@@ -208,7 +214,10 @@ function FormInformes() {
 
         const res = await fetch(url, {
           method,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
           body: JSON.stringify(datosActualizados),
         });
         if (!res.ok) {
@@ -217,7 +226,13 @@ function FormInformes() {
 
         if (!params.id) {
           const lastData = await fetch(
-            `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
+            `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
           );
           const lastInforme = await lastData.json();
 
@@ -245,7 +260,13 @@ function FormInformes() {
 
   const handleFirstInforme = async () => {
     const res = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/first`
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/first`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     );
     if (res.ok) {
       const firstInforme = await res.json();
@@ -263,7 +284,13 @@ function FormInformes() {
 
   const handleLastInforme = async () => {
     const res = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     );
     if (res.ok) {
       const lastInforme = await res.json();
@@ -282,7 +309,13 @@ function FormInformes() {
     const id = params.id;
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/${id}/prev`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/${id}/prev`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       const data = await res.json();
       //console.log(data.informe[0].id_informes_central);
@@ -301,7 +334,13 @@ function FormInformes() {
     const id = params.id;
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/${id}/next`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/${id}/next`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       const data = await res.json();
       const idInforme = data.informe[0].id_informes_central;
@@ -361,7 +400,10 @@ function FormInformes() {
       `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${id}`,
       {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       }
     );
     const updatedInforme = { ...informes };
@@ -369,7 +411,13 @@ function FormInformes() {
     setInformes(updatedInforme);
 
     const res = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`
+      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
     );
     const data = await res.json();
     const idInforme = data.informe[0].id_informes_central;

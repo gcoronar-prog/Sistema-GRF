@@ -33,7 +33,12 @@ function ListPendiente(refresh) {
         ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/pendientes`
         : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/progreso`;*/
 
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       const data = await res.json();
       setPendientes(data.informe);
       console.log(data);

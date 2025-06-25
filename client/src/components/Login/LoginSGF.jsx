@@ -20,7 +20,10 @@ function LoginSGF() {
         `${import.meta.env.VITE_SERVER_ROUTE_BACK}/login`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
           body: JSON.stringify(login),
         }
       );
@@ -43,6 +46,7 @@ function LoginSGF() {
           navigate("/home/central");
         }
       }
+      console.log(jwtDecode(localStorage.getItem("token")));
     } catch (error) {
       console.error(error);
     }
