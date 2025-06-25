@@ -26,10 +26,15 @@ export const AuthHome = async ({ navigate, setUserData }) => {
         navigate("/sgf/v1/login/");
       }, expirationTime * 1000);
 
+      console.log("Token:", token);
+      console.log("Decodificado:", jwtDecode(token));
       const res = await fetch(
         `${import.meta.env.VITE_SERVER_ROUTE_BACK}/profile`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 

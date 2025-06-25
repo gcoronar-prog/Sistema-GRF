@@ -2,9 +2,13 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchForm from "./SearchForm";
 import { AuthHome } from "../../../server/src/middlewares/AuthHome";
+import { jwtDecode } from "jwt-decode";
 
 function NavbarSGF({ formulario }) {
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
@@ -82,7 +86,7 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
               </>
-            ) : (
+            ) : decoded.user_rol === "superadmin" ? (
               <>
                 <li className="nav-item dropdown">
                   <a
@@ -136,6 +140,8 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
               </>
+            ) : (
+              "ohg!"
             )}
           </ul>
 
