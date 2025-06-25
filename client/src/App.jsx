@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomeCentral from "./components/HomeCentral";
 import FormCentral from "./components/Central_Muni/FormCentral";
 import ReportList from "./components/ReportList";
-import { Container } from "@mui/material";
+
 import "../src/styles.css";
 //import FormAcciones from "./components/FormAcciones";
 import AttachFiles from "./components/AttachFiles";
@@ -27,14 +27,15 @@ import SearchExpediente from "./components/Inspeccion/SearchExpediente";
 import GaleriaInspeccion from "./components/Inspeccion/GaleriaInspeccion";
 import StatisticsInspect from "./components/Estadisticas/StatisticsInspect";
 import HomeAdmin from "./components/HomeAdmin";
+import Layout from "./components/Layout";
 
 function App() {
   return (
     <BrowserRouter>
-      <Container>
-        <Routes>
-          <Route path="/sgf/v1/login/" element={<LoginSGF />} />
+      <Routes>
+        <Route path="/sgf/v1/login/" element={<LoginSGF />} />
 
+        <Route element={<Layout />}>
           <Route path="/home/admin" element={<HomeAdmin />} />
           <Route path="/home/central" element={<HomeCentral />} />
 
@@ -81,8 +82,9 @@ function App() {
             path="/statistics/inspeccion/v1"
             element={<StatisticsInspect />}
           />
-        </Routes>
-      </Container>
+          <Route />
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -3,19 +3,17 @@ import { useNavigate } from "react-router-dom";
 import NavbarSGF from "./NavbarSGF";
 import { jwtDecode } from "jwt-decode";
 import ListPendiente from "./ListPendiente";
-import { AuthHome } from "../../../server/src/middlewares/AuthHome";
+import { useTokenSession } from "./useTokenSession";
 
 function HomeCentral() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({});
-  useEffect(() => {
-    //loadProfile();
-    AuthHome({ navigate, setUserData });
-  }, []);
+
+  useTokenSession({ setUserData });
 
   return (
     <>
-      <NavbarSGF formulario={"central"} />
+      <NavbarSGF />
       {userData.user_rol ? (
         userData?.user_rol === "usercentral" ? (
           <ListPendiente />

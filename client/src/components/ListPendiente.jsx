@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthHome } from "../../../server/src/middlewares/AuthHome";
+import { useTokenSession } from "./useTokenSession";
 
 function ListPendiente(refresh) {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ function ListPendiente(refresh) {
   const [userData, setUserData] = useState({});
 
   useEffect(() => {
-    AuthHome({ navigate, setUserData });
+    useTokenSession(setUserData);
     loadPendiente();
   }, [refresh, estado]);
 

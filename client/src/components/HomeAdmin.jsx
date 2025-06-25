@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import NavbarSGF from "./NavbarSGF";
 import ListPendiente from "./ListPendiente";
-import { AuthHome } from "../../../server/src/middlewares/AuthHome";
 import ListExpe from "./Inspeccion/ListExpe";
+import { useTokenSession } from "./useTokenSession";
 
 function HomeAdmin() {
-  const navigate = useNavigate();
   const [userData, setUserData] = useState({});
-  useEffect(() => {
-    AuthHome({ navigate, setUserData });
-  }, []);
 
+  useTokenSession(setUserData);
+
+  /*if (!userData?.user_rol) {
+    return <p>Cargando sesión...</p>;
+  }*/
   return (
     <>
-      <NavbarSGF />
       <div className="accordion" id="accordion-admin">
         <div className="accordion-item">
           <h2 className="accordion-header">

@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchForm from "./SearchForm";
-import { AuthHome } from "../../../server/src/middlewares/AuthHome";
-import { jwtDecode } from "jwt-decode";
 
-function NavbarSGF({ formulario }) {
+import { jwtDecode } from "jwt-decode";
+import { useTokenSession } from "./useTokenSession";
+
+function NavbarSGF() {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    console.log("Token en localStorage:", token);
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decodificado:", decoded);
+      } catch (e) {
+        console.error("Error al decodificar:", e);
+      }
+    }
+  }, []);
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
-  const decoded = jwtDecode(token);
+  const user = useTokenSession();
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
@@ -34,6 +47,8 @@ function NavbarSGF({ formulario }) {
     navigate(`/inspect/${id_informe}/edit`);
   };
 
+  if (!user) return null;
+
   const handleLogOut = async () => {
     localStorage.removeItem("token");
     navigate("/sgf/v1/login/");
@@ -55,7 +70,7 @@ function NavbarSGF({ formulario }) {
               </a>
             </li>
 
-            {formulario === "central" ? (
+            {user.user_rol === "usercentral" && (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" onClick={handleLastInforme}>
@@ -68,7 +83,9 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
               </>
-            ) : formulario === "inspeccion" ? (
+            )}
+
+            {user.user_rol === "inspeccion" && (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" onClick={handleLastExpediente}>
@@ -86,7 +103,9 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
               </>
-            ) : decoded.user_rol === "superadmin" ? (
+            )}
+
+            {user.user_rol === "superadmin" && (
               <>
                 <li className="nav-item dropdown">
                   <a
@@ -140,8 +159,6 @@ function NavbarSGF({ formulario }) {
                   </Link>
                 </li>
               </>
-            ) : (
-              "ohg!"
             )}
           </ul>
 

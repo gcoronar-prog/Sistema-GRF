@@ -14,8 +14,9 @@ import CentralPDF from "../PDFs/CentralPDF";
 import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
 import FormAcciones from "../FormAcciones";
-import NavbarSGF from "../NavbarSGF";
-import { AuthHome } from "../../../../server/src/middlewares/AuthHome";
+
+import { jwtDecode } from "jwt-decode";
+import { useTokenSession } from "../useTokenSession";
 
 function FormInformes() {
   const params = useParams();
@@ -72,8 +73,11 @@ function FormInformes() {
   const { originRef, clasiRef, informanteRef, tipoRef, recursoRef, sectorRef } =
     useRef(null);
 
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
+
   useEffect(() => {
-    AuthHome({ navigate, setUserData });
+    useTokenSession(setUserData);
 
     if (params.id) {
       loadInformes(params.id);
@@ -423,10 +427,12 @@ function FormInformes() {
     const idInforme = data.informe[0].id_informes_central;
     navigate(`/informes/central/${idInforme}`);
   };
+
+  //verificar rol usuario y cambiar variable rolUser
+
   document.body.style = "background:rgb(236, 241, 241);";
   return (
     <>
-      <NavbarSGF formulario={"central"} />
       <div className="container-fluid mt-4 w-100">
         <div className="d-flex flex-wrap align-items-center gap-2 my-3">
           <button
