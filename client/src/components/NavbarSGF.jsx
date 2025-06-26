@@ -6,8 +6,8 @@ import { jwtDecode } from "jwt-decode";
 import { useTokenSession } from "./useTokenSession";
 
 function NavbarSGF() {
+  const token = localStorage.getItem("token");
   useEffect(() => {
-    const token = localStorage.getItem("token");
     console.log("Token en localStorage:", token);
 
     if (token) {
@@ -26,7 +26,12 @@ function NavbarSGF() {
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
   const handleLastInforme = async () => {
-    const res = await fetch(`${servidor_local}/informe/central/last`);
+    const res = await fetch(`${servidor_local}/informe/central/last`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     const lastInforme = await res.json();
 
@@ -37,7 +42,12 @@ function NavbarSGF() {
   };
 
   const handleLastExpediente = async () => {
-    const res = await fetch(`${servidor_local}/last/exped`);
+    const res = await fetch(`${servidor_local}/last/exped`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     const lastExpediente = await res.json();
 
@@ -163,7 +173,7 @@ function NavbarSGF() {
           </ul>
 
           <div className="d-flex align-items-center border-start ps-3">
-            <SearchForm formulario={formulario} />
+            <SearchForm formulario={user.user_rol} />
           </div>
         </div>
 

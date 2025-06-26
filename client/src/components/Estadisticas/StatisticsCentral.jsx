@@ -20,6 +20,9 @@ function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
   const dateNow = dayjs().format("YYYY-MM-DDTHH:mm");
 
+  const server_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const token = localStorage.getItem("token");
+
   const defaultValues = {
     fechaInicio: startMonth,
     fechaFin: dateNow,
@@ -44,10 +47,10 @@ function StatisticsCentral() {
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [selectedClasif, setSelectedClasif] = useState([]);
 
-  const [rangoFilter, setRangoFilter] = useState([]);
+  /*const [rangoFilter, setRangoFilter] = useState([]);
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
   const [origenFilter, setOrigenFilter] = useState(defaultValues);
-  const [recursosFilter, setRecursosFilter] = useState([]);
+  const [recursosFilter, setRecursosFilter] = useState([]);*/
   const [estadoFilter, setEstadoFilter] = useState({
     atendido: false,
     progreso: false,
@@ -62,7 +65,7 @@ function StatisticsCentral() {
   });
 
   const fetchData = async (tipoDoc) => {
-    let url = "http://localhost:3000/estadisticaCentral?";
+    let url = `${server_local}/estadisticaCentral?`;
     let params = new URLSearchParams();
 
     if (fechaInicio && fechaFin) {
@@ -107,7 +110,12 @@ function StatisticsCentral() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       //setCentral(data.informe || []);
       //console.log(data.informe);
@@ -208,7 +216,7 @@ function StatisticsCentral() {
   };
 
   const resumenRecursosPDF = async () => {
-    const url = "http://localhost:3000/resumen_recursos_central?";
+    const url = `${server_local}/resumen_recursos_central?`;
     let params = new URLSearchParams();
 
     if (fechaInicio && fechaFin) {
@@ -267,7 +275,7 @@ function StatisticsCentral() {
   };
 
   const resumenClasifPDF = async () => {
-    const url = "http://localhost:3000/resumen_clasif_central?";
+    const url = `${server_local}/resumen_clasif_central?`;
     const params = new URLSearchParams();
 
     if (fechaInicio && fechaFin) {
@@ -326,7 +334,7 @@ function StatisticsCentral() {
   };
 
   const resumenOrigenPDF = async () => {
-    const url = "http://localhost:3000/resumen_origen_central?";
+    const url = `${server_local}/resumen_origen_central?`;
     const params = new URLSearchParams();
 
     if (fechaInicio && fechaFin) {
@@ -385,7 +393,7 @@ function StatisticsCentral() {
   };
 
   const resumenEstadoPDF = async () => {
-    const url = "http://localhost:3000/resumen_estado_central?";
+    const url = `${server_local}/resumen_estado_central?`;
     const params = new URLSearchParams();
 
     if (fechaInicio && fechaFin) {
@@ -430,7 +438,12 @@ function StatisticsCentral() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
 
       if (data.informe.length === 0) {
@@ -445,7 +458,7 @@ function StatisticsCentral() {
   };
 
   const resumenRangoPDF = async () => {
-    const url = "http://localhost:3000/resumen_rango_central?";
+    const url = `${server_local}/resumen_rango_central?`;
     const params = new URLSearchParams();
     if (fechaInicio && fechaFin) {
       params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
@@ -489,7 +502,12 @@ function StatisticsCentral() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
 
       if (data.informe.length === 0) {

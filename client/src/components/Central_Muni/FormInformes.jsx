@@ -68,17 +68,14 @@ function FormInformes() {
   const [refresh, setRefresh] = useState(false);
   const [editing, setEditing] = useState(true);
   const [errors, setErrors] = useState({});
-  const [userData, setUserData] = useState({});
 
   const { originRef, clasiRef, informanteRef, tipoRef, recursoRef, sectorRef } =
     useRef(null);
 
   const token = localStorage.getItem("token");
-  const decoded = jwtDecode(token);
 
+  const userData = useTokenSession();
   useEffect(() => {
-    useTokenSession(setUserData);
-
     if (params.id) {
       loadInformes(params.id);
     } else {
@@ -92,7 +89,7 @@ function FormInformes() {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -220,7 +217,7 @@ function FormInformes() {
           method,
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(datosActualizados),
         });
@@ -234,7 +231,7 @@ function FormInformes() {
             {
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
@@ -268,7 +265,7 @@ function FormInformes() {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -292,7 +289,7 @@ function FormInformes() {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -317,7 +314,7 @@ function FormInformes() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -342,7 +339,7 @@ function FormInformes() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -406,7 +403,7 @@ function FormInformes() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -419,7 +416,7 @@ function FormInformes() {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -788,7 +785,7 @@ function FormInformes() {
                       onClick={handleNewInform}
                       style={{ display: editing ? "" : "none" }}
                     >
-                      <i className="bi bi-clipboard2-plus"></i> Nuevo Expediente
+                      <i className="bi bi-clipboard2-plus"></i> Nuevo informe
                     </button>
                     <button
                       type="button"

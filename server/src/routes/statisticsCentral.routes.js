@@ -7,17 +7,52 @@ import {
   getResumenRango,
   getResumenRecursos,
 } from "../controllers/statisticsCentral.controller.js";
-import { verifyToken } from "../middlewares/jwt.middleware.js";
+import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 
 const router = Router();
 
-router.get("/estadisticaCentral", getEstadisticaCentral);
-router.put("/estadisticaCentral", getEstadisticaCentral);
+router.get(
+  "/estadisticaCentral",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getEstadisticaCentral
+);
+router.put(
+  "/estadisticaCentral",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getEstadisticaCentral
+);
 
-router.get("/resumen_clasif_central", getResumenClasi);
-router.get("/resumen_origen_central", getResumenOrigen);
-router.get("/resumen_estado_central", getResumenEstado);
-router.get("/resumen_recursos_central", getResumenRecursos);
-router.get("/resumen_rango_central", getResumenRango);
+router.get(
+  "/resumen_clasif_central",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getResumenClasi
+);
+router.get(
+  "/resumen_origen_central",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getResumenOrigen
+);
+router.get(
+  "/resumen_estado_central",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getResumenEstado
+);
+router.get(
+  "/resumen_recursos_central",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getResumenRecursos
+);
+router.get(
+  "/resumen_rango_central",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getResumenRango
+);
 
 export default router;

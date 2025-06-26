@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-export function useTokenSession(setUserData) {
+export function useTokenSession() {
+  const [userData, setUserData] = useState({});
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
 
@@ -42,10 +43,10 @@ export function useTokenSession(setUserData) {
           if (!res.ok) throw new Error("No autorizado");
           return res.json();
         })
-        //  .then((data) => {
-        //setUserData(data.msg[0]);
-        //console.log(setUserData, "data user");
-        //})
+        .then((data) => {
+          console.log("Usuario cargado:", data.msg[0]);
+          setUserData(data.msg[0]);
+        })
         .catch((err) => {
           console.error("Error al obtener el perfil:", err);
           localStorage.removeItem("token");
@@ -59,5 +60,7 @@ export function useTokenSession(setUserData) {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [navigate, setUserData]);
+  }, [navigate]);
+
+  return userData;
 }

@@ -6,10 +6,10 @@ function ListPendiente(refresh) {
   const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
   const [estado, setEstado] = useState(1);
-  const [userData, setUserData] = useState({});
+
+  const userData = useTokenSession();
 
   useEffect(() => {
-    useTokenSession(setUserData);
     loadPendiente();
   }, [refresh, estado]);
 

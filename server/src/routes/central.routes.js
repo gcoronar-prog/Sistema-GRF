@@ -21,6 +21,7 @@ import {
   getVehiculos,
   updateReport,
 } from "../controllers/central.controller.js";
+import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 
 const router = Router();
 
@@ -49,10 +50,30 @@ router.get("/origenes", getOrigenes);
 router.get("/tripulantes", getTripulantes);
 
 router.get("/sectores", getSectores);
-
-router.get("/fileAttach", getArchivos);
-router.get("/fileAttach/:id", findArchivos);
-router.post("/fileAttach", createArchivo);
-router.delete("/fileAttach/:id", deleteArchivo);
+//ruta adjuntar archivos
+router.get(
+  "/fileAttach",
+  verifyToken,
+  verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
+  getArchivos
+);
+router.get(
+  "/fileAttach/:id",
+  verifyToken,
+  verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
+  findArchivos
+);
+router.post(
+  "/fileAttach",
+  verifyToken,
+  verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
+  createArchivo
+);
+router.delete(
+  "/fileAttach/:id",
+  verifyToken,
+  verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
+  deleteArchivo
+);
 
 export default router;

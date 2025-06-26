@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useTokenSession } from "./useTokenSession";
 
 function FormAcciones({ tipo }) {
   const defaultAccion = {
@@ -14,6 +15,8 @@ function FormAcciones({ tipo }) {
 
   const params = useParams();
   const [acciones, setAcciones] = useState([defaultAccion]);
+  const token = localStorage.getItem("token");
+  const userData = useTokenSession();
 
   useEffect(() => {
     if (params.id) {
@@ -26,7 +29,13 @@ function FormAcciones({ tipo }) {
   const loadAcciones = async (id) => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${id}`
+        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (!res.ok) throw new Error("Problemas obteniendo datos");
       const data = await res.json();
@@ -77,7 +86,10 @@ function FormAcciones({ tipo }) {
         `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${indi}`,
         {
           method,
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify(accionToSubmit), // Envía solo el registro específico
         }
       );
@@ -105,7 +117,10 @@ function FormAcciones({ tipo }) {
       `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${id}`,
       {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
     //const updateAccion = { ...acciones };

@@ -4,13 +4,9 @@ import ListExpe from "./Inspeccion/ListExpe";
 import { useTokenSession } from "./useTokenSession";
 
 function HomeAdmin() {
-  const [userData, setUserData] = useState({});
+  const userData = useTokenSession();
 
-  useTokenSession(setUserData);
-
-  /*if (!userData?.user_rol) {
-    return <p>Cargando sesión...</p>;
-  }*/
+  console.log(userData, "userData desde homeadmin");
   return (
     <>
       <div className="accordion" id="accordion-admin">

@@ -315,34 +315,6 @@ const getLastInformeCentral = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    /*const informe = await client.query(
-      "SELECT * FROM informes_central ORDER BY id_informes_central DESC LIMIT 1"
-    );
-    const idOrigen = informe.rows[0].id_origen_informe;
-    const idTipos = informe.rows[0].id_tipos_informe;
-    const idUbicacion = informe.rows[0].id_ubicacion_informe;
-    const idVehiculo = informe.rows[0].id_vehiculo_informe;
-
-    const origen = await client.query(
-      "SELECT * FROM datos_origen_informe WHERE id_origen_informe=$1",
-      [idOrigen]
-    );
-
-    const tipos = await client.query(
-      "SELECT * FROM datos_tipos_informes WHERE id_tipos_informes=$1",
-      [idTipos]
-    );
-
-    const ubicacion = await client.query(
-      "SELECT * FROM datos_ubicacion_informe WHERE id_ubicacion=$1",
-      [idUbicacion]
-    );
-
-    const vehiculo = await client.query(
-      "SELECT * FROM datos_vehiculos_informe WHERE id_vehiculos=$1",
-      [idVehiculo]
-    );*/
-
     const informe = await client.query(
       "SELECT \
           ic.*,\
@@ -366,14 +338,10 @@ const getLastInformeCentral = async (req, res) => {
     await client.query("COMMIT");
     return res.status(200).json({
       informe: informe.rows,
-      /*origen: origen.rows,
-      tipos: tipos.rows,
-      ubicacion: ubicacion.rows,
-      vehiculo: vehiculo.rows,*/
     });
   } catch (error) {
-    await client.query("ROLLBACK");
     console.error(error);
+    await client.query("ROLLBACK");
     return res.status(500).json({ message: "Problemas con el servidor" });
   } finally {
     client.release();

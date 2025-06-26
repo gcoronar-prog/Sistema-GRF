@@ -1,19 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import NavbarSGF from "./NavbarSGF";
-import { jwtDecode } from "jwt-decode";
 import ListPendiente from "./ListPendiente";
 import { useTokenSession } from "./useTokenSession";
 
 function HomeCentral() {
-  const navigate = useNavigate();
-  const [userData, setUserData] = useState({});
-
-  useTokenSession({ setUserData });
+  const userData = useTokenSession();
 
   return (
     <>
-      <NavbarSGF />
       {userData.user_rol ? (
         userData?.user_rol === "usercentral" ? (
           <ListPendiente />

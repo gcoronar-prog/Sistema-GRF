@@ -22,15 +22,16 @@ function LoginSGF() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            // Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(login),
         }
       );
       if (res.ok) {
         const data = await res.json();
-
+        //console.log("Token recibido:", data.msg);
         localStorage.setItem("token", data.msg);
+        console.log(data.msg, "token");
         const decode = jwtDecode(data.msg);
         const userRole = decode.user_rol;
 
