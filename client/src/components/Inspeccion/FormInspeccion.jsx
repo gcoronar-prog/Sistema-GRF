@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import AttachFiles from "../AttachFiles";
 
-import { BlobProvider } from "@react-pdf/renderer";
-import InspeccionPDF from "../PDFs/InspeccionPDF";
-import NavbarSGF from "../NavbarSGF";
 import SearchExpediente from "./SearchExpediente";
 import InspectPDF from "../PDFs/InspectPDF";
 import SelectSector from "../SelectSector";
@@ -69,13 +66,19 @@ function FormInspeccion() {
   const [selectedSector, setSelectedSector] = useState(null);
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const token = localStorage.getItem("token");
 
   const loadExpedientes = async (id) => {
-    const res = await fetch(`${servidor_local}/exped/${id}`);
+    const res = await fetch(`${servidor_local}/exped/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const data = await res.json();
     const exped = data;
 
-    setNumControl(data.expediente.num_control);
+    //setNumControl(data.expediente.num_control);
     const formattedDate = dayjs(exped.expediente.fecha_resolucion).format(
       "YYYY-MM-DDTHH:mm"
     );
@@ -122,7 +125,12 @@ function FormInspeccion() {
 
   const loadInspectores = async () => {
     try {
-      const res = await fetch(`${servidor_local}/inspectores`);
+      const res = await fetch(`${servidor_local}/inspectores`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Problemas obteniendo datos inspectores");
       const data = await res.json();
       setInspectores(data);
@@ -133,7 +141,12 @@ function FormInspeccion() {
 
   const loadTestigo = async () => {
     try {
-      const res = await fetch(`${servidor_local}/inspectores`);
+      const res = await fetch(`${servidor_local}/inspectores`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Problemas obteniendo datos testigos");
 
       const data = await res.json();
@@ -145,7 +158,12 @@ function FormInspeccion() {
 
   const loadLeyes = async () => {
     try {
-      const res = await fetch(`${servidor_local}/leyes`);
+      const res = await fetch(`${servidor_local}/leyes`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Problemas obteniendo leyes");
       const data = await res.json();
       setLey(data);
@@ -156,7 +174,12 @@ function FormInspeccion() {
 
   const loadGlosas = async () => {
     try {
-      const res = await fetch(`${servidor_local}/glosas`);
+      const res = await fetch(`${servidor_local}/glosas`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Problemas obteniendo datos de glosas");
       const data = await res.json();
       setGlosas(data);
@@ -167,7 +190,12 @@ function FormInspeccion() {
 
   const loadDatosVeh = async () => {
     try {
-      const res = await fetch(`${servidor_local}/datos_vehi`);
+      const res = await fetch(`${servidor_local}/datos_vehi`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Problemas obteniendo datos de vehículos");
       const data = await res.json();
       setDatosVehiculos(data);
@@ -178,7 +206,12 @@ function FormInspeccion() {
 
   const loadSectores = async () => {
     try {
-      const res = await fetch(`${servidor_local}/sectores`);
+      const res = await fetch(`${servidor_local}/sectores`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) throw new Error("Problemas obteniendo sectores");
       const data = await res.json();
       setSectores(data);
@@ -189,7 +222,12 @@ function FormInspeccion() {
 
   const loadIdExpedientes = async () => {
     try {
-      const res = await fetch(`${servidor_local}/expedientes`);
+      const res = await fetch(`${servidor_local}/expedientes`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       setIdExpedientes(data);
       console.log(data);
@@ -240,7 +278,10 @@ function FormInspeccion() {
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(datosActualizados),
       });
       if (!res.ok) {
@@ -248,7 +289,12 @@ function FormInspeccion() {
       }
 
       if (!params.id) {
-        const lastData = await fetch(`${servidor_local}/last/exped`);
+        const lastData = await fetch(`${servidor_local}/last/exped`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const lastExpediente = await lastData.json();
 
         if (lastExpediente && lastExpediente.expediente) {
@@ -274,7 +320,10 @@ function FormInspeccion() {
     try {
       await fetch(`${servidor_local}/exped/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
       const updateExpedientes = { ...expedientes };
       delete updateExpedientes[id];
@@ -309,7 +358,12 @@ function FormInspeccion() {
 
   const handleLastExpediente = async () => {
     try {
-      const response = await fetch(`${servidor_local}/last/exped`);
+      const response = await fetch(`${servidor_local}/last/exped`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const lastExpediente = await response.json();
@@ -334,7 +388,12 @@ function FormInspeccion() {
 
   const handleFirstExpediente = async () => {
     try {
-      const response = await fetch(`${servidor_local}/first/exped`);
+      const response = await fetch(`${servidor_local}/first/exped`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const firstExpediente = await response.json();
@@ -357,7 +416,9 @@ function FormInspeccion() {
 
   const handlePrevious = async () => {
     try {
-      const response = await fetch(`${servidor_local}/exp/prev/${params.id}`);
+      const response = await fetch(`${servidor_local}/exp/prev/${params.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await response.json();
 
       if (data?.expediente.id_expediente) {
@@ -373,7 +434,9 @@ function FormInspeccion() {
 
   const handleNext = async () => {
     try {
-      const response = await fetch(`${servidor_local}/exp/next/${params.id}`);
+      const response = await fetch(`${servidor_local}/exp/next/${params.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await response.json();
 
       if (data?.expediente.id_expediente) {
@@ -421,7 +484,6 @@ function FormInspeccion() {
   document.body.style = "background:rgb(236, 241, 241);";
   return (
     <>
-      <NavbarSGF formulario={"inspeccion"} />
       <div className="container-fluid mt-4 w-100">
         <div className="d-flex flex-wrap align-items-center gap-2 my-3">
           <button

@@ -15,9 +15,6 @@ import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
 import FormAcciones from "../FormAcciones";
 
-import { jwtDecode } from "jwt-decode";
-import { useTokenSession } from "../useTokenSession";
-
 function FormInformes() {
   const params = useParams();
   const navigate = useNavigate();
@@ -74,7 +71,6 @@ function FormInformes() {
 
   const token = localStorage.getItem("token");
 
-  const userData = useTokenSession();
   useEffect(() => {
     if (params.id) {
       loadInformes(params.id);

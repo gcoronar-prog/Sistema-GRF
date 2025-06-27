@@ -28,6 +28,7 @@ import GaleriaInspeccion from "./components/Inspeccion/GaleriaInspeccion";
 import StatisticsInspect from "./components/Estadisticas/StatisticsInspect";
 import HomeAdmin from "./components/HomeAdmin";
 import Layout from "./components/Layout";
+import HomeInspeccion from "./components/Inspeccion/HomeInspeccion";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/home/admin" element={<HomeAdmin />} />
           <Route path="/home/central" element={<HomeCentral />} />
+          <Route path="/home/inspeccion" element={<HomeInspeccion />} />
 
           <Route path="/Reports/new" element={<FormCentral />} />
           <Route path="/Reports/:id/edit" element={<FormCentral />} />

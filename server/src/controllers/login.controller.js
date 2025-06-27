@@ -153,7 +153,7 @@ const login = async (req, res) => {
       user_rol: usuario.rows[0].user_rol,
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1m",
+      expiresIn: "2m",
     });
 
     if (!isMatch) {

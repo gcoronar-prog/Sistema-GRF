@@ -8,6 +8,9 @@ function ListExpe() {
   const [selectedTipo, setSelectedTipo] = useState("");
 
   const server = import.meta.env.VITE_SERVER_ROUTE_BACK;
+
+  const token = localStorage.getItem("token");
+
   const navigate = useNavigate();
   useEffect(() => {
     loadExped();
@@ -19,13 +22,17 @@ function ListExpe() {
       let tipo = `${server}/exped_tipo?tipo=${selectedTipo}`;
 
       if (selectedEstado) {
-        const res = await fetch(estado);
+        const res = await fetch(estado, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         setExpeEstado(data.expediente);
       }
 
       if (selectedTipo) {
-        const res = await fetch(tipo);
+        const res = await fetch(tipo, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         setExpeTipo(data.expediente);
       }

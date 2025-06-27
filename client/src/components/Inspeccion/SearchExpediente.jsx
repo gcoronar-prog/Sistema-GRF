@@ -10,11 +10,13 @@ function SearchExpediente() {
   const [expediente, setExpediente] = useState([]);
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const token = localStorage.getItem("token");
 
   const buscaExpediente = async (rut, ppu, num_control) => {
     try {
       const res = await fetch(
-        `${servidor_local}/search_expediente?rut=${rut}&ppu=${ppu}&num_control=${num_control}`
+        `${servidor_local}/search_expediente?rut=${rut}&ppu=${ppu}&num_control=${num_control}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
 

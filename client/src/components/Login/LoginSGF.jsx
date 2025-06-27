@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { rolesGrupo } from "../../../../server/src/middlewares/groupRole";
 
 function LoginSGF() {
   const defaultValues = {
@@ -39,8 +40,11 @@ function LoginSGF() {
           navigate("/home/admin");
         } else if (userRole === "usercentral") {
           navigate("/home/central");
-        } else if (userRole === "userinspeccion") {
-          navigate("/home/central");
+        } else if (
+          rolesGrupo.noinspeccion.includes(userRole) ||
+          rolesGrupo.inspeccion.includes(userRole)
+        ) {
+          navigate("/home/inspeccion");
         } else if (userRole === "userseguridad") {
           navigate("/home/central");
         } else if (userRole === "usergrd") {

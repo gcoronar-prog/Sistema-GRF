@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SelectOrigin from "../SelectOrigin";
 import SelectSector from "../SelectSector";
 import SelectVehiculo from "../SelectVehiculo";
@@ -14,7 +14,6 @@ import ClasifCentralPDF from "../PDFs/ClasifCentralPDF.jsx";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF.jsx";
 import RangoCentralPDF from "../PDFs/RangoCentralPDF.jsx";
 import EstadoCentralPDF from "../PDFs/EstadoCentralPDF.jsx";
-import NavbarSGF from "../NavbarSGF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -261,7 +260,9 @@ function StatisticsCentral() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
 
       if (data.informe.length === 0) {
@@ -320,7 +321,9 @@ function StatisticsCentral() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
 
       if (data.informe.length === 0) {
@@ -379,7 +382,9 @@ function StatisticsCentral() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
 
       if (data.informe.length === 0) {
@@ -566,7 +571,6 @@ function StatisticsCentral() {
 
   return (
     <>
-      <NavbarSGF formulario={"central"} />
       <hr />
       <div className="card">
         <div className="card-header text-bg-success">

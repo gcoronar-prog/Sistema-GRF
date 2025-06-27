@@ -70,6 +70,8 @@ function StatisticsInspect() {
   const [selectedSector, setSelectedSector] = useState("");
   //const [tipoDoc, setTipoDoc] = useState(0);
 
+  const token = localStorage.getItem("token");
+
   const fetchData = async (tipoDoc) => {
     let url = `${server_back}/estadisticaInspeccion?`;
     let params = new URLSearchParams();
@@ -128,7 +130,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
 
       if (data.expedientes.length !== 0) {
@@ -310,7 +314,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
@@ -388,7 +394,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
@@ -466,7 +474,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       //console.log(data);
       if (data.expedientes.length === 0) {
@@ -545,7 +555,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       //console.log(data);
       if (data.expedientes.length === 0) {
@@ -624,7 +636,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       //console.log(data);
       if (data.expedientes.length === 0) {
@@ -703,7 +717,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       //console.log(data);
       if (data.expedientes.length === 0) {
@@ -782,7 +798,9 @@ function StatisticsInspect() {
     }
 
     try {
-      const res = await fetch(url + params.toString());
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       //console.log(data);
       if (data.expedientes.length === 0) {
@@ -834,7 +852,6 @@ function StatisticsInspect() {
 
   return (
     <>
-      <NavbarSGF />
       <hr />
       <div className="card">
         <div className="card-header text-bg-success">

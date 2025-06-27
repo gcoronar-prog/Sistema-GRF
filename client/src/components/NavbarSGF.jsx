@@ -95,7 +95,7 @@ function NavbarSGF() {
               </>
             )}
 
-            {user.user_rol === "inspeccion" && (
+            {user.user_rol === "userinspeccion" && (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" onClick={handleLastExpediente}>

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import NavbarSGF from "../NavbarSGF";
+
 import { useNavigate } from "react-router-dom";
 
 const GaleriaVisual = () => {
   const navigate = useNavigate();
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const token = localStorage.getItem("token");
 
   const [listImagen, setListImagen] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -18,7 +19,8 @@ const GaleriaVisual = () => {
   const loadListaImagen = async (id_expe, rut, ppu, num_control) => {
     try {
       const res = await fetch(
-        `${servidor_local}/listaImagen?id_expe=${id_expe}&rut=${rut}&ppu=${ppu}&num_control=${num_control}`
+        `${servidor_local}/listaImagen?id_expe=${id_expe}&rut=${rut}&ppu=${ppu}&num_control=${num_control}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
       setListImagen(data.imgExpedientes || []);
@@ -38,7 +40,6 @@ const GaleriaVisual = () => {
 
   return (
     <>
-      <NavbarSGF />
       <hr />
       <div className="row">
         <div className="col">
