@@ -211,13 +211,13 @@ router.get(
 router.get(
   "/fileAttach",
   verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  verifyGroup("superadmin", "inspeccion"),
   getArchivosExp
 );
 router.get(
   "/fileAttach/:id",
   verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  verifyGroup("superadmin", "inspeccion"),
   findArchivosExp
 );
 router.post(

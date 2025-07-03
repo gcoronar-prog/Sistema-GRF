@@ -20,7 +20,14 @@ router.post("/login", login);
 router.get(
   "/profile",
   verifyToken,
-  verifyGroup("superadmin", "central", "seguridad", "inspeccion", "grd"),
+  verifyGroup(
+    "superadmin",
+    "central",
+    "seguridad",
+    "inspeccion",
+    "noinspeccion",
+    "grd"
+  ),
   profile,
   (req, res) => {
     res.status(200).json({ msg: "Acceso a superadmin" });

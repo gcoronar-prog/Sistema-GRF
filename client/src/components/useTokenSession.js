@@ -6,7 +6,7 @@ export function useTokenSession() {
   const [userData, setUserData] = useState({});
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
-
+  const server_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -34,7 +34,7 @@ export function useTokenSession() {
         navigate("/sgf/v1/login/");
       }, expirationTime * 1000);
 
-      fetch(`${import.meta.env.VITE_SERVER_ROUTE_BACK}/profile`, {
+      fetch(`${server_local}/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
