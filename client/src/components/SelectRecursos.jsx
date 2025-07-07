@@ -9,9 +9,8 @@ const SelectRecursos = ({
   selectRef,
 }) => {
   const loadRecursos = async (inputValue) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/recursos`
-    );
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+    const res = await fetch(`${servidor}/recursos`);
     const data = await res.json();
 
     return data

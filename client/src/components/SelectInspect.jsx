@@ -8,10 +8,9 @@ function SelectInspect({
   selectRef,
 }) {
   const loadInspect = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/inspectores`
-      );
+      const response = await fetch(`${servidor}/inspectores`);
       if (!response.ok) {
         throw new Error("Error al cargar leyes");
       }

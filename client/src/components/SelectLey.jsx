@@ -2,10 +2,9 @@ import AsyncSelect from "react-select/async";
 
 function SelectLey({ selectedLey, setSelectedLey, edition, error, selectRef }) {
   const loadLeyes = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/leyes`
-      );
+      const response = await fetch(`${servidor}/leyes`);
       if (!response.ok) {
         throw new Error("Error al cargar leyes");
       }

@@ -72,19 +72,13 @@ router.delete(
   deleteExFile
 );
 
-router.get(
-  "/inspectores",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
-  getInspectores
-); //solo para devolver datos y rellenar campos
+router.get("/inspectores", getInspectores); //solo para devolver datos y rellenar campos
 
 //router.get("/patrulleros", getPatrulleros); //solo para devolver datos y rellenar campos
 
 router.get(
   "/leyes",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+
   getLeyes
 ); //solo para devolver datos y rellenar campos
 
@@ -195,12 +189,7 @@ router.get(
   getNextExpediente
 );
 
-router.get(
-  "/datos_vehi",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
-  getDatosVehi
-); //solo para datos de vehiculos y rellenar campos de selección
+router.get("/datos_vehi", getDatosVehi); //solo para datos de vehiculos y rellenar campos de selección
 router.get(
   "/glosas",
   verifyToken,

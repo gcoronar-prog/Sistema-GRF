@@ -73,7 +73,7 @@ const InspectResumenPDF = (
 
   const tableColumn = ["Inspector", "Tipo de procedimiento", "Cantidad"];
   const tableRows = datos.map((e) => [
-    e.inspector,
+    e.funcionario,
     e.tipo_procedimiento,
     e.cantidad,
   ]);

@@ -7,18 +7,20 @@ import { useTokenSession } from "./useTokenSession";
 
 function NavbarSGF() {
   const token = localStorage.getItem("token");
-  useEffect(() => {
+
+  /*useEffect(() => {
     console.log("Token en localStorage:", token);
 
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        console.log("Decodificado:", decoded);
+        console.log("Decodificado:", decoded.user_rol);
       } catch (e) {
         console.error("Error al decodificar:", e);
       }
     }
-  }, []);
+  }, []);*/
+
   const navigate = useNavigate();
 
   const user = useTokenSession();
@@ -57,8 +59,13 @@ function NavbarSGF() {
     navigate(`/inspect/${id_informe}/edit`);
   };
 
-  if (!user) return null;
-
+  const rol = user.user_rol;
+  /*if (!user) {
+    return null;
+  } else {
+    console.log(rol);
+  }*/
+  console.log(rol);
   const handleLogOut = async () => {
     localStorage.removeItem("token");
     navigate("/sgf/v1/login/");
@@ -173,7 +180,7 @@ function NavbarSGF() {
           </ul>
 
           <div className="d-flex align-items-center border-start ps-3">
-            <SearchForm formulario={user.user_rol} />
+            <SearchForm formulario={rol} />
           </div>
         </div>
 

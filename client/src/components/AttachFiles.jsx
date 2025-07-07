@@ -4,6 +4,7 @@ import { useParams, useLocation } from "react-router-dom";
 const AttachFiles = ({ idInforme }) => {
   const params = useParams();
   const location = useLocation();
+  const token = localStorage.getItem("token");
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   // Define entityType basado en la ruta
@@ -55,6 +56,7 @@ const AttachFiles = ({ idInforme }) => {
       const response = await fetch(
         `${servidor_local}/api/upload/${entityType}/${idInforme}`,
         {
+          headers: { Authorization: `Bearer ${token}` },
           method: "POST",
           body: formData,
         }
@@ -79,6 +81,7 @@ const AttachFiles = ({ idInforme }) => {
     const confirmar = window.confirm("¿Desea eliminar la imagen?");
     if (!confirmar) return;
     await fetch(`${servidor_local}/api/galeria/${entityType}/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
       method: "DELETE",
     });
     setListImagen(listImagen.filter((lista) => lista.id_adjunto !== id));
@@ -87,7 +90,10 @@ const AttachFiles = ({ idInforme }) => {
   const loadListaImagen = async (id) => {
     try {
       const res = await fetch(
-        `${servidor_local}/api/imagenes/${entityType}/${id}`
+        `${servidor_local}/api/imagenes/${entityType}/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
       const data = await res.json();
       setListImagen(data);
@@ -185,18 +191,14 @@ const AttachFiles = ({ idInforme }) => {
               <div className="text-center">
                 {selectedId && listImagen ? (
                   <a
-                    href={`${
-                      import.meta.env.VITE_SERVER_ROUTE_BACK
-                    }/api/galeria/${entityType}/${selectedId}`}
+                    href={`${servidor_local}/api/galeria/${entityType}/${selectedId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <img
-                      src={`${
-                        import.meta.env.VITE_SERVER_ROUTE_BACK
-                      }/api/galeria/${entityType}/${selectedId}`}
+                      src={`${servidor_local}/api/galeria/${entityType}/${selectedId}`}
                       className="img-thumbnail border border-primary-subtle w-75 h-auto"
-                      alt={`Imagen con id ${selectedId}`}
+                      alt={`ID ${selectedId}`}
                     />
                   </a>
                 ) : (

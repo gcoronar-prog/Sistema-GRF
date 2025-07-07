@@ -8,10 +8,9 @@ function SelectSector({
   selectRef,
 }) {
   const loadSector = async (inputValue) => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/sectores`
-      );
+      const response = await fetch(`${servidor}/sectores`);
       if (!response.ok) {
         throw new Error("Error al cargar los sectores");
       }

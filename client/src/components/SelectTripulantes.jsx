@@ -6,10 +6,9 @@ function SelectTripulantes({
   edition,
 }) {
   const loadTripulantes = async (inputValue) => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/tripulantes`
-      );
+      const response = await fetch(`${servidor}/tripulantes`);
       console.log(response);
       if (!response.ok) {
         throw new Error("Error al cargar los tripulantes");

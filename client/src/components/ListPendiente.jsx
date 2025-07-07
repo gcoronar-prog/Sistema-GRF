@@ -6,7 +6,8 @@ function ListPendiente(refresh) {
   const navigate = useNavigate();
   const [pendientes, setPendientes] = useState([]);
   const [estado, setEstado] = useState(1);
-
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const token = localStorage.getItem("token");
   const userData = useTokenSession();
 
   useEffect(() => {
@@ -19,13 +20,13 @@ function ListPendiente(refresh) {
 
       switch (estado) {
         case 1:
-          url = `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/pendientes`;
+          url = `${servidor}/informes/pendientes`;
           break;
         case 2:
-          url = `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/progreso`;
+          url = `${servidor}/informes/progreso`;
           break;
         case 3:
-          url = `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes/emergencia`;
+          url = `${servidor}/informes/emergencia`;
         default:
           break;
       }
@@ -36,7 +37,7 @@ function ListPendiente(refresh) {
       const res = await fetch(url, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       const data = await res.json();

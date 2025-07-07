@@ -257,7 +257,7 @@ function StatisticsInspect() {
   };
 
   const resumenEstadoInsp = async () => {
-    const url = "http://localhost:3000/resumen_estado_inspe?";
+    const url = `http://${server_back}/resumen_estado_inspe?`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -337,7 +337,7 @@ function StatisticsInspect() {
   };
 
   const resumenTipoExp = async () => {
-    const url = "http://localhost:3000/resumen_tipo_inspe?";
+    const url = `${server_back}/resumen_tipo_inspe?`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -417,7 +417,7 @@ function StatisticsInspect() {
   };
 
   const resumenLeyInspec = async () => {
-    const url = "http://localhost:3000/resumen_ley_inspe?";
+    const url = `${server_back}/resumen_ley_inspe?`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -498,7 +498,7 @@ function StatisticsInspect() {
   };
 
   const resumenInspector = async () => {
-    const url = "http://localhost:3000/resumen_inspector_inspe?";
+    const url = `${server_back}/resumen_inspector_inspe?`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -579,7 +579,7 @@ function StatisticsInspect() {
   };
 
   const resumenVehi = async () => {
-    const url = "http://localhost:3000/resumen_vehi_inspe?";
+    const url = `${server_back}/resumen_vehi_inspe?`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -660,7 +660,7 @@ function StatisticsInspect() {
   };
 
   const resumenSector = async () => {
-    const url = "http://localhost:3000/resumen_sector_inspe?";
+    const url = `${server_back}/resumen_sector_inspe?;`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -741,7 +741,7 @@ function StatisticsInspect() {
   };
 
   const resumenGlosa = async () => {
-    const url = "http://localhost:3000/resumen_glosa_inspe?";
+    const url = `${server_back}/resumen_glosa_inspe?`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {

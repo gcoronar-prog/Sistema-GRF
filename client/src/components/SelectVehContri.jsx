@@ -9,10 +9,9 @@ function SelectVehContri({
   tipo,
 }) {
   const loadVehi = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/datos_vehi`
-      );
+      const response = await fetch(`${servidor}/datos_vehi`);
       if (!response.ok) {
         throw new Error("Error al cargar leyes");
       }

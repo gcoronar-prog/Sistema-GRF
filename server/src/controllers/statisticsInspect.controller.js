@@ -711,13 +711,14 @@ const getInspectResumen = async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    let inspectResumen = `SELECT DISTINCT expe.inspector, 
-                            expe.tipo_procedimiento,
-                            COUNT(expe.id_expediente) AS cantidad
-                          FROM expedientes expe
-                          JOIN infracciones infra 
-                          ON infra.id_expediente=expe.id_expediente                       
-                        WHERE 1=1`;
+    let inspectResumen = `SELECT DISTINCT  
+		func.funcionario,
+		expe.tipo_procedimiento,
+		COUNT(expe.id_expediente) AS cantidad
+	FROM expedientes expe 
+	JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
+	JOIN funcionarios func on expe.id_inspector=func.id_funcionario
+	WHERE 1=1`;
 
     const params = [];
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -836,8 +837,8 @@ const getInspectResumen = async (req, res) => {
       params.push(cleanedSector);
     }
 
-    inspectResumen += ` GROUP BY expe.inspector,expe.tipo_procedimiento
-                          ORDER BY expe.inspector`;
+    inspectResumen += ` GROUP BY expe.id_inspector,expe.tipo_procedimiento,func.funcionario
+ORDER BY func.funcionario`;
 
     const result = await client.query(inspectResumen, params);
     await client.query("COMMIT");
@@ -1042,7 +1043,7 @@ const getSectorInfra = async (req, res) => {
   try {
     await client.query("BEGIN");
     let sectorResumen = `SELECT infra.sector_infraccion, 
-                          expe.inspector,
+                          expe.id_inspector,
                           expe.tipo_procedimiento,
                           COUNT(expe.id_expediente) as cantidad
                           FROM infracciones infra
@@ -1167,7 +1168,7 @@ const getSectorInfra = async (req, res) => {
       params.push(cleanedSector);
     }
 
-    sectorResumen += ` GROUP BY infra.sector_infraccion, expe.inspector,expe.tipo_procedimiento 
+    sectorResumen += ` GROUP BY infra.sector_infraccion, expe.id_inspector,expe.tipo_procedimiento 
                           ORDER BY infra.sector_infraccion`;
 
     const result = await client.query(sectorResumen, params);

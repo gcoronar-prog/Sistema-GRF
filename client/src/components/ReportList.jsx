@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 function ReportList() {
   const [vehiculo, setVehiculo] = useState([]);
   const [selectVehiculo, setSelectVehiculo] = useState([]);
-
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const params = useParams();
 
   useEffect(() => {
@@ -20,17 +20,13 @@ function ReportList() {
   }, [params.id]);
 
   const loadVehiculo = async () => {
-    const response = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/vehiculos`
-    );
+    const response = await fetch(`${servidor}/vehiculos`);
     const data = await response.json();
     setVehiculo(data);
   };
 
   const loadReportes = async (id) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_SERVER_ROUTE_BACK}/central/${id}`
-    );
+    const res = await fetch(`${servidor}/central/${id}`);
     const data = await res.json();
     const repo = data[0];
     //setVehiculo(JSON.parse(repo.vehiculo));

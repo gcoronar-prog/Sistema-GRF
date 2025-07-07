@@ -8,10 +8,9 @@ function SelectOrigin({
   selectRef,
 }) {
   const loadOrigin = async (inputValue) => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/origenes`
-      );
+      const response = await fetch(`${servidor}/origenes`);
       if (!response.ok) {
         throw new Error("Error al cargar los datos");
       }

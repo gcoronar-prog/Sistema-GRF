@@ -160,60 +160,43 @@ app.get(
   }
 );
 
-app.get(
-  "/api/galeria/:entityType/:id",
-  verifyToken,
-  verifyGroup("superadmin", "central", "inspeccion"),
-  async (req, res) => {
-    const { entityType, id } = req.params;
-    console.log(`Buscando imágenes con ID de imagen: ${id}`);
-    try {
-      if (entityType === "informes") {
-        const images = await findArchivosById(id); // Asegúrate de implementar esta función
-        if (!images.length) {
-          return res.status(404).json({ msg: "No se encontraron imágenes" });
-        }
-
-        const image = images[0];
-        const imagePath = path.join(
-          __dirname,
-          "../uploads",
-          image.path_document
-        );
-        res.sendFile(imagePath);
-      } else if (entityType === "inspect") {
-        const images = await findArchivosByIdExp(id); // Asegúrate de implementar esta función
-        if (!images.length) {
-          return res.status(404).json({ msg: "No se encontraron imágenes" });
-        }
-
-        const image = images[0];
-        const imagePath = path.join(
-          __dirname,
-          "../uploads",
-          image.path_document
-        );
-        res.sendFile(imagePath);
-      } else if (entityType === "atencion") {
-        const images = await findArchivosByIdAten(id); // Asegúrate de implementar esta función
-        if (!images.length) {
-          return res.status(404).json({ msg: "No se encontraron imágenes" });
-        }
-
-        const image = images[0];
-        const imagePath = path.join(
-          __dirname,
-          "../uploads",
-          image.path_document
-        );
-        res.sendFile(imagePath);
+app.get("/api/galeria/:entityType/:id", async (req, res) => {
+  const { entityType, id } = req.params;
+  console.log(`Buscando imágenes con ID de imagen: ${id}`);
+  try {
+    if (entityType === "informes") {
+      const images = await findArchivosById(id); // Asegúrate de implementar esta función
+      if (!images.length) {
+        return res.status(404).json({ msg: "No se encontraron imágenes" });
       }
-    } catch (error) {
-      console.error("Error al obtener las imágenes:", error);
-      res.status(500).json({ msg: "Error del servidor" });
+
+      const image = images[0];
+      const imagePath = path.join(__dirname, "../uploads", image.path_document);
+      res.sendFile(imagePath);
+    } else if (entityType === "inspect") {
+      const images = await findArchivosByIdExp(id); // Asegúrate de implementar esta función
+      if (!images.length) {
+        return res.status(404).json({ msg: "No se encontraron imágenes" });
+      }
+
+      const image = images[0];
+      const imagePath = path.join(__dirname, "../uploads", image.path_document);
+      res.sendFile(imagePath);
+    } else if (entityType === "atencion") {
+      const images = await findArchivosByIdAten(id); // Asegúrate de implementar esta función
+      if (!images.length) {
+        return res.status(404).json({ msg: "No se encontraron imágenes" });
+      }
+
+      const image = images[0];
+      const imagePath = path.join(__dirname, "../uploads", image.path_document);
+      res.sendFile(imagePath);
     }
+  } catch (error) {
+    console.error("Error al obtener las imágenes:", error);
+    res.status(500).json({ msg: "Error del servidor" });
   }
-);
+});
 
 app.delete(
   "/api/galeria/:entityType/:id",
@@ -226,5 +209,6 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Conectado al puerto ${PORT}`);
 });
+
 /*app.listen(3001);
 console.log("conectado a puerto 3001");*/

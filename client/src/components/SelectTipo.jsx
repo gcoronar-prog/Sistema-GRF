@@ -18,12 +18,11 @@ function SelectTipo({
   }, [tipo]);
 
   const loadTipo = async (inputValue) => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     if (!tipo?.value) return [];
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/tipoReporte?grupo_reporte=${
-          tipo.label
-        }`
+        `${servidor}/tipoReporte?grupo_reporte=${tipo.label}`
       );
       if (!response.ok) {
         throw new Error("Error al cargar los datos");

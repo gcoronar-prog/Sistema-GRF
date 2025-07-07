@@ -6,6 +6,7 @@ import AttachFiles from "../AttachFiles";
 import SearchExpediente from "./SearchExpediente";
 import InspectPDF from "../PDFs/InspectPDF";
 import SelectSector from "../SelectSector";
+import { jwtDecode } from "jwt-decode";
 
 function FormInspeccion() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function FormInspeccion() {
     id_expediente: "",
 
     user_creador: "",
+    fecha_documento: "",
     tipo_procedimiento: "",
     empadronado: "",
     inspector: "",
@@ -45,6 +47,7 @@ function FormInspeccion() {
     direccion: "",
     rol_contri: "",
     num_control: "",
+    estado_exp: "",
   };
   const [expedientes, setExpedientes] = useState({
     defaultExpediente,
@@ -93,6 +96,7 @@ function FormInspeccion() {
       inspector: exped.expediente.inspector,
       testigo: exped.expediente.testigo,
       fecha_resolucion: exped.expediente.fecha_resolucion,
+      fecha_documento: exped.expediente.fecha_documento,
 
       id_inspector: exped.expediente.id_inspector,
 
@@ -119,7 +123,7 @@ function FormInspeccion() {
       direccion: exped.contribuyente.direccion,
       rol_contri: exped.contribuyente.rol_contri,
     });
-
+    console.log(exped.expediente.fecha_documento, "fecha documento");
     setSelectedSector(exped.contribuyente.sector_contri);
   };
 
@@ -256,7 +260,7 @@ function FormInspeccion() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const decoded = jwtDecode(token);
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) handleCancel();
 
@@ -269,6 +273,7 @@ function FormInspeccion() {
     const datosActualizados = {
       ...expedientes,
       sector_contri: selectedSector,
+      user_creador: decoded.user_name,
     };
     try {
       const url = params.id
@@ -1184,6 +1189,13 @@ function FormInspeccion() {
                   <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
                 </button>
               </div>
+              <fieldset className="border rounded-3 p-3 mb-4">
+                <small>Creado por: {expedientes.user_creador}</small>
+                <small>
+                  {" "}
+                  Fecha creación: {formatDate(expedientes.fecha_documento)}
+                </small>
+              </fieldset>
             </div>
           </div>
           <div className="col-md-4">

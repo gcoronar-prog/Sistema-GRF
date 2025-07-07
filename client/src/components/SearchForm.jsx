@@ -6,18 +6,20 @@ function SearchForm({ formulario }) {
   const navigate = useNavigate();
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const token = localStorage.getItem("token");
 
   const buscaInforme = async (id) => {
     const codCentral = "CINF" + id;
     const codInspect = "IPC" + id;
     try {
       const res = await fetch(
-        formulario === "central"
+        formulario === "usercentral"
           ? `${servidor_local}/search_inform?id=${codCentral}`
-          : `${servidor_local}/search_exped?id=${codInspect}`
+          : `${servidor_local}/search_exped?id=${codInspect}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
-      if (formulario === "central") {
+      if (formulario === "usercentral") {
         if (data.informe.length > 0) {
           navigate(`/informes/central/${id}`);
           setCodigo("");
@@ -25,7 +27,7 @@ function SearchForm({ formulario }) {
           window.alert("No existen registros con este codigo");
           setCodigo("");
         }
-      } else if (formulario === "inspeccion") {
+      } else if (formulario === "userinspeccion") {
         if (data.expedientes.length > 0) {
           navigate(`/inspect/${codInspect}/edit`);
           setCodigo("");
@@ -51,7 +53,7 @@ function SearchForm({ formulario }) {
 
   return (
     <>
-      {formulario === "central" || formulario === "inspeccion" ? (
+      {formulario === "usercentral" || formulario === "userinspeccion" ? (
         <>
           <input
             className="form-control me-2"
@@ -61,7 +63,7 @@ function SearchForm({ formulario }) {
             onChange={handleChanges}
             value={codigo}
             placeholder={
-              formulario === "central"
+              formulario === "usercentral"
                 ? "Código del informe"
                 : "Codigo del expediente"
             }

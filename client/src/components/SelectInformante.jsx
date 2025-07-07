@@ -8,10 +8,9 @@ function SelectInformante({
   error,
 }) {
   const loadInformante = async (inputValue) => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informantes`
-      );
+      const response = await fetch(`${servidor}/informantes`);
       if (!response.ok) {
         throw new Error("Error al cargar los tripulantes");
       }
