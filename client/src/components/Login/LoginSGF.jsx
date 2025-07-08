@@ -63,27 +63,53 @@ function LoginSGF() {
   };
 
   return (
-    <div>
-      <h4>Login SGF</h4>
+    <div className="container min-vh-100 d-flex justify-content-center align-items-center bg-light">
+      <div
+        className="card shadow-lg p-4"
+        style={{ width: "100%", maxWidth: "400px" }}
+      >
+        <div className="card-body">
+          <h4 className="card-title text-center mb-4">
+            🔐 Ingreso al Sistema SGF
+          </h4>
 
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="">Usuario</label>
-        <input
-          type="text"
-          name="user_name"
-          onChange={handleChanges}
-          value={login.user_name}
-        />
-        <label htmlFor="">Contraseña</label>
-        <input
-          type="password"
-          name="password"
-          onChange={handleChanges}
-          value={login.password}
-        />
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="user_name" className="form-label">
+                👤 Usuario
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="user_name"
+                name="user_name"
+                value={login.user_name}
+                onChange={handleChanges}
+                required
+              />
+            </div>
 
-        <button type="submit">Acceder</button>
-      </form>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                🔒 Contraseña
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                name="password"
+                value={login.password}
+                onChange={handleChanges}
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary w-100">
+              Acceder
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

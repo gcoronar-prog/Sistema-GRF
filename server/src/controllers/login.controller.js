@@ -107,6 +107,40 @@ const updateUser = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  const { id } = req.params;
+  const servidor = "http://localhost:5173";
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "15m",
+  });
+
+  const resetLink = `${servidor}/sgf/reset-password/${token}`;
+
+  console.log("Enlace de restablecimiento:", resetLink);
+
+  return res.json({ msg: "Token generado", token });
+};
+
+const realResetPassword = async (req, res) => {
+  const { token, password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const id = decoded.id;
+
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    await pool.query(
+      "UPDATE users_system SET user_password = $1 WHERE id_user = $2",
+      [hashedPassword, id]
+    );
+
+    res.json({ msg: "Contraseña actualizada" });
+  } catch (error) {
+    console.error("Error de token:", error);
+    res.status(400).json({ msg: "Token inválido o expirado" });
+  }
+};
+
 const deleteuser = async (req, res) => {
   const client = await pool.connect();
   const { id } = req.params;
@@ -185,4 +219,14 @@ const profile = async (req, res) => {
   }
 };
 
-export { getUser, createUser, updateUser, deleteuser, login, profile };
+export {
+  getUser,
+  createUser,
+  updateUser,
+  deleteuser,
+  login,
+  profile,
+  getUsers,
+  resetPassword,
+  realResetPassword,
+};

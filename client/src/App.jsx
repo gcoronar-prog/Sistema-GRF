@@ -29,12 +29,16 @@ import StatisticsInspect from "./components/Estadisticas/StatisticsInspect";
 import HomeAdmin from "./components/HomeAdmin";
 import Layout from "./components/Layout";
 import HomeInspeccion from "./components/Inspeccion/HomeInspeccion";
+import ListUser from "./components/Admin/ListUser";
+import ChangePassword from "./components/Login/ChangePassword";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/sgf/v1/login/" element={<LoginSGF />} />
+        <Route path="/sgf/get/users/" element={<ListUser />} />
+        <Route path="/sgf/reset-password/" element={<ChangePassword />} />
 
         <Route element={<Layout />}>
           <Route path="/home/admin" element={<HomeAdmin />} />
