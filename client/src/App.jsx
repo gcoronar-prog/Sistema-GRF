@@ -38,7 +38,7 @@ function App() {
       <Routes>
         <Route path="/sgf/v1/login/" element={<LoginSGF />} />
         <Route path="/sgf/get/users/" element={<ListUser />} />
-        <Route path="/sgf/reset-password/" element={<ChangePassword />} />
+        <Route path="/sgf/reset-password/:token" element={<ChangePassword />} />
 
         <Route element={<Layout />}>
           <Route path="/home/admin" element={<HomeAdmin />} />

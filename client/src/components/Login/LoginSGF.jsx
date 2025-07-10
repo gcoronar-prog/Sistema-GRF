@@ -51,7 +51,6 @@ function LoginSGF() {
           navigate("/home/central");
         }
       }
-      console.log(jwtDecode(localStorage.getItem("token")));
     } catch (error) {
       console.error(error);
     }

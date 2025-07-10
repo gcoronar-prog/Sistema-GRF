@@ -123,7 +123,8 @@ function FormInspeccion() {
       direccion: exped.contribuyente.direccion,
       rol_contri: exped.contribuyente.rol_contri,
     });
-    console.log(exped.expediente.fecha_documento, "fecha documento");
+    const decoded = jwtDecode(token);
+    console.log(decoded, "decoded token");
     setSelectedSector(exped.contribuyente.sector_contri);
   };
 

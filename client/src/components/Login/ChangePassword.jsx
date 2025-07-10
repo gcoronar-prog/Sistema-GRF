@@ -25,6 +25,11 @@ function ChangePassword() {
     }
   };
 
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setPassword(value);
+  };
+
   return (
     <>
       <form onSubmit={handleReset}>
@@ -33,7 +38,7 @@ function ChangePassword() {
           type="text"
           name="user_password"
           value={password}
-          onChange={(e) => e.target.value}
+          onChange={handleChange}
         />
         <button type="submit">Crear</button>
       </form>

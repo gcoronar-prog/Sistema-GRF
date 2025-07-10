@@ -27,7 +27,7 @@ function SearchForm({ formulario }) {
           window.alert("No existen registros con este codigo");
           setCodigo("");
         }
-      } else if (formulario === "userinspeccion") {
+      } else if (formulario === "userinspeccion" || formulario === "userjpl") {
         if (data.expedientes.length > 0) {
           navigate(`/inspect/${codInspect}/edit`);
           setCodigo("");
@@ -53,7 +53,9 @@ function SearchForm({ formulario }) {
 
   return (
     <>
-      {formulario === "usercentral" || formulario === "userinspeccion" ? (
+      {formulario === "usercentral" ||
+      formulario === "userinspeccion" ||
+      formulario === "userjpl" ? (
         <>
           <input
             className="form-control me-2"

@@ -26,6 +26,9 @@ function NavbarSGF() {
   const user = useTokenSession();
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  useEffect(() => {
+    user;
+  }, []);
 
   const handleLastInforme = async () => {
     const res = await fetch(`${servidor_local}/informe/central/last`, {
@@ -39,7 +42,6 @@ function NavbarSGF() {
 
     const id_informe = lastInforme.informe[0].id_informes_central;
 
-    console.log(lastInforme);
     navigate(`/informes/central/${id_informe}`);
   };
 
@@ -55,7 +57,6 @@ function NavbarSGF() {
 
     const id_informe = lastExpediente.expediente.id_expediente;
 
-    console.log(lastExpediente);
     navigate(`/inspect/${id_informe}/edit`);
   };
 
@@ -65,7 +66,7 @@ function NavbarSGF() {
   } else {
     console.log(rol);
   }*/
-  console.log(rol);
+
   const handleLogOut = async () => {
     localStorage.removeItem("token");
     navigate("/sgf/v1/login/");
@@ -102,7 +103,8 @@ function NavbarSGF() {
               </>
             )}
 
-            {user.user_rol === "userinspeccion" && (
+            {(user.user_rol === "userinspeccion" ||
+              user.user_rol === "userjpl") && (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" onClick={handleLastExpediente}>
@@ -180,7 +182,7 @@ function NavbarSGF() {
           </ul>
 
           <div className="d-flex align-items-center border-start ps-3">
-            <SearchForm formulario={rol} />
+            <SearchForm formulario={user.user_rol} />
           </div>
         </div>
 
