@@ -423,86 +423,67 @@ function FormInformes() {
 
   //verificar rol usuario y cambiar variable rolUser
 
-  document.body.style = "background:rgb(236, 241, 241);";
   return (
     <>
-      <div className="container-fluid mt-4 w-100">
-        <div className="d-flex flex-wrap align-items-center gap-2 my-3">
+      <div className="container-fluid mt-4">
+        <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
           <button
-            type="button"
-            className="btn btn-outline-primary d-flex align-items-center"
+            className="btn btn-outline-primary"
             onClick={handleFirstInforme}
-            disabled={
-              //disabledPrevButton
-              !editing
-            }
+            disabled={!editing}
           >
             <i className="bi bi-skip-start me-1"></i> Primer Informe
           </button>
           <button
-            type="button"
-            className="btn btn-outline-primary d-flex align-items-center"
+            className="btn btn-outline-primary"
             onClick={handlePrevious}
-            disabled={
-              //disabledPrevButton
-              !editing
-            }
+            disabled={!editing}
           >
-            <i className="bi bi-chevron-left me-1"></i> Atras
+            <i className="bi bi-chevron-left me-1"></i> Atrás
           </button>
           <button
-            type="button"
-            className="btn btn-outline-primary d-flex align-items-center"
+            className="btn btn-outline-primary"
             onClick={handleNext}
-            disabled={
-              //disabledNextButton
-              !editing
-            }
+            disabled={!editing}
           >
             Siguiente <i className="bi bi-chevron-right ms-1"></i>
           </button>
           <button
-            type="button"
-            className="btn btn-outline-primary d-flex align-items-center"
+            className="btn btn-outline-primary"
             onClick={handleLastInforme}
-            disabled={
-              !editing
-              //disabledNextButton
-            }
+            disabled={!editing}
           >
-            Ultimo Informe <i className="bi bi-skip-end ms-1"></i>
+            Último Informe <i className="bi bi-skip-end ms-1"></i>
           </button>
         </div>
-        <br />
 
         <div className="row">
-          <div className="col-md-6">
-            <div className="card">
-              <div className="card-header text-bg-success">
-                <span className="form-label fw-bold">
-                  Código informe: {informes.cod_informes_central}
-                </span>
-                {"      ||      "}
-                <span className="form-label fw-bold">
-                  Fecha creación:{" "}
-                  {dayjs(informes.fecha_doc_central).format("DD-MM-YYYY HH:mm")}
-                </span>
+          <div className="col-lg-7">
+            <div className="card shadow-sm mb-4">
+              <div className="card-header bg-success text-white d-flex justify-content-between">
+                <strong>Código informe: {informes.cod_informes_central}</strong>
+                <div>
+                  <small className="fw-semibold">Creado: </small>
+                  <small className="fst-italic">
+                    {dayjs(informes.fecha_doc_central).format(
+                      "DD-MM-YYYY HH:mm"
+                    )}
+                  </small>
+                </div>
               </div>
+
               <div className="card-body">
                 <form
-                  action=""
                   onSubmit={handleSubmit}
-                  className="was-validated"
+                  className="needs-validation"
+                  noValidate
                 >
-                  <div className="row g-3 mb-4">
-                    <div className="col-md-5">
-                      <label htmlFor="fecha_informe" className="form-label">
-                        Fecha de informe:
-                      </label>
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label">Fecha de informe</label>
                       <input
-                        id="fecha_informe"
-                        className="form-control"
                         type="datetime-local"
+                        className="form-control"
                         name="fecha_informe"
                         onChange={handleChanges}
                         value={informes.fecha_informe}
@@ -511,313 +492,252 @@ function FormInformes() {
                       />
                     </div>
                     <div className="col-md-6">
-                      <label htmlFor="origen_informe" className="form-label">
+                      <label className="form-label">
                         Origen de la información
                       </label>
                       <SelectOrigin
-                        id="origen_informe"
-                        edition={editing}
-                        selectedOrigin={selectedOrigin}
-                        setSelectedOrigin={setSelectedOrigin}
-                        error={errors.origin}
-                        selectRef={originRef}
+                        {...{
+                          edition: editing,
+                          selectedOrigin,
+                          setSelectedOrigin,
+                          error: errors.origin,
+                          selectRef: originRef,
+                        }}
                       />
                     </div>
 
                     <div className="col-md-6">
-                      <label
-                        htmlFor="persona_informante"
-                        className="form-label"
-                      >
-                        Persona informante
-                      </label>
+                      <label className="form-label">Persona informante</label>
                       <SelectInformante
-                        id="persona_informante"
-                        edition={editing}
-                        selectedInformante={selectedInformante}
-                        setSelectedInformante={setSelectedInformante}
-                        error={errors.informante}
-                        selectRef={informanteRef}
+                        {...{
+                          edition: editing,
+                          selectedInformante,
+                          setSelectedInformante,
+                          error: errors.informante,
+                          selectRef: informanteRef,
+                        }}
                       />
                     </div>
+
                     <div className="col-md-6">
-                      <div className="row">
-                        <label className="form-label d-block">
-                          Captura del informe:
-                        </label>
-                        <div className="d-flex flex-wrap gap-3">
-                          {[
-                            "radios",
-                            "telefono",
-                            "rrss",
-                            "presencial",
-                            "email",
-                          ].map((tipo) => (
-                            <div className="col">
-                              <div className="form-check form-check" key={tipo}>
-                                <input
-                                  className="form-check-input"
-                                  type="radio"
-                                  name="captura_informe"
-                                  id={tipo}
-                                  value={tipo}
-                                  checked={informes.captura_informe === tipo}
-                                  onChange={handleChanges}
-                                  disabled={editing}
-                                  required
-                                />
-                                <label
-                                  className="form-check-label"
-                                  htmlFor={tipo}
-                                >
-                                  {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-                                </label>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <label
-                        htmlFor="persona_informante"
-                        className="form-label"
-                      >
-                        Clasificación
-                      </label>
+                      <label className="form-label">Clasificación</label>
                       <SelectClasifica
-                        id="clasificacion"
-                        selectedClasif={selectedClasif}
-                        setSelectedClasif={setSelectedClasif}
-                        edition={editing}
-                        error={errors.clasif}
-                        selectRef={clasiRef}
+                        {...{
+                          selectedClasif,
+                          setSelectedClasif,
+                          edition: editing,
+                          error: errors.clasif,
+                          selectRef: clasiRef,
+                        }}
                       />
+                    </div>
+
+                    <div className="col-md-12">
+                      <label className="form-label">Captura del informe</label>
+                      <div className="d-flex flex-wrap gap-2">
+                        {[
+                          "radios",
+                          "telefono",
+                          "rrss",
+                          "presencial",
+                          "email",
+                        ].map((tipo) => (
+                          <div className="form-check" key={tipo}>
+                            <input
+                              type="radio"
+                              className="form-check-input"
+                              id={tipo}
+                              name="captura_informe"
+                              value={tipo}
+                              onChange={handleChanges}
+                              checked={informes.captura_informe === tipo}
+                              disabled={editing}
+                              required
+                            />
+                            <label className="form-check-label" htmlFor={tipo}>
+                              {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="col-md-12">
+                      <label className="form-label">Estado del informe</label>
+                      <div className="d-flex flex-wrap gap-2">
+                        {["atendido", "progreso", "pendiente"].map((estado) => (
+                          <div className="form-check" key={estado}>
+                            <input
+                              type="radio"
+                              className="form-check-input"
+                              id={estado}
+                              name="estado_informe"
+                              value={estado}
+                              onChange={handleChanges}
+                              checked={informes.estado_informe === estado}
+                              disabled={editing}
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={estado}
+                            >
+                              {estado.charAt(0).toUpperCase() + estado.slice(1)}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label d-block">
-                        Estado del informe:
-                      </label>
-                      <div className="d-flex flex-wrap gap-3">
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="estado_informe"
-                            id="atendido"
-                            onChange={handleChanges}
-                            value={"atendido"}
-                            checked={informes.estado_informe === "atendido"}
-                            disabled={editing}
-                            required
-                          />
-                          <label
-                            htmlFor="atendido"
-                            className="form-check-label"
-                          >
-                            Atendido
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="estado_informe"
-                            id="progreso"
-                            onChange={handleChanges}
-                            value={"progreso"}
-                            checked={informes.estado_informe === "progreso"}
-                            disabled={editing}
-                          />
-                          <label
-                            htmlFor="progreso"
-                            className="form-check-label"
-                          >
-                            En progreso
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="estado_informe"
-                            id="pendiente"
-                            onChange={handleChanges}
-                            value={"pendiente"}
-                            checked={informes.estado_informe === "pendiente"}
-                            disabled={editing}
-                          />
-                          <label
-                            htmlFor="pendiente"
-                            className="form-check-label"
-                          >
-                            Pendiente
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-md-8">
-                      <label htmlFor="tipoInforme" className="form-label">
-                        Tipo de informe
-                      </label>
+                      <label className="form-label">Tipo de informe</label>
                       <SelectTipo
-                        id="tipoInforme"
-                        edition={editing}
-                        selectedTipo={selectedTipo}
-                        setSelectedTipo={setSelectedTipo}
-                        tipo={selectedClasif}
-                        error={errors.tipo}
-                        selectRef={tipoRef}
+                        {...{
+                          selectedTipo,
+                          setSelectedTipo,
+                          tipo: selectedClasif,
+                          edition: editing,
+                          error: errors.tipo,
+                          selectRef: tipoRef,
+                        }}
                       />
                     </div>
 
-                    {informes.tipo_informe == "Otro" ? (
-                      <>
-                        <label htmlFor="otroTipo" className="form-label">
-                          Otro tipo de informe:
+                    {informes.tipo_informe === "Otro" && (
+                      <div className="col-md-6">
+                        <label className="form-label">
+                          Otro tipo de informe
                         </label>
                         <input
-                          className="form-control"
                           type="text"
+                          className="form-control"
                           name="otro_tipo"
-                          id="otroTipo"
                           onChange={handleChanges}
                           value={informes.otro_tipo}
                           readOnly={editing}
                         />
-                      </>
-                    ) : (
-                      ""
+                      </div>
                     )}
 
-                    <div className="w-25,">
-                      <label htmlFor="descripcion" className="form-label">
-                        Descripción:
-                      </label>
+                    <div className="col-12">
+                      <label className="form-label">Descripción</label>
                       <textarea
                         className="form-control"
+                        rows="3"
                         name="descripcion_informe"
-                        id="descripcion"
                         onChange={handleChanges}
                         value={informes.descripcion_informe}
                         readOnly={editing}
                       ></textarea>
                     </div>
 
-                    <div className="col-md-9">
-                      <label htmlFor="recursosInvo" className="form-label">
-                        Recursos Involucrados:
+                    <div className="col-md-12">
+                      <label className="form-label">
+                        Recursos involucrados
                       </label>
                       <SelectRecursos
-                        id="recursosInvo"
-                        edition={editing}
-                        selectedRecursos={selectedRecursos}
-                        setSelectedRecursos={setSelectedRecursos}
-                        error={errors.recurso}
-                        selectRef={recursoRef}
+                        {...{
+                          selectedRecursos,
+                          setSelectedRecursos,
+                          edition: editing,
+                          error: errors.recurso,
+                          selectRef: recursoRef,
+                        }}
                       />
                     </div>
+
                     <div className="col-md-6">
-                      <label htmlFor="sector" className="form-label">
-                        Sector:
-                      </label>
+                      <label className="form-label">Sector</label>
                       <SelectSector
-                        id="sector"
-                        edition={editing}
-                        selectedSector={selectedSector}
-                        setSelectedSector={setSelectedSector}
-                        error={errors.sector}
-                        selectRef={sectorRef}
+                        {...{
+                          selectedSector,
+                          setSelectedSector,
+                          edition: editing,
+                          error: errors.sector,
+                          selectRef: sectorRef,
+                        }}
                       />
                     </div>
+
                     <div className="col-md-6">
-                      <label htmlFor="direccion" className="form-label">
-                        Dirección:
-                      </label>
+                      <label className="form-label">Dirección</label>
                       <input
-                        className="form-control"
                         type="text"
+                        className="form-control"
                         name="direccion_informe"
-                        id="direccion"
                         onChange={handleChanges}
                         value={informes.direccion_informe}
                         readOnly={editing}
                       />
                     </div>
 
-                    <div className="col-md-8">
-                      <label htmlFor="vehiculos" className="form-label">
-                        Ingrese vehículos
-                      </label>
+                    <div className="col-md-6">
+                      <label className="form-label">Vehículos</label>
                       <SelectVehiculo
-                        id="vehiculos"
-                        edition={editing}
-                        selectedVehiculo={selectedVehiculo}
-                        setSelectedVehiculo={setSelectedVehiculo}
+                        {...{
+                          selectedVehiculo,
+                          setSelectedVehiculo,
+                          edition: editing,
+                        }}
                       />
                     </div>
 
-                    <div className="col-md-8">
-                      <label htmlFor="tripu" className="form-label">
-                        Ingrese Tripulantes
-                      </label>
+                    <div className="col-md-6">
+                      <label className="form-label">Tripulantes</label>
                       <SelectTripulantes
-                        id="tripu"
-                        edition={editing}
-                        selectedTripulante={selectedTripulante}
-                        setSelectedTripulante={setSelectedTripulante}
+                        {...{
+                          selectedTripulante,
+                          setSelectedTripulante,
+                          edition: editing,
+                        }}
                       />
                     </div>
                   </div>
 
-                  {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
-                  <div className="d-flex flex-wrap gap-2 mt-3">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={handleNewInform}
-                      style={{ display: editing ? "" : "none" }}
-                    >
-                      <i className="bi bi-clipboard2-plus"></i> Nuevo informe
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={handleEdit}
-                      style={{ display: editing ? "" : "none" }}
-                    >
-                      <i className="bi bi-pencil-square"></i> Editar
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      style={{ display: editing ? "none" : "" }}
-                    >
-                      Guardar Informe
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      style={{ display: editing ? "none" : "" }}
-                      onClick={handleCancel}
-                    >
-                      <i className="bi bi-x-octagon"></i> Cancelar
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      style={{ display: editing ? "" : "none" }}
-                      onClick={handleDeleteInforme}
-                    >
-                      <i className="bi bi-trash"></i> Eliminar
-                    </button>
+                  {/* Botones de acción */}
+                  <div className="d-flex flex-wrap gap-2 mt-4">
+                    {editing ? (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-success"
+                          onClick={handleNewInform}
+                        >
+                          <i className="bi bi-clipboard2-plus"></i> Nuevo
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={handleEdit}
+                        >
+                          <i className="bi bi-pencil-square"></i> Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          onClick={handleDeleteInforme}
+                        >
+                          <i className="bi bi-trash"></i> Eliminar
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="submit" className="btn btn-primary">
+                          <i className="bi bi-save"></i> Guardar
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          onClick={handleCancel}
+                        >
+                          <i className="bi bi-x-octagon"></i> Cancelar
+                        </button>
+                      </>
+                    )}
                   </div>
                 </form>
               </div>
-              <div className="card-footer">
+
+              <div className="card-footer text-end">
                 <button
                   className="btn btn-danger"
                   onClick={() => CentralPDF(params.id)}
@@ -827,20 +747,20 @@ function FormInformes() {
               </div>
             </div>
           </div>
-          <div className="col-md-6">
-            {selectedClasif.value === 1 && params.id ? (
-              <FormAcciones tipo="central" />
-            ) : (
-              ""
-            )}
 
+          <div className="col-lg-5">
+            {selectedClasif.value === 1 && params.id && (
+              <FormAcciones tipo="central" />
+            )}
             <ListPendiente refresh={refresh} />
           </div>
         </div>
-        <hr />
-        <div className="row">
-          {editing ? <AttachFiles idInforme={params.id} /> : ""}
-        </div>
+
+        {editing && (
+          <div className="row mt-4">
+            <AttachFiles idInforme={params.id} />
+          </div>
+        )}
       </div>
     </>
   );

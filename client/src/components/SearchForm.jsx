@@ -53,12 +53,12 @@ function SearchForm({ formulario }) {
 
   return (
     <>
-      {formulario === "usercentral" ||
-      formulario === "userinspeccion" ||
-      formulario === "userjpl" ? (
-        <>
+      {(formulario === "usercentral" ||
+        formulario === "userinspeccion" ||
+        formulario === "userjpl") && (
+        <form className="d-flex align-items-center gap-2" role="search">
           <input
-            className="form-control me-2"
+            className="form-control form-control-sm"
             id="codigoBusqueda"
             name="codigoBusqueda"
             type="search"
@@ -67,20 +67,19 @@ function SearchForm({ formulario }) {
             placeholder={
               formulario === "usercentral"
                 ? "Código del informe"
-                : "Codigo del expediente"
+                : "Código del expediente"
             }
-            aria-label="Search"
+            aria-label="Buscar"
           />
           <button
-            className="btn btn-outline-success"
+            className="btn btn-outline-success btn-sm"
             onClick={() => buscaInforme(codigo)}
             type="button"
           >
+            <i className="bi bi-search me-1"></i>
             Buscar
           </button>
-        </>
-      ) : (
-        ""
+        </form>
       )}
     </>
   );

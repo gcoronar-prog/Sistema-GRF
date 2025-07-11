@@ -487,61 +487,56 @@ function FormInspeccion() {
       });
     }
   };
-  document.body.style = "background:rgb(236, 241, 241);";
+
   return (
     <>
       <div className="container-fluid mt-4 w-100">
-        <div className="d-flex flex-wrap align-items-center gap-2 my-3">
+        <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
           <button
-            className="btn btn-outline-primary d-flex align-items-center"
-            type="button"
+            className="btn btn-outline-primary"
             onClick={handleFirstExpediente}
             disabled={!editing}
           >
-            <i className="bi bi-skip-start me-1"></i> Primer Expediente
+            <i className="bi bi-skip-start me-1"></i> Primer
           </button>
           <button
-            className="btn btn-outline-primary d-flex align-items-center"
-            type="button"
+            className="btn btn-outline-primary"
             onClick={handlePrevious}
             disabled={!editing}
           >
-            <i className="bi bi-chevron-left me-1"></i> Atras
+            <i className="bi bi-chevron-left me-1"></i> Anterior
           </button>
           <button
-            className="btn btn-outline-primary d-flex align-items-center"
-            type="button"
+            className="btn btn-outline-primary"
             onClick={handleNext}
             disabled={!editing}
           >
             Siguiente <i className="bi bi-chevron-right ms-1"></i>
           </button>
           <button
-            className="btn btn-outline-primary d-flex align-items-center"
-            type="button"
+            className="btn btn-outline-primary"
             onClick={handleLastExpediente}
             disabled={!editing}
           >
-            Ultimo Expediente <i className="bi bi-skip-end ms-1"></i>
+            Último <i className="bi bi-skip-end ms-1"></i>
           </button>
         </div>
 
         <div className="row">
-          <div className="col-md-8">
-            <div className="card">
-              <div className="card-header text-bg-success d-flex">
-                <span className="form-label fw-bold fst-italic">
-                  N° Expediente: {expedientes.id_expediente}
-                </span>
-                &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-                &nbsp; &nbsp; &nbsp;
-                <small className="mb-0 fw-semibold">
-                  {expedientes.estado_exp}
-                </small>
-                &nbsp;
-                <small className="mb-0 fst-italic">
-                  {formatDate(expedientes.fecha_resolucion)}
-                </small>
+          <div className="col-lg-8">
+            <div className="card shadow-sm">
+              <div className="card-header bg-success text-white d-flex justify-content-between">
+                <strong>N° Expediente: {expedientes.id_expediente}</strong>
+                <div>
+                  <small className="fw-semibold">
+                    {expedientes.estado_exp}
+                  </small>{" "}
+                  -
+                  <small className="fst-italic">
+                    {" "}
+                    {formatDate(expedientes.fecha_resolucion)}
+                  </small>
+                </div>
               </div>
               <div className="card-body">
                 <form onSubmit={handleSubmit} className="was-validated">
@@ -1110,15 +1105,6 @@ function FormInspeccion() {
                   </fieldset>
                   <div className="row g-4">
                     {/*user creador sera valor del token de inicio sesion hay que quitar este input al configurar todo */}
-                    <input
-                      hidden
-                      name="user_creador"
-                      type="text"
-                      placeholder="Usuario digitador"
-                      value={expedientes.user_creador}
-                      onChange={handleChanges}
-                      readOnly={editing}
-                    />
 
                     <div className="col-md-12">
                       <label htmlFor="observaciones" className="form-label">
@@ -1136,53 +1122,55 @@ function FormInspeccion() {
                       ></textarea>
                     </div>
 
-                    <div className="d-flex flex-wrap gap-2 mt-3">
-                      <button
-                        className="btn btn-success"
-                        type="button"
-                        onClick={handleNewExpediente}
-                        style={{ display: editing ? "" : "none" }}
-                      >
-                        <i className="bi bi-clipboard2-plus"></i> Nuevo
-                        Expediente
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        type="submit"
-                        style={{ display: editing ? "none" : "" }}
-                      >
-                        <i className="bi bi-floppy2"></i> Guardar Expediente
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={handleEdit}
-                        style={{ display: editing ? "" : "none" }}
-                      >
-                        <i className="bi bi-pencil-square"></i> Editar
-                      </button>
+                    {/*botones*/}
+                    <div className="d-flex flex-wrap gap-2 mt-4">
+                      {!editing && (
+                        <button className="btn btn-primary" type="submit">
+                          <i className="bi bi-floppy2"></i> Guardar Expediente
+                        </button>
+                      )}
 
-                      <button
-                        className="btn btn-danger"
-                        type="button"
-                        onClick={handleCancel}
-                        style={{ display: editing ? "none" : "" }}
-                      >
-                        <i className="bi bi-x-octagon"></i> Cancelar
-                      </button>
-                      <button
-                        className="btn btn-danger"
-                        type="button"
-                        onClick={handleDeleteExpediente}
-                        style={{ display: editing ? "" : "none" }}
-                      >
-                        <i className="bi bi-trash"></i> Eliminar
-                      </button>
+                      {editing && (
+                        <>
+                          <button
+                            className="btn btn-success"
+                            type="button"
+                            onClick={handleNewExpediente}
+                          >
+                            <i className="bi bi-clipboard2-plus"></i> Nuevo
+                            Expediente
+                          </button>
+                          <button
+                            className="btn btn-primary"
+                            type="button"
+                            onClick={handleEdit}
+                          >
+                            <i className="bi bi-pencil-square"></i> Editar
+                          </button>
+
+                          <button
+                            className="btn btn-danger"
+                            type="button"
+                            onClick={handleDeleteExpediente}
+                          >
+                            <i className="bi bi-trash"></i> Eliminar
+                          </button>
+                        </>
+                      )}
+                      {!editing && (
+                        <button
+                          className="btn btn-danger"
+                          type="button"
+                          onClick={handleCancel}
+                        >
+                          <i className="bi bi-x-octagon"></i> Cancelar
+                        </button>
+                      )}
                     </div>
                   </div>
                 </form>
               </div>
-              <div className="card-footer">
+              <div className="card-footer d-flex justify-content-between align-items-center">
                 <button
                   className="btn btn-danger"
                   onClick={() => InspectPDF(params.id)}
@@ -1190,23 +1178,24 @@ function FormInspeccion() {
                   <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
                 </button>
               </div>
-              <fieldset className="border rounded-3 p-3 mb-4">
-                <small>Creado por: {expedientes.user_creador}</small>
-                <small>
-                  {" "}
-                  Fecha creación: {formatDate(expedientes.fecha_documento)}
-                </small>
-              </fieldset>
+              <div>
+                <small>Creado por: {expedientes.user_creador}</small> |{" "}
+                <small>Fecha: {formatDate(expedientes.fecha_documento)}</small>
+              </div>
             </div>
           </div>
-          <div className="col-md-4">
+          <div className="col-lg-4">
             <SearchExpediente />
           </div>
         </div>
         <br />
-        <div className="row">
-          {editing ? <AttachFiles idInforme={params.id} /> : ""}
-        </div>
+        {editing && (
+          <div className="row mt-4">
+            <div className="col-12">
+              <AttachFiles idInforme={params.id} />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

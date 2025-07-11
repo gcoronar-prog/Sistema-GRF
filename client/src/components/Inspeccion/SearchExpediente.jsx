@@ -39,12 +39,12 @@ function SearchExpediente() {
 
   return (
     <>
-      <div className="card">
-        <div className="card-header text-bg-success">
-          <span className="form-label fw-bold">Búsqueda de expedientes</span>
+      <div className="card shadow-sm">
+        <div className="card-header bg-primary text-white">
+          <strong>Búsqueda de Expedientes</strong>
         </div>
         <div className="card-body">
-          <div className=" gap-2 mt-3">
+          <div className="mb-3">
             <label htmlFor="num_control" className="form-label">
               Número de control:
             </label>
@@ -54,10 +54,11 @@ function SearchExpediente() {
               className="form-control"
               onChange={handleChanges}
               value={valorBusqueda.num_control}
+              placeholder="Ingrese número de control"
             />
           </div>
 
-          <div className="gap-2 mt-3">
+          <div className="mb-3">
             <label htmlFor="rut_contri" className="form-label">
               RUT de Contribuyente:
             </label>
@@ -67,10 +68,11 @@ function SearchExpediente() {
               onChange={handleChanges}
               value={valorBusqueda.rut_contri}
               type="text"
+              placeholder="Ej: 12345678-9"
             />
           </div>
 
-          <div className="gap-2 mt-3">
+          <div className="mb-3">
             <label htmlFor="ppu" className="form-label">
               PPU:
             </label>
@@ -80,10 +82,11 @@ function SearchExpediente() {
               className="form-control"
               onChange={handleChanges}
               value={valorBusqueda.ppu}
+              placeholder="Ingrese PPU del vehículo"
             />
           </div>
 
-          <div className="d-flex flex-wrap gap-2 mt-3">
+          <div className="d-flex justify-content-end mt-4">
             <button
               className="btn btn-primary"
               onClick={() =>
@@ -94,10 +97,12 @@ function SearchExpediente() {
                 )
               }
             >
-              <i className="bi bi-search"></i> Buscar
+              <i className="bi bi-search me-1"></i> Buscar
             </button>
           </div>
-          <ListSearchExpe expediente={expediente} />
+          <div className="mt-4">
+            <ListSearchExpe expediente={expediente} />
+          </div>
         </div>
       </div>
     </>

@@ -41,8 +41,8 @@ const GaleriaVisual = () => {
   return (
     <>
       <hr />
-      <div className="row">
-        <div className="col">
+      <div className="row g-4">
+        <div className="col-md-6 text-center">
           <div className="align-middle text-center">
             {selectedId && (
               <a
@@ -51,24 +51,24 @@ const GaleriaVisual = () => {
                 rel="noopener noreferrer"
               >
                 <img
-                  className="img-thumbnail"
+                  className="img-thumbnail shadow-sm"
                   src={`${servidor_local}/api/galeria/inspect/${selectedId}`}
                   alt={`Imagen con id ${selectedId}`}
-                  style={{ width: "500px" }}
+                  style={{ maxWidth: "100%", width: "500px" }}
                 />
               </a>
             )}
           </div>
         </div>
-        <div className="col">
-          <div className="card">
-            <div className="card-header">
-              <h5>Galería de Imágenes</h5>
+        <div className="col-md-6">
+          <div className="card shadow-sm mb-4">
+            <div className="card-header bg-secondary text-white">
+              <h5 className="mb-0">Galería de Imágenes</h5>
             </div>
 
             <div className="card-body">
-              <div className="row">
-                <div>
+              <div className="row g-2">
+                <div className="col-md-6">
                   <input
                     className="form-control mt-2"
                     type="text"
@@ -77,6 +77,8 @@ const GaleriaVisual = () => {
                     value={filtro.id_expe}
                     onChange={handleChanges}
                   />
+                </div>
+                <div className="col-md-6">
                   <input
                     className="form-control mt-2"
                     type="text"
@@ -85,6 +87,8 @@ const GaleriaVisual = () => {
                     value={filtro.num_control}
                     onChange={handleChanges}
                   />
+                </div>
+                <div className="col-md-6">
                   <input
                     className="form-control mt-2"
                     type="text"
@@ -93,6 +97,8 @@ const GaleriaVisual = () => {
                     value={filtro.rut_contri}
                     onChange={handleChanges}
                   />
+                </div>
+                <div className="col-md-6">
                   <input
                     className="form-control mt-2"
                     type="text"
@@ -103,9 +109,9 @@ const GaleriaVisual = () => {
                   />
                 </div>
               </div>
-              <div className="d-flex flex-wrap gap-2 mt-3">
+              <div className="d-flex justify-content-end mt-3">
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-primary shadow-sm"
                   onClick={() =>
                     loadListaImagen(
                       filtro.id_expe,
@@ -115,20 +121,20 @@ const GaleriaVisual = () => {
                     )
                   }
                 >
-                  <i className="bi bi-search"></i> Buscar
+                  <i className="bi bi-search me-1"></i> Buscar
                 </button>
               </div>
             </div>
           </div>
-          <div className="card">
-            <div className="card-header">
-              <h5>Listado imágenes</h5>
+          <div className="card shadow-sm">
+            <div className="card-header bg-light">
+              <h5 className="mb-0">Listado imágenes</h5>
             </div>
             <div className="card-body">
-              <div className="col">
-                {listImagen.length > 0 ? (
-                  <table className="table table-bordered table-hover">
-                    <thead className="table-light align-middle">
+              {listImagen.length > 0 ? (
+                <div className="table-responsive">
+                  <table className="table table-hover table-bordered align-middle">
+                    <thead className="table-dark text-center">
                       <tr>
                         <th>Nombre del archivo</th>
                         <th className="text-center">Expediente</th>
@@ -147,16 +153,18 @@ const GaleriaVisual = () => {
                           <td
                             style={{
                               color:
-                                l.id_adjunto === selectedId ? "red" : "black",
+                                l.id_adjunto === selectedId
+                                  ? "#dc3545"
+                                  : "inherit",
                             }}
                           >
                             {" "}
                             {l.path_document}
                           </td>
-                          <td>{l.id_expediente}</td>
-                          <td className="text-center align-middle">
+                          <td className="text-center">{l.id_expediente}</td>
+                          <td className="text-center">
                             <button
-                              className="btn btn-primary"
+                              className="btn btn-outline-primary btn-sm"
                               onClick={() =>
                                 navigate(`/inspect/${l.id_expediente}/edit`)
                               }
@@ -168,16 +176,16 @@ const GaleriaVisual = () => {
                       ))}
                     </tbody>
                   </table>
-                ) : (
-                  <p>No hay imágenes para mostrar.</p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <p className="text-muted">No hay imágenes para mostrar.</p>
+              )}
             </div>
           </div>
         </div>
-
-        <br />
       </div>
+
+      <br />
     </>
   );
 };

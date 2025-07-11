@@ -32,16 +32,37 @@ function ChangePassword() {
 
   return (
     <>
-      <form onSubmit={handleReset}>
-        <label htmlFor="">Contraseña nueva</label>
-        <input
-          type="text"
-          name="user_password"
-          value={password}
-          onChange={handleChange}
-        />
-        <button type="submit">Crear</button>
-      </form>
+      <div className="container min-vh-100 d-flex justify-content-center align-items-center bg-light">
+        <div
+          className="card shadow-lg p-4"
+          style={{ width: "100%", maxWidth: "400px" }}
+        >
+          <div className="card-body">
+            <h4 className="card-title text-center mb-4">
+              🔐 Cambio de contraseña
+            </h4>
+            <form onSubmit={handleReset}>
+              <div className="mb-3">
+                <label htmlFor="user_password" className="form-label">
+                  🔒 Contraseña nueva
+                </label>
+                <input
+                  className="form-control"
+                  type="password"
+                  id="user_password"
+                  name="user_password"
+                  value={password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w-100">
+                Cambiar contraseña
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

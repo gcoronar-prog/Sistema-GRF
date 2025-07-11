@@ -853,479 +853,265 @@ function StatisticsInspect() {
   return (
     <>
       <hr />
-      <div className="card">
-        <div className="card-header text-bg-success">
-          <span className="fw-bold">Estadisticas Inspección Municipal</span>
+      <div className="card shadow-sm">
+        <div className="card-header bg-success text-white">
+          <h5 className="mb-0">Estadísticas Inspección Municipal</h5>
         </div>
 
         <div className="card-body">
-          <div className="row">
-            <div className="col">
-              <div className="card m-3" name="fechasInfraccion">
-                <div className="card-header">
-                  <span className="fw-bold">Fechas de infracción</span>
-                </div>
-                <div className="card-body">
-                  <div name="rangoFecha" className="">
-                    <label htmlFor="fechaInicioInfrac" className="form-label">
-                      Inicio
-                    </label>
+          {/* Filtros por fecha */}
+          <div className="row g-3">
+            {[
+              {
+                title: "Fechas de infracción",
+                inicio: fechaInicioInfrac,
+                fin: fechaFinInfrac,
+                setInicio: setFechaInicioInfrac,
+                setFin: setFechaFinInfrac,
+                name: "fechaInfraccion",
+              },
+              {
+                title: "Fechas de citación",
+                inicio: fechaInicioCitacion,
+                fin: fechaFinCitacion,
+                setInicio: setFechaInicioCitacion,
+                setFin: setFechaFinCitacion,
+                name: "fechaCitacion",
+              },
+              {
+                title: "Fecha de creación",
+                inicio: fechaInicio,
+                fin: fechaFin,
+                setInicio: setFechaInicio,
+                setFin: setFechaFin,
+                name: "fechaCreacion",
+              },
+            ].map((item, index) => (
+              <div className="col-md-4" key={index}>
+                <div className="card border-secondary h-100">
+                  <div className="card-header">
+                    <strong>{item.title}</strong>
+                  </div>
+                  <div className="card-body">
+                    <label className="form-label">Inicio</label>
                     <input
-                      className="form-control"
                       type="datetime-local"
-                      name="fechaInicioInfrac"
-                      id="fechaInicioInfrac"
-                      onChange={(e) => setFechaInicioInfrac(e.target.value)}
-                      value={fechaInicioInfrac}
+                      className="form-control mb-2"
+                      value={item.inicio}
+                      onChange={(e) => item.setInicio(e.target.value)}
                     />
-
-                    <label htmlFor="fechaFinInfrac" className="form-label">
-                      Término
-                    </label>
+                    <label className="form-label">Término</label>
                     <input
-                      className="form-control"
                       type="datetime-local"
-                      name="fechaFinInfrac"
-                      id=""
-                      onChange={(e) => setFechaFinInfrac(e.target.value)}
-                      value={fechaFinInfrac}
+                      className="form-control"
+                      value={item.fin}
+                      onChange={(e) => item.setFin(e.target.value)}
                     />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="col">
-              <div className="card m-3" name="fechasCitacion">
-                <div className="card-header">
-                  <span className="fw-bold">Fechas de citación</span>
-                </div>
-                <div className="card-body">
-                  <div className="rangoFechaCitacion">
-                    <label htmlFor="fechaInicioCitacion" className="form-label">
-                      Inicio
-                    </label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fechaInicioCitacion"
-                      id=""
-                      onChange={(e) => setFechaInicioCitacion(e.target.value)}
-                      value={fechaInicioCitacion}
-                    />
+            ))}
+          </div>
 
-                    <label htmlFor="fechaFinCitacion" className="form-label">
-                      Término
-                    </label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fechaFinCitacion"
-                      id=""
-                      onChange={(e) => setFechaFinCitacion(e.target.value)}
-                      value={fechaFinCitacion}
-                    />
+          {/* Filtros checkbox */}
+          <div className="card mt-4">
+            <div className="card-body">
+              <div className="row g-4">
+                {[
+                  {
+                    label: "Estado expedientes",
+                    options: estadoFilter,
+                    type: "estado",
+                  },
+                  {
+                    label: "Tipos de procedimientos",
+                    options: tipoProced,
+                    type: "tipo",
+                  },
+                  {
+                    label: "Juzgados",
+                    options: jplFilter,
+                    type: "jpl",
+                  },
+                ].map((filtro, idx) => (
+                  <div className="col-md-4" key={idx}>
+                    <strong className="form-label d-block mb-2">
+                      {filtro.label}
+                    </strong>
+                    {Object.keys(filtro.options).map((key) => (
+                      <div className="form-check" key={key}>
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id={key}
+                          name={key}
+                          data-type={filtro.type}
+                          value={key}
+                          checked={filtro.options[key] || false}
+                          onChange={handleCheckboxChange}
+                        />
+                        <label className="form-check-label" htmlFor={key}>
+                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </label>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </div>
-            </div>
-            <div className="col">
-              <div className="card m-3" name="fechasCreacion">
-                <div className="card-header">
-                  <span className="fw-bold">Fecha de creación</span>
-                </div>
-                <div className="card-body">
-                  <div className="rangoFechaCreacion">
-                    <label htmlFor="fechaInicio" className="form-label">
-                      Inicio
-                    </label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fechaInicio"
-                      id=""
-                      onChange={(e) => setFechaInicio(e.target.value)}
-                      value={fechaInicio}
-                    />
-
-                    <label htmlFor="fechaFin" className="form-label">
-                      Término
-                    </label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fechaFin"
-                      id=""
-                      onChange={(e) => setFechaFin(e.target.value)}
-                      value={fechaFin}
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
-          <div className="card m-3">
+          {/* Filtros de texto y select */}
+          <div className="card mt-4">
             <div className="card-body">
-              <div className="row">
-                <div className="col">
-                  <div name="estadoExped">
-                    <label htmlFor="estadoExp" className="form-label fw-bold">
-                      Estado expedientes
-                    </label>
-                    <div className="form-check">
-                      <label htmlFor="pendiente" className="form-label">
-                        Pendiente
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="pendiente"
-                        value="Pendiente"
-                        id="pendiente"
-                        data-type="estado"
-                        onChange={handleCheckboxChange}
-                        checked={estadoFilter.pendiente || false}
-                      />
-                    </div>
-                    <div className="form-check">
-                      <label htmlFor="despachado" className="form-label">
-                        Despachado
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="despachado"
-                        id="despachado"
-                        value="despachado"
-                        data-type="estado"
-                        onChange={handleCheckboxChange}
-                        checked={estadoFilter.despachado || false}
-                      />
-                    </div>
-
-                    <div className="form-check">
-                      <label htmlFor="resuelto" className="form-label">
-                        Resuelto
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="resuelto"
-                        id="resuelto"
-                        value="resuelto"
-                        data-type="estado"
-                        onChange={handleCheckboxChange}
-                        checked={estadoFilter.resuelto || false}
-                      />
-                    </div>
-                    <div className="form-check">
-                      <label htmlFor="nulo" className="form-label">
-                        Nulo
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="nulo"
-                        id="nulo"
-                        value="nulo"
-                        data-type="estado"
-                        onChange={handleCheckboxChange}
-                        checked={estadoFilter.nulo || false}
-                      />
-                    </div>
-                  </div>
+              <div className="row g-3">
+                <div className="col-md-4">
+                  <label htmlFor="rut_contri" className="form-label fw-bold">
+                    Rut Contribuyente
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="rut_contri"
+                    name="rut_contri"
+                  />
                 </div>
-                <div className="col">
-                  <div name="tipoProced">
-                    <label htmlFor="tipoProced" className="form-label fw-bold">
-                      Tipos de procedimientos
-                    </label>
-
-                    <div className="form-check">
-                      <label htmlFor="notificacion" className="form-label">
-                        Notificación
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="notificacion"
-                        value="notificacion"
-                        id="notificacion"
-                        data-type="tipo"
-                        onChange={handleCheckboxChange}
-                        checked={tipoProced.notificacion || false}
-                      />
-                    </div>
-                    <div className="form-check">
-                      <label htmlFor="causas" className="form-label">
-                        Causas JPL
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="causas"
-                        id="causas"
-                        value="causas"
-                        data-type="tipo"
-                        onChange={handleCheckboxChange}
-                        checked={tipoProced.causas || false}
-                      />
-                    </div>
-                    <div className="form-check">
-                      <label htmlFor="citacion" className="form-label">
-                        Citación
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="citacion"
-                        id="citacion"
-                        value="citacion"
-                        data-type="tipo"
-                        onChange={handleCheckboxChange}
-                        checked={tipoProced.citacion || false}
-                      />
-                    </div>
-
-                    <div className="form-check">
-                      <label htmlFor="solicitudes" className="form-label">
-                        Solicitudes generales
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="solicitudes"
-                        id="solicitudes"
-                        value="solicitudes"
-                        data-type="tipo"
-                        onChange={handleCheckboxChange}
-                        checked={tipoProced.solicitudes || false}
-                      />
-                    </div>
-                  </div>
+                <div className="col-md-4">
+                  <label htmlFor="inspectores" className="form-label fw-bold">
+                    Inspectores
+                  </label>
+                  <SelectInspect
+                    id="inspectores"
+                    selectedInspect={selectedInspect}
+                    setSelectInspect={setSelectedInspect}
+                  />
                 </div>
-                <div className="col">
-                  <div name="jpls">
-                    <label htmlFor="jpls" className="form-label fw-bold">
-                      Juzgados
-                    </label>
-                    <div className="form-check">
-                      <label htmlFor="jpl1" className="form-label">
-                        JPL 1
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="jpl1"
-                        id="jpl1"
-                        value="jpl1"
-                        data-type="jpl"
-                        onChange={handleCheckboxChange}
-                        checked={jplFilter.jpl1 || false}
-                      />
-                    </div>
-                    <div className="form-check">
-                      <label htmlFor="jpl2" className="form-label">
-                        JPL 2
-                      </label>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="jpl2"
-                        id="jpl2"
-                        value="jpl2"
-                        data-type="jpl"
-                        onChange={handleCheckboxChange}
-                        checked={jplFilter.jpl2 || false}
-                      />
-                    </div>
-                  </div>
+                <div className="col-md-4">
+                  <label htmlFor="leyes_1" className="form-label fw-bold">
+                    Leyes
+                  </label>
+                  <SelectLey
+                    id="leyes_1"
+                    selectedLey={selectedLey}
+                    setSelectedLey={setSelectedLey}
+                  />
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card m-3">
-            <div className="card-body">
-              <div className="row">
-                <div className="col">
-                  <div name="rut_contrib">
-                    <label htmlFor="rut_contri" className="form-label fw-bold">
-                      Rut Contribuyente
-                    </label>
-                    <input
-                      type="text"
-                      name="rut_contri"
-                      id="rut_contri"
-                      className="form-control"
-                    />
-                  </div>
+                <div className="col-md-4">
+                  <label htmlFor="marcaVeh" className="form-label fw-bold">
+                    Marca Vehículo
+                  </label>
+                  <SelectVehContri
+                    id="marcaVeh"
+                    selectedVeh={selectedVeh}
+                    setSelectVeh={setSelectedVeh}
+                    tipo="marca"
+                  />
                 </div>
-                <div className="col">
-                  <div name="inspectores">
-                    <label htmlFor="inspectores" className="form-label fw-bold">
-                      Inspectores
-                    </label>
-                    <SelectInspect
-                      id="inspectores"
-                      selectedInspect={selectedInspect}
-                      setSelectInspect={setSelectedInspect}
-                    />
-                  </div>
+                <div className="col-md-4">
+                  <label htmlFor="tipoVeh" className="form-label fw-bold">
+                    Tipo de Vehículo
+                  </label>
+                  <SelectVehContri
+                    id="tipoVeh"
+                    selectedVeh={selectedTipoVeh}
+                    setSelectVeh={setSelectedTipoVeh}
+                    tipo="tipo"
+                  />
                 </div>
-                <div className="col">
-                  <div name="leyes">
-                    <label htmlFor="leyes_1" className="form-label fw-bold">
-                      Leyes
-                    </label>
-                    <SelectLey
-                      id="leyes_1"
-                      selectedLey={selectedLey}
-                      setSelectedLey={setSelectedLey}
-                    />
-                  </div>
-                </div>
-              </div>
-              <br />
-              <div className="row">
-                <div className="col">
-                  <div name="marca">
-                    <label htmlFor="marcaVeh" className="form-label fw-bold">
-                      Marca Vehículo
-                    </label>
-                    <SelectVehContri
-                      id="marcaVeh"
-                      selectedVeh={selectedVeh}
-                      setSelectVeh={setSelectedVeh}
-                      tipo={"marca"}
-                    />
-                  </div>
-                </div>
-                <div className="col">
-                  <div name="tipo">
-                    <label htmlFor="tipoVeh" className="form-label fw-bold">
-                      Tipo de Vehículo
-                    </label>
-                    <SelectVehContri
-                      id="tipoVeh"
-                      selectedVeh={selectedTipoVeh}
-                      setSelectVeh={setSelectedTipoVeh}
-                      tipo={"tipo"}
-                    />
-                  </div>
-                </div>
-                <div className="col">
-                  <div name="sector">
-                    <label
-                      htmlFor="sectorContri"
-                      className="form-label fw-bold"
-                    >
-                      Sector
-                    </label>
-                    <SelectSector
-                      id="sectorContri"
-                      selectedSector={selectedSector}
-                      setSelectedSector={setSelectedSector}
-                    />
-                  </div>
+                <div className="col-md-4">
+                  <label htmlFor="sectorContri" className="form-label fw-bold">
+                    Sector
+                  </label>
+                  <SelectSector
+                    id="sectorContri"
+                    selectedSector={selectedSector}
+                    setSelectedSector={setSelectedSector}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <hr />
-      <div className="row">
-        <div className="col">
+
+      {/* Acciones y resumen */}
+      <div className="row g-4">
+        <div className="col-md-6">
           <div className="card">
-            <div className="card-header text-bg-success">
-              <span className="fw-bold">Acciones</span>
+            <div className="card-header bg-success text-white">
+              <strong>Acciones</strong>
             </div>
-            <div className="card-body">
-              <div
-                name="botones"
-                className="d-flex flex-column gap-2 align-items-center"
+            <div className="card-body d-flex flex-column gap-3 align-items-center">
+              <button
+                className="btn btn-danger w-75"
+                onClick={() => fetchData(1)}
               >
-                <button
-                  onClick={() => {
-                    fetchData(1);
-                  }}
-                  className="btn btn-danger w-50"
-                >
-                  <i className="bi bi-file-pdf"></i> Descargar PDF
-                </button>
-                <button
-                  onClick={() => {
-                    fetchData(2);
-                  }}
-                  className="btn btn-success w-50 excel"
-                >
-                  <i className="bi bi-file-earmark-text"></i> Descargar Excel
-                </button>
-                <button
-                  className="btn btn-primary w-50"
-                  onClick={handleClearFilter}
-                >
-                  <i className="bi bi-stars"></i> Limpiar filtros
-                </button>
-              </div>
+                <i className="bi bi-file-pdf me-1"></i> Descargar PDF
+              </button>
+              <button
+                className="btn btn-success w-75"
+                onClick={() => fetchData(2)}
+              >
+                <i className="bi bi-file-earmark-excel me-1"></i> Descargar
+                Excel
+              </button>
+              <button
+                className="btn btn-primary w-75"
+                onClick={handleClearFilter}
+              >
+                <i className="bi bi-stars me-1"></i> Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
-        <div className="col">
+
+        <div className="col-md-6">
           <div className="card">
-            <div className="card-header text-bg-success">
-              <span className="fw-bold">Resumen Estadísticas</span>
+            <div className="card-header bg-success text-white">
+              <strong>Resumen Estadísticas</strong>
             </div>
-            <div className="card-body">
-              <div name="btnResumen" className="row">
-                <div className="col-md-6 d-flex flex-column gap-2">
+            <div className="card-body row g-2">
+              {[
+                {
+                  text: "Resumen estado",
+                  handler: resumenEstadoInsp,
+                },
+                {
+                  text: "Resumen tipo",
+                  handler: resumenTipoExp,
+                },
+                {
+                  text: "Resumen por Ley",
+                  handler: resumenLeyInspec,
+                },
+                {
+                  text: "Resumen por Inspector",
+                  handler: resumenInspector,
+                },
+                {
+                  text: "Resumen por Vehículo",
+                  handler: resumenVehi,
+                },
+                {
+                  text: "Resumen por Sector",
+                  handler: resumenSector,
+                },
+                {
+                  text: "Resumen por Glosa",
+                  handler: resumenGlosa,
+                },
+              ].map((btn, idx) => (
+                <div className="col-md-6" key={idx}>
                   <button
-                    className="btn btn-outline-success"
-                    onClick={resumenEstadoInsp}
+                    className="btn btn-outline-success w-100"
+                    onClick={btn.handler}
                   >
-                    <i className="bi bi-download"></i> Resumen estado
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenTipoExp}
-                  >
-                    <i className="bi bi-download"></i> Resumen tipo
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenLeyInspec}
-                  >
-                    <i className="bi bi-download"></i> Resumen por Ley
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenInspector}
-                  >
-                    <i className="bi bi-download"></i> Resumen por Inspector
-                  </button>
-                </div>
-                <div className="col-md-6 d-flex flex-column gap-2">
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenVehi}
-                  >
-                    <i className="bi bi-download"></i> Resumen por Vehiculo
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenSector}
-                  >
-                    <i className="bi bi-download"></i> Resumen por Sector
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenGlosa}
-                  >
-                    <i className="bi bi-download"></i> Resumen por Glosa
+                    <i className="bi bi-download me-1"></i> {btn.text}
                   </button>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

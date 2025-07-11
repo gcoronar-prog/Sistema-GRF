@@ -168,150 +168,152 @@ function FormAcciones({ tipo }) {
 
   return (
     <>
-      <div className="card mb-3">
-        <div className="card-header text-bg-success">
-          <p className="h5"> Lista de acciones</p>
+      <div className="card mb-4 shadow-sm">
+        <div className="card-header bg-success text-white d-flex justify-content-between align-items-cente">
+          <h5 className="mb-0"> Lista de acciones</h5>
+          <button
+            type="button"
+            className="btn btn-outline-light btn-sm"
+            onClick={() => handleNewData("")}
+          >
+            <i className="bi bi-plus-circle me-1"></i> Agregar acción
+          </button>
         </div>
-        <div className="card-body table-responsive">
-          <div style={{ maxWidth: "600px", margin: "auto" }}>
-            <table className="table table-striped table-hover table-bordered align-middle caption-top table-sm">
-              <thead className="table-primary text-center align-middle">
-                <tr>
-                  <th>Fecha</th>
-                  {tipo === "SGC" ? <th>Estado acción</th> : ""}
 
-                  <th className="w-50">Descripción</th>
-                  {tipo === "SGC" ? <th>Fecha Resolución</th> : ""}
-                  <th colSpan={2}>
-                    {" "}
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary btn-sm"
-                      onClick={() => handleNewData("")}
-                      style={{ backgroundColor: "white", color: "black" }}
-                    >
-                      <i className="bi bi-plus-circle"></i> Agregar acción
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="table-group-divider text-center">
-                {acciones.map((a) =>
-                  a.isEditing ? (
-                    <tr key={a.cod_accion}>
-                      <td>
-                        {new Date(a.fecha_accion).toLocaleDateString() +
+        <div className="card-body table-responsive px-2 py-3">
+          <table className="table table-bordered table-hover align-middle text-center table-sm">
+            <thead className="table-primary">
+              <tr>
+                <th style={{ minWidth: "140px" }}>Fecha</th>
+                {tipo === "SGC" ? <th>Estado</th> : ""}
+
+                <th style={{ width: "40%" }}>Descripción</th>
+                {tipo === "SGC" ? (
+                  <th style={{ minWidth: "140px" }}>Fecha Resolución</th>
+                ) : (
+                  ""
+                )}
+                <th colSpan={2}> </th>
+              </tr>
+            </thead>
+            <tbody className="table-group-divider">
+              {acciones.map((a) =>
+                a.isEditing ? (
+                  <tr key={a.cod_accion}>
+                    <td className="text-nowrap">
+                      {new Date(a.fecha_accion).toLocaleDateString() +
+                        "  " +
+                        new Date(a.fecha_accion).toLocaleTimeString()}
+                    </td>
+                    {tipo === "SGC" ? <td>{a.estado_accion}</td> : ""}
+
+                    <td className="text-start text-truncate">
+                      {a.desc_acciones}
+                    </td>
+                    {tipo === "SGC" ? (
+                      <td className="text-nowrap">
+                        {new Date(a.fecha_resolucion).toLocaleDateString() +
                           "  " +
-                          new Date(a.fecha_accion).toLocaleTimeString()}
+                          new Date(a.fecha_resolucion).toLocaleTimeString()}
                       </td>
-                      {tipo === "SGC" ? <td>{a.estado_accion}</td> : ""}
+                    ) : (
+                      ""
+                    )}
 
-                      <td>{a.desc_acciones}</td>
-                      {tipo === "SGC" ? (
-                        <td>
-                          {new Date(a.fecha_resolucion).toLocaleDateString() +
-                            "  " +
-                            new Date(a.fecha_resolucion).toLocaleTimeString()}
-                        </td>
-                      ) : (
-                        ""
-                      )}
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-success"
+                        onClick={() => handleEdit(a.cod_accion)}
+                      >
+                        <i className="bi bi-pencil-square"></i> Editar
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleDelete(a.cod_accion)}
+                      >
+                        <i className="bi bi-trash"></i> Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={a.cod_accion}>
+                    <td>
+                      <input
+                        className="form-control form-control-sm"
+                        name="fecha_accion"
+                        type="datetime-local"
+                        value={a.fecha_accion}
+                        onChange={(e) => handleChanges(e, a.cod_accion)}
+                      />
+                    </td>
+                    {tipo === "SGC" ? (
+                      <td>
+                        <select
+                          className="form-select form-select-sm"
+                          name="estado_accion"
+                          id=""
+                          value={a.estado_accion || ""}
+                          onChange={(e) => handleChanges(e, a.cod_accion)}
+                        >
+                          <option value="">Seleccione estado</option>
+                          <option value="pendiente">Pendiente</option>
+                          <option value="completado">Completado</option>
+                        </select>
+                      </td>
+                    ) : (
+                      ""
+                    )}
 
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-success me-2"
-                          onClick={() => handleEdit(a.cod_accion)}
-                        >
-                          <i className="bi bi-pencil-square"></i> Editar
-                        </button>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleDelete(a.cod_accion)}
-                        >
-                          <i className="bi bi-trash"></i> Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr key={a.cod_accion}>
+                    <td>
+                      <textarea
+                        className="form-control form-control-sm"
+                        name="desc_acciones"
+                        id=""
+                        value={a.desc_acciones || ""}
+                        onChange={(e) => handleChanges(e, a.cod_accion)}
+                      ></textarea>
+                    </td>
+                    {tipo === "SGC" ? (
                       <td>
                         <input
-                          className="form-control"
-                          name="fecha_accion"
+                          className="form-control form-control-sm"
                           type="datetime-local"
-                          value={a.fecha_accion}
+                          name="fecha_resolucion"
+                          value={a.fecha_resolucion}
                           onChange={(e) => handleChanges(e, a.cod_accion)}
                         />
                       </td>
-                      {tipo === "SGC" ? (
-                        <td>
-                          <select
-                            className="form-select"
-                            name="estado_accion"
-                            id=""
-                            value={a.estado_accion || ""}
-                            onChange={(e) => handleChanges(e, a.cod_accion)}
-                          >
-                            <option value="">Seleccione estado</option>
-                            <option value="pendiente">Pendiente</option>
-                            <option value="completado">Completado</option>
-                          </select>
-                        </td>
-                      ) : (
-                        ""
-                      )}
+                    ) : (
+                      ""
+                    )}
 
-                      <td>
-                        <textarea
-                          className="form-control"
-                          name="desc_acciones"
-                          id=""
-                          value={a.desc_acciones || ""}
-                          onChange={(e) => handleChanges(e, a.cod_accion)}
-                        ></textarea>
-                      </td>
-                      {tipo === "SGC" ? (
-                        <td>
-                          <input
-                            className="form-control"
-                            type="datetime-local"
-                            name="fecha_resolucion"
-                            value={a.fecha_resolucion}
-                            onChange={(e) => handleChanges(e, a.cod_accion)}
-                          />
-                        </td>
-                      ) : (
-                        ""
-                      )}
-
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-primary me-2"
-                          onClick={(e) => handleSubmit(e, a.cod_accion)}
-                        >
-                          <i className="bi bi-check-circle"></i> Guardar
-                        </button>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-warning me-2"
-                          onClick={() => handleCancel(a.cod_accion)}
-                        >
-                          <i className="bi bi-x-circle"></i> Cancelar
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={(e) => handleSubmit(e, a.cod_accion)}
+                      >
+                        <i className="bi bi-check-circle"></i> Guardar
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-warning"
+                        onClick={() => handleCancel(a.cod_accion)}
+                      >
+                        <i className="bi bi-x-circle"></i> Cancelar
+                      </button>
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </>

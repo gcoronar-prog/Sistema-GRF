@@ -12,10 +12,12 @@ function ListSearchExpe({ expediente }) {
   };
 
   return (
-    <div className="mt-3">
-      <h5>Resultados encontrados:</h5>
+    <div className="mt-4">
+      <h5 className="mb-3 text-secondary border-bottom pb-2">
+        Resultados encontrados:
+      </h5>
       <div className="table-responsive">
-        <table className="table table-striped table-hover table-bordered table-sm">
+        <table className="table table-striped table-hover align-middle text-center table-bordered table-sm">
           <thead className="table-dark">
             <tr>
               <th>ID</th>

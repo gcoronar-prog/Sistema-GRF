@@ -572,321 +572,217 @@ function StatisticsCentral() {
   return (
     <>
       <hr />
-      <div className="card">
-        <div className="card-header text-bg-success">
-          <span className="fw-bold">Estadisticas Central Municipal </span>
+      <div className="card shadow-sm">
+        <div className="card-header bg-success text-white">
+          <h5 className="mb-0">Estadísticas Central Municipal</h5>
         </div>
         <div className="card-body">
-          <div className="rangoFecha">
-            <div className="row p-2">
-              <div className="col-4">
-                <div className="card">
-                  <div className="card-header">
-                    <span className="fw-bold">Fecha de infomes</span>
-                  </div>
-                  <div className="card-body">
-                    <label
-                      htmlFor="fechaInicio"
-                      className="form-label fw-bold p-1"
-                    >
-                      Inicio
-                    </label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fechaInicio"
-                      id="fechaInicio"
-                      onChange={(e) => setFechaInicio(e.target.value)}
-                      value={fechaInicio}
-                    />
-                    <label
-                      htmlFor="fechaFin"
-                      className="form-label fw-bold p-1"
-                    >
-                      Término
-                    </label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fechaFin"
-                      id="fechaFin"
-                      onChange={(e) => setFechaFin(e.target.value)}
-                      value={fechaFin}
-                    />
-                  </div>
+          <div className="row g-4">
+            <div className="col-md-4">
+              <div className="card h-100 border-secondary">
+                <div className="card-header">
+                  <strong>Fecha de informes</strong>
                 </div>
-              </div>
-              <div className="col-1">{/*hago puro espacio jejejeje >:D */}</div>
-              <div className="col-3">
-                <div className="estadoInforme">
-                  <label htmlFor="estado" className="form-label fw-bold">
-                    Estado informes
+                <div className="card-body">
+                  <label htmlFor="fechaInicio" className="form-label fw-bold">
+                    Inicio
                   </label>
-                  <div className="form-check">
-                    <label htmlFor="atendido">Atendido</label>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      name="atendido"
-                      value="atendido"
-                      id="atendido"
-                      data-type="estado"
-                      onChange={handleCheckboxChange}
-                      checked={estadoFilter.atendido || false}
-                    />
-                  </div>
-                  <div className="form-check">
-                    <label htmlFor="progreso">En progreso</label>
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      name="progreso"
-                      id="progreso"
-                      value="progreso"
-                      data-type="estado"
-                      onChange={handleCheckboxChange}
-                      checked={estadoFilter.progreso || false}
-                    />
-                  </div>
-                  <div className="form-check">
-                    <label htmlFor="pendiente">Pendiente</label>
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      name="pendiente"
-                      id="pendiente"
-                      value="pendiente"
-                      data-type="estado"
-                      onChange={handleCheckboxChange}
-                      checked={estadoFilter.pendiente || false}
-                    />
-                  </div>
+                  <input
+                    className="form-control mb-2"
+                    type="datetime-local"
+                    id="fechaInicio"
+                    value={fechaInicio}
+                    onChange={(e) => setFechaInicio(e.target.value)}
+                  />
+                  <label htmlFor="fechaFin" className="form-label fw-bold">
+                    Término
+                  </label>
+                  <input
+                    className="form-control"
+                    type="datetime-local"
+                    id="fechaFin"
+                    value={fechaFin}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                  />
                 </div>
               </div>
-              <div className="col-3">
-                <label htmlFor="" className="form-label fw-bold">
-                  Captura de información
-                </label>
-                <div className="capturaInforme">
-                  <div className="form-check">
-                    <label htmlFor="radios">Radio</label>
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      name="radios"
-                      id="radios"
-                      value="radios"
-                      data-type="captura"
-                      onChange={handleCheckboxChange}
-                      checked={capturaFilter.radios || false}
-                    />
-                  </div>
-                  <div className="form-check">
-                    <label htmlFor="telefono">Teléfono</label>
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      name="telefono"
-                      id="telefono"
-                      value="telefono"
-                      data-type="captura"
-                      onChange={handleCheckboxChange}
-                      checked={capturaFilter.telefono || false}
-                    />
-                  </div>
-                  <div className="form-check">
-                    <label htmlFor="rrss">RRSS</label>
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      name="rrss"
-                      id="rrss"
-                      value="rrss"
-                      data-type="captura"
-                      onChange={handleCheckboxChange}
-                      checked={capturaFilter.rrss || false}
-                    />
-                  </div>
-                  <div className="form-check">
-                    <label htmlFor="presencial">Presencial</label>
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      name="presencial"
-                      id="presencial"
-                      value="presencial"
-                      data-type="captura"
-                      onChange={handleCheckboxChange}
-                      checked={capturaFilter.presencial || false}
-                    />
-                  </div>
-                  <div className="form-check">
-                    <label htmlFor="email">E-mail</label>
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      name="email"
-                      id="email"
-                      value="email"
-                      data-type="captura"
-                      onChange={handleCheckboxChange}
-                      checked={capturaFilter.email || false}
-                    />
-                  </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="card h-100 border-secondary">
+                <div className="card-header">
+                  <strong>Estado Informes</strong>
+                </div>
+                <div className="card-body">
+                  {Object.keys(estadoFilter).map((key) => (
+                    <div className="form-check" key={key}>
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id={key}
+                        name={key}
+                        data-type="estado"
+                        value={key}
+                        checked={estadoFilter[key] || false}
+                        onChange={handleCheckboxChange}
+                      />
+                      <label className="form-check-label" htmlFor={key}>
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="card h-100 border-secondary">
+                <div className="card-header">
+                  <strong>Captura de Información</strong>
+                </div>
+                <div className="card-body">
+                  {Object.keys(capturaFilter).map((key) => (
+                    <div className="form-check" key={key}>
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id={key}
+                        name={key}
+                        data-type="captura"
+                        value={key}
+                        checked={capturaFilter[key] || false}
+                        onChange={handleCheckboxChange}
+                      />
+                      <label className="form-check-label" htmlFor={key}>
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </label>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="row p-2">
-            <div className="col">
-              <div className="clasiInforme">
-                <label htmlFor="clasificacion" className="form-label fw-bold">
-                  Clasificación
-                </label>
-
-                <SelectClasifica
-                  id="clasificacion"
-                  selectedClasif={selectedClasif}
-                  setSelectedClasif={setSelectedClasif}
-                />
-              </div>
+          <div className="row g-4 mt-3">
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Clasificación</label>
+              <SelectClasifica
+                selectedClasif={selectedClasif}
+                setSelectedClasif={setSelectedClasif}
+              />
             </div>
-            <div className="col">
-              <div className="origenInforme">
-                <label htmlFor="" className="form-label fw-bold">
-                  Origen:
-                </label>
-                <SelectOrigin
-                  selectedOrigin={selectedOrigen}
-                  setSelectedOrigin={setSelectedOrigen}
-                />
-              </div>
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Origen</label>
+              <SelectOrigin
+                selectedOrigin={selectedOrigen}
+                setSelectedOrigin={setSelectedOrigen}
+              />
             </div>
-            <div className="col">
-              <div className="sectorInforme">
-                <label htmlFor="" className="form-label fw-bold">
-                  Sector:
-                </label>
-                <SelectSector
-                  selectedSector={selectedSector}
-                  setSelectedSector={setSelectedSector}
-                />
-              </div>
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Sector</label>
+              <SelectSector
+                selectedSector={selectedSector}
+                setSelectedSector={setSelectedSector}
+              />
             </div>
           </div>
-          <div className="row p-2">
-            <div className="col">
-              <div className="tipoReporte">
-                <label htmlFor="" className="form-label fw-bold">
-                  Tipo de informe:
-                </label>
-                <SelectTipo
-                  tipo={selectedClasif}
-                  selectedTipo={selectedTipo}
-                  setSelectedTipo={setSelectedTipo}
-                />
-              </div>
+
+          <div className="row g-4 mt-3">
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Tipo de informe</label>
+              <SelectTipo
+                tipo={selectedClasif}
+                selectedTipo={selectedTipo}
+                setSelectedTipo={setSelectedTipo}
+              />
             </div>
-            <div className="col">
-              <div className="recursosInvolucrados">
-                <label htmlFor="" className="form-label fw-bold">
-                  Recursos
-                </label>
-                <SelectRecursos
-                  selectedRecursos={selectedRecursos}
-                  setSelectedRecursos={setSelectedRecursos}
-                />
-              </div>
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Recursos</label>
+              <SelectRecursos
+                selectedRecursos={selectedRecursos}
+                setSelectedRecursos={setSelectedRecursos}
+              />
             </div>
-            <div className="col">
-              <div className="vechiculoInforme">
-                <label htmlFor="" className="form-label fw-bold">
-                  Vehículos:
-                </label>
-                <SelectVehiculo
-                  selectedVehiculo={selectedVehiculo}
-                  setSelectedVehiculo={setSelectedVehiculo}
-                />
-              </div>
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Vehículos</label>
+              <SelectVehiculo
+                selectedVehiculo={selectedVehiculo}
+                setSelectedVehiculo={setSelectedVehiculo}
+              />
             </div>
           </div>
         </div>
       </div>
+
       <hr />
-      {/*BOTONEEEEES! */}
-      <div className="row">
-        <div className="col">
+
+      <div className="row g-4">
+        <div className="col-md-6">
           <div className="card">
-            <div className="card-header text-bg-success">
-              <span className="fw-bold">Acciones</span>
+            <div className="card-header bg-success text-white">
+              <strong>Acciones</strong>
             </div>
-            <div className="card-body">
-              <div className="d-flex flex-column gap-2 align-items-center">
-                <button
-                  className="btn btn-danger w-50"
-                  onClick={() => fetchData(1)}
-                >
-                  <i className="bi bi-file-pdf"></i> Descargar PDF
-                </button>
-                <button
-                  className="btn btn-success w-50"
-                  onClick={() => fetchData(2)}
-                >
-                  <i className="bi bi-file-earmark-text"></i> Exportar a Excel
-                </button>
-                <button
-                  className="btn btn-primary w-50"
-                  onClick={handleClearFilter}
-                >
-                  <i className="bi bi-stars"></i> Limpiar filtros
-                </button>
-              </div>
+            <div className="card-body d-flex flex-column gap-3 align-items-center">
+              <button
+                className="btn btn-danger w-75"
+                onClick={() => fetchData(1)}
+              >
+                <i className="bi bi-file-pdf me-1"></i> Descargar PDF
+              </button>
+              <button
+                className="btn btn-success w-75"
+                onClick={() => fetchData(2)}
+              >
+                <i className="bi bi-file-earmark-excel me-1"></i> Exportar a
+                Excel
+              </button>
+              <button
+                className="btn btn-primary w-75"
+                onClick={handleClearFilter}
+              >
+                <i className="bi bi-stars me-1"></i> Limpiar filtros
+              </button>
             </div>
           </div>
         </div>
-        <div className="col">
+
+        <div className="col-md-6">
           <div className="card">
-            <div className="card-header text-bg-success">
-              <span className="fw-bold">Resumen estadisticas</span>
+            <div className="card-header bg-success text-white">
+              <strong>Resumen Estadísticas</strong>
             </div>
-            <div className="card-body">
-              <div className="row">
-                <div className="col-md-6 d-flex flex-column gap-2">
+            <div className="card-body row g-2">
+              {[
+                {
+                  text: "Recursos involucrados",
+                  handler: resumenRecursosPDF,
+                },
+                {
+                  text: "Clasificación",
+                  handler: resumenClasifPDF,
+                },
+                {
+                  text: "Origen",
+                  handler: resumenOrigenPDF,
+                },
+                {
+                  text: "Rango Horario",
+                  handler: resumenRangoPDF,
+                },
+                {
+                  text: "Estado Informe",
+                  handler: resumenEstadoPDF,
+                },
+              ].map((btn, idx) => (
+                <div className="col-md-6" key={idx}>
                   <button
-                    className="btn btn-outline-success"
-                    onClick={resumenRecursosPDF}
+                    className="btn btn-outline-success w-100"
+                    onClick={btn.handler}
                   >
-                    <i className="bi bi-download"></i> Recursos involucrados
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenClasifPDF}
-                  >
-                    <i className="bi bi-download"></i> Clasificación
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenOrigenPDF}
-                  >
-                    <i className="bi bi-download"></i> Origen
-                  </button>
-                </div>
-                <div className="col-md-6 d-flex flex-column gap-2">
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenRangoPDF}
-                  >
-                    <i className="bi bi-download"></i> Rango Horario
-                  </button>
-                  <button
-                    className="btn btn-outline-success"
-                    onClick={resumenEstadoPDF}
-                  >
-                    <i className="bi bi-download"></i> Estado Informe
+                    <i className="bi bi-download me-1"></i> {btn.text}
                   </button>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

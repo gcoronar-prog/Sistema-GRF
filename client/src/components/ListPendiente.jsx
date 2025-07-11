@@ -57,33 +57,47 @@ function ListPendiente(refresh) {
   const estados = { 1: "pendientes", 2: "en progreso", 3: " - Emergencias -" };
   return (
     <>
-      <div className="card">
+      <div className="card shadow-sm mb-4">
         <div className="card-header text-center text-bg-light">
-          <p className="h5">Listado informes {estados[estado]}</p>
+          <h5 className="mb-0">
+            <i className="bi bi-journal-text me-2"></i>
+            Listado informes{" "}
+            <span className="text-success">{estados[estado]}</span>
+          </h5>
         </div>
         <div className="card-body">
-          <div className="text-center">
+          <div className="d-flex justify-content-center mb-3 gap-2 flex-wrap">
             <div className="btn-group mb-2">
               <button
-                className="btn btn-outline-success"
+                className={`btn ${
+                  estado === 1 ? "btn-success" : "btn-outline-success"
+                }`}
                 onClick={() => setEstado(1)}
               >
-                <i className="bi bi-hourglass-split"></i> Pendiente
+                <i className="bi bi-hourglass-split me-1"></i> Pendiente
               </button>
               <button
-                className="btn btn-outline-secondary"
+                className={`btn ${
+                  estado === 2 ? "btn-secondary" : "btn-outline-secondary"
+                }`}
                 onClick={() => setEstado(2)}
               >
-                <i className="bi bi-arrow-repeat"></i> Progreso
+                <i className="bi bi-arrow-repeat me-1"></i> Progreso
               </button>
-              <button className="btn btn-danger" onClick={() => setEstado(3)}>
-                <i className="bi bi-exclamation-circle"></i> Emergencias
+              <button
+                className={`btn ${
+                  estado === 3 ? "btn-danger" : "btn-outline-danger"
+                }`}
+                onClick={() => setEstado(3)}
+              >
+                <i className="bi bi-exclamation-circle me-1"></i> Emergencias
               </button>
             </div>
           </div>
-          <div style={{ maxWidth: "600px", margin: "auto" }}>
-            <table className="table table-striped table-hover table-bordered table-sm">
-              <thead className="table-success text-center align-middle">
+
+          <div className="table responsive">
+            <table className="table table-bordered table-hover align-middle text-center table-sm">
+              <thead className="table-success">
                 <tr>
                   <th>Código Informe</th>
                   <th>Fecha Informe</th>
@@ -94,7 +108,7 @@ function ListPendiente(refresh) {
                   <th>Persona Informante</th>
                 </tr>
               </thead>
-              <tbody className="table-group-divider text-center">
+              <tbody className="table-group-divider">
                 {pendientes.map((p) => (
                   <tr
                     key={p.id_informes_central}

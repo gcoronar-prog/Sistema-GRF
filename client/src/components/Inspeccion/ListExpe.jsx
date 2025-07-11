@@ -63,14 +63,18 @@ function ListExpe() {
 
   return (
     <>
-      <div className="card">
+      <div className="card shadow-sm mb-4">
         <div className="card-header text-center text-bg-light">
-          <p className="h5">Listado Expedientes</p>
+          <h5 className="mb-0">
+            <i className="bi bi-folder2-open me-2"></i>
+            Listado Expedientes
+          </h5>
         </div>
+
         <div className="card-body">
-          <div className="row d-flex justify-content-center">
+          <div className="row justify-content-center g-4">
             <div className="col-md-5">
-              <label htmlFor="selectEstado" className="fw-bold">
+              <label htmlFor="selectEstado" className="form-label fw-bold">
                 Estado expedientes
               </label>
               <select
@@ -86,7 +90,7 @@ function ListExpe() {
               </select>
             </div>
             <div className="col-md-5">
-              <label htmlFor="selectEstado" className="fw-bold">
+              <label htmlFor="selectEstado" className="form-label fw-bold">
                 Tipo expedientes
               </label>
               <select
@@ -103,12 +107,12 @@ function ListExpe() {
             </div>
           </div>
           <hr />
-          <span className="fst-italic d-flex justify-content-center">
+          <p className="fst-italic text-center text-muted mt-2">
             Expedientes por: {selectedEstado || selectedTipo}
-          </span>
-          <div style={{ maxWidth: "700px", margin: "auto", marginTop: "30px" }}>
-            <table className="table table-striped table-hover table-bordered table-sm">
-              <thead className="table-success text-center align-middle">
+          </p>
+          <div className="table-responsive mt-4">
+            <table className="table table-bordered table-hover align-middle text-center table-sm">
+              <thead className="table-success">
                 <tr>
                   <th>Código expediente</th>
                   <th>Fecha expediente</th>
@@ -118,55 +122,37 @@ function ListExpe() {
                   <th>Estado</th>
                   <th>Inspector</th>
                   <th>Sector</th>
-                  <th style={{ width: "100px" }}></th>
+                  <th style={{ width: "80px" }}></th>
                 </tr>
               </thead>
 
-              <tbody className="table-group-divider text-center">
-                {selectedEstado ? (
-                  expeEstado.map((e) => (
+              <tbody className="table-group-divider">
+                {(selectedEstado ? expeEstado : selectedTipo ? expeTipo : [])
+                  .length > 0 ? (
+                  (selectedEstado ? expeEstado : expeTipo).map((e) => (
                     <tr key={e.id_expediente}>
                       <td>{e.id_expediente}</td>
                       <td>{new Date(e.fecha_documento).toLocaleString()}</td>
-
                       <td>{e.tipo_procedimiento}</td>
-
                       <td>{e.estado_exp}</td>
                       <td>{e.funcionario}</td>
                       <td>{e.sector_infraccion}</td>
                       <td>
                         <button
-                          className="btn btn-success"
+                          className="btn btn-outline-success btn-sm"
                           onClick={() => handleNavigateExpe(e.id_expediente)}
                         >
-                          IR <i className="bi bi-box-arrow-in-right"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : selectedTipo ? (
-                  expeTipo.map((e) => (
-                    <tr key={e.id_expediente}>
-                      <td>{e.id_expediente}</td>
-                      <td>{new Date(e.fecha_documento).toLocaleString()}</td>
-
-                      <td>{e.tipo_procedimiento}</td>
-
-                      <td>{e.estado_exp}</td>
-                      <td>{e.funcionario}</td>
-                      <td>{e.sector_infraccion}</td>
-                      <td>
-                        <button
-                          className="btn btn-success"
-                          onClick={() => handleNavigateExpe(e.id_expediente)}
-                        >
-                          IR <i className="bi bi-box-arrow-in-right"></i>
+                          <i className="bi bi-box-arrow-in-right"></i> Ir
                         </button>
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <strong>No existen expedientes</strong>
+                  <tr>
+                    <td colSpan={7} className="text-center text-muted">
+                      No existen expedientes para el filtro seleccionado.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
