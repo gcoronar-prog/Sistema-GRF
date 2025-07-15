@@ -5,7 +5,8 @@ import autoTable from "jspdf-autotable";
 // import logo from './logoBase64.js'; // si tienes un logotipo en base64
 
 const CentralPDF = async (id) => {
-  const response = await fetch(`http://localhost:3000/informes_central/${id}`);
+  const server_back = `${import.meta.env.VITE_SERVER_ROUTE_BACK}`;
+  const response = await fetch(`${server_back}/informes_central/${id}`);
   const data = await response.json();
 
   const informe = data.informe[0];
@@ -16,10 +17,10 @@ const CentralPDF = async (id) => {
   const otrosRecursos = informe.otros_recursos || "-";
 
   const vehiculos =
-    informe.vehiculos_informe?.map((v) => v.label).join(", ") || "-";
+    informe.vehiculos_informe.map((v) => v.label).join(", ") || "-";
 
   const tripulantes =
-    informe.tripulantes_informe?.map((v) => v.label).join(", ") || "-";
+    informe.tripulantes_informe.map((v) => v.label).join(", ") || "-";
 
   const doc = new jsPDF();
 

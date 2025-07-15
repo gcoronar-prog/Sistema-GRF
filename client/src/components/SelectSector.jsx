@@ -4,7 +4,6 @@ function SelectSector({
   selectedSector,
   setSelectedSector,
   edition,
-  error,
   selectRef,
 }) {
   const loadSector = async (inputValue) => {
@@ -46,11 +45,12 @@ function SelectSector({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedSector ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedSector && <p style={{ color: "red" }}>Seleccione sector</p>}
+      {selectedSector && null}
     </div>
   );
 }

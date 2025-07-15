@@ -1,6 +1,6 @@
 import AsyncSelect from "react-select/async";
 
-function SelectLey({ selectedLey, setSelectedLey, edition, error, selectRef }) {
+function SelectLey({ selectedLey, setSelectedLey, edition, selectRef }) {
   const loadLeyes = async () => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
@@ -35,11 +35,12 @@ function SelectLey({ selectedLey, setSelectedLey, edition, error, selectRef }) {
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedLey ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedLey && <p style={{ color: "red" }}>Elija una ley</p>}
+      {selectedLey && null}
     </div>
   );
 }

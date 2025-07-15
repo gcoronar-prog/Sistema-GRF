@@ -42,12 +42,14 @@ function FormAcciones({ tipo }) {
 
       const formattedData = data.acciones.map((accion) => ({
         cod_accion: accion.cod_accion,
-        fecha_accion: dayjs(accion.fecha_accion).format("YYYY-MM-DDTHH:mm"),
+        fecha_accion: accion.fecha_accion
+          ? dayjs(accion.fecha_accion).format("YYYY-MM-DDTHH:mm")
+          : null,
         desc_acciones: accion.desc_acciones,
         estado_accion: accion.estado_accion,
-        fecha_resolucion: dayjs(accion.fecha_resolucion).format(
-          "YYYY-MM-DDTHH:mm"
-        ),
+        fecha_resolucion: accion.fecha_resolucion
+          ? dayjs(accion.fecha_resolucion).format("YYYY-MM-DDTHH:mm")
+          : null,
         isEditing: true,
       }));
 
@@ -71,17 +73,15 @@ function FormAcciones({ tipo }) {
     e.preventDefault();
     const confirmar = window.confirm("¿Deseas guardar la acción?");
     if (!confirmar) return;
-    const indi = params.id;
 
-    const method = id.toString().startsWith("temp") ? "POST" : "PUT";
+    const idString = id.toString().startsWith("temp");
+    const method = idString ? "POST" : "PUT";
+    const indi = params.id;
     try {
       const accionToSubmit = acciones.find(
         (accion) => accion.cod_accion === id
       );
-      /*const url =
-        indi != ""
-          ? `http://localhost:3000/acciones`
-          : `http://localhost:3000/acciones/${indi}`;*/
+
       const res = await fetch(
         `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/${tipo}/${indi}`,
         {
@@ -90,7 +90,7 @@ function FormAcciones({ tipo }) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(accionToSubmit), // Envía solo el registro específico
+          body: JSON.stringify(accionToSubmit),
         }
       );
 
@@ -246,7 +246,7 @@ function FormAcciones({ tipo }) {
                         className="form-control form-control-sm"
                         name="fecha_accion"
                         type="datetime-local"
-                        value={a.fecha_accion}
+                        value={a.fecha_accion || ""}
                         onChange={(e) => handleChanges(e, a.cod_accion)}
                       />
                     </td>
@@ -283,7 +283,7 @@ function FormAcciones({ tipo }) {
                           className="form-control form-control-sm"
                           type="datetime-local"
                           name="fecha_resolucion"
-                          value={a.fecha_resolucion}
+                          value={a.fecha_resolucion || ""}
                           onChange={(e) => handleChanges(e, a.cod_accion)}
                         />
                       </td>

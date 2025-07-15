@@ -10,7 +10,6 @@ const SelectClasifica = ({
   selectedClasif,
   setSelectedClasif,
   edition,
-  error,
   selectRef,
 }) => {
   //const [selectedOption, setSelectedOption] = useState(null);
@@ -26,11 +25,14 @@ const SelectClasifica = ({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedClasif ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedClasif && (
+        <p style={{ color: "red" }}>Seleccione clasificación de informe</p>
+      )}
+      {selectedClasif && null}
     </div>
   );
 };

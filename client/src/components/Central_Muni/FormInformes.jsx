@@ -64,7 +64,6 @@ function FormInformes() {
   const [selectedClasif, setSelectedClasif] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [editing, setEditing] = useState(true);
-  const [errors, setErrors] = useState({});
 
   const { originRef, clasiRef, informanteRef, tipoRef, recursoRef, sectorRef } =
     useRef(null);
@@ -158,101 +157,81 @@ function FormInformes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newErrors = {};
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) return;
 
-    if (!selectedOrigin) newErrors.origin = true;
-    if (!selectedClasif) newErrors.clasif = true;
-    if (!selectedInformante) newErrors.informante = true;
-    if (!selectedTipo) newErrors.tipo = true;
-    if (!selectedRecursos) newErrors.recurso = true;
-    if (!selectedSector) newErrors.sector = true;
+    setRefresh((prev) => !prev);
 
-    setErrors(newErrors);
+    const vehiculosFormateados = JSON.stringify(selectedVehiculo);
+    const tripuFormateado = JSON.stringify(selectedTripulante);
+    const originFormateado = JSON.stringify(selectedOrigin);
+    const informanteFormateado = JSON.stringify(selectedInformante);
+    const tipoFormateado = JSON.stringify(selectedTipo);
+    const sectorFormateado = JSON.stringify(selectedSector);
+    const recursosFormateado = JSON.stringify(selectedRecursos);
+    const clasificaFormateado = JSON.stringify(selectedClasif);
+    const datosActualizados = {
+      ...informes,
+      sector_informe: sectorFormateado,
+      tipo_informe: tipoFormateado,
+      persona_informante: informanteFormateado,
+      origen_informe: originFormateado,
+      vehiculos_informe: vehiculosFormateados,
+      tripulantes_informe: tripuFormateado,
+      clasificacion_informe: clasificaFormateado,
+      recursos_informe: recursosFormateado,
+    };
+    //setSelectedValues(arrayFormateado);
+    console.log("Datos enviados", informes);
+    console.log("Datos a enviar:", JSON.stringify(datosActualizados, null, 2));
 
-    if (Object.keys(newErrors).length === 0) {
-      const confirmar = window.confirm("¿Deseas guardar los cambios?");
-      if (!confirmar) return; // Si el usuario cancela, no sigue
-      setRefresh((prev) => !prev);
+    try {
+      const url = params.id
+        ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${
+            params.id
+          }`
+        : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central`;
 
-      const vehiculosFormateados = JSON.stringify(selectedVehiculo);
-      const tripuFormateado = JSON.stringify(selectedTripulante);
-      const originFormateado = JSON.stringify(selectedOrigin);
-      const informanteFormateado = JSON.stringify(selectedInformante);
-      const tipoFormateado = JSON.stringify(selectedTipo);
-      const sectorFormateado = JSON.stringify(selectedSector);
-      const recursosFormateado = JSON.stringify(selectedRecursos);
-      const clasificaFormateado = JSON.stringify(selectedClasif);
-      const datosActualizados = {
-        ...informes,
-        sector_informe: sectorFormateado,
-        tipo_informe: tipoFormateado,
-        persona_informante: informanteFormateado,
-        origen_informe: originFormateado,
-        vehiculos_informe: vehiculosFormateados,
-        tripulantes_informe: tripuFormateado,
-        clasificacion_informe: clasificaFormateado,
-        recursos_informe: recursosFormateado,
-      };
-      //setSelectedValues(arrayFormateado);
-      console.log("Datos enviados", informes);
-      console.log(
-        "Datos a enviar:",
-        JSON.stringify(datosActualizados, null, 2)
-      );
+      const method = params.id ? "PUT" : "POST";
 
-      try {
-        const url = params.id
-          ? `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central/${
-              params.id
-            }`
-          : `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informes_central`;
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(datosActualizados),
+      });
 
-        const method = params.id ? "PUT" : "POST";
-
-        const res = await fetch(url, {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(datosActualizados),
-        });
-        if (!res.ok) {
-          throw new Error("Error al enviar los datos al servidor");
-        }
-
-        if (!params.id) {
-          const lastData = await fetch(
-            `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          const lastInforme = await lastData.json();
-
-          if (lastInforme && lastInforme.informe[0]) {
-            const lastIdInfo = lastInforme.informe[0].id_informes_central;
-            setLastId(lastIdInfo); // Actualizar el estado (aunque es asíncrono)
-
-            // Navegar a la nueva ruta
-            navigate(`/informes/central/${lastIdInfo}`);
-          }
-        }
-      } catch (error) {
-        console.error(error);
+      if (!res.ok) {
+        throw new Error("Error al enviar los datos al servidor");
       }
-      setEditing(true);
-    } else {
-      if (newErrors.origin) originRef.current?.focus();
-      else if (newErrors.clasif) clasiRef.current?.focus();
-      else if (newErrors.informante) informanteRef.current?.focus();
-      else if (newErrors.tipo) tipoRef.current?.focus();
-      else if (newErrors.recurso) recursoRef.current?.focus();
-      else if (newErrors.sector) sectorRef.current?.focus();
+
+      if (!params.id) {
+        const lastData = await fetch(
+          `${import.meta.env.VITE_SERVER_ROUTE_BACK}/informe/central/last`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const lastInforme = await lastData.json();
+
+        if (lastInforme && lastInforme.informe[0]) {
+          const lastIdInfo = lastInforme.informe[0].id_informes_central;
+          setLastId(lastIdInfo); // Actualizar el estado (aunque es asíncrono)
+
+          // Navegar a la nueva ruta
+          navigate(`/informes/central/${lastIdInfo}`);
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
+
+    setEditing(true);
   };
 
   const handleFirstInforme = async () => {
@@ -366,6 +345,7 @@ function FormInformes() {
     setSelectedRecursos("");
     setEditing(false);
   };
+
   const handleEdit = async () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(false);
@@ -383,7 +363,7 @@ function FormInformes() {
       console.error(error);
     }
     setEditing(true);
-    setErrors(false);
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -473,11 +453,7 @@ function FormInformes() {
               </div>
 
               <div className="card-body">
-                <form
-                  onSubmit={handleSubmit}
-                  className="needs-validation"
-                  noValidate
-                >
+                <form onSubmit={handleSubmit} className="was-validated">
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label className="form-label">Fecha de informe</label>
@@ -490,6 +466,7 @@ function FormInformes() {
                         readOnly={editing}
                         required
                       />
+                      <div className="invalid-feedback">Ingrese fecha</div>
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">
@@ -500,11 +477,12 @@ function FormInformes() {
                           edition: editing,
                           selectedOrigin,
                           setSelectedOrigin,
-                          error: errors.origin,
+
                           selectRef: originRef,
                         }}
                       />
                     </div>
+                    <div className="invalid-feedback">Ingrese Origen</div>
 
                     <div className="col-md-6">
                       <label className="form-label">Persona informante</label>
@@ -513,12 +491,14 @@ function FormInformes() {
                           edition: editing,
                           selectedInformante,
                           setSelectedInformante,
-                          error: errors.informante,
+
                           selectRef: informanteRef,
                         }}
                       />
                     </div>
-
+                    <div className="invalid-feedback">
+                      Ingrese al informante
+                    </div>
                     <div className="col-md-6">
                       <label className="form-label">Clasificación</label>
                       <SelectClasifica
@@ -526,10 +506,13 @@ function FormInformes() {
                           selectedClasif,
                           setSelectedClasif,
                           edition: editing,
-                          error: errors.clasif,
+
                           selectRef: clasiRef,
                         }}
                       />
+                    </div>
+                    <div className="invalid-feedback">
+                      Ingrese clasificación del informe
                     </div>
 
                     <div className="col-md-12">
@@ -560,6 +543,9 @@ function FormInformes() {
                           </div>
                         ))}
                       </div>
+                      <div className="invalid-feedback">
+                        Ingrese Medio de captura
+                      </div>
                     </div>
 
                     <div className="col-md-12">
@@ -576,6 +562,7 @@ function FormInformes() {
                               onChange={handleChanges}
                               checked={informes.estado_informe === estado}
                               disabled={editing}
+                              required
                             />
                             <label
                               className="form-check-label"
@@ -585,6 +572,9 @@ function FormInformes() {
                             </label>
                           </div>
                         ))}
+                      </div>
+                      <div className="invalid-feedback">
+                        Ingrese estado del informe
                       </div>
                     </div>
 
@@ -596,10 +586,13 @@ function FormInformes() {
                           setSelectedTipo,
                           tipo: selectedClasif,
                           edition: editing,
-                          error: errors.tipo,
+
                           selectRef: tipoRef,
                         }}
                       />
+                    </div>
+                    <div className="invalid-feedback">
+                      Ingrese tipo de informe
                     </div>
 
                     {informes.tipo_informe === "Otro" && (
@@ -639,10 +632,13 @@ function FormInformes() {
                           selectedRecursos,
                           setSelectedRecursos,
                           edition: editing,
-                          error: errors.recurso,
+
                           selectRef: recursoRef,
                         }}
                       />
+                    </div>
+                    <div className="invalid-feedback">
+                      Ingrese recursos involucrados
                     </div>
 
                     <div className="col-md-6">
@@ -652,10 +648,13 @@ function FormInformes() {
                           selectedSector,
                           setSelectedSector,
                           edition: editing,
-                          error: errors.sector,
+
                           selectRef: sectorRef,
                         }}
                       />
+                    </div>
+                    <div className="invalid-feedback">
+                      Ingrese sector asociado a informe
                     </div>
 
                     <div className="col-md-6">
@@ -694,33 +693,9 @@ function FormInformes() {
                   </div>
 
                   {/* Botones de acción */}
-                  <div className="d-flex flex-wrap gap-2 mt-4">
-                    {editing ? (
-                      <>
-                        <button
-                          type="button"
-                          className="btn btn-success"
-                          onClick={handleNewInform}
-                        >
-                          <i className="bi bi-clipboard2-plus"></i> Nuevo
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={handleEdit}
-                        >
-                          <i className="bi bi-pencil-square"></i> Editar
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-danger"
-                          onClick={handleDeleteInforme}
-                        >
-                          <i className="bi bi-trash"></i> Eliminar
-                        </button>
-                      </>
-                    ) : (
-                      <>
+                  <div className="d-flex flex-wrap gap-2 mt-4 ">
+                    {!editing && (
+                      <div className="d-flex flex-wrap gap-2 mt-4">
                         <button type="submit" className="btn btn-primary">
                           <i className="bi bi-save"></i> Guardar
                         </button>
@@ -731,19 +706,46 @@ function FormInformes() {
                         >
                           <i className="bi bi-x-octagon"></i> Cancelar
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </form>
+                {editing && (
+                  <div className="d-flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={handleNewInform}
+                    >
+                      <i className="bi bi-clipboard2-plus"></i> Nuevo
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleEdit}
+                    >
+                      <i className="bi bi-pencil-square"></i> Editar
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={handleDeleteInforme}
+                    >
+                      <i className="bi bi-trash"></i> Eliminar
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="card-footer text-end">
-                <button
-                  className="btn btn-danger"
-                  onClick={() => CentralPDF(params.id)}
-                >
-                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
-                </button>
+                {editing && (
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => CentralPDF(params.id)}
+                  >
+                    <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -752,7 +754,7 @@ function FormInformes() {
             {selectedClasif.value === 1 && params.id && (
               <FormAcciones tipo="central" />
             )}
-            <ListPendiente refresh={refresh} />
+            {editing && <ListPendiente refresh={refresh} />}
           </div>
         </div>
 

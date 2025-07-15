@@ -7,7 +7,6 @@ function SelectTipo({
   edition,
   tipo,
   selectRef,
-  error,
 }) {
   const [key, setKey] = useState(0);
   useEffect(() => {
@@ -57,16 +56,17 @@ function SelectTipo({
         onChange={(selectedOptions) => {
           setSelectedTipo(selectedOptions);
         }}
-        value={selectedTipo || null}
+        value={selectedTipo}
         ref={selectRef}
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedTipo ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedTipo && <p style={{ color: "red" }}>Ingrese tipo de informe</p>}
+      {selectedTipo && null}
     </div>
   );
 }

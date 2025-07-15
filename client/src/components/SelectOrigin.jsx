@@ -4,7 +4,7 @@ function SelectOrigin({
   selectedOrigin,
   setSelectedOrigin,
   edition,
-  error,
+
   selectRef,
 }) {
   const loadOrigin = async (inputValue) => {
@@ -46,11 +46,14 @@ function SelectOrigin({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedOrigin ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedOrigin && (
+        <p style={{ color: "red" }}>Seleccione origen de la información</p>
+      )}
+      {selectedOrigin && null}
     </div>
   );
 }

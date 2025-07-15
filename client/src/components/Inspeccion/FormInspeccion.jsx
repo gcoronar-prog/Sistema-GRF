@@ -265,8 +265,8 @@ function FormInspeccion() {
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) handleCancel();
 
-    if (expedientes.num_control == numControl && !params.id) {
-      alert("Número de control ya existe, por favor ingrese otro.");
+    if (expedientes.num_control) {
+      window.alert("Número de control ya existe, por favor ingrese otro.");
       return;
     }
     const sectorFormatted = JSON.stringify(selectedSector.label);
@@ -314,6 +314,7 @@ function FormInspeccion() {
     } catch (error) {
       console.error("Error al enviar datos:", error);
     }
+
     setEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -553,7 +554,7 @@ function FormInspeccion() {
                           className="form-control"
                           type="text"
                           name="num_control"
-                          value={expedientes.num_control}
+                          value={expedientes.num_control || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                           required
@@ -573,7 +574,7 @@ function FormInspeccion() {
                           className="form-control"
                           type="datetime-local"
                           name="fecha_infraccion"
-                          value={expedientes.fecha_infraccion}
+                          value={expedientes.fecha_infraccion || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                           required
@@ -666,7 +667,7 @@ function FormInspeccion() {
                           className="form-control"
                           type="datetime-local"
                           name="fecha_citacion"
-                          value={expedientes.fecha_citacion}
+                          value={expedientes.fecha_citacion || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                           hidden={
@@ -949,7 +950,7 @@ function FormInspeccion() {
                           type="text"
                           name="rut_contri"
                           placeholder="Rut Contribuyente"
-                          value={expedientes.rut_contri}
+                          value={expedientes.rut_contri || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                         />
@@ -961,7 +962,7 @@ function FormInspeccion() {
                           type="text"
                           name="giro_contri"
                           placeholder="Giro del Contribuyente"
-                          value={expedientes.giro_contri}
+                          value={expedientes.giro_contri || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                         />
@@ -975,7 +976,7 @@ function FormInspeccion() {
                           type="text"
                           name="nombre"
                           placeholder="Nombre del Contribuyente"
-                          value={expedientes.nombre}
+                          value={expedientes.nombre || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                         />
@@ -987,13 +988,13 @@ function FormInspeccion() {
                           type="text"
                           name="direccion"
                           placeholder="Dirección del Contribuyente"
-                          value={expedientes.direccion}
+                          value={expedientes.direccion || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                         />
                       </div>
                       <div className="col-md-6">
-                        <label htmlFor="sector_contri">
+                        <label htmlFor="sector_contri" className="form-label">
                           Sector Contribuyente
                         </label>
                         <SelectSector
@@ -1012,7 +1013,7 @@ function FormInspeccion() {
                           type="text"
                           name="rol_contri"
                           placeholder="Rol del Contribuyente"
-                          value={expedientes.rol_contri}
+                          value={expedientes.rol_contri || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                         />
@@ -1033,7 +1034,7 @@ function FormInspeccion() {
                           className="form-select"
                           name="tipo_vehi"
                           id=""
-                          value={expedientes.tipo_vehi}
+                          value={expedientes.tipo_vehi || ""}
                           onChange={handleChanges}
                           disabled={editing}
                         >
@@ -1054,7 +1055,7 @@ function FormInspeccion() {
                           className="form-select"
                           name="marca_vehi"
                           id=""
-                          value={expedientes.marca_vehi}
+                          value={expedientes.marca_vehi || ""}
                           onChange={handleChanges}
                           disabled={editing}
                         >
@@ -1074,7 +1075,7 @@ function FormInspeccion() {
                           className="form-select"
                           name="color_vehi"
                           id=""
-                          value={expedientes.color_vehi}
+                          value={expedientes.color_vehi || ""}
                           onChange={handleChanges}
                           disabled={editing}
                         >
@@ -1096,7 +1097,7 @@ function FormInspeccion() {
                           type="text"
                           name="ppu"
                           placeholder="PPU"
-                          value={expedientes.ppu}
+                          value={expedientes.ppu || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                         />
@@ -1116,7 +1117,7 @@ function FormInspeccion() {
                         id="observaciones"
                         rows={4}
                         placeholder="Escriba aquí..."
-                        value={expedientes.observaciones}
+                        value={expedientes.observaciones || ""}
                         onChange={handleChanges}
                         readOnly={editing}
                       ></textarea>
@@ -1171,12 +1172,14 @@ function FormInspeccion() {
                 </form>
               </div>
               <div className="card-footer d-flex justify-content-between align-items-center">
-                <button
-                  className="btn btn-danger"
-                  onClick={() => InspectPDF(params.id)}
-                >
-                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
-                </button>
+                {editing && (
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => InspectPDF(params.id)}
+                  >
+                    <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                  </button>
+                )}
               </div>
               <div>
                 <small>Creado por: {expedientes.user_creador}</small> |{" "}
@@ -1184,9 +1187,11 @@ function FormInspeccion() {
               </div>
             </div>
           </div>
-          <div className="col-lg-4">
-            <SearchExpediente />
-          </div>
+          {editing && (
+            <div className="col-lg-4">
+              <SearchExpediente />
+            </div>
+          )}
         </div>
         <br />
         {editing && (

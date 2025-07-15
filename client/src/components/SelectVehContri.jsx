@@ -46,14 +46,7 @@ function SelectVehContri({
         }}
         value={selectedVeh}
         ref={selectRef}
-        styles={{
-          control: (base) => ({
-            ...base,
-            borderColor: error ? "red" : base.borderColor,
-          }),
-        }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
     </div>
   );
 }

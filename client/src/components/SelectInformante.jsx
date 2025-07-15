@@ -5,7 +5,6 @@ function SelectInformante({
   setSelectedInformante,
   edition,
   selectRef,
-  error,
 }) {
   const loadInformante = async (inputValue) => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -45,11 +44,14 @@ function SelectInformante({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedInformante ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedInformante && (
+        <p style={{ color: "red" }}>Seleccione un informante</p>
+      )}
+      {selectedInformante && null}
     </div>
   );
 }

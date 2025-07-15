@@ -5,7 +5,7 @@ const SelectRecursos = ({
   selectedRecursos,
   setSelectedRecursos,
   edition,
-  error,
+
   selectRef,
 }) => {
   const loadRecursos = async (inputValue) => {
@@ -37,11 +37,14 @@ const SelectRecursos = ({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedRecursos ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedRecursos && (
+        <p style={{ color: "red" }}>Seleccione recursos involucrados</p>
+      )}
+      {selectedRecursos && null}
     </div>
   );
 };

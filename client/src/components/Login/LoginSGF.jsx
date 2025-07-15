@@ -23,7 +23,6 @@ function LoginSGF() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(login),
         }
@@ -50,6 +49,10 @@ function LoginSGF() {
         } else if (userRole === "usergrd") {
           navigate("/home/central");
         }
+      }
+      if (!res.ok) {
+        window.alert("Usuario y/o contrasela incorrectos");
+        setLogin(defaultValues);
       }
     } catch (error) {
       console.error(error);

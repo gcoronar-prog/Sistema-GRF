@@ -4,7 +4,6 @@ function SelectInspect({
   selectedInspect,
   setSelectInspect,
   edition,
-  error,
   selectRef,
 }) {
   const loadInspect = async () => {
@@ -41,11 +40,12 @@ function SelectInspect({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: error ? "red" : base.borderColor,
+            borderColor: !selectedInspect ? "red" : base.borderColor,
           }),
         }}
       />
-      {error && <p style={{ color: "red" }}>Este campo es obligatorio</p>}
+      {!selectedInspect && <p style={{ color: "red" }}>Elija un inspector</p>}
+      {selectedInspect && null}
     </div>
   );
 }
