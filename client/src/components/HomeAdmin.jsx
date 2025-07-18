@@ -6,14 +6,13 @@ import { useTokenSession } from "./useTokenSession";
 function HomeAdmin() {
   const userData = useTokenSession();
 
-  console.log(userData, "userData desde homeadmin");
   return (
     <>
       <div className="accordion" id="accordion-admin">
         <div className="accordion-item">
           <h2 className="accordion-header">
             <button
-              className="accordion-button"
+              className="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#collapseCentral"
@@ -44,7 +43,7 @@ function HomeAdmin() {
         <div className="accordion-item">
           <h2 className="accordion-header">
             <button
-              className="accordion-button"
+              className="accordion-button collapsed"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#collapseInspeccion"

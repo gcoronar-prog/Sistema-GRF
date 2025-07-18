@@ -5,6 +5,7 @@ function SelectInspect({
   setSelectInspect,
   edition,
   selectRef,
+  estadistica,
 }) {
   const loadInspect = async () => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -40,11 +41,14 @@ function SelectInspect({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: !selectedInspect ? "red" : base.borderColor,
+            borderColor:
+              !selectedInspect && !estadistica ? "red" : base.borderColor,
           }),
         }}
       />
-      {!selectedInspect && <p style={{ color: "red" }}>Elija un inspector</p>}
+      {!selectedInspect && !estadistica && (
+        <p style={{ color: "red" }}>Elija un inspector</p>
+      )}
       {selectedInspect && null}
     </div>
   );

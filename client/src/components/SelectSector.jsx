@@ -5,6 +5,7 @@ function SelectSector({
   setSelectedSector,
   edition,
   selectRef,
+  estadistica,
 }) {
   const loadSector = async (inputValue) => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -45,11 +46,14 @@ function SelectSector({
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: !selectedSector ? "red" : base.borderColor,
+            borderColor:
+              !selectedSector && !estadistica ? "red" : base.borderColor,
           }),
         }}
       />
-      {!selectedSector && <p style={{ color: "red" }}>Seleccione sector</p>}
+      {!selectedSector && !estadistica && (
+        <p style={{ color: "red" }}>Seleccione sector</p>
+      )}
       {selectedSector && null}
     </div>
   );

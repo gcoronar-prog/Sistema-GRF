@@ -984,6 +984,7 @@ function StatisticsInspect() {
                     id="inspectores"
                     selectedInspect={selectedInspect}
                     setSelectInspect={setSelectedInspect}
+                    estadistica={true}
                   />
                 </div>
                 <div className="col-md-4">
@@ -994,6 +995,7 @@ function StatisticsInspect() {
                     id="leyes_1"
                     selectedLey={selectedLey}
                     setSelectedLey={setSelectedLey}
+                    estadistica={true}
                   />
                 </div>
                 <div className="col-md-4">
@@ -1026,6 +1028,7 @@ function StatisticsInspect() {
                     id="sectorContri"
                     selectedSector={selectedSector}
                     setSelectedSector={setSelectedSector}
+                    estadistica={true}
                   />
                 </div>
               </div>

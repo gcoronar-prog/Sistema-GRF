@@ -72,12 +72,34 @@ function NavbarSGF() {
     navigate("/sgf/v1/login/");
   };
 
+  const handleHome = async () => {
+    const userRol = user.user_rol;
+
+    switch (userRol) {
+      case "userinspeccion":
+        navigate("/home/inspeccion");
+        break;
+      case "usercentral":
+        navigate("/home/central");
+        break;
+      case "superadmin":
+        navigate("/home/admin");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
         <div className="container-fluid">
-          <a className="navbar-brand fw-bold" href="/">
-            Inicio
+          <a
+            className="navbar-brand fw-bold"
+            style={{ cursor: "pointer" }}
+            onClick={handleHome}
+          >
+            <i className="bi bi-house me-1"></i> Inicio
           </a>
 
           <button

@@ -18,7 +18,7 @@ const CentralStatsPDF = ({ data }) => {
 
   const addHeader = (title, subtitle = "") => {
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFontSize(15);
     doc.text(title, pageWidth / 2, 20, { align: "center" });
 
     if (subtitle) {

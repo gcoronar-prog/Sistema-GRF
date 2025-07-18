@@ -833,7 +833,7 @@ function FormInspeccion() {
                           type="text"
                           name="direccion_infraccion"
                           placeholder="Direccion infraccion"
-                          value={expedientes.direccion_infraccion}
+                          value={expedientes.direccion_infraccion || ""}
                           onChange={handleChanges}
                           readOnly={editing}
                         />

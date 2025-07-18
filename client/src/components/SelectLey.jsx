@@ -1,6 +1,12 @@
 import AsyncSelect from "react-select/async";
 
-function SelectLey({ selectedLey, setSelectedLey, edition, selectRef }) {
+function SelectLey({
+  selectedLey,
+  setSelectedLey,
+  edition,
+  selectRef,
+  estadistica,
+}) {
   const loadLeyes = async () => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
@@ -35,11 +41,14 @@ function SelectLey({ selectedLey, setSelectedLey, edition, selectRef }) {
         styles={{
           control: (base) => ({
             ...base,
-            borderColor: !selectedLey ? "red" : base.borderColor,
+            borderColor:
+              !selectedLey && !estadistica ? "red" : base.borderColor,
           }),
         }}
       />
-      {!selectedLey && <p style={{ color: "red" }}>Elija una ley</p>}
+      {!selectedLey && !estadistica && (
+        <p style={{ color: "red" }}>Elija una ley</p>
+      )}
       {selectedLey && null}
     </div>
   );
