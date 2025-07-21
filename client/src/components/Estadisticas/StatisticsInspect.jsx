@@ -156,6 +156,11 @@ function StatisticsInspect() {
   const generarPDF = (dato) => {
     const doc = new jsPDF({ orientation: "landscape" });
 
+    const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
+    const logoSegPub = `${import.meta.env.VITE_LOGO_SEG}`;
+    doc.addImage(logo, "PNG", 250, 5, 35, 18);
+    doc.addImage(logoSegPub, "PNG", 200, 9, 42, 15);
+
     doc.setFontSize(18);
     doc.setTextColor(40, 40, 40);
     doc.text("Expedientes Inspección Municipal", 14, 15);
@@ -257,7 +262,7 @@ function StatisticsInspect() {
   };
 
   const resumenEstadoInsp = async () => {
-    const url = `http://${server_back}/resumen_estado_inspe?`;
+    const url = `${server_back}/resumen_estado_inspe?`;
     let params = new URLSearchParams();
 
     if (fechaInicioInfrac && fechaFinInfrac) {

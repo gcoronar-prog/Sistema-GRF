@@ -17,10 +17,10 @@ const CentralPDF = async (id) => {
   const otrosRecursos = informe.otros_recursos || "-";
 
   const vehiculos =
-    informe.vehiculos_informe.map((v) => v.label).join(", ") || "-";
+    informe.vehiculos_informe?.map((v) => v.label).join(", ") || "-";
 
   const tripulantes =
-    informe.tripulantes_informe.map((v) => v.label).join(", ") || "-";
+    informe.tripulantes_informe?.map((v) => v.label).join(", ") || "-";
 
   const doc = new jsPDF();
 
@@ -49,8 +49,11 @@ const CentralPDF = async (id) => {
       doc.text(subtitle, pageWidth / 2, 27, { align: "center" });
     }
 
-    // Opcional: logotipo (si tienes uno en base64)
-    // doc.addImage(logo, "PNG", margin, 10, 30, 15);
+    const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
+
+    const logoSegPub = `${import.meta.env.VITE_LOGO_SEG}`;
+    doc.addImage(logo, "PNG", 4, 3, 30, 15);
+    doc.addImage(logoSegPub, "PNG", 167, 4, 40, 15);
   };
 
   // === Función para pie de página ===

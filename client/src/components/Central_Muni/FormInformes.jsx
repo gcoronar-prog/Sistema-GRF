@@ -14,6 +14,7 @@ import CentralPDF from "../PDFs/CentralPDF";
 import SelectRecursos from "../SelectRecursos";
 import SelectClasifica from "../SelectClasifica";
 import FormAcciones from "../FormAcciones";
+import { jwtDecode } from "jwt-decode";
 
 function FormInformes() {
   const params = useParams();
@@ -106,7 +107,7 @@ function FormInformes() {
       id_vehiculo_informe: data.informe[0].id_vehiculo_informe,
       cod_informes_central: data.informe[0].cod_informes_central,
       fecha_doc_central: data.informe[0].fecha_doc_central,
-
+      user_creador: data.informe[0].user_creador,
       //origen informe
       fecha_informe: dayjs(data.informe[0].fecha_informe).format(
         "YYYY-MM-DDTHH:mm"
@@ -157,6 +158,7 @@ function FormInformes() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const decoded = jwtDecode(token);
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) return;
 
@@ -180,10 +182,11 @@ function FormInformes() {
       tripulantes_informe: tripuFormateado,
       clasificacion_informe: clasificaFormateado,
       recursos_informe: recursosFormateado,
+      user_creador: decoded.user_name,
     };
     //setSelectedValues(arrayFormateado);
-    console.log("Datos enviados", informes);
-    console.log("Datos a enviar:", JSON.stringify(datosActualizados, null, 2));
+    //console.log("Datos enviados", informes);
+    //console.log("Datos a enviar:", JSON.stringify(datosActualizados, null, 2));
 
     try {
       const url = params.id

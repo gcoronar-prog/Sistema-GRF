@@ -90,8 +90,26 @@ function NavbarSGF() {
     }
   };
 
+  const logoMuni = import.meta.env.VITE_LOGO_MUNI;
+  const logoSGIE = import.meta.env.VITE_LOGO_SGIE;
   return (
     <>
+      <div className="bg-white py-2 border-bottom">
+        <img
+          src={logoMuni}
+          alt="Logo"
+          className="d-inline-block align-text-top me-2"
+          width={140}
+          height={80}
+        />
+        <img
+          src={logoSGIE}
+          alt="Logo"
+          className="d-inline-block align-text-top me-2"
+          width={140}
+          height={80}
+        />
+      </div>
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
         <div className="container-fluid">
           <a

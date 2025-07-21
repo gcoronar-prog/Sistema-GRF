@@ -125,14 +125,15 @@ const createInformeCentral = async (req, res) => {
     const [origen, tipos, ubicacion, vehiculo] = await Promise.all([
       await client.query(
         "INSERT INTO datos_origen_informe (fecha_informe,\
-        origen_informe,persona_informante,captura_informe,estado_informe)\
-         VALUES ($1,$2,$3,$4,$5) RETURNING *",
+        origen_informe,persona_informante,captura_informe,estado_informe,user_creador)\
+         VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
         [
           data.fecha_informe,
           data.origen_informe,
           data.persona_informante,
           data.captura_informe,
           data.estado_informe,
+          data.user_creador,
         ]
       ),
       await client.query(
@@ -211,13 +212,14 @@ const updateInformeCentral = async (req, res) => {
       await client.query(
         "UPDATE datos_origen_informe SET fecha_informe=$1,\
         origen_informe=$2,persona_informante=$3,captura_informe=$4,\
-        estado_informe=$5 WHERE id_origen_informe=$6 RETURNING *",
+        estado_informe=$5, user_creador=$6 WHERE id_origen_informe=$7 RETURNING *",
         [
           data.fecha_informe,
           data.origen_informe,
           data.persona_informante,
           data.captura_informe,
           data.estado_informe,
+          data.user_creador,
           idOrigen,
         ]
       ),
