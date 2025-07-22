@@ -11,3 +11,10 @@ fieldset {
   border-color: beige;
   border-width: 2px;
 }
+
+.titulo {
+  font-family: "Roboto Slab", serif;
+  font-size: 2rem;
+  text-align: center;
+  color: #2c3e50;
+}

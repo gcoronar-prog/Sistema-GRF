@@ -4,7 +4,7 @@ import SearchForm from "./SearchForm";
 
 import { jwtDecode } from "jwt-decode";
 import { useTokenSession } from "./useTokenSession";
-
+import logoSGIE from "../img/logo_sgie.png";
 function NavbarSGF() {
   const token = localStorage.getItem("token");
 
@@ -91,23 +91,44 @@ function NavbarSGF() {
   };
 
   const logoMuni = import.meta.env.VITE_LOGO_MUNI;
-  const logoSGIE = import.meta.env.VITE_LOGO_SGIE;
+
   return (
     <>
-      <div className="bg-white py-2 border-bottom">
+      <div className="bg-white py-2 border-bottom d-flex justify-content-between align-items-center px-3">
         <img
           src={logoMuni}
           alt="Logo"
-          className="d-inline-block align-text-top me-2"
+          className="d-inline-block"
           width={140}
           height={80}
         />
+
+        <h2 className="titulo">
+          {user.user_rol === "usercentral" && (
+            <>
+              <i className="bi bi-broadcast-pin me-2"></i> Central de
+              comunicaciones Municipal
+            </>
+          )}
+          {user.user_rol === "userinspeccion" && (
+            <>
+              <i className="bi bi-clipboard-check me-2"></i> Inspección
+              Municipal
+            </>
+          )}
+          {user.user_rol === "userjpl" && <>Juzgado de Policía Local</>}
+          {user.user_rol === "userrentas" && (
+            <>
+              <i className="bi bi-clipboard2-data"></i> Rentas Municipal
+            </>
+          )}
+        </h2>
         <img
           src={logoSGIE}
           alt="Logo"
-          className="d-inline-block align-text-top me-2"
-          width={140}
-          height={80}
+          className="d-inline-block"
+          width={120}
+          height={120}
         />
       </div>
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom">
@@ -151,7 +172,8 @@ function NavbarSGF() {
 
               {/* User Inspección o JPL */}
               {(user.user_rol === "userinspeccion" ||
-                user.user_rol === "userjpl") && (
+                user.user_rol === "userjpl" ||
+                user.user_rol === "userrentas") && (
                 <>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleLastExpediente}>
@@ -236,6 +258,11 @@ function NavbarSGF() {
                   <li className="nav-item">
                     <Link className="nav-link" to="/galeriaImgExp">
                       Galería Inspección
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/sgf/get/users/">
+                      Listado Usuarios
                     </Link>
                   </li>
                 </>

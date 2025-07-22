@@ -27,7 +27,11 @@ function SearchForm({ formulario }) {
           window.alert("No existen registros con este codigo");
           setCodigo("");
         }
-      } else if (formulario === "userinspeccion" || formulario === "userjpl") {
+      } else if (
+        formulario === "userinspeccion" ||
+        formulario === "userjpl" ||
+        formulario === "userrentas"
+      ) {
         if (data.expedientes.length > 0) {
           navigate(`/inspect/${codInspect}/edit`);
           setCodigo("");

@@ -109,7 +109,7 @@ const updateUser = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   const { id } = req.params;
-  const servidor = "http://localhost:5173";
+  const servidor = process.env.VITE_SERVER_ROUTE_FRONT;
   const token = jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
@@ -118,7 +118,7 @@ const resetPassword = async (req, res) => {
 
   console.log("Enlace de restablecimiento:", resetLink);
 
-  return res.json({ msg: "Token generado", token });
+  return res.json({ msg: "Token generado", token, link: resetLink });
 };
 
 const realResetPassword = async (req, res) => {

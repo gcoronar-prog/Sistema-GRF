@@ -37,10 +37,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/sgf/v1/login/" element={<LoginSGF />} />
-        <Route path="/sgf/get/users/" element={<ListUser />} />
         <Route path="/sgf/reset-password/:token" element={<ChangePassword />} />
 
         <Route element={<Layout />}>
+          <Route path="/sgf/get/users/" element={<ListUser />} />
           <Route path="/home/admin" element={<HomeAdmin />} />
           <Route path="/home/central" element={<HomeCentral />} />
           <Route path="/home/inspeccion" element={<HomeInspeccion />} />

@@ -7,6 +7,7 @@ import SearchExpediente from "./SearchExpediente";
 import InspectPDF from "../PDFs/InspectPDF";
 import SelectSector from "../SelectSector";
 import { jwtDecode } from "jwt-decode";
+import { useTokenSession } from "../useTokenSession";
 
 function FormInspeccion() {
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ function FormInspeccion() {
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const token = localStorage.getItem("token");
+  const user = useTokenSession();
 
   const loadExpedientes = async (id) => {
     const res = await fetch(`${servidor_local}/exped/${id}`, {
@@ -249,6 +251,7 @@ function FormInspeccion() {
     loadDatosVeh();
     loadSectores();
     loadTestigo();
+    console.log("usuario", user);
   }, []);
 
   useEffect(() => {
@@ -1124,50 +1127,56 @@ function FormInspeccion() {
                     </div>
 
                     {/*botones*/}
-                    <div className="d-flex flex-wrap gap-2 mt-4">
-                      {!editing && (
-                        <button className="btn btn-primary" type="submit">
-                          <i className="bi bi-floppy2"></i> Guardar Expediente
-                        </button>
-                      )}
 
-                      {editing && (
+                    {user.user_rol !== "userrentas" &&
+                      user.user_rol !== "userjpl" && (
                         <>
-                          <button
-                            className="btn btn-success"
-                            type="button"
-                            onClick={handleNewExpediente}
-                          >
-                            <i className="bi bi-clipboard2-plus"></i> Nuevo
-                            Expediente
-                          </button>
-                          <button
-                            className="btn btn-primary"
-                            type="button"
-                            onClick={handleEdit}
-                          >
-                            <i className="bi bi-pencil-square"></i> Editar
-                          </button>
+                          <div className="d-flex flex-wrap gap-2 mt-4">
+                            {!editing && (
+                              <button className="btn btn-primary" type="submit">
+                                <i className="bi bi-floppy2"></i> Guardar
+                                Expediente
+                              </button>
+                            )}
+                            {editing && (
+                              <>
+                                <button
+                                  className="btn btn-success"
+                                  type="button"
+                                  onClick={handleNewExpediente}
+                                >
+                                  <i className="bi bi-clipboard2-plus"></i>{" "}
+                                  Nuevo Expediente
+                                </button>
+                                <button
+                                  className="btn btn-primary"
+                                  type="button"
+                                  onClick={handleEdit}
+                                >
+                                  <i className="bi bi-pencil-square"></i> Editar
+                                </button>
 
-                          <button
-                            className="btn btn-danger"
-                            type="button"
-                            onClick={handleDeleteExpediente}
-                          >
-                            <i className="bi bi-trash"></i> Eliminar
-                          </button>
+                                <button
+                                  className="btn btn-danger"
+                                  type="button"
+                                  onClick={handleDeleteExpediente}
+                                >
+                                  <i className="bi bi-trash"></i> Eliminar
+                                </button>
+                              </>
+                            )}
+                            {!editing && (
+                              <button
+                                className="btn btn-danger"
+                                type="button"
+                                onClick={handleCancel}
+                              >
+                                <i className="bi bi-x-octagon"></i> Cancelar
+                              </button>
+                            )}
+                          </div>
                         </>
                       )}
-                      {!editing && (
-                        <button
-                          className="btn btn-danger"
-                          type="button"
-                          onClick={handleCancel}
-                        >
-                          <i className="bi bi-x-octagon"></i> Cancelar
-                        </button>
-                      )}
-                    </div>
                   </div>
                 </form>
               </div>

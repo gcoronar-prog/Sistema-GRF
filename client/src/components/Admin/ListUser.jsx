@@ -8,8 +8,10 @@ function ListUser() {
     user_name: "",
     nombre: "",
     apellido: "",
+    user_password: "123456789",
     user_rol: "",
   });
+  const [linkReset, setLinkReset] = useState("");
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
   useEffect(() => {
@@ -55,8 +57,12 @@ function ListUser() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`${servidor}/update/user/${user.id_user}`, {
-        method: "PUT",
+      const url = user.id_user
+        ? `${servidor}/update/user/${user.id_user}`
+        : `${servidor}/create/user`;
+      const method = user.id_user ? "PUT" : "POST";
+      await fetch(url, {
+        method,
         headers: { "Content-type": "application/json" },
         body: JSON.stringify(user),
       });
@@ -86,8 +92,9 @@ function ListUser() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
-      const data = res.json();
+      const data = await res.json();
       alert("Reset contraseña generado");
+      setLinkReset(data.link);
     } catch (error) {
       console.error(error);
     }
@@ -175,6 +182,10 @@ function ListUser() {
 
         <button>Guardar</button>
       </form>
+      <div className="justify-content p-2 w-50">
+        link reinicio contraseña
+        <p>{linkReset}</p>
+      </div>
     </>
   );
 }

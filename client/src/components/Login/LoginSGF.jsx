@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { rolesGrupo } from "../../../../server/src/middlewares/groupRole";
+import logoSGIE from "../../img/logo_sgie.png";
 
 function LoginSGF() {
   const defaultValues = {
@@ -70,10 +71,17 @@ function LoginSGF() {
         className="card shadow-lg p-4"
         style={{ width: "100%", maxWidth: "400px" }}
       >
+        <div className="d-flex justify-content-center mb-1">
+          <img
+            src={logoSGIE}
+            alt="Logo"
+            className="d-inline-block"
+            width={210}
+            height={230}
+          />
+        </div>
         <div className="card-body">
-          <h4 className="card-title text-center mb-4">
-            🔐 Ingreso al Sistema SGF
-          </h4>
+          <h4 className="card-title text-center mb-4">🔐 Inicio Sesión</h4>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
