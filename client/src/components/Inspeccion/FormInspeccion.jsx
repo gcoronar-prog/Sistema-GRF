@@ -257,10 +257,27 @@ function FormInspeccion() {
   useEffect(() => {
     if (params.id) {
       loadExpedientes(params.id);
+      verificarNumControl();
     } else {
       setExpedientes(defaultExpediente);
     }
   }, [params.id]);
+
+  const verificarNumControl = async () => {
+    try {
+      const res = await fetch(`${servidor_local}/numcontrol`, {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("confirmar numcontrol", data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -268,12 +285,12 @@ function FormInspeccion() {
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) handleCancel();
 
-    if (expedientes.num_control) {
+    /* if (expedientes.num_control) {
       window.alert("Número de control ya existe, por favor ingrese otro.");
       return;
-    }
-    const sectorFormatted = JSON.stringify(selectedSector.label);
-    console.log(selectedSector.label);
+    }*/
+    //const sectorFormatted = JSON.stringify(selectedSector.label);
+    //console.log(selectedSector.label);
     const datosActualizados = {
       ...expedientes,
       sector_contri: selectedSector,
