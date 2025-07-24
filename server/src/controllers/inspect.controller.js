@@ -55,6 +55,11 @@ const createEXfiles = async (req, res) => {
     return res.json(rows[0]);
   } catch (error) {
     console.log(error);
+    if (error.code === "23505") {
+      return res
+        .status(400)
+        .json({ mensaje: "El número de control ya existe" });
+    }
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -87,6 +92,11 @@ const updateEXfiles = async (req, res) => {
     return res.json(rows[0]);
   } catch (error) {
     console.log(error);
+    if (error.code === "23505") {
+      return res
+        .status(400)
+        .json({ mensaje: "El número de control ya existe" });
+    }
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -451,6 +461,9 @@ const createExpediente = async (req, res) => {
     console.log(error);
 
     await client.query("ROLLBACK");
+    if (error.code === "23505") {
+      return res.status(400).json({ message: "Número de control ya existe" });
+    }
     return res
       .status(500)
       .json({ message: "Problema de conexion con servidor" });
@@ -534,6 +547,9 @@ const updateExpediente = async (req, res) => {
   } catch (error) {
     console.log(error);
     await client.query("ROLLBACK");
+    if (error.code === "23505") {
+      return res.status(400).json({ message: "Número de control ya existe" });
+    }
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -1201,33 +1217,6 @@ const getExpedTipo = async (req, res) => {
   }
 };
 
-const getNumControl = async (req, res) => {
-  const client = await client.connect();
-  const numero = req.body;
-  try {
-    await client.query("BEGIN");
-    const num = await client.query(
-      "SELECT 1 FROM expedientes WHERE num_control = $1",
-      [numero]
-    );
-
-    if (num.rowCount > 0) {
-      res.json({ existe: true });
-    } else {
-      res.json({ existe: false });
-    }
-
-    await client.query("COMMIT");
-    return;
-  } catch (error) {
-    console.log(error);
-    await client.query("ROLLBACK");
-    return res.status(500).json({ message: "Problemas con el servidor" });
-  } finally {
-    client.release();
-  }
-};
-
 export {
   getExpedientes,
   getExpediente,
@@ -1266,5 +1255,4 @@ export {
   getExpediente2,
   getExpedEstado,
   getExpedTipo,
-  getNumControl,
 };

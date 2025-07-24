@@ -13,7 +13,7 @@ const LeyInspeccionPDF = (
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 14;
+  const margin = 30;
   const addHeader = (title, subtitle = "") => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);

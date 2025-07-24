@@ -27,7 +27,6 @@ import {
   getLastExpediente,
   getLeyes,
   getNextExpediente,
-  getNumControl,
   getPrevExpediente,
   getVehiculoContri,
   getVehInfrac,
@@ -261,13 +260,6 @@ router.get(
   verifyToken,
   verifyGroup("superadmin", "inspeccion", "noinspeccion"),
   getExpedTipo
-);
-
-router.get(
-  "/numcontrol",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
-  getNumControl
 );
 
 export default router;

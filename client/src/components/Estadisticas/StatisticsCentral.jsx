@@ -14,6 +14,7 @@ import ClasifCentralPDF from "../PDFs/ClasifCentralPDF.jsx";
 import OrigenCentralPDF from "../PDFs/OrigenCentralPDF.jsx";
 import RangoCentralPDF from "../PDFs/RangoCentralPDF.jsx";
 import EstadoCentralPDF from "../PDFs/EstadoCentralPDF.jsx";
+import SelectUsers from "./SelectUsers.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -45,6 +46,7 @@ function StatisticsCentral() {
   const [selectedTipo, setSelectedTipo] = useState([]);
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [selectedClasif, setSelectedClasif] = useState([]);
+  const [selectedUser, setSelectedUser] = useState([]);
 
   /*const [rangoFilter, setRangoFilter] = useState([]);
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
@@ -106,6 +108,10 @@ function StatisticsCentral() {
 
     if (selectedRecursos) {
       params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
+    if (selectedUser) {
+      params.append("centralista", JSON.stringify(selectedUser));
     }
 
     try {
@@ -267,6 +273,10 @@ function StatisticsCentral() {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
 
+    if (selectedUser) {
+      params.append("centralista", JSON.stringify(selectedUser));
+    }
+
     try {
       const res = await fetch(url + params.toString(), {
         headers: { Authorization: `Bearer ${token}` },
@@ -326,6 +336,10 @@ function StatisticsCentral() {
 
     if (selectedRecursos) {
       params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
+    if (selectedUser) {
+      params.append("centralista", JSON.stringify(selectedUser));
     }
 
     try {
@@ -388,6 +402,9 @@ function StatisticsCentral() {
     if (selectedRecursos) {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
+    if (selectedUser) {
+      params.append("centralista", JSON.stringify(selectedUser));
+    }
 
     try {
       const res = await fetch(url + params.toString(), {
@@ -448,6 +465,10 @@ function StatisticsCentral() {
 
     if (selectedRecursos) {
       params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
+    if (selectedUser) {
+      params.append("centralista", JSON.stringify(selectedUser));
     }
 
     try {
@@ -514,6 +535,10 @@ function StatisticsCentral() {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
 
+    if (selectedUser) {
+      params.append("centralista", JSON.stringify(selectedUser));
+    }
+
     try {
       const res = await fetch(url + params.toString(), {
         headers: {
@@ -562,6 +587,7 @@ function StatisticsCentral() {
     setSelectedTipo([]);
     setSelectedRecursos([]);
     setSelectedClasif([]);
+    setSelectedUser([]);
     setEstadoFilter({
       atendido: false,
       progreso: false,
@@ -716,6 +742,13 @@ function StatisticsCentral() {
               <SelectVehiculo
                 selectedVehiculo={selectedVehiculo}
                 setSelectedVehiculo={setSelectedVehiculo}
+              />
+            </div>
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Vehículos</label>
+              <SelectUsers
+                selectedUser={selectedUser}
+                setSelectedUser={setSelectedUser}
               />
             </div>
           </div>

@@ -13,7 +13,7 @@ const estadoInspeccionPDF = (
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 14;
+  const margin = 55;
 
   const addHeader = (title, subtitle = "") => {
     doc.setFont("helvetica", "bold");
@@ -55,7 +55,7 @@ const estadoInspeccionPDF = (
     });
   };
 
-  addHeader("Resumen Estado", "");
+  addHeader("Resumen Inspeción por Estado", "");
 
   let filtros = `Filtros aplicados:\n`;
   if (fechaInicio && fechaFin)

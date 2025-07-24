@@ -159,6 +159,7 @@ function FormInformes() {
     e.preventDefault();
 
     const decoded = jwtDecode(token);
+    const user_decoded = decoded.user_name;
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) return;
 
@@ -182,7 +183,7 @@ function FormInformes() {
       tripulantes_informe: tripuFormateado,
       clasificacion_informe: clasificaFormateado,
       recursos_informe: recursosFormateado,
-      user_creador: decoded.user_name,
+      user_creador: user_decoded,
     };
     //setSelectedValues(arrayFormateado);
     //console.log("Datos enviados", informes);

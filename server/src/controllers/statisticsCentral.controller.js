@@ -156,7 +156,16 @@ const getEstadisticaCentral = async (req, res) => {
         params.push(tipoReporte);
       }
     }
-
+    if (centralista && Object.keys(centralista).length > 0) {
+      if (centralista === "[]") {
+        centralista = null;
+      } else {
+        informes += ` AND doi.user_creador::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(centralista);
+      }
+    }
     /*if (horario) {
       query += ` AND ic.horario = $${params.length + 1}`;
       params.push(horario);
@@ -201,7 +210,7 @@ const getResumenEstado = async (req, res) => {
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-        WHERE 1=1";
+        WHERE 1=1 AND doi.estado_informe IS NOT NULL";
 
     const params = [];
 
@@ -324,6 +333,17 @@ const getResumenEstado = async (req, res) => {
       }
     }
 
+    if (centralista && Object.keys(centralista).length > 0) {
+      if (centralista === "[]") {
+        centralista = null;
+      } else {
+        informes += ` AND doi.user_creador::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(centralista);
+      }
+    }
+
     estadoResumen +=
       " GROUP BY doi.estado_informe, dti.clasificacion_informe->>'label',dti.tipo_informe->>'label'\
       ORDER BY doi.estado_informe ASC";
@@ -367,7 +387,7 @@ const getResumenOrigen = async (req, res) => {
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-        WHERE 1=1";
+        WHERE 1=1 AND doi.origen_informe->>'label' IS NOT NULL";
 
     const params = [];
 
@@ -489,9 +509,20 @@ const getResumenOrigen = async (req, res) => {
         params.push(tipoReporte);
       }
     }
+    if (centralista && Object.keys(centralista).length > 0) {
+      if (centralista === "[]") {
+        centralista = null;
+      } else {
+        informes += ` AND doi.user_creador::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(centralista);
+      }
+    }
 
     origenResumen +=
-      " GROUP BY doi.origen_informe->>'label', dti.clasificacion_informe->>'label',doi.captura_informe";
+      " GROUP BY doi.origen_informe->>'label', dti.clasificacion_informe->>'label',doi.captura_informe\
+      ORDER BY doi.origen_informe->>'label'";
     const resultOrigen = await client.query(origenResumen, params);
     await client.query("COMMIT");
     //console.log(origenResumen, parameter);
@@ -529,7 +560,7 @@ const getResumenClasi = async (req, res) => {
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-       ";
+       WHERE dti.clasificacion_informe->>'label' IS NOT NULL";
     //WHERE dti.clasificacion_informe='Emergencia'
     const params = [];
 
@@ -651,6 +682,16 @@ const getResumenClasi = async (req, res) => {
         params.push(tipoReporte);
       }
     }
+    if (centralista && Object.keys(centralista).length > 0) {
+      if (centralista === "[]") {
+        centralista = null;
+      } else {
+        informes += ` AND doi.user_creador::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(centralista);
+      }
+    }
 
     estadoEmergencia +=
       " GROUP BY dti.clasificacion_informe->>'label', dti.tipo_informe->>'label'";
@@ -697,7 +738,7 @@ const getResumenRecursos = async (req, res) => {
     JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
     JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe,\
     LATERAL json_array_elements(dti.recursos_informe) AS recurso\
-    WHERE 1=1";
+    WHERE 1=1 AND recurso->>'label' IS NOT NULL";
 
     const params = [];
 
@@ -820,7 +861,18 @@ const getResumenRecursos = async (req, res) => {
       }
     }
 
-    recursosResumen += " GROUP BY recurso->>'label'";
+    if (centralista && Object.keys(centralista).length > 0) {
+      if (centralista === "[]") {
+        centralista = null;
+      } else {
+        informes += ` AND doi.user_creador::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(centralista);
+      }
+    }
+
+    recursosResumen += " GROUP BY recurso->>'label' ORDER BY recurso->>'label'";
     console.log("query", recursosResumen);
     console.log("params:", params);
 
@@ -858,7 +910,7 @@ const getResumenRango = async (req, res) => {
         FROM informes_central ic\
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-        WHERE 1=1";
+        WHERE 1=1 AND doi.rango_horario IS NOT NULL";
 
     const params = [];
 
@@ -981,8 +1033,20 @@ const getResumenRango = async (req, res) => {
       }
     }
 
+    if (centralista && Object.keys(centralista).length > 0) {
+      if (centralista === "[]") {
+        centralista = null;
+      } else {
+        informes += ` AND doi.user_creador::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(centralista);
+      }
+    }
+
     rangoResumen +=
-      " GROUP BY doi.rango_horario, dti.clasificacion_informe->>'label'";
+      " GROUP BY doi.rango_horario, dti.clasificacion_informe->>'label'\
+      ORDER BY doi.rango_horario";
     const resultRango = await client.query(rangoResumen, params);
     await client.query("COMMIT");
     //console.log(rangoResumen, parameter);

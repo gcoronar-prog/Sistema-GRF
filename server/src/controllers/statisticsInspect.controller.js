@@ -211,7 +211,7 @@ const getEstadoExpe = async (req, res) => {
                               ON vehi.id_expediente=expe.id_expediente
                               JOIN funcionarios funci
                               ON funci.id_funcionario=expe.id_inspector
-                            WHERE 1=1`;
+                            WHERE 1=1 AND estado_exp IS NOT NULL AND tipo_procedimiento IS NOT NULL`;
 
     const params = [];
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -330,7 +330,7 @@ const getEstadoExpe = async (req, res) => {
       params.push(cleanedSector);
     }
 
-    estadoInspeccion += ` GROUP BY estado_exp, tipo_procedimiento`;
+    estadoInspeccion += ` GROUP BY estado_exp, tipo_procedimiento ORDER BY estado_exp, tipo_procedimiento`;
 
     const result = await client.query(estadoInspeccion, params);
 
@@ -385,7 +385,7 @@ const getTipoProce = async (req, res) => {
                               ON vehi.id_expediente=expe.id_expediente
                               JOIN funcionarios funci
                               ON funci.id_funcionario=expe.id_inspector
-                            WHERE 1=1`;
+                            WHERE 1=1 AND tipo_procedimiento IS NOT NULL`;
 
     const params = [];
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -552,7 +552,7 @@ const getLeyesInsp = async (req, res) => {
                         JOIN infracciones infra
                         ON infra.id_expediente=expe.id_expediente
                         JOIN leyes l ON l.id_ley=expe.id_leyes
-                        WHERE 1=1`;
+                        WHERE 1=1 AND l.ley IS NOT NULL AND expe.tipo_procedimiento IS NOT NULL`;
 
     const params = [];
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -718,7 +718,7 @@ const getInspectResumen = async (req, res) => {
 	FROM expedientes expe 
 	JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
 	JOIN funcionarios func on expe.id_inspector=func.id_funcionario
-	WHERE 1=1`;
+	WHERE 1=1 AND func.funcionario IS NOT NULL`;
 
     const params = [];
     if (fechaInicioInfrac && fechaFinInfrac) {
@@ -883,7 +883,7 @@ const getVehiculoResumen = async (req, res) => {
                           FROM vehiculos_contri vehi
                             JOIN expedientes expe ON expe.id_expediente=vehi.id_expediente
                             JOIN infracciones infra ON expe.id_expediente=infra.id_expediente                      
-                        WHERE 1=1`;
+                        WHERE 1=1 AND  vehi.tipo_vehi IS NOT NULL`;
 
     const params = [];
     if (fechaInicioInfrac && fechaFinInfrac) {

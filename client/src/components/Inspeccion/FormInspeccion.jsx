@@ -257,7 +257,6 @@ function FormInspeccion() {
   useEffect(() => {
     if (params.id) {
       loadExpedientes(params.id);
-      verificarNumControl();
     } else {
       setExpedientes(defaultExpediente);
     }
@@ -265,12 +264,15 @@ function FormInspeccion() {
 
   const verificarNumControl = async () => {
     try {
-      const res = await fetch(`${servidor_local}/numcontrol`, {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${servidor_local}/numcontrol?num_control=${expedientes.num_control}`,
+        {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await res.json();
       console.log("confirmar numcontrol", data);
@@ -281,6 +283,7 @@ function FormInspeccion() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const decoded = jwtDecode(token);
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) handleCancel();
@@ -310,6 +313,13 @@ function FormInspeccion() {
         },
         body: JSON.stringify(datosActualizados),
       });
+
+      const data = await res.json();
+      if (res.status === 400 && data.message.includes("Número de control")) {
+        window.alert("Número de control ya existe");
+        return;
+      }
+
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
       }

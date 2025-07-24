@@ -8,6 +8,7 @@ import {
   getResumenRecursos,
 } from "../controllers/statisticsCentral.controller.js";
 import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
+import { getUsers } from "../controllers/users.controller.js";
 
 const router = Router();
 
@@ -55,4 +56,5 @@ router.get(
   getResumenRango
 );
 
+router.get("/usersgie", getUsers);
 export default router;
