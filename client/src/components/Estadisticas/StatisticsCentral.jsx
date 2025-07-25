@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SelectOrigin from "../SelectOrigin";
 import SelectSector from "../SelectSector";
 import SelectVehiculo from "../SelectVehiculo";
@@ -15,6 +15,7 @@ import OrigenCentralPDF from "../PDFs/OrigenCentralPDF.jsx";
 import RangoCentralPDF from "../PDFs/RangoCentralPDF.jsx";
 import EstadoCentralPDF from "../PDFs/EstadoCentralPDF.jsx";
 import SelectUsers from "./SelectUsers.jsx";
+import UserCentralPDF from "../PDFs/UserCentralPDF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -46,7 +47,7 @@ function StatisticsCentral() {
   const [selectedTipo, setSelectedTipo] = useState([]);
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [selectedClasif, setSelectedClasif] = useState([]);
-  const [selectedUser, setSelectedUser] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
 
   /*const [rangoFilter, setRangoFilter] = useState([]);
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
@@ -109,9 +110,9 @@ function StatisticsCentral() {
     if (selectedRecursos) {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
-
+    const userCentral = selectedUser.value;
     if (selectedUser) {
-      params.append("centralista", JSON.stringify(selectedUser));
+      params.append("centralista", userCentral);
     }
 
     try {
@@ -127,7 +128,6 @@ function StatisticsCentral() {
       if (data.informe.length !== 0) {
         if (tipoDoc === 1) {
           generarPDF(data.informe);
-          console.log(data.informe.length);
         } else if (tipoDoc === 2) {
           exportExcel(data.informe, "Central.xlsx", "central");
         }
@@ -274,7 +274,7 @@ function StatisticsCentral() {
     }
 
     if (selectedUser) {
-      params.append("centralista", JSON.stringify(selectedUser));
+      params.append("centralista", selectedUser.value);
     }
 
     try {
@@ -338,8 +338,9 @@ function StatisticsCentral() {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
 
+    const userCentral = selectedUser.value;
     if (selectedUser) {
-      params.append("centralista", JSON.stringify(selectedUser));
+      params.append("centralista", userCentral);
     }
 
     try {
@@ -402,8 +403,9 @@ function StatisticsCentral() {
     if (selectedRecursos) {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
+    const userCentral = selectedUser.value;
     if (selectedUser) {
-      params.append("centralista", JSON.stringify(selectedUser));
+      params.append("centralista", userCentral);
     }
 
     try {
@@ -467,8 +469,9 @@ function StatisticsCentral() {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
 
+    const userCentral = selectedUser.value;
     if (selectedUser) {
-      params.append("centralista", JSON.stringify(selectedUser));
+      params.append("centralista", userCentral);
     }
 
     try {
@@ -535,8 +538,9 @@ function StatisticsCentral() {
       params.append("recursos", JSON.stringify(selectedRecursos));
     }
 
+    const userCentral = selectedUser.value;
     if (selectedUser) {
-      params.append("centralista", JSON.stringify(selectedUser));
+      params.append("centralista", userCentral);
     }
 
     try {
@@ -552,6 +556,75 @@ function StatisticsCentral() {
         alert("No existen registros ");
       } else {
         RangoCentralPDF(fechaInicio, fechaFin, data.informe);
+      }
+      console.log("filtro origen", data.informe);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenUserPDF = async () => {
+    const url = `${server_local}/resumen_user_central?`;
+    const params = new URLSearchParams();
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
+      }
+    });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
+    const userCentral = selectedUser.value;
+    if (selectedUser) {
+      params.append("centralista", userCentral);
+    }
+
+    try {
+      const res = await fetch(url + params.toString(), {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+
+      if (data.informe.length === 0) {
+        alert("No existen registros ");
+      } else {
+        UserCentralPDF(data.informe, fechaInicio, fechaFin);
       }
       console.log("filtro origen", data.informe);
     } catch (error) {
@@ -745,7 +818,7 @@ function StatisticsCentral() {
               />
             </div>
             <div className="col-md-4">
-              <label className="form-label fw-bold">Vehículos</label>
+              <label className="form-label fw-bold">Centralista</label>
               <SelectUsers
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}
@@ -813,6 +886,10 @@ function StatisticsCentral() {
                 {
                   text: "Estado Informe",
                   handler: resumenEstadoPDF,
+                },
+                {
+                  text: "Informes por centralista",
+                  handler: resumenUserPDF,
                 },
               ].map((btn, idx) => (
                 <div className="col-md-6" key={idx}>

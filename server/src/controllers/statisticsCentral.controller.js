@@ -156,15 +156,9 @@ const getEstadisticaCentral = async (req, res) => {
         params.push(tipoReporte);
       }
     }
-    if (centralista && Object.keys(centralista).length > 0) {
-      if (centralista === "[]") {
-        centralista = null;
-      } else {
-        informes += ` AND doi.user_creador::jsonb @> $${
-          params.length + 1
-        }::jsonb`;
-        params.push(centralista);
-      }
+    if (centralista) {
+      informes += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
     }
     /*if (horario) {
       query += ` AND ic.horario = $${params.length + 1}`;
@@ -333,15 +327,9 @@ const getResumenEstado = async (req, res) => {
       }
     }
 
-    if (centralista && Object.keys(centralista).length > 0) {
-      if (centralista === "[]") {
-        centralista = null;
-      } else {
-        informes += ` AND doi.user_creador::jsonb @> $${
-          params.length + 1
-        }::jsonb`;
-        params.push(centralista);
-      }
+    if (centralista) {
+      estadoResumen += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
     }
 
     estadoResumen +=
@@ -509,15 +497,9 @@ const getResumenOrigen = async (req, res) => {
         params.push(tipoReporte);
       }
     }
-    if (centralista && Object.keys(centralista).length > 0) {
-      if (centralista === "[]") {
-        centralista = null;
-      } else {
-        informes += ` AND doi.user_creador::jsonb @> $${
-          params.length + 1
-        }::jsonb`;
-        params.push(centralista);
-      }
+    if (centralista) {
+      origenResumen += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
     }
 
     origenResumen +=
@@ -682,15 +664,9 @@ const getResumenClasi = async (req, res) => {
         params.push(tipoReporte);
       }
     }
-    if (centralista && Object.keys(centralista).length > 0) {
-      if (centralista === "[]") {
-        centralista = null;
-      } else {
-        informes += ` AND doi.user_creador::jsonb @> $${
-          params.length + 1
-        }::jsonb`;
-        params.push(centralista);
-      }
+    if (centralista && centralista.length > 0) {
+      estadoEmergencia += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
     }
 
     estadoEmergencia +=
@@ -850,7 +826,7 @@ const getResumenRecursos = async (req, res) => {
       params.push(centralista);
     }*/
 
-    if (tipoReporte && Object.keys(tipoReporte).length > 0) {
+    if (tipoReporte) {
       if (tipoReporte === "[]") {
         tipoReporte = null;
       } else {
@@ -861,15 +837,9 @@ const getResumenRecursos = async (req, res) => {
       }
     }
 
-    if (centralista && Object.keys(centralista).length > 0) {
-      if (centralista === "[]") {
-        centralista = null;
-      } else {
-        informes += ` AND doi.user_creador::jsonb @> $${
-          params.length + 1
-        }::jsonb`;
-        params.push(centralista);
-      }
+    if (centralista) {
+      recursosResumen += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
     }
 
     recursosResumen += " GROUP BY recurso->>'label' ORDER BY recurso->>'label'";
@@ -1022,7 +992,7 @@ const getResumenRango = async (req, res) => {
       params.push(centralista);
     }*/
 
-    if (tipoReporte && Object.keys(tipoReporte).length > 0) {
+    if (tipoReporte) {
       if (tipoReporte === "[]") {
         tipoReporte = null;
       } else {
@@ -1033,15 +1003,9 @@ const getResumenRango = async (req, res) => {
       }
     }
 
-    if (centralista && Object.keys(centralista).length > 0) {
-      if (centralista === "[]") {
-        centralista = null;
-      } else {
-        informes += ` AND doi.user_creador::jsonb @> $${
-          params.length + 1
-        }::jsonb`;
-        params.push(centralista);
-      }
+    if (centralista) {
+      rangoResumen += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
     }
 
     rangoResumen +=
@@ -1061,6 +1025,172 @@ const getResumenRango = async (req, res) => {
   }
 };
 
+const getResumenUser = async (req, res) => {
+  const client = await pool.connect();
+  let {
+    fechaInicio,
+    fechaFin,
+    estado,
+    clasificacion,
+    captura,
+    origen,
+    recursos,
+    sector,
+    vehiculo,
+    centralista,
+    tipoReporte,
+  } = req.query;
+  try {
+    await client.query("BEGIN");
+    let userResumen =
+      "SELECT doi.user_creador,dti.tipo_informe->>'label' as tipo,doi.estado_informe,COUNT(doi.user_creador) as cantidad\
+        FROM informes_central ic\
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+        WHERE user_creador IS NOT NULL";
+
+    const params = [];
+
+    if (fechaInicio && fechaFin) {
+      userResumen += ` AND doi.fecha_informe BETWEEN $${
+        params.length + 1
+      } AND $${params.length + 2}`;
+      params.push(fechaInicio, fechaFin);
+    }
+
+    if (estado && estado.length > 0) {
+      if (Array.isArray(estado)) {
+        // Si estado ya es un array, úsalo directamente
+        const estadosArray = estado;
+
+        userResumen += ` AND doi.estado_informe IN (${estadosArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...estadosArray);
+      } else if (typeof estado === "string") {
+        // Si estado es una cadena (string), conviértelo en array
+        const estadosArray = estado.split(",");
+
+        userResumen += ` AND doi.estado_informe IN (${estadosArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...estadosArray);
+      }
+    }
+
+    if (clasificacion?.length > 0) {
+      if (clasificacion === "[]") {
+        clasificacion = null;
+      } else {
+        userResumen += ` AND dti.clasificacion_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(clasificacion);
+      }
+    }
+
+    if (captura && captura.length > 0) {
+      if (Array.isArray(captura)) {
+        const capturaArray = captura;
+
+        userResumen += ` AND doi.captura_informe IN (${capturaArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...capturaArray);
+      } else if (typeof captura === "string") {
+        const capturaArray = captura.split(",");
+
+        userResumen += ` AND doi.captura_informe IN (${capturaArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+        params.push(...capturaArray);
+      }
+    }
+
+    if (origen && Object.keys(origen).length > 0) {
+      if (origen === "[]") {
+        origen = null;
+      } else {
+        userResumen += ` AND doi.origen_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(origen);
+      }
+    }
+
+    if (recursos && Object.keys(recursos).length > 0) {
+      if (recursos === "[]") {
+        recursos = null;
+      } else {
+        userResumen += ` AND dti.recursos_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(recursos);
+      }
+    }
+
+    if (sector && Object.keys(sector).length > 0) {
+      if (sector === "[]") {
+        sector = null;
+      } else {
+        userResumen += ` AND dui.sector_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(sector);
+      }
+    }
+
+    if (vehiculo && Object.keys(vehiculo).length > 0) {
+      if (vehiculo === "[]") {
+        vehiculo = null;
+      } else {
+        userResumen += ` AND dvi.vehiculos_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(vehiculo);
+      }
+    }
+
+    /*if (centralista) {
+      query += ` AND ic.centralista = $${params.length + 1}`;
+      params.push(centralista);
+    }*/
+
+    if (tipoReporte) {
+      if (tipoReporte === "[]") {
+        tipoReporte = null;
+      } else {
+        userResumen += ` AND dti.tipo_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(tipoReporte);
+      }
+    }
+
+    if (centralista) {
+      userResumen += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
+    }
+
+    userResumen +=
+      " GROUP BY doi.user_creador,dti.tipo_informe->>'label',doi.estado_informe\
+        ORDER BY doi.user_creador";
+    const resultRango = await client.query(userResumen, params);
+    await client.query("COMMIT");
+    //console.log(rangoResumen, parameter);
+
+    return res.status(200).json({
+      informe: resultRango.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error de conexión con el servido" });
+  }
+};
 export {
   getResumenClasi,
   getEstadisticaCentral,
@@ -1068,4 +1198,5 @@ export {
   getResumenOrigen,
   getResumenRecursos,
   getResumenRango,
+  getResumenUser,
 };

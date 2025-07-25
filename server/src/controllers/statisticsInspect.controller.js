@@ -1168,6 +1168,11 @@ const getSectorInfra = async (req, res) => {
       params.push(cleanedSector);
     }
 
+    if (digitador && digitador.length > 0) {
+      sectorResumen += ` AND expe.user_creador = $${params.length + 1}`;
+      params.push(digitador);
+    }
+
     sectorResumen += ` GROUP BY infra.sector_infraccion, expe.id_inspector,expe.tipo_procedimiento 
                           ORDER BY infra.sector_infraccion`;
 

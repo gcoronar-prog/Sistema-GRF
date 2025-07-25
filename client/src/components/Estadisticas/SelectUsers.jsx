@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import AsyncSelect from "react-select/async";
 
 function SelectUsers({ selectedUser, setSelectedUser }) {
@@ -10,8 +9,8 @@ function SelectUsers({ selectedUser, setSelectedUser }) {
       const data = await res.json();
 
       return data.map((item) => ({
-        label: item.nombre + " " + item.apellido,
         value: item.user_name,
+        label: item.nombre + " " + item.apellido,
       }));
     } catch (error) {
       console.error(error);

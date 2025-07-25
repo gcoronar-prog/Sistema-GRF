@@ -1,6 +1,6 @@
 import { pool } from "../db.js";
 
-const getUsers = async (req, res) => {
+const getUsersCentral = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -15,4 +15,4 @@ const getUsers = async (req, res) => {
   }
 };
 
-export { getUsers };
+export { getUsersCentral };

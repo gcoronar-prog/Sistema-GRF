@@ -68,6 +68,7 @@ function StatisticsInspect() {
   const [selectedVeh, setSelectedVeh] = useState("");
   const [selectedTipoVeh, setSelectedTipoVeh] = useState("");
   const [selectedSector, setSelectedSector] = useState("");
+  const [selectedUser, setSelectedUser] = useState("");
   //const [tipoDoc, setTipoDoc] = useState(0);
 
   const token = localStorage.getItem("token");
@@ -1031,6 +1032,17 @@ function StatisticsInspect() {
                   </label>
                   <SelectSector
                     id="sectorContri"
+                    selectedSector={selectedSector}
+                    setSelectedSector={setSelectedSector}
+                    estadistica={true}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label htmlFor="sectorContri" className="form-label fw-bold">
+                    Sector
+                  </label>
+                  <SelectUsers
+                    id="userInspect"
                     selectedSector={selectedSector}
                     setSelectedSector={setSelectedSector}
                     estadistica={true}
