@@ -30,7 +30,7 @@ function SelectVehiculo({ selectedVehiculo, setSelectedVehiculo, edition }) {
         onChange={(selectedOptions) => {
           setSelectedVehiculo(selectedOptions);
         }}
-        value={selectedVehiculo || "[]"}
+        value={selectedVehiculo || null}
       />
     </div>
   );

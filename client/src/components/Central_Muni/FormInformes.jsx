@@ -41,8 +41,8 @@ function FormInformes() {
     direccion_informe: "",
 
     //datos vehiculos
-    vehiculos_informe: "",
-    tripulantes_informe: "",
+    vehiculos_informe: null,
+    tripulantes_informe: null,
 
     //informes
     id_informes_central: "",
@@ -338,15 +338,15 @@ function FormInformes() {
   const handleNewInform = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     navigate("/informes/new");
-    setSelectedTripulante("");
-    setSelectedVehiculo("");
-    setSelectedValues("");
-    setSelectedOrigin("");
-    setSelectedInformante("");
-    setSelectedSector("");
-    setSelectedTipo("");
-    setSelectedClasif("");
-    setSelectedRecursos("");
+    setSelectedTripulante();
+    setSelectedVehiculo();
+    setSelectedValues();
+    setSelectedOrigin();
+    setSelectedInformante();
+    setSelectedSector();
+    setSelectedTipo();
+    setSelectedClasif();
+    setSelectedRecursos();
     setEditing(false);
   };
 

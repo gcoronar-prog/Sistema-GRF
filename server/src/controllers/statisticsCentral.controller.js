@@ -1191,6 +1191,176 @@ const getResumenUser = async (req, res) => {
     return res.status(500).json({ msg: "Error de conexión con el servido" });
   }
 };
+
+const getResumenVehi = async (req, res) => {
+  const client = await pool.connect();
+  let {
+    fechaInicio,
+    fechaFin,
+    estado,
+    clasificacion,
+    captura,
+    origen,
+    recursos,
+    sector,
+    vehiculo,
+    centralista,
+    tipoReporte,
+  } = req.query;
+  try {
+    await client.query("BEGIN");
+    let vehiResumen =
+      "SELECT\
+        dti.clasificacion_informe->>'label' AS clasificacion,\
+        elem->>'label' AS nombre_vehiculo,\
+        COUNT(*) AS veces_que_aparece\
+      FROM informes_central ic\
+      JOIN datos_tipos_informes dti ON dti.id_tipos_informes = ic.id_tipos_informe\
+      JOIN datos_vehiculos_informe dvi ON dvi.id_vehiculos = ic.id_vehiculo_informe\
+      JOIN LATERAL jsonb_array_elements(dvi.vehiculos_informe::jsonb) AS elem ON TRUE\
+      WHERE elem->>'label' IS NOT NULL";
+
+    const params = [];
+
+    if (fechaInicio && fechaFin) {
+      vehiResumen += ` AND doi.fecha_informe BETWEEN $${
+        params.length + 1
+      } AND $${params.length + 2}`;
+      params.push(fechaInicio, fechaFin);
+    }
+
+    if (estado && estado.length > 0) {
+      if (Array.isArray(estado)) {
+        // Si estado ya es un array, úsalo directamente
+        const estadosArray = estado;
+
+        vehiResumen += ` AND doi.estado_informe IN (${estadosArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...estadosArray);
+      } else if (typeof estado === "string") {
+        // Si estado es una cadena (string), conviértelo en array
+        const estadosArray = estado.split(",");
+
+        vehiResumen += ` AND doi.estado_informe IN (${estadosArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...estadosArray);
+      }
+    }
+
+    if (clasificacion?.length > 0) {
+      if (clasificacion === "[]") {
+        clasificacion = null;
+      } else {
+        vehiResumen += ` AND dti.clasificacion_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(clasificacion);
+      }
+    }
+
+    if (captura && captura.length > 0) {
+      if (Array.isArray(captura)) {
+        const capturaArray = captura;
+
+        vehiResumen += ` AND doi.captura_informe IN (${capturaArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+
+        params.push(...capturaArray);
+      } else if (typeof captura === "string") {
+        const capturaArray = captura.split(",");
+
+        vehiResumen += ` AND doi.captura_informe IN (${capturaArray
+          .map((_, index) => `$${params.length + index + 1}`)
+          .join(", ")})`;
+        params.push(...capturaArray);
+      }
+    }
+
+    if (origen && Object.keys(origen).length > 0) {
+      if (origen === "[]") {
+        origen = null;
+      } else {
+        vehiResumen += ` AND doi.origen_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(origen);
+      }
+    }
+
+    if (recursos && Object.keys(recursos).length > 0) {
+      if (recursos === "[]") {
+        recursos = null;
+      } else {
+        vehiResumen += ` AND dti.recursos_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(recursos);
+      }
+    }
+
+    if (sector && Object.keys(sector).length > 0) {
+      if (sector === "[]") {
+        sector = null;
+      } else {
+        vehiResumen += ` AND dui.sector_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(sector);
+      }
+    }
+
+    if (vehiculo && Object.keys(vehiculo).length > 0) {
+      if (vehiculo === "[]") {
+        vehiculo = null;
+      } else {
+        vehiResumen += ` AND dvi.vehiculos_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(vehiculo);
+      }
+    }
+
+    /*if (centralista) {
+      query += ` AND ic.centralista = $${params.length + 1}`;
+      params.push(centralista);
+    }*/
+
+    if (tipoReporte) {
+      if (tipoReporte === "[]") {
+        tipoReporte = null;
+      } else {
+        vehiResumen += ` AND dti.tipo_informe::jsonb @> $${
+          params.length + 1
+        }::jsonb`;
+        params.push(tipoReporte);
+      }
+    }
+
+    if (centralista) {
+      vehiResumen += ` AND doi.user_creador = $${params.length + 1}`;
+      params.push(centralista);
+    }
+
+    vehiResumen +=
+      " GROUP BY dti.clasificacion_informe->>'label',elem->>'label'\
+        ORDER BY veces_que_aparece DESC";
+    const resultRango = await client.query(vehiResumen, params);
+    await client.query("COMMIT");
+
+    return res.status(200).json({
+      informe: resultRango.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    return res.status(500).json({ msg: "Error de conexión con el servido" });
+  }
+};
 export {
   getResumenClasi,
   getEstadisticaCentral,
@@ -1199,4 +1369,5 @@ export {
   getResumenRecursos,
   getResumenRango,
   getResumenUser,
+  getResumenVehi,
 };

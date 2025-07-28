@@ -7,6 +7,7 @@ import {
   getResumenRango,
   getResumenRecursos,
   getResumenUser,
+  getResumenVehi,
 } from "../controllers/statisticsCentral.controller.js";
 import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 import { getUsersCentral } from "../controllers/users.controller.js";
@@ -57,12 +58,24 @@ router.get(
   getResumenRango
 );
 
-router.get("/usersgie", getUsersCentral);
+router.get(
+  "/usersgie",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getUsersCentral
+);
 
 router.get(
   "/resumen_user_central",
   verifyToken,
   verifyGroup("superadmin", "central"),
   getResumenUser
+);
+
+router.get(
+  "/resumen_vehi_central",
+  verifyToken,
+  verifyGroup("superadmin", "central"),
+  getResumenVehi
 );
 export default router;

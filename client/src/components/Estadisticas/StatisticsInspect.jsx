@@ -16,6 +16,7 @@ import SesctorInspectPDF from "../PDFs/SectorInspectPDF";
 import GlosaInspectPDF from "../PDFs/GlosaInspectPDF";
 import { exportExcel } from "../exportExcel";
 import SectorInspectPDF from "../PDFs/SectorInspectPDF";
+import SelectUsers from "./SelectUsers";
 
 function StatisticsInspect() {
   const server_back = import.meta.env.VITE_SERVER_ROUTE_BACK;

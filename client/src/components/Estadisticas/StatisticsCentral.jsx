@@ -16,6 +16,7 @@ import RangoCentralPDF from "../PDFs/RangoCentralPDF.jsx";
 import EstadoCentralPDF from "../PDFs/EstadoCentralPDF.jsx";
 import SelectUsers from "./SelectUsers.jsx";
 import UserCentralPDF from "../PDFs/UserCentralPDF.jsx";
+import VehiculoCentralPDF from "../PDFs/VehiculoCentralPDF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -632,6 +633,75 @@ function StatisticsCentral() {
     }
   };
 
+  const resumenVehiPDF = async () => {
+    const url = `${server_local}/resumen_vehi_central?`;
+    const params = new URLSearchParams();
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado) => {
+      if (estadoFilter[estado]) {
+        params.append("estado", estado);
+      }
+    });
+
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
+
+    if (selectedClasif) {
+      params.append("clasificacion", JSON.stringify(selectedClasif));
+    }
+
+    if (selectedOrigen) {
+      params.append("origen", JSON.stringify(selectedOrigen));
+    }
+
+    if (selectedSector) {
+      params.append("sector", JSON.stringify(selectedSector));
+    }
+
+    if (selectedVehiculo) {
+      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+    }
+
+    if (selectedTipo) {
+      params.append("tipoReporte", JSON.stringify(selectedTipo));
+    }
+
+    if (selectedRecursos) {
+      params.append("recursos", JSON.stringify(selectedRecursos));
+    }
+
+    const userCentral = selectedUser.value;
+    if (selectedUser) {
+      params.append("centralista", userCentral);
+    }
+
+    try {
+      const res = await fetch(url + params.toString(), {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+
+      if (data.informe.length === 0) {
+        alert("No existen registros ");
+      } else {
+        VehiculoCentralPDF(fechaInicio, fechaFin, data.informe);
+      }
+      console.log("filtro origen", data.informe);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleCheckboxChange = (e) => {
     const { name, checked, dataset, value } = e.target;
 
@@ -890,6 +960,10 @@ function StatisticsCentral() {
                 {
                   text: "Informes por centralista",
                   handler: resumenUserPDF,
+                },
+                {
+                  text: "Resumen vehículos",
+                  handler: resumenVehiPDF,
                 },
               ].map((btn, idx) => (
                 <div className="col-md-6" key={idx}>
