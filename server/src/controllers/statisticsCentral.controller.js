@@ -537,12 +537,17 @@ const getResumenClasi = async (req, res) => {
   try {
     await client.query("BEGIN");
     let estadoEmergencia =
-      "SELECT  dti.clasificacion_informe->>'label' as clasif, dti.tipo_informe->>'label' as tipo, \
-      COUNT(dti.clasificacion_informe) as cantidad\
-        FROM informes_central ic\
-        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
-        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-       WHERE dti.clasificacion_informe->>'label' IS NOT NULL";
+      "SELECT \
+        dti.clasificacion_informe->>'label' AS clasificacion,\
+        dti.tipo_informe->>'label' AS tipo,\
+        COUNT(*) AS cantidad,\
+        COUNT(dti.clasificacion_informe) AS total\
+      FROM informes_central ic\
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes = ic.id_tipos_informe\
+        JOIN datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
+        JOIN datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
+        JOIN datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
+      WHERE dti.clasificacion_informe->>'label' IS NOT NULL";
     //WHERE dti.clasificacion_informe='Emergencia'
     const params = [];
 
@@ -670,17 +675,31 @@ const getResumenClasi = async (req, res) => {
     }
 
     estadoEmergencia +=
-      " GROUP BY dti.clasificacion_informe->>'label', dti.tipo_informe->>'label'";
+      " GROUP BY clasificacion, tipo\
+        ORDER BY clasificacion, tipo";
 
     const resultEmergencia = await client.query(estadoEmergencia, params);
 
-    //console.log(estadoEmergencia, parameter);
+    const agrupado = {};
+    resultEmergencia.rows.forEach((row) => {
+      const { clasificacion, tipo, cantidad } = row;
+      if (!agrupado[clasificacion]) {
+        agrupado[clasificacion] = [];
+      }
+      agrupado[clasificacion].push({ tipo, cantidad: parseInt(cantidad) });
+    });
+
+    const respuesta = Object.entries(agrupado).map(
+      ([clasificacion, tipos]) => ({
+        clasificacion,
+        tipos,
+      })
+    );
+
     await client.query("COMMIT");
-    //console.log("query", estadoEmergencia);
-    //console.log("params:", parameter);
-    //console.log("resultado", resultEmergencia.rows);
+
     return res.status(200).json({
-      informe: resultEmergencia.rows,
+      informe: respuesta,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -1217,6 +1236,8 @@ const getResumenVehi = async (req, res) => {
       FROM informes_central ic\
       JOIN datos_tipos_informes dti ON dti.id_tipos_informes = ic.id_tipos_informe\
       JOIN datos_vehiculos_informe dvi ON dvi.id_vehiculos = ic.id_vehiculo_informe\
+      JOIN datos_origen_informe doi ON doi.id_origen_informe = ic.id_origen_informe\
+      JOIN datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
       JOIN LATERAL jsonb_array_elements(dvi.vehiculos_informe::jsonb) AS elem ON TRUE\
       WHERE elem->>'label' IS NOT NULL";
 

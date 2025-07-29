@@ -48,6 +48,29 @@ const ClasifCentralPDF = (fechaInicio, fechaFin, clasi) => {
     });
   };
 
+  const tableBody = [];
+
+  clasi.forEach((grupo) => {
+    // Fila de clasificación (colspan)
+    tableBody.push([
+      {
+        content: grupo.clasificacion,
+        colSpan: 3,
+        styles: {
+          fillColor: [230, 230, 230],
+          textColor: 20,
+          fontStyle: "bold",
+          halign: "left",
+        },
+      },
+    ]);
+
+    // Agregar filas con tipo y cantidad
+    grupo.tipos.forEach((tipo) => {
+      tableBody.push(["", tipo.tipo, tipo.cantidad]);
+    });
+  });
+
   addHeader("Resumen Clasificación Central Municipal", "");
 
   let filtros = `Filtros aplicados:\n`;
@@ -59,14 +82,18 @@ const ClasifCentralPDF = (fechaInicio, fechaFin, clasi) => {
   doc.text(filtros, 14, 25);
 
   const tableColumn = ["Clasificación", "Tipo de informe", "Cantidad"];
-  const tableRows = clasi.map((c) => [c.clasif, c.tipo, c.cantidad]);
 
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
+
     startY: 40,
     styles: { fontSize: 13, cellPadding: 3, lineWidth: 0.3 },
-    headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
+    headStyles: {
+      fillColor: [44, 62, 80],
+      textColor: 255,
+      halign: "center",
+    },
     alternateRowStyles: { fillColor: [245, 245, 245] },
     margin: { left: margin, right: margin },
     columnStyles: {
