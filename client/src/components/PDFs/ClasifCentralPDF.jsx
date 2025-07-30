@@ -51,23 +51,34 @@ const ClasifCentralPDF = (fechaInicio, fechaFin, clasi) => {
   const tableBody = [];
 
   clasi.forEach((grupo) => {
-    // Fila de clasificación (colspan)
-    tableBody.push([
-      {
-        content: grupo.clasificacion,
-        colSpan: 3,
-        styles: {
-          fillColor: [230, 230, 230],
-          textColor: 20,
-          fontStyle: "bold",
-          halign: "left",
-        },
-      },
-    ]);
-
-    // Agregar filas con tipo y cantidad
     grupo.tipos.forEach((tipo) => {
-      tableBody.push(["", tipo.tipo, tipo.cantidad]);
+      if (tipo.tipo === null) {
+        // Fila con clasificación y total
+        tableBody.push([
+          {
+            content: grupo.clasificacion,
+            colSpan: 2,
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: tipo.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        // Fila normal
+        tableBody.push(["", tipo.tipo, tipo.cantidad]);
+      }
     });
   });
 

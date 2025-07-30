@@ -29,8 +29,8 @@ router.put(
 
 router.get(
   "/resumen_clasif_central",
-  verifyToken,
-  verifyGroup("superadmin", "central"),
+  //verifyToken,
+  //verifyGroup("superadmin", "central"),
   getResumenClasi
 );
 router.get(

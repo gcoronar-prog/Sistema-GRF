@@ -675,8 +675,9 @@ const getResumenClasi = async (req, res) => {
     }
 
     estadoEmergencia +=
-      " GROUP BY clasificacion, tipo\
-        ORDER BY clasificacion, tipo";
+      " GROUP BY ROLLUP (clasificacion, tipo) \
+      HAVING dti.clasificacion_informe->>'label' IS NOT NULL \
+      ORDER BY clasificacion, tipo NULLS FIRST";
 
     const resultEmergencia = await client.query(estadoEmergencia, params);
 
@@ -686,7 +687,11 @@ const getResumenClasi = async (req, res) => {
       if (!agrupado[clasificacion]) {
         agrupado[clasificacion] = [];
       }
-      agrupado[clasificacion].push({ tipo, cantidad: parseInt(cantidad) });
+
+      agrupado[clasificacion].push({
+        tipo,
+        cantidad: parseInt(cantidad),
+      });
     });
 
     const respuesta = Object.entries(agrupado).map(
