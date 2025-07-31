@@ -47,6 +47,70 @@ const OrigenCentralPDF = (fechaInicio, fechaFin, origen) => {
     });
   };
 
+  const tableBody = [];
+
+  origen.informe.forEach((grupo) => {
+    grupo.datos.sort((a, b) => {
+      if (a.captura === null) return -1;
+      if (b.captura === null) return 1;
+      return 0;
+    });
+    grupo.datos.forEach((c) => {
+      if (c.captura === "Total captura") {
+        return;
+      }
+
+      if (c.captura === null) {
+        tableBody.push([
+          {
+            content: grupo.origen,
+            colSpan: 2,
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: c.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        tableBody.push([c.clasif, c.captura, c.cantidad.toString()]);
+      }
+    });
+  });
+
+  tableBody.push([
+    {
+      content: "Total de reportes",
+      colSpan: 2,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: origen.informe.rowsCount(),
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
+  ]);
+
   addHeader("Resumen Origen Central Municipal", "");
 
   let filtros = `Filtros aplicados:\n`;
@@ -57,17 +121,11 @@ const OrigenCentralPDF = (fechaInicio, fechaFin, origen) => {
   doc.setTextColor(80);
   doc.text(filtros, 14, 25);
 
-  const tableColumn = ["Origen", "Clasificación", "Captura", "Cantidad"];
-  const tableRows = origen.map((c) => [
-    c.origen,
-    c.clasif,
-    c.captura_informe,
-    c.cantidad,
-  ]);
+  const tableColumn = ["Clasificación", "Captura", "Cantidad"];
 
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
     startY: 40,
     styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },

@@ -370,12 +370,27 @@ const getResumenOrigen = async (req, res) => {
   try {
     await client.query("BEGIN");
     let origenResumen =
-      "SELECT DISTINCT doi.origen_informe->>'label' as origen, dti.clasificacion_informe->>'label' as clasif, doi.captura_informe,\
-      COUNT(doi.origen_informe) as cantidad\
-        FROM informes_central ic\
-        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
-        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
-        WHERE 1=1 AND doi.origen_informe->>'label' IS NOT NULL";
+      "SELECT \
+      CASE \
+          WHEN doi.origen_informe->>'label' IS NULL AND\
+        dti.clasificacion_informe->>'label' IS NULL AND \
+        doi.captura_informe IS NULL THEN 'TOTAL GENERAL'\
+          WHEN doi.origen_informe->>'label' IS NULL THEN 'Total origen'\
+          ELSE doi.origen_informe->>'label'\
+        END AS origen,	\
+      CASE \
+          WHEN dti.clasificacion_informe->>'label' IS NULL AND doi.origen_informe->>'label' IS NOT NULL THEN 'Total clasif'\
+          ELSE dti.clasificacion_informe->>'label'\
+        END AS clasif,\
+      CASE \
+        WHEN doi.captura_informe IS NULL AND dti.clasificacion_informe->>'label' IS NOT NULL THEN 'Total captura'\
+        ELSE doi.captura_informe\
+      END AS captura,\
+        COUNT(doi.origen_informe) as cantidad\
+            FROM informes_central ic\
+            JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe\
+            JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe\
+            WHERE doi.origen_informe->>'label' IS NOT NULL";
 
     const params = [];
 
@@ -503,14 +518,35 @@ const getResumenOrigen = async (req, res) => {
     }
 
     origenResumen +=
-      " GROUP BY doi.origen_informe->>'label', dti.clasificacion_informe->>'label',doi.captura_informe\
-      ORDER BY doi.origen_informe->>'label'";
+      " GROUP BY ROLLUP (doi.origen_informe->>'label' ,dti.clasificacion_informe->>'label',doi.captura_informe)\
+	    HAVING doi.origen_informe->>'label' IS NOT NULL\
+        ORDER BY origen,clasif NULLS LAST";
     const resultOrigen = await client.query(origenResumen, params);
+
+    const agrupado = {};
+    resultOrigen.rows.forEach((row) => {
+      const { clasif, origen, cantidad, captura } = row;
+      if (!agrupado[origen]) {
+        agrupado[origen] = [];
+      }
+
+      agrupado[origen].push({
+        clasif,
+        captura,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([origen, datos]) => ({
+      origen,
+      datos,
+    }));
+
     await client.query("COMMIT");
     //console.log(origenResumen, parameter);
 
     return res.status(200).json({
-      informe: resultOrigen.rows,
+      informe: respuesta,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -681,6 +717,10 @@ const getResumenClasi = async (req, res) => {
 
     const resultEmergencia = await client.query(estadoEmergencia, params);
 
+    const totalClasi = await client.query(
+      "SELECT COUNT(*) FROM datos_tipos_informes"
+    );
+
     const agrupado = {};
     resultEmergencia.rows.forEach((row) => {
       const { clasificacion, tipo, cantidad } = row;
@@ -705,6 +745,7 @@ const getResumenClasi = async (req, res) => {
 
     return res.status(200).json({
       informe: respuesta,
+      total: totalClasi.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");

@@ -29,8 +29,8 @@ router.put(
 
 router.get(
   "/resumen_clasif_central",
-  //verifyToken,
-  //verifyGroup("superadmin", "central"),
+  verifyToken,
+  verifyGroup("superadmin", "central"),
   getResumenClasi
 );
 router.get(
@@ -59,13 +59,6 @@ router.get(
 );
 
 router.get(
-  "/usersgie",
-  verifyToken,
-  verifyGroup("superadmin", "central"),
-  getUsersCentral
-);
-
-router.get(
   "/resumen_user_central",
   verifyToken,
   verifyGroup("superadmin", "central"),
@@ -78,4 +71,6 @@ router.get(
   verifyGroup("superadmin", "central"),
   getResumenVehi
 );
+
+router.get("/users_gie", getUsersCentral);
 export default router;

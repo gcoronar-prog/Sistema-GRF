@@ -4,8 +4,10 @@ function SelectUsers({ selectedUser, setSelectedUser }) {
   const loadUsers = async () => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const res = await fetch(`${servidor}/usersgie`);
-
+      const res = await fetch(`${servidor}/users_gie`);
+      if (!res.ok) {
+        throw new Error("Error al cargar los usuarios");
+      }
       const data = await res.json();
 
       return data.map((item) => ({

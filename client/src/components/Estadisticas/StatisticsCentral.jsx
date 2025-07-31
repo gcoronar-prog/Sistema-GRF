@@ -353,7 +353,7 @@ function StatisticsCentral() {
       if (data.informe.length === 0) {
         alert("No existen registros");
       } else {
-        ClasifCentralPDF(fechaInicio, fechaFin, data.informe);
+        ClasifCentralPDF(fechaInicio, fechaFin, data);
       }
     } catch (error) {
       console.log(error);
@@ -418,7 +418,7 @@ function StatisticsCentral() {
       if (data.informe.length === 0) {
         alert("No existen registros");
       } else {
-        OrigenCentralPDF(fechaInicio, fechaFin, data.informe);
+        OrigenCentralPDF(fechaInicio, fechaFin, data);
       }
     } catch (error) {
       console.log(error);

@@ -50,7 +50,7 @@ const ClasifCentralPDF = (fechaInicio, fechaFin, clasi) => {
 
   const tableBody = [];
 
-  clasi.forEach((grupo) => {
+  clasi.informe.forEach((grupo) => {
     grupo.tipos.forEach((tipo) => {
       if (tipo.tipo === null) {
         // Fila con clasificación y total
@@ -81,6 +81,28 @@ const ClasifCentralPDF = (fechaInicio, fechaFin, clasi) => {
       }
     });
   });
+
+  tableBody.push([
+    {
+      content: "Total reportes: ",
+      colSpan: 2,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: clasi.total[0].count.toString(),
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
+  ]);
 
   addHeader("Resumen Clasificación Central Municipal", "");
 
