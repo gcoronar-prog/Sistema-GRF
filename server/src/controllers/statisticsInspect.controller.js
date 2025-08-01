@@ -1356,6 +1356,137 @@ const getGlosasResumen = async (req, res) => {
   }
 };
 
+function buildWhereClause({
+  fechaInicioInfrac,
+  fechaFinInfrac,
+  fechaInicioCitacion,
+  fechaFinCitacion,
+  fechaInicio,
+  fechaFin,
+
+  estado_exp,
+  tipo_proce,
+  jpl,
+  digitador,
+  leyes,
+  inspector,
+
+  rut_contri,
+  tipo_vehiculo,
+  marca_vehiculo,
+  sector_infrac,
+}) {
+  const conditions = [];
+  const values = [];
+
+  const addCondition = (cond, ...vals) => {
+    conditions.push(cond);
+    values.push(...vals);
+  };
+
+  if (fechaInicioInfrac && fechaFinInfrac) {
+    addCondition(
+      `infra.fecha_infraccion BETWEEN $${values.length + 1} AND $${
+        values.length + 2
+      }`,
+      fechaInicioInfrac,
+      fechaFinInfrac
+    );
+  }
+
+  if (fechaInicioCitacion && fechaFinCitacion) {
+    addCondition(
+      `infra.fecha_citacion BETWEEN $${values.length + 1} AND $${
+        values.length + 2
+      }`,
+      fechaInicioInfrac,
+      fechaFinInfrac
+    );
+  }
+
+  // fecha de creacion del expediente. Se agrega automaticamente desde un trigger.
+  if (fechaInicio && fechaFin) {
+    addCondition(
+      `infra.fecha_resolucion BETWEEN $${values.length + 1} AND $${
+        values.length + 2
+      }`,
+      fechaInicio,
+      fechaFin
+    );
+  }
+
+  if (estado_exp && estado_exp.length > 0) {
+    const estadosArray = Array.isArray(estado_exp)
+      ? estado_exp
+      : estado_exp.split(",");
+    addCondition(
+      `expe.estado_exp IN (${estadosArray
+        .map((_, index) => `$${values.length + index + 1}`)
+        .join(", ")})`,
+      ...estadosArray
+    );
+  }
+
+  if (tipo_proce && tipo_proce.length > 0) {
+    const procesoArray = Array.isArray(tipo_proce)
+      ? tipo_proce
+      : tipo_proce.split(",");
+
+    addCondition(
+      `expe.tipo_procedimiento IN (${procesoArray
+        .map((_, index) => `$${values.length + index + 1}`)
+        .join(", ")})`,
+      ...procesoArray
+    );
+  }
+
+  if (jpl && jpl.length > 0) {
+    const jplArray = Array.isArray(jpl) ? jpl : jpl.split(",");
+    addCondition(
+      `expe.tipo_procedimiento IN (${jplArray
+        .map((_, index) => `$${values.length + index + 1}`)
+        .join(", ")})`,
+      ...jplArray
+    );
+  }
+
+  if (leyes && leyes.length > 0) {
+    addCondition(` AND expe.id_leyes=$${values.length + 1}`, leyes);
+  }
+
+  if (inspector && inspector.length > 0) {
+    const cleanedInspector = inspector.replace(/"/g, "");
+    addCondition(`expe.id_inspector= $${values.length + 1}`, cleanedInspector);
+  }
+
+  if (rut_contri && rut_contri.length > 0) {
+    addCondition(`contri.rut_contri = $${values.length + 1}`, rut_contri);
+  }
+
+  if (tipo_vehiculo && tipo_vehiculo.length > 0) {
+    const cleanedTipo = tipo_vehiculo.replace(/"/g, "");
+    addCondition(`vehi.tipo_vehi= $${values.length + 1}`, cleanedTipo);
+  }
+
+  if (marca_vehiculo && marca_vehiculo.length > 0) {
+    const cleanedMarca = marca_vehiculo.replace(/"/g, "");
+    addCondition(`vehi.marca_vehi = $${values.length + 1}`, cleanedMarca);
+  }
+
+  if (sector_infrac && sector_infrac.length > 0) {
+    const cleanedSector = sector_infrac.replace(/"/g, "");
+    addCondition(
+      ` AND infra.sector_infraccion= $${values.length + 1}`,
+      cleanedSector
+    );
+  }
+
+  return {
+    whereClause: conditions.length ? " AND " + conditions.join(" AND ") : "",
+    values,
+  };
+}
+
 export {
   getStatisticInspect,
   getEstadoExpe,

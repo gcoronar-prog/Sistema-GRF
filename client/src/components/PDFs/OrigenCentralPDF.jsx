@@ -88,6 +88,7 @@ const OrigenCentralPDF = (fechaInicio, fechaFin, origen) => {
     });
   });
 
+  const totalOrigen = origen.total[0].count;
   tableBody.push([
     {
       content: "Total de reportes",
@@ -100,7 +101,7 @@ const OrigenCentralPDF = (fechaInicio, fechaFin, origen) => {
       },
     },
     {
-      content: origen.informe.rowsCount(),
+      content: totalOrigen,
       colSpan: 1,
       styles: {
         fillColor: [230, 230, 230],

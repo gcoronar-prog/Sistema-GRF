@@ -35,8 +35,8 @@ router.get(
 );
 router.get(
   "/resumen_origen_central",
-  verifyToken,
-  verifyGroup("superadmin", "central"),
+  //verifyToken,
+  //verifyGroup("superadmin", "central"),
   getResumenOrigen
 );
 router.get(
