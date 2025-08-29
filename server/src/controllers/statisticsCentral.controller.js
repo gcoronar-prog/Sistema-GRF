@@ -2,33 +2,8 @@ import { pool } from "../db.js";
 
 const getEstadisticaCentral = async (req, res) => {
   const client = await pool.connect();
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
 
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
+  const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
 
@@ -67,33 +42,7 @@ const getEstadisticaCentral = async (req, res) => {
 
 const getResumenEstado = async (req, res) => {
   const client = await pool.connect();
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
-
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
+  const { whereClause, values } = buildWhereClause(req.query);
 
   try {
     await client.query("BEGIN");
@@ -125,34 +74,8 @@ const getResumenEstado = async (req, res) => {
 };
 
 const getResumenOrigen = async (req, res) => {
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
-
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
   const client = await pool.connect();
+  const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
     let totalOrigen = `SELECT COUNT(*) FROM informes_central ic 
@@ -223,33 +146,7 @@ const getResumenOrigen = async (req, res) => {
 
 const getResumenClasi = async (req, res) => {
   const client = await pool.connect();
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
-
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
+  const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
     let estadoEmergencia = `SELECT 
@@ -314,33 +211,7 @@ const getResumenClasi = async (req, res) => {
 
 const getResumenRecursos = async (req, res) => {
   const client = await pool.connect();
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
-
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
+  const { whereClause, values } = buildWhereClause(req.query);
 
   try {
     await client.query("BEGIN");
@@ -366,34 +237,7 @@ const getResumenRecursos = async (req, res) => {
 
 const getResumenRango = async (req, res) => {
   const client = await pool.connect();
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
-
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
-
+  const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
     let rangoResumen = `SELECT doi.rango_horario, dti.clasificacion_informe->>'label' as clasif ,COUNT(ic.id_informes_central) as cantidad
@@ -420,33 +264,7 @@ const getResumenRango = async (req, res) => {
 
 const getResumenUser = async (req, res) => {
   const client = await pool.connect();
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
-
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
+  const { whereClause, values } = buildWhereClause(req.query);
 
   try {
     await client.query("BEGIN");
@@ -473,34 +291,7 @@ const getResumenUser = async (req, res) => {
 
 const getResumenVehi = async (req, res) => {
   const client = await pool.connect();
-  const {
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  } = req.query;
-
-  const { whereClause, values } = buildWhereClause({
-    fechaInicio,
-    fechaFin,
-    estado,
-    clasificacion,
-    captura,
-    origen,
-    recursos,
-    sector,
-    vehiculo,
-    centralista,
-    tipoReporte,
-  });
-
+  const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
     let vehiResumen = `SELECT

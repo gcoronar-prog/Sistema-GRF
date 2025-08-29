@@ -244,8 +244,8 @@ router.get(
 
 router.get(
   "/expedi/:id",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  //  verifyToken,
+  // verifyGroup("superadmin", "inspeccion", "noinspeccion"),
   getExpediente2
 );
 
