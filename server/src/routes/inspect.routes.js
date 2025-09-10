@@ -14,6 +14,7 @@ import {
   getAllExpedientes,
   getArchivosExp,
   getDatosVehi,
+  getDigitador,
   getExpedEstado,
   getExpediente,
   getExpediente2,
@@ -260,6 +261,13 @@ router.get(
   verifyToken,
   verifyGroup("superadmin", "inspeccion", "noinspeccion"),
   getExpedTipo
+);
+
+router.get(
+  "/digitador",
+  verifyToken,
+  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  getDigitador
 );
 
 export default router;

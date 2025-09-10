@@ -45,7 +45,7 @@ function FormSolicitud() {
   }, [params.id]);
 
   const loadImagenes = async (id) => {
-    const res = await fetch(`http://localhost:3000/imagenes/seg/${id}/edit`);
+    const res = await fetch(`${servidor}/imagenes/seg/${id}/edit`);
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
 
@@ -94,8 +94,8 @@ function FormSolicitud() {
 
     try {
       const url = params.id
-        ? `http://localhost:3000/imagenes/seg/${params.id}/edit`
-        : `http://localhost:3000/imagenes/seg/new`;
+        ? `${servidor}/imagenes/seg/${params.id}/edit`
+        : `${servidor}/imagenes/seg/new`;
 
       const method = params.id ? "PUT" : "POST";
 
@@ -108,7 +108,7 @@ function FormSolicitud() {
         throw new Error("Error al enviar los datos al servidor");
       }
       console.log(params.id);
-      const lastData = await fetch("http://localhost:3000/seg/imagenes/last");
+      const lastData = await fetch(`${servidor}/seg/imagenes/last`);
 
       const lastSolicitud = await lastData.json();
       setLastId(lastSolicitud.ultima[0].id_solicitud);
@@ -128,7 +128,7 @@ function FormSolicitud() {
   };
 
   const handleFirstSoli = async () => {
-    const res = await fetch("http://localhost:3000/seg/imagenes/first");
+    const res = await fetch(`${servidor}/seg/imagenes/first`);
     if (res.ok) {
       const firstSoli = await res.json();
       if (firstSoli) {
@@ -143,7 +143,7 @@ function FormSolicitud() {
   };
 
   const handleLastSoli = async () => {
-    const res = await fetch("http://localhost:3000/seg/imagenes/last");
+    const res = await fetch(`${servidor}/seg/imagenes/last`);
     if (res.ok) {
       const lastSoli = await res.json();
       if (lastSoli) {
@@ -160,7 +160,7 @@ function FormSolicitud() {
   const handlePrevious = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/seg/imagenes/prev/${params.id}`
+        `${servidor}/seg/imagenes/prev/${params.id}`
       );
       const data = await response.json();
 
@@ -180,7 +180,7 @@ function FormSolicitud() {
   const handleNext = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/seg/imagenes/next/${params.id}`
+        `${servidor}/seg/imagenes/next/${params.id}`
       );
       const data = await response.json();
 
@@ -210,7 +210,7 @@ function FormSolicitud() {
     const id = params.id;
 
     try {
-      const res = await fetch("http://localhost:3000/seg/imagenes/last");
+      const res = await fetch(`${servidor}/seg/imagenes/last`);
 
       if (!id) {
         if (res.ok) {
@@ -231,7 +231,7 @@ function FormSolicitud() {
 
   const handleDeleteSoli = async () => {
     const id = params.id;
-    await fetch(`http://localhost:3000/imagenes/seg/${id}`, {
+    await fetch(`${servidor}/imagenes/seg/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
@@ -239,7 +239,7 @@ function FormSolicitud() {
     delete updatedSoli[id];
     setSolicitudes(updatedSoli);
 
-    const res = await fetch("http://localhost:3000/seg/imagenes/last");
+    const res = await fetch(`${servidor}/seg/imagenes/last`);
     const data = await res.json();
     navigate(`/sc/imagenes/${data.ultima[0].id_solicitud}`);
   };

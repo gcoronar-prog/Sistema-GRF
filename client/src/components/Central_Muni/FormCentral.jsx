@@ -100,6 +100,7 @@ function FormCentral() {
   const [selectInformante, setSelectInformante] = useState("");
   const [autocompleteInstance, setAutocompleteInstance] = useState(null);
   const [inputs, setInputs] = useState("");
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
 
   useEffect(() => {
     loadOrigen();
@@ -149,7 +150,7 @@ function FormCentral() {
   }, [params.id]);
 
   const loadIdReportes = async () => {
-    const res = await fetch("http://localhost:3000/central", {
+    const res = await fetch(`${servidor}/central`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -158,7 +159,7 @@ function FormCentral() {
   };
 
   const loadOrigen = async () => {
-    const response = await fetch("http://localhost:3000/origenes", {
+    const response = await fetch(`${servidor}/origenes`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -167,13 +168,13 @@ function FormCentral() {
   };
 
   const loadInformante = async () => {
-    const response = await fetch("http://localhost:3000/informantes");
+    const response = await fetch(`${servidor}/informantes`);
     const data = await response.json();
     setInformantes(data);
   };
 
   const loadTipoReport = async () => {
-    const response = await fetch("http://localhost:3000/tipoReportes", {
+    const response = await fetch(`${servidor}/tipoReportes`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -182,31 +183,31 @@ function FormCentral() {
   };
 
   const loadVehiculo = async () => {
-    const response = await fetch("http://localhost:3000/vehiculos");
+    const response = await fetch(`${servidor}/vehiculos`);
     const data = await response.json();
     setVehiculos(data);
   };
 
   const loadTripulante = async () => {
-    const response = await fetch("http://localhost:3000/tripulantes");
+    const response = await fetch(`${servidor}/tripulantes`);
     const data = await response.json();
     setCompanion(data);
   };
 
   const loadSectores = async () => {
-    const response = await fetch("http://localhost:3000/sectores");
+    const response = await fetch(`${servidor}/sectores`);
     const data = await response.json();
     setSectors(data);
   };
 
   const loadLastReport = async () => {
-    const response = await fetch("http://localhost:3000/central/last/report");
+    const response = await fetch(`${servidor}/central/last/report`);
     const data = await response.json();
     setLastIds(data[0].id_reporte);
   };
 
   const loadReportes = async (id) => {
-    const res = await fetch(`http://localhost:3000/central/${id}`);
+    const res = await fetch(`${servidor}/central/${id}`);
     const data = await res.json();
     const repo = data[0];
     setInitialD(data);
@@ -249,7 +250,7 @@ function FormCentral() {
     console.log("Datos que se envían: ", reportesCentral);
 
     if (params.id) {
-      const res = await fetch(`http://localhost:3000/central/${params.id}`, {
+      const res = await fetch(`${servidor}/central/${params.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reportesCentral),
@@ -264,7 +265,7 @@ function FormCentral() {
       navigate(`/reports/${params.id}/edit`);
     } else {
       try {
-        const res = await fetch("http://localhost:3000/central", {
+        const res = await fetch(`${servidor}/central`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reportesCentral),
@@ -508,7 +509,7 @@ function FormCentral() {
 
   const handleDeleteReports = async () => {
     const id = params.id;
-    await fetch(`http://localhost:3000/central/${id}`, {
+    await fetch(`${servidor}/central/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });

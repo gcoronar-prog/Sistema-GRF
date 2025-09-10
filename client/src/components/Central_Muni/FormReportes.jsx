@@ -29,7 +29,7 @@ function FormReportes() {
 
   const loadReportes = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/reportes/${id}`);
+      const response = await fetch(`${servidor}/reportes/${id}`);
       const data = await response.json();
       const formattedFecha = dayjs(
         data.reporte_seleccionado[0].fecha_reporte
@@ -57,8 +57,8 @@ function FormReportes() {
     e.preventDefault();
     try {
       const url = params.id
-        ? `http://localhost:3000/reportes/${params.id}`
-        : "http://localhost:3000/reportesService";
+        ? `${servidor}/reportes/${params.id}`
+        : `${servidor}/reportesService`;
       const method = params.id ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -72,9 +72,7 @@ function FormReportes() {
         throw new Error("Error en la petición");
       }
 
-      const lastReporteData = await fetch(
-        "http://localhost:3000/reportesService/last"
-      );
+      const lastReporteData = await fetch(`${servidor}/reportesService/last`);
       const lastReporte = await lastReporteData.json();
       setLastId(lastReporte[0].id_reporte_service);
 
@@ -94,9 +92,7 @@ function FormReportes() {
 
   const handleFirstReporte = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/reportesService/first"
-      );
+      const response = await fetch(`${servidor}/reportesService/first`);
       if (response.ok) {
         const firsRepo = await response.json();
         if (firsRepo) {
@@ -116,9 +112,7 @@ function FormReportes() {
   const handlePrevReporte = async () => {
     const id = params.id;
     try {
-      const response = await fetch(
-        `http://localhost:3000/reportesService/prev/${id}`
-      );
+      const response = await fetch(`${servidor}/reportesService/prev/${id}`);
       const data = await response.json();
       if (data[0]?.id_reporte_service > 0) {
         navigate(`/reporte/${data[0].id_reporte_service}`);
@@ -133,9 +127,7 @@ function FormReportes() {
   const handleNextReporte = async () => {
     const id = params.id;
     try {
-      const response = await fetch(
-        `http://localhost:3000/reportesService/next/${id}`
-      );
+      const response = await fetch(`${servidor}/reportesService/next/${id}`);
       const data = await response.json();
       navigate(`/reporte/${data[0].id_reporte_service}`);
     } catch (error) {
@@ -145,9 +137,7 @@ function FormReportes() {
 
   const handleLastReporte = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/reportesService/last"
-      );
+      const response = await fetch(`${servidor}/reportesService/last`);
       if (response.ok) {
         const lastRepo = await response.json();
         if (lastRepo) {
@@ -175,7 +165,7 @@ function FormReportes() {
 
   const handleDeleteReporte = async () => {
     const id = params.id;
-    await fetch(`http://localhost:3000/reportes/${id}`, {
+    await fetch(`${servidor}/reportes/${id}`, {
       method: "DELETE",
       headers: { "content-type": "application/json" },
     });
@@ -183,7 +173,7 @@ function FormReportes() {
     delete updatedReportes[id];
     setReportes(updatedReportes);
 
-    const res = await fetch("http://localhost:3000/reportesService/last");
+    const res = await fetch(`${servidor}/reportesService/last`);
     const data = await res.json();
     navigate(`/reporte/${data[0].id_reporte_service}`);
   };

@@ -40,7 +40,7 @@ function InventarioGRD() {
 
   const loadInventario = async (id) => {
     //console.log(id);
-    const res = await fetch(`http://localhost:3000/inventario/grd/${id}`);
+    const res = await fetch(`${servidor}/inventario/grd/${id}`);
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
 
@@ -87,8 +87,8 @@ function InventarioGRD() {
 
     try {
       const url = params.id
-        ? `http://localhost:3000/inventario/grd/${params.id}/edit`
-        : "http://localhost:3000/inventario/new";
+        ? `${servidor}/inventario/grd/${params.id}/edit`
+        : `${servidor}/inventario/new`;
 
       const method = params.id ? "PUT" : "POST";
 
@@ -104,9 +104,7 @@ function InventarioGRD() {
 
       const data = await res.json();
 
-      const lastInventarioRes = await fetch(
-        "http://localhost:3000/inventario/last/grd"
-      );
+      const lastInventarioRes = await fetch(`${servidor}/inventario/last/grd`);
       const lastInventarioData = await lastInventarioRes.json();
       setLastIdInventario(lastInventarioData.ultimo[0].id_producto);
 
@@ -140,7 +138,7 @@ function InventarioGRD() {
     const id = params.id;
 
     try {
-      const res = await fetch("http://localhost:3000/inventario/last/grd");
+      const res = await fetch(`${servidor}/inventario/last/grd`);
 
       if (!id) {
         if (res.ok) {
@@ -164,14 +162,14 @@ function InventarioGRD() {
   const handleDeleteInventario = async () => {
     const id = params.id;
 
-    await fetch(`http://localhost:3000/inventario/grd/${id}/delete`, {
+    await fetch(`${servidor}/inventario/grd/${id}/delete`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
     const updateInventario = { ...inventarios };
     delete updateInventario[id];
     setInventarios(updateInventario);
-    const res = await fetch("http://localhost:3000/inventario/last/grd");
+    const res = await fetch(`${servidor}/inventario/last/grd`);
     const data = await res.json();
     //console.log(data.informe_Alfa.cod_alfa);
     navigate(`/grd/inventario/${data.ultimo[0].id_producto}/edit`);
@@ -179,7 +177,7 @@ function InventarioGRD() {
   };
 
   const handleFirstInventario = async () => {
-    const res = await fetch("http://localhost:3000/inventario/first/grd");
+    const res = await fetch(`${servidor}/inventario/first/grd`);
     if (res.ok) {
       const firstInventario = await res.json();
       //console.log(lastAlfa);
@@ -199,7 +197,7 @@ function InventarioGRD() {
   };
 
   const handleLastInventario = async () => {
-    const res = await fetch("http://localhost:3000/inventario/last/grd");
+    const res = await fetch(`${servidor}/inventario/last/grd`);
     if (res.ok) {
       const lastInventario = await res.json();
       //console.log(lastAlfa);
@@ -221,7 +219,7 @@ function InventarioGRD() {
   const handlePrevious = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/inventario/prev/grd/${params.id}`
+        `${servidor}/inventario/prev/grd/${params.id}`
       );
       const data = await response.json();
 
@@ -244,7 +242,7 @@ function InventarioGRD() {
   const handleNext = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/inventario/next/grd/${params.id}`
+        `${servidor}/inventario/next/grd/${params.id}`
       );
       const data = await response.json();
 

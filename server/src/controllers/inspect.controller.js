@@ -1018,7 +1018,7 @@ const searchInformeInspeccion = async (req, res) => {
 const searchExpedientes = async (req, res) => {
   const client = await pool.connect();
   try {
-    const { rut, ppu, num_control } = req.query;
+    const { rut, ppu, num_control, fecha_inicio, fecha_fin, jpl } = req.query;
 
     await client.query("BEGIN");
     let whereClauses = [];
@@ -1037,6 +1037,21 @@ const searchExpedientes = async (req, res) => {
     if (num_control) {
       whereClauses.push("expe.num_control = $" + (values.length + 1));
       values.push(num_control);
+    }
+
+    if (jpl) {
+      whereClauses.push("inf.juzgado = $" + (values.length + 1));
+      values.push(jpl);
+    }
+
+    if (fecha_inicio && fecha_fin) {
+      whereClauses.push(
+        "expe.fecha_documento BETWEEN $" +
+          (values.length + 1) +
+          " AND $" +
+          (values.length + 2)
+      );
+      values.push(fecha_inicio, fecha_fin);
     }
 
     const whereSQL =
@@ -1217,6 +1232,27 @@ const getExpedTipo = async (req, res) => {
   }
 };
 
+const getDigitador = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const expediente = await client.query(
+      "SELECT cod_user, user_name, nombre,apellido FROM users_system WHERE user_rol=userinspeccion"
+    );
+    await client.query("COMMIT");
+    return res.status(200).json({
+      expediente: expediente.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    return res
+      .status(500)
+      .json({ msg: "Problemas al conectar con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 export {
   getExpedientes,
   getExpediente,
@@ -1255,4 +1291,5 @@ export {
   getExpediente2,
   getExpedEstado,
   getExpedTipo,
+  getDigitador,
 };

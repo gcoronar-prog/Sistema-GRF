@@ -55,7 +55,7 @@ function FormAtencion() {
   }, [params.id]);
 
   const loadAtenciones = async (id) => {
-    const res = await fetch(`http://localhost:3000/atenciones/${id}/sgc`);
+    const res = await fetch(`${servidor}/atenciones/${id}/sgc`);
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
     const formattedFecha = dayjs(data.proceso[0].fecha_solicitud).format(
@@ -105,8 +105,8 @@ function FormAtencion() {
     try {
       const idAten = params.id;
       const url = idAten
-        ? `http://localhost:3000/atenciones/${params.id}/sgc`
-        : "http://localhost:3000/atenciones/sgc";
+        ? `${servidor}/atenciones/${params.id}/sgc`
+        : `${servidor}/atenciones/sgc`;
       const method = idAten ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -118,9 +118,7 @@ function FormAtencion() {
         throw new Error("Error al enviar los datos al servidor");
       }
 
-      const lastAtencionData = await fetch(
-        "http://localhost:3000/atenciones/sgc/last"
-      );
+      const lastAtencionData = await fetch(`${servidor}/atenciones/sgc/last`);
 
       const lastAtencion = await lastAtencionData.json();
       setLastId(lastAtencion.atencion_ciudadana[0].id_atencion);
@@ -144,7 +142,7 @@ function FormAtencion() {
   };
 
   const handleFirstAten = async () => {
-    const res = await fetch("http://localhost:3000/atenciones/sgc/first");
+    const res = await fetch(`${servidor}/atenciones/sgc/first`);
     if (res.ok) {
       const firstAten = await res.json();
       if (firstAten) {
@@ -159,7 +157,7 @@ function FormAtencion() {
   };
 
   const handleLastAten = async () => {
-    const res = await fetch("http://localhost:3000/atenciones/sgc/last");
+    const res = await fetch(`${servidor}/atenciones/sgc/last`);
     if (res.ok) {
       const lastAten = await res.json();
       if (lastAten) {
@@ -176,9 +174,7 @@ function FormAtencion() {
   const handlePrevious = async () => {
     const id = params.id;
     try {
-      const response = await fetch(
-        `http://localhost:3000/atenciones/${id}/sgc/prev`
-      );
+      const response = await fetch(`${servidor}/atenciones/${id}/sgc/prev`);
       const data = await response.json();
 
       if (
@@ -200,9 +196,7 @@ function FormAtencion() {
   const handleNext = async () => {
     const id = params.id;
     try {
-      const response = await fetch(
-        `http://localhost:3000/atenciones/${id}/sgc/next`
-      );
+      const response = await fetch(`${servidor}/atenciones/${id}/sgc/next`);
       const data = await response.json();
 
       if (
@@ -232,7 +226,7 @@ function FormAtencion() {
 
   const handleDeleteAten = async () => {
     const id = params.id;
-    await fetch(`http://localhost:3000/atenciones/${id}/sgc`, {
+    await fetch(`${servidor}/atenciones/${id}/sgc`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
@@ -240,7 +234,7 @@ function FormAtencion() {
     delete updatedAten[id];
     setAtenciones(updatedAten);
 
-    const res = await fetch("http://localhost:3000/atenciones/sgc/last");
+    const res = await fetch(`${servidor}/atenciones/sgc/last`);
     const data = await res.json();
     navigate(`/sgc/atencion/${data.atencion_ciudadana[0].id_atencion}`);
   };

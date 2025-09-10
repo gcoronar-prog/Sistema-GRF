@@ -67,14 +67,14 @@ function FormAlfa() {
   }, [params.id]);
 
   const loadFuncionario = async () => {
-    const res = await fetch("http://localhost:3000/funciongrd");
+    const res = await fetch(`${servidor}/funciongrd`);
     if (!res.ok) throw new Error("Problemas obteniendo datos inspectores");
     const data = await res.json();
     setFuncionarios(data);
   };
 
   const loadInformes = async (id) => {
-    const res = await fetch(`http://localhost:3000/alfa/${id}`);
+    const res = await fetch(`${servidor}/alfa/${id}`);
     if (!res.ok) throw new Error("Problemas obteniendo datos de informes");
     const data = await res.json();
     const info = data;
@@ -144,8 +144,8 @@ function FormAlfa() {
 
       // Configuración de la URL y método HTTP
       const url = params.id
-        ? `http://localhost:3000/alfa/${params.id}`
-        : "http://localhost:3000/alfa/";
+        ? `${servidor}/alfa/${params.id}`
+        : `${servidor}/alfa/`;
       const method = params.id ? "PUT" : "POST";
 
       // Realizar la solicitud al servidor
@@ -173,14 +173,14 @@ function FormAlfa() {
   const handleDeleteInforme = async () => {
     const id = params.id;
 
-    await fetch(`http://localhost:3000/alfa/${id}`, {
+    await fetch(`${servidor}/alfa/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
     const updateAlfa = { ...informesALFA };
     delete updateAlfa[id];
     setInformesALFA(updateAlfa);
-    const res = await fetch("http://localhost:3000/lastalfa");
+    const res = await fetch(`${servidor}/lastalfa`);
     const data = await res.json();
     //console.log(data.informe_Alfa.cod_alfa);
     navigate(`/alfa/${data.informe_Alfa.cod_alfa}/edit`);
@@ -252,7 +252,7 @@ function FormAlfa() {
   };*/
 
   const handleLastAlfa = async () => {
-    const res = await fetch("http://localhost:3000/lastalfa");
+    const res = await fetch(`${servidor}/lastalfa`);
     if (res.ok) {
       const lastAlfa = await res.json();
       //console.log(lastAlfa);
@@ -272,7 +272,7 @@ function FormAlfa() {
   };
 
   const handleFirstAlfa = async () => {
-    const res = await fetch("http://localhost:3000/firstalfa");
+    const res = await fetch(`${servidor}/firstalfa`);
     if (res.ok) {
       const firstAlfa = await res.json();
       //console.log(lastAlfa);
@@ -294,9 +294,7 @@ function FormAlfa() {
 
   const handlePrevious = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/alfa/prev/${params.id}`
-      );
+      const response = await fetch(`${servidor}/alfa/prev/${params.id}`);
       const data = await response.json();
 
       if (data?.informesRows?.length > 0 && data.informesRows[0].cod_alfa) {
@@ -314,9 +312,7 @@ function FormAlfa() {
 
   const handleNext = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/alfa/next/${params.id}`
-      );
+      const response = await fetch(`${servidor}/alfa/next/${params.id}`);
       const data = await response.json();
 
       if (data?.informesRows?.length > 0 && data?.informesRows[0].cod_alfa) {
@@ -356,7 +352,7 @@ function FormAlfa() {
     const id = params.id;
 
     try {
-      const res = await fetch("http://localhost:3000/lastalfa");
+      const res = await fetch(`${servidor}/lastalfa`);
 
       if (!id) {
         if (res.ok) {

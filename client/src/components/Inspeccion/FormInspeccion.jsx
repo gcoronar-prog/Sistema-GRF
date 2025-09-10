@@ -8,6 +8,7 @@ import InspectPDF from "../PDFs/InspectPDF";
 import SelectSector from "../SelectSector";
 import { jwtDecode } from "jwt-decode";
 import { useTokenSession } from "../useTokenSession";
+import DespachoExp from "./DespachoExp";
 
 function FormInspeccion() {
   const navigate = useNavigate();
@@ -1226,6 +1227,8 @@ function FormInspeccion() {
           {editing && (
             <div className="col-lg-4">
               <SearchExpediente />
+              <br />
+              <DespachoExp />
             </div>
           )}
         </div>
