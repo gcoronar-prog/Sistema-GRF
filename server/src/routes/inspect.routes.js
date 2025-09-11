@@ -265,8 +265,8 @@ router.get(
 
 router.get(
   "/digitador",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  //verifyToken,
+  //verifyGroup("superadmin", "inspeccion", "noinspeccion"),
   getDigitador
 );
 

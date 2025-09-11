@@ -1018,7 +1018,8 @@ const searchInformeInspeccion = async (req, res) => {
 const searchExpedientes = async (req, res) => {
   const client = await pool.connect();
   try {
-    const { rut, ppu, num_control, fecha_inicio, fecha_fin, jpl } = req.query;
+    const { rut, ppu, num_control, fecha_inicio, fecha_fin, jpl, digitador } =
+      req.query;
 
     await client.query("BEGIN");
     let whereClauses = [];
@@ -1052,6 +1053,11 @@ const searchExpedientes = async (req, res) => {
           (values.length + 2)
       );
       values.push(fecha_inicio, fecha_fin);
+    }
+
+    if (digitador) {
+      whereClauses.push("expe.user_creador = $" + (values.length + 1));
+      values.push(digitador);
     }
 
     const whereSQL =
@@ -1237,7 +1243,7 @@ const getDigitador = async (req, res) => {
   try {
     await client.query("BEGIN");
     const expediente = await client.query(
-      "SELECT cod_user, user_name, nombre,apellido FROM users_system WHERE user_rol=userinspeccion"
+      "SELECT cod_user, user_name, nombre,apellido FROM users_system WHERE user_rol='userinspeccion'"
     );
     await client.query("COMMIT");
     return res.status(200).json({
