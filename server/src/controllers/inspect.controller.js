@@ -1061,7 +1061,7 @@ const searchExpedientes = async (req, res) => {
     }
 
     const whereSQL =
-      whereClauses.length > 0 ? "WHERE " + whereClauses.join(" OR ") : "";
+      whereClauses.length > 0 ? "WHERE " + whereClauses.join(" AND ") : "";
 
     const expediente = await client.query(
       `SELECT expe.*, inf.* as infracciones,
@@ -1259,6 +1259,31 @@ const getDigitador = async (req, res) => {
   }
 };
 
+const despachoExpediente = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const { num_expe } = req.query;
+    const expe = await client.query(
+      `UPDATE expedientes 
+	              SET estado_exp =CASE 
+                    WHEN tipo_procedimiento = 'Notificación' THEN 'Resuelto'
+                    ELSE 'Despachado'
+                 END
+                WHERE id_exp IN ($1) returning *`,
+      [num_expe]
+    );
+    await client.query("COMMIT");
+    console.log(num_expe);
+    return res.status(200).json({ expediente: expe.rows });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ msg: "Problemas al conectar con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 export {
   getExpedientes,
   getExpediente,
@@ -1298,4 +1323,5 @@ export {
   getExpedEstado,
   getExpedTipo,
   getDigitador,
+  despachoExpediente,
 };

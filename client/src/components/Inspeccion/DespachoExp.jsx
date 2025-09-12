@@ -7,9 +7,18 @@ function DespachoExp() {
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const token = localStorage.getItem("token");
 
+  // Hoy
+  const hoy = new Date();
+  const hoyStr = hoy.toISOString().split("T")[0]; // "2025-09-11"
+
+  // Mañana
+  const manana = new Date();
+  manana.setDate(manana.getDate() + 1);
+  const mananaStr = manana.toISOString().split("T")[0]; // "2025-09-12"
+
   const [busqueda, setBusqueda] = useState({
-    fecha_inicio: "",
-    fecha_fin: "",
+    fecha_inicio: hoyStr,
+    fecha_fin: mananaStr,
     jpl: "",
     digitador: "",
   });
@@ -33,6 +42,20 @@ function DespachoExp() {
 
       // Guardar en el estado
       setExpediente(data.expedientes || []);
+      console.log(data.expedientes.id_exp);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const despacharExpe = async (num_expe) => {
+    try {
+      const res = await fetch(
+        `${servidor_local}/despachoExpe?num_expe=${num_expe}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+      console.log(data);
     } catch (error) {
       console.error(error);
     }
@@ -85,6 +108,7 @@ function DespachoExp() {
     const tableColumn = [
       "ID Expediente",
       "N° Control",
+      "Digitador",
       "Fecha Infracción",
       "Fecha de Citación",
       "Rut contribuyente",
@@ -100,6 +124,7 @@ function DespachoExp() {
     const tableRows = dato.map((c) => [
       c.id_expediente,
       c.num_control,
+      c.user_creador,
       new Date(c.fecha_infraccion).toLocaleString("es-ES") || "-",
       new Date(c.fecha_citacion).toLocaleString("es-ES") || "-",
       c.rut_contri || "-",
@@ -147,7 +172,7 @@ function DespachoExp() {
     <>
       <div className="card shadow-sm">
         <div className="card-header bg-secondary text-white">
-          <strong>Búsqueda de Expedientes</strong>
+          <strong>Despacho de Expedientes</strong>
         </div>
         <div className="card-body">
           <div className="mb-3">
@@ -156,9 +181,10 @@ function DespachoExp() {
             </label>
             <input
               name="fecha_inicio"
-              type="datetime-local"
+              type="date"
               className="form-control"
               onChange={handleChanges}
+              defaultValue={hoyStr}
               value={busqueda.fecha_inicio}
             />
           </div>
@@ -168,7 +194,7 @@ function DespachoExp() {
             </label>
             <input
               name="fecha_fin"
-              type="datetime-local"
+              type="date"
               className="form-control"
               onChange={handleChanges}
               value={busqueda.fecha_fin}
@@ -180,14 +206,16 @@ function DespachoExp() {
               Juzgado:
             </label>
             <select
+              className="form-select"
               name="jpl"
               id=""
               onChange={handleChanges}
               value={busqueda.jpl}
+              required
             >
               <option value="">Seleccione JPL</option>
-              <option value="jpl1">JPL 1</option>
-              <option value="jpl2">JPL 2</option>
+              <option value="JPL 1">JPL 1</option>
+              <option value="JPL 2">JPL 2</option>
             </select>
           </div>
 
@@ -196,6 +224,7 @@ function DespachoExp() {
               Digitador:
             </label>
             <select
+              className="form-select"
               name="digitador"
               id=""
               onChange={handleChanges}
@@ -209,27 +238,33 @@ function DespachoExp() {
             </select>
           </div>
 
-          <div className="d-flex justify-content-end mt-4">
-            <button
-              className="btn btn-primary"
-              onClick={() =>
-                buscaExpediente(
-                  busqueda.fecha_inicio,
-                  busqueda.fecha_fin,
-                  busqueda.jpl,
-                  busqueda.digitador
-                )
-              }
-            >
-              <i className="bi bi-list-columns-reverse"></i> Mostrar lista
-            </button>
-            <button
-              className="btn btn-danger"
-              onClick={() => generarPDF(expediente)}
-            >
-              <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
-            </button>
-          </div>
+          {busqueda.jpl && (
+            <div className="d-flex justify-content-end gap-2 mt-4">
+              <div className="mb-3">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    buscaExpediente(
+                      busqueda.fecha_inicio,
+                      busqueda.fecha_fin,
+                      busqueda.jpl,
+                      busqueda.digitador
+                    );
+                  }}
+                >
+                  <i className="bi bi-list-columns-reverse"></i> Mostrar lista
+                </button>
+              </div>
+              <div className="mb-3">
+                <button
+                  className="btn btn-danger"
+                  onClick={() => generarPDF(expediente)}
+                >
+                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                </button>
+              </div>
+            </div>
+          )}
           <div className="mt-4">
             <ListDespacho expediente={expediente} />
           </div>

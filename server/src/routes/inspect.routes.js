@@ -10,6 +10,7 @@ import {
   deleteExpediente,
   deleteInfraccion,
   deleteVehiInfra,
+  despachoExpediente,
   findArchivosExp,
   getAllExpedientes,
   getArchivosExp,
@@ -268,6 +269,13 @@ router.get(
   //verifyToken,
   //verifyGroup("superadmin", "inspeccion", "noinspeccion"),
   getDigitador
+);
+
+router.put(
+  "/despachoExpe",
+  //verifyToken,
+  //verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  despachoExpediente
 );
 
 export default router;
