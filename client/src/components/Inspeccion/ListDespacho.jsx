@@ -1,5 +1,3 @@
-import React from "react";
-
 function ListDespacho({ expediente }) {
   return (
     <div className="mt-4">
@@ -10,19 +8,19 @@ function ListDespacho({ expediente }) {
         <table className="table table-striped table-hover align-middle text-center table-bordered table-sm">
           <thead className="table-dark">
             <tr>
-              <th>ID</th>
-              <th>Contribuyente</th>
-              <th>PPU</th>
+              <th># Control</th>
+              <th>Proceso</th>
               <th>Fecha</th>
+              <th>Estado</th>
             </tr>
           </thead>
           <tbody>
             {expediente.map((item, index) => (
               <tr key={index}>
-                <td>{item.id_expediente}</td>
-                <td>{item.rut_contri}</td>
-                <td>{item.ppu}</td>
-                <td>{new Date(item.fecha_infraccion).toLocaleDateString()}</td>
+                <td>{item.num_control}</td>
+                <td>{item.tipo_proceso}</td>
+                <td>{item.fecha_documento}</td>
+                <td>{item.estado_exp}</td>
               </tr>
             ))}
           </tbody>

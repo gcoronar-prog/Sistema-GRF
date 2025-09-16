@@ -1263,14 +1263,14 @@ const despachoExpediente = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const { num_expe } = req.query;
+    const { num_expe } = req.body;
     const expe = await client.query(
       `UPDATE expedientes 
 	              SET estado_exp =CASE 
                     WHEN tipo_procedimiento = 'Notificación' THEN 'Resuelto'
                     ELSE 'Despachado'
                  END
-                WHERE id_exp IN ($1) returning *`,
+                WHERE id_exp = ANY($1::int[]) returning *`,
       [num_expe]
     );
     await client.query("COMMIT");

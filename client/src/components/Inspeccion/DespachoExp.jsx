@@ -50,12 +50,21 @@ function DespachoExp() {
 
   const despacharExpe = async (num_expe) => {
     try {
-      const res = await fetch(
-        `${servidor_local}/despachoExpe?num_expe=${num_expe}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const ids = num_expe.map((e) => e.id_exp);
+      const res = await fetch(`${servidor_local}/despachoExpe`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ num_expe: ids }),
+      });
       const data = await res.json();
-      console.log(data);
+      //setExpediente(data.expediente || []);
+
+      console.log("id despacho", ids);
+
+      return data;
     } catch (error) {
       console.error(error);
     }
@@ -125,8 +134,8 @@ function DespachoExp() {
       c.id_expediente,
       c.num_control,
       c.user_creador,
-      new Date(c.fecha_infraccion).toLocaleString("es-ES") || "-",
-      new Date(c.fecha_citacion).toLocaleString("es-ES") || "-",
+      c.fecha_infraccion || "-",
+      c.fecha_citacion || "-",
       c.rut_contri || "-",
       c.nombre || "-",
       c.funcionario || "-",
@@ -258,9 +267,21 @@ function DespachoExp() {
               <div className="mb-3">
                 <button
                   className="btn btn-danger"
-                  onClick={() => generarPDF(expediente)}
+                  onClick={() => {
+                    generarPDF(expediente);
+                  }}
                 >
                   <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                </button>
+              </div>
+              <div className="mb-3">
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    despacharExpe(expediente);
+                  }}
+                >
+                  <i className="bi bi-file-earmark-pdf"></i> despachar
                 </button>
               </div>
             </div>

@@ -271,7 +271,7 @@ router.get(
   getDigitador
 );
 
-router.put(
+router.post(
   "/despachoExpe",
   //verifyToken,
   //verifyGroup("superadmin", "inspeccion", "noinspeccion"),
