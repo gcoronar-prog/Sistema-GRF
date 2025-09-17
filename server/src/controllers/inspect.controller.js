@@ -1060,6 +1060,11 @@ const searchExpedientes = async (req, res) => {
       values.push(digitador);
     }
 
+    if (proceso) {
+      whereClauses.push("expe.tipo_procedimiento = $" + (values.length + 1));
+      values.push(proceso);
+    }
+
     const whereSQL =
       whereClauses.length > 0 ? "WHERE " + whereClauses.join(" AND ") : "";
 
@@ -1273,9 +1278,23 @@ const despachoExpediente = async (req, res) => {
                 WHERE id_exp = ANY($1::int[]) returning *`,
       [num_expe]
     );
+    const expediente = await client.query(
+      `SELECT * FROM expedientes expe
+                          JOIN funcionarios func 
+                          ON func.id_funcionario=expe.id_inspector
+                          JOIN leyes l ON l.id_ley=expe.id_leyes
+                          JOIN glosas_ley gl ON gl.id_glosa=expe.id_glosas
+                          JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
+                          JOIN contribuyentes contri ON contri.id_expediente=expe.id_expediente
+                          JOIN vehiculos_contri vehi ON vehi.id_expediente=expe.id_expediente
+                        WHERE id_exp = ANY($1::int[])`,
+      [num_expe]
+    );
     await client.query("COMMIT");
     console.log(num_expe);
-    return res.status(200).json({ expediente: expe.rows });
+    return res
+      .status(200)
+      .json({ expediente: expe.rows, expedientes: expediente.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     res.status(500).json({ msg: "Problemas al conectar con el servidor" });

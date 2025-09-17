@@ -1,4 +1,12 @@
 function ListDespacho({ expediente }) {
+  const formatFecha = (fecha) => {
+    if (!fecha) return "";
+    return new Date(fecha).toLocaleDateString("es-CL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
   return (
     <div className="mt-4">
       <h5 className="mb-3 text-secondary border-bottom pb-2">
@@ -18,8 +26,8 @@ function ListDespacho({ expediente }) {
             {expediente.map((item, index) => (
               <tr key={index}>
                 <td>{item.num_control}</td>
-                <td>{item.tipo_proceso}</td>
-                <td>{item.fecha_documento}</td>
+                <td>{item.tipo_procedimiento}</td>
+                <td>{formatFecha(item.fecha_documento)}</td>
                 <td>{item.estado_exp}</td>
               </tr>
             ))}

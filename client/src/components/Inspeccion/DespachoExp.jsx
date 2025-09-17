@@ -12,13 +12,13 @@ function DespachoExp() {
   const hoyStr = hoy.toISOString().split("T")[0]; // "2025-09-11"
 
   // Mañana
-  const manana = new Date();
-  manana.setDate(manana.getDate() + 1);
-  const mananaStr = manana.toISOString().split("T")[0]; // "2025-09-12"
+  const ayer = new Date();
+  ayer.setDate(ayer.getDate() - 1);
+  const ayerStr = ayer.toISOString().split("T")[0]; // "2025-09-12"
 
   const [busqueda, setBusqueda] = useState({
-    fecha_inicio: hoyStr,
-    fecha_fin: mananaStr,
+    fecha_inicio: ayerStr,
+    fecha_fin: hoyStr,
     jpl: "",
     digitador: "",
   });
@@ -60,7 +60,7 @@ function DespachoExp() {
         body: JSON.stringify({ num_expe: ids }),
       });
       const data = await res.json();
-      //setExpediente(data.expediente || []);
+      setExpediente(data.expedientes || []);
 
       console.log("id despacho", ids);
 
