@@ -21,6 +21,7 @@ function DespachoExp() {
     fecha_fin: hoyStr,
     jpl: "",
     digitador: "",
+    proceso: "Citación",
   });
   const [expediente, setExpediente] = useState([]);
   const [digitador, setDigitador] = useState([]);
@@ -30,10 +31,16 @@ function DespachoExp() {
     //console.log(digitador);
   }, []);
 
-  const buscaExpediente = async (fecha_inicio, fecha_fin, jpl, digitador) => {
+  const buscaExpediente = async (
+    fecha_inicio,
+    fecha_fin,
+    jpl,
+    digitador,
+    proceso
+  ) => {
     try {
       const res = await fetch(
-        `${servidor_local}/search_expediente?fecha_inicio=${fecha_inicio}&fecha_fin=${fecha_fin}&jpl=${jpl}&digitador=${digitador}`,
+        `${servidor_local}/search_expediente?fecha_inicio=${fecha_inicio}&fecha_fin=${fecha_fin}&jpl=${jpl}&digitador=${digitador}&proceso=${proceso}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -209,6 +216,24 @@ function DespachoExp() {
               value={busqueda.fecha_fin}
             />
           </div>
+          <div className="mb-3">
+            <label htmlFor="proceso" className="form-label">
+              Procedimiento
+            </label>
+            <select
+              className="form-select"
+              name="proceso"
+              id=""
+              value={busqueda.proceso}
+              onChange={handleChanges}
+              required
+            >
+              <option value="Citación">Citación</option>
+              <option value="Notificación">Notificación</option>
+              <option value="Causas">Causas JPL</option>
+              <option value="Solicitudes">Solicitudes Generales</option>
+            </select>
+          </div>
 
           <div className="mb-3">
             <label htmlFor="jpl" className="form-label">
@@ -248,7 +273,7 @@ function DespachoExp() {
           </div>
 
           {busqueda.jpl && (
-            <div className="d-flex justify-content-end gap-2 mt-4">
+            <div className="">
               <div className="mb-3">
                 <button
                   className="btn btn-primary"
@@ -257,7 +282,8 @@ function DespachoExp() {
                       busqueda.fecha_inicio,
                       busqueda.fecha_fin,
                       busqueda.jpl,
-                      busqueda.digitador
+                      busqueda.digitador,
+                      busqueda.proceso
                     );
                   }}
                 >
@@ -276,12 +302,13 @@ function DespachoExp() {
               </div>
               <div className="mb-3">
                 <button
-                  className="btn btn-danger"
+                  className="btn btn-secondary"
                   onClick={() => {
                     despacharExpe(expediente);
                   }}
                 >
-                  <i className="bi bi-file-earmark-pdf"></i> despachar
+                  <i className="bi bi-box-arrow-in-right"></i> Despachar
+                  Expedientes
                 </button>
               </div>
             </div>

@@ -1018,8 +1018,16 @@ const searchInformeInspeccion = async (req, res) => {
 const searchExpedientes = async (req, res) => {
   const client = await pool.connect();
   try {
-    const { rut, ppu, num_control, fecha_inicio, fecha_fin, jpl, digitador } =
-      req.query;
+    const {
+      rut,
+      ppu,
+      num_control,
+      fecha_inicio,
+      fecha_fin,
+      jpl,
+      digitador,
+      proceso,
+    } = req.query;
 
     await client.query("BEGIN");
     let whereClauses = [];
