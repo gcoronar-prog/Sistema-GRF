@@ -892,6 +892,8 @@ function StatisticsCentral() {
               <SelectUsers
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}
+                estadistica={true}
+                tipo={"central"}
               />
             </div>
           </div>

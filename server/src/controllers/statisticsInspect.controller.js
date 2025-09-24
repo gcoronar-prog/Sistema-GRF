@@ -26,6 +26,7 @@ const getStatisticInspect = async (req, res) => {
     const result = await client.query(expedientes, values);
     await client.query("COMMIT");
     console.log("expediente: ", expedientes);
+
     return res.status(200).json({
       expedientes: result.rows,
     });
@@ -377,6 +378,14 @@ function buildWhereClause({
     addCondition(
       ` AND infra.sector_infraccion= $${values.length + 1}`,
       cleanedSector
+    );
+  }
+
+  if (digitador && digitador.length > 0) {
+    const cleanedDigitador = digitador.replace(/"/g, "");
+    addCondition(
+      ` AND infra.user_creador= $${values.length + 1}`,
+      cleanedDigitador
     );
   }
 

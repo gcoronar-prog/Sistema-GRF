@@ -10,7 +10,10 @@ import {
   getResumenVehi,
 } from "../controllers/statisticsCentral.controller.js";
 import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
-import { getUsersCentral } from "../controllers/users.controller.js";
+import {
+  getUsersCentral,
+  getUsersInspect,
+} from "../controllers/users.controller.js";
 
 const router = Router();
 
@@ -72,5 +75,6 @@ router.get(
   getResumenVehi
 );
 
-router.get("/users_gie", getUsersCentral);
+router.get("/users_gie_central", getUsersCentral);
+router.get("/users_gie_inspect", getUsersInspect);
 export default router;

@@ -1256,7 +1256,7 @@ const getDigitador = async (req, res) => {
   try {
     await client.query("BEGIN");
     const expediente = await client.query(
-      "SELECT cod_user, user_name, nombre,apellido FROM users_system WHERE user_rol='userinspeccion'"
+      "SELECT cod_user, user_name, nombre,apellido FROM users_system WHERE user_rol='userinspeccion' OR user_rol='superadmin'"
     );
     await client.query("COMMIT");
     return res.status(200).json({

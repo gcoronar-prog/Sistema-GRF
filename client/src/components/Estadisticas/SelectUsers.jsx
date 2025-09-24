@@ -1,10 +1,16 @@
 import AsyncSelect from "react-select/async";
 
-function SelectUsers({ selectedUser, setSelectedUser }) {
+function SelectUsers({ selectedUser, setSelectedUser, estadistica, tipo }) {
   const loadUsers = async () => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
-      const res = await fetch(`${servidor}/users_gie`);
+      let url;
+      if (tipo === "central") {
+        url = `${servidor}/users_gie_central`;
+      } else if (tipo === "inspect") {
+        url = `${servidor}/users_gie_inspect`;
+      }
+      const res = await fetch(url);
       if (!res.ok) {
         throw new Error("Error al cargar los usuarios");
       }
@@ -31,6 +37,13 @@ function SelectUsers({ selectedUser, setSelectedUser }) {
           setSelectedUser(select);
         }}
         value={selectedUser}
+        styles={{
+          control: (base) => ({
+            ...base,
+            borderColor:
+              !selectedUser && !estadistica ? "red" : base.borderColor,
+          }),
+        }}
       />
     </div>
   );

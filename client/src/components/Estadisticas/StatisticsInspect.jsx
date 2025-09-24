@@ -131,6 +131,10 @@ function StatisticsInspect() {
       params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
     }
 
+    if (selectedUser) {
+      params.append("user_creador", JSON.stringify(selectedUser.value));
+    }
+
     try {
       const res = await fetch(url + params.toString(), {
         headers: { Authorization: `Bearer ${token}` },
@@ -1040,13 +1044,14 @@ function StatisticsInspect() {
                 </div>
                 <div className="col-md-4">
                   <label htmlFor="sectorContri" className="form-label fw-bold">
-                    Sector
+                    Digitadores
                   </label>
                   <SelectUsers
                     id="userInspect"
-                    selectedSector={selectedSector}
-                    setSelectedSector={setSelectedSector}
+                    selectedUser={selectedUser}
+                    setSelectedUser={setSelectedUser}
                     estadistica={true}
+                    tipo={"inspect"}
                   />
                 </div>
               </div>

@@ -13,7 +13,7 @@ import {
 const router = Router();
 
 router.get("/estadisticaInspeccion", getStatisticInspect);
-router.put("/estadisticaInspeccion", getStatisticInspect);
+//router.put("/estadisticaInspeccion", getStatisticInspect);
 
 router.get("/resumen_estado_inspe", getEstadoExpe);
 router.get("/resumen_tipo_inspe", getTipoProce);

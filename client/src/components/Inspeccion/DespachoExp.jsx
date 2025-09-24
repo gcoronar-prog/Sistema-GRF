@@ -47,9 +47,11 @@ function DespachoExp() {
 
       console.log(data, "expediente busqueda");
 
-      // Guardar en el estado
+      if (data.expedientes.length === 0) {
+        alert("No existen registros");
+      }
       setExpediente(data.expedientes || []);
-      console.log(data.expedientes.id_exp);
+      console.log(data.expedientes);
     } catch (error) {
       console.error(error);
     }
@@ -68,7 +70,9 @@ function DespachoExp() {
       });
       const data = await res.json();
       setExpediente(data.expedientes || []);
-
+      if (data.expedientes.length === 0) {
+        alert("No existen registros para despachar");
+      }
       console.log("id despacho", ids);
 
       return data;
@@ -83,7 +87,7 @@ function DespachoExp() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      console.log(data, "digitadores");
+      //console.log(data.expediente, "digitadores");
       setDigitador(data.expediente || []);
     } catch (error) {
       console.error(error);
@@ -184,6 +188,14 @@ function DespachoExp() {
     doc.output("dataurlnewwindow");
   };
 
+  function generarPDF1(expe) {
+    if (expe.length === 0) {
+      alert("No hay registros para generar documento");
+    } else {
+      generarPDF(expe);
+    }
+  }
+
   return (
     <>
       <div className="card shadow-sm">
@@ -266,7 +278,7 @@ function DespachoExp() {
             >
               {digitador.map((d) => (
                 <option key={d.cod_user} value={d.user_name}>
-                  {d.nombre}
+                  {d.user_name}
                 </option>
               ))}
             </select>
@@ -294,7 +306,7 @@ function DespachoExp() {
                 <button
                   className="btn btn-danger"
                   onClick={() => {
-                    generarPDF(expediente);
+                    generarPDF1(expediente);
                   }}
                 >
                   <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
