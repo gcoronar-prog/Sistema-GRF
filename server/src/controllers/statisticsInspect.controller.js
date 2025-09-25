@@ -267,14 +267,14 @@ function buildWhereClause({
   estado_exp,
   tipo_proce,
   jpl,
-  digitador,
+  user_creador,
   leyes,
   inspector,
 
   rut_contri,
   tipo_vehiculo,
   marca_vehiculo,
-  sector_infrac,
+  sector_infraccion,
 }) {
   const conditions = [];
   const values = [];
@@ -351,7 +351,7 @@ function buildWhereClause({
   }
 
   if (leyes && leyes.length > 0) {
-    addCondition(` AND expe.id_leyes=$${values.length + 1}`, leyes);
+    addCondition(`expe.id_leyes=$${values.length + 1}`, leyes);
   }
 
   if (inspector && inspector.length > 0) {
@@ -373,20 +373,17 @@ function buildWhereClause({
     addCondition(`vehi.marca_vehi = $${values.length + 1}`, cleanedMarca);
   }
 
-  if (sector_infrac && sector_infrac.length > 0) {
-    const cleanedSector = sector_infrac.replace(/"/g, "");
+  if (sector_infraccion && sector_infraccion.length > 0) {
+    const cleanedSector = sector_infraccion.replace(/"/g, "");
     addCondition(
-      ` AND infra.sector_infraccion= $${values.length + 1}`,
+      `infra.sector_infraccion= $${values.length + 1}`,
       cleanedSector
     );
   }
 
-  if (digitador && digitador.length > 0) {
-    const cleanedDigitador = digitador.replace(/"/g, "");
-    addCondition(
-      ` AND infra.user_creador= $${values.length + 1}`,
-      cleanedDigitador
-    );
+  if (user_creador && user_creador.length > 0) {
+    const cleanedDigitador = user_creador.replace(/"/g, "");
+    addCondition(`expe.user_creador= $${values.length + 1}`, cleanedDigitador);
   }
 
   return {

@@ -23,28 +23,9 @@ function StatisticsInspect() {
 
   const startDate = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
   const datenow = dayjs().format("YYYY-MM-DDTHH:mm");
-  const defaultValues = {
-    fechaInicioInfrac: startDate,
-    fechaFinInfrac: datenow,
-    fechaInicioCitacion: "",
-    fechaFinCitacion: "",
-    fechaInicio: "",
-    fechaFin: "",
-
-    estado_exp: "",
-    tipo_proce: "",
-    jpl: "",
-    digitador: "",
-    leyes: "",
-    inspector: "",
-
-    rut_contri: "",
-    tipo_vehiculo: "",
-    marca_vehiculo: "",
-    sector_infrac: "",
-  };
 
   const [inspeccion, setInspeccion] = useState([]);
+  const [rut_contri, setRut_Contri] = useState("");
   const [fechaInicioInfrac, setFechaInicioInfrac] = useState("");
   const [fechaFinInfrac, setFechaFinInfrac] = useState("");
   const [fechaInicioCitacion, setFechaInicioCitacion] = useState("");
@@ -91,6 +72,12 @@ function StatisticsInspect() {
     if (fechaInicio && fechaFin) {
       params.append("fechaInicio", fechaInicio);
       params.append("fechaFin", fechaFin);
+    }
+
+    if (rut_contri && typeof rut_contri === "object" && rut_contri.value) {
+      params.append("rut_contri", rut_contri.value);
+    } else if (typeof rut_contri === "string") {
+      params.append("rut_contri", rut_contri);
     }
 
     Object.keys(estadoFilter).forEach((estado_exp) => {
@@ -267,571 +254,6 @@ function StatisticsInspect() {
     }
   };
 
-  const resumenEstadoInsp = async () => {
-    const url = `${server_back}/resumen_estado_inspe?`;
-    let params = new URLSearchParams();
-
-    if (fechaInicioInfrac && fechaFinInfrac) {
-      params.append("fechaInicioInfrac", fechaInicioInfrac);
-      params.append("fechaFinInfrac", fechaFinInfrac);
-    }
-
-    if (fechaInicioCitacion && fechaFinCitacion) {
-      params.append("fechaInicioCitacion", fechaInicioCitacion);
-      params.append("fechaFinCitacion", fechaFinCitacion);
-    }
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio);
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado_exp) => {
-      if (estadoFilter[estado_exp]) {
-        params.append("estado_exp", estado_exp);
-      }
-    });
-
-    Object.keys(tipoProced).forEach((tipo_proce) => {
-      if (tipoProced[tipo_proce]) {
-        params.append("tipo_proce", tipo_proce);
-      }
-    });
-
-    Object.keys(jplFilter).forEach((jpl) => {
-      if (jplFilter[jpl]) {
-        params.append("jpl", jpl);
-      }
-    });
-
-    if (selectedInspect) {
-      params.append("inspector", JSON.stringify(selectedInspect.value));
-    }
-
-    if (selectedLey) {
-      params.append("leyes", JSON.stringify(selectedLey.value));
-    }
-
-    if (selectedSector) {
-      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
-    }
-
-    if (selectedTipoVeh) {
-      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
-    }
-
-    if (selectedVeh) {
-      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.expedientes.length === 0) {
-        alert("No existen datos para mostrar");
-      } else {
-        estadoInspeccionPDF(
-          data.expedientes,
-          fechaInicioInfrac,
-          fechaFinInfrac,
-          fechaInicioCitacion,
-          fechaFinCitacion,
-          fechaInicio,
-          fechaFin
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenTipoExp = async () => {
-    const url = `${server_back}/resumen_tipo_inspe?`;
-    let params = new URLSearchParams();
-
-    if (fechaInicioInfrac && fechaFinInfrac) {
-      params.append("fechaInicioInfrac", fechaInicioInfrac);
-      params.append("fechaFinInfrac", fechaFinInfrac);
-    }
-
-    if (fechaInicioCitacion && fechaFinCitacion) {
-      params.append("fechaInicioCitacion", fechaInicioCitacion);
-      params.append("fechaFinCitacion", fechaFinCitacion);
-    }
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio);
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado_exp) => {
-      if (estadoFilter[estado_exp]) {
-        params.append("estado_exp", estado_exp);
-      }
-    });
-
-    Object.keys(tipoProced).forEach((tipo_proce) => {
-      if (tipoProced[tipo_proce]) {
-        params.append("tipo_proce", tipo_proce);
-      }
-    });
-
-    Object.keys(jplFilter).forEach((jpl) => {
-      if (jplFilter[jpl]) {
-        params.append("jpl", jpl);
-      }
-    });
-
-    if (selectedInspect) {
-      params.append("inspector", JSON.stringify(selectedInspect.value));
-    }
-
-    if (selectedLey) {
-      params.append("leyes", JSON.stringify(selectedLey.value));
-    }
-
-    if (selectedSector) {
-      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
-    }
-
-    if (selectedTipoVeh) {
-      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
-    }
-
-    if (selectedVeh) {
-      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.expedientes.length === 0) {
-        alert("No existen datos para mostrar");
-      } else {
-        TipoProceInspPDF(
-          data.expedientes,
-          fechaInicioInfrac,
-          fechaFinInfrac,
-          fechaInicioCitacion,
-          fechaFinCitacion,
-          fechaInicio,
-          fechaFin
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenLeyInspec = async () => {
-    const url = `${server_back}/resumen_ley_inspe?`;
-    let params = new URLSearchParams();
-
-    if (fechaInicioInfrac && fechaFinInfrac) {
-      params.append("fechaInicioInfrac", fechaInicioInfrac);
-      params.append("fechaFinInfrac", fechaFinInfrac);
-    }
-
-    if (fechaInicioCitacion && fechaFinCitacion) {
-      params.append("fechaInicioCitacion", fechaInicioCitacion);
-      params.append("fechaFinCitacion", fechaFinCitacion);
-    }
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio);
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado_exp) => {
-      if (estadoFilter[estado_exp]) {
-        params.append("estado_exp", estado_exp);
-      }
-    });
-
-    Object.keys(tipoProced).forEach((tipo_proce) => {
-      if (tipoProced[tipo_proce]) {
-        params.append("tipo_proce", tipo_proce);
-      }
-    });
-
-    Object.keys(jplFilter).forEach((jpl) => {
-      if (jplFilter[jpl]) {
-        params.append("jpl", jpl);
-      }
-    });
-
-    if (selectedInspect) {
-      params.append("inspector", JSON.stringify(selectedInspect.value));
-    }
-
-    if (selectedLey) {
-      params.append("leyes", JSON.stringify(selectedLey.value));
-    }
-
-    if (selectedSector) {
-      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
-    }
-
-    if (selectedTipoVeh) {
-      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
-    }
-
-    if (selectedVeh) {
-      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      //console.log(data);
-      if (data.expedientes.length === 0) {
-        alert("No existen datos para mostrar");
-      } else {
-        LeyInspeccionPDF(
-          data.expedientes,
-          fechaInicioInfrac,
-          fechaFinInfrac,
-          fechaInicioCitacion,
-          fechaFinCitacion,
-          fechaInicio,
-          fechaFin
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenInspector = async () => {
-    const url = `${server_back}/resumen_inspector_inspe?`;
-    let params = new URLSearchParams();
-
-    if (fechaInicioInfrac && fechaFinInfrac) {
-      params.append("fechaInicioInfrac", fechaInicioInfrac);
-      params.append("fechaFinInfrac", fechaFinInfrac);
-    }
-
-    if (fechaInicioCitacion && fechaFinCitacion) {
-      params.append("fechaInicioCitacion", fechaInicioCitacion);
-      params.append("fechaFinCitacion", fechaFinCitacion);
-    }
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio);
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado_exp) => {
-      if (estadoFilter[estado_exp]) {
-        params.append("estado_exp", estado_exp);
-      }
-    });
-
-    Object.keys(tipoProced).forEach((tipo_proce) => {
-      if (tipoProced[tipo_proce]) {
-        params.append("tipo_proce", tipo_proce);
-      }
-    });
-
-    Object.keys(jplFilter).forEach((jpl) => {
-      if (jplFilter[jpl]) {
-        params.append("jpl", jpl);
-      }
-    });
-
-    if (selectedInspect) {
-      params.append("inspector", JSON.stringify(selectedInspect.value));
-    }
-
-    if (selectedLey) {
-      params.append("leyes", JSON.stringify(selectedLey.value));
-    }
-
-    if (selectedSector) {
-      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
-    }
-
-    if (selectedTipoVeh) {
-      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
-    }
-
-    if (selectedVeh) {
-      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      //console.log(data);
-      if (data.expedientes.length === 0) {
-        alert("No existen datos para mostrar");
-      } else {
-        InspectResumenPDF(
-          data.expedientes,
-          fechaInicioInfrac,
-          fechaFinInfrac,
-          fechaInicioCitacion,
-          fechaFinCitacion,
-          fechaInicio,
-          fechaFin
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenVehi = async () => {
-    const url = `${server_back}/resumen_vehi_inspe?`;
-    let params = new URLSearchParams();
-
-    if (fechaInicioInfrac && fechaFinInfrac) {
-      params.append("fechaInicioInfrac", fechaInicioInfrac);
-      params.append("fechaFinInfrac", fechaFinInfrac);
-    }
-
-    if (fechaInicioCitacion && fechaFinCitacion) {
-      params.append("fechaInicioCitacion", fechaInicioCitacion);
-      params.append("fechaFinCitacion", fechaFinCitacion);
-    }
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio);
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado_exp) => {
-      if (estadoFilter[estado_exp]) {
-        params.append("estado_exp", estado_exp);
-      }
-    });
-
-    Object.keys(tipoProced).forEach((tipo_proce) => {
-      if (tipoProced[tipo_proce]) {
-        params.append("tipo_proce", tipo_proce);
-      }
-    });
-
-    Object.keys(jplFilter).forEach((jpl) => {
-      if (jplFilter[jpl]) {
-        params.append("jpl", jpl);
-      }
-    });
-
-    if (selectedInspect) {
-      params.append("inspector", JSON.stringify(selectedInspect.value));
-    }
-
-    if (selectedLey) {
-      params.append("leyes", JSON.stringify(selectedLey.value));
-    }
-
-    if (selectedSector) {
-      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
-    }
-
-    if (selectedTipoVeh) {
-      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
-    }
-
-    if (selectedVeh) {
-      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      //console.log(data);
-      if (data.expedientes.length === 0) {
-        alert("No existen datos para mostrar");
-      } else {
-        VehiInspectPDF(
-          data.expedientes,
-          fechaInicioInfrac,
-          fechaFinInfrac,
-          fechaInicioCitacion,
-          fechaFinCitacion,
-          fechaInicio,
-          fechaFin
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenSector = async () => {
-    const url = `${server_back}/resumen_sector_inspe?;`;
-    let params = new URLSearchParams();
-
-    if (fechaInicioInfrac && fechaFinInfrac) {
-      params.append("fechaInicioInfrac", fechaInicioInfrac);
-      params.append("fechaFinInfrac", fechaFinInfrac);
-    }
-
-    if (fechaInicioCitacion && fechaFinCitacion) {
-      params.append("fechaInicioCitacion", fechaInicioCitacion);
-      params.append("fechaFinCitacion", fechaFinCitacion);
-    }
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio);
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado_exp) => {
-      if (estadoFilter[estado_exp]) {
-        params.append("estado_exp", estado_exp);
-      }
-    });
-
-    Object.keys(tipoProced).forEach((tipo_proce) => {
-      if (tipoProced[tipo_proce]) {
-        params.append("tipo_proce", tipo_proce);
-      }
-    });
-
-    Object.keys(jplFilter).forEach((jpl) => {
-      if (jplFilter[jpl]) {
-        params.append("jpl", jpl);
-      }
-    });
-
-    if (selectedInspect) {
-      params.append("inspector", JSON.stringify(selectedInspect.value));
-    }
-
-    if (selectedLey) {
-      params.append("leyes", JSON.stringify(selectedLey.value));
-    }
-
-    if (selectedSector) {
-      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
-    }
-
-    if (selectedTipoVeh) {
-      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
-    }
-
-    if (selectedVeh) {
-      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      //console.log(data);
-      if (data.expedientes.length === 0) {
-        alert("No existen datos para mostrar");
-      } else {
-        SectorInspectPDF(
-          data.expedientes,
-          fechaInicioInfrac,
-          fechaFinInfrac,
-          fechaInicioCitacion,
-          fechaFinCitacion,
-          fechaInicio,
-          fechaFin
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenGlosa = async () => {
-    const url = `${server_back}/resumen_glosa_inspe?`;
-    let params = new URLSearchParams();
-
-    if (fechaInicioInfrac && fechaFinInfrac) {
-      params.append("fechaInicioInfrac", fechaInicioInfrac);
-      params.append("fechaFinInfrac", fechaFinInfrac);
-    }
-
-    if (fechaInicioCitacion && fechaFinCitacion) {
-      params.append("fechaInicioCitacion", fechaInicioCitacion);
-      params.append("fechaFinCitacion", fechaFinCitacion);
-    }
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio);
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado_exp) => {
-      if (estadoFilter[estado_exp]) {
-        params.append("estado_exp", estado_exp);
-      }
-    });
-
-    Object.keys(tipoProced).forEach((tipo_proce) => {
-      if (tipoProced[tipo_proce]) {
-        params.append("tipo_proce", tipo_proce);
-      }
-    });
-
-    Object.keys(jplFilter).forEach((jpl) => {
-      if (jplFilter[jpl]) {
-        params.append("jpl", jpl);
-      }
-    });
-
-    if (selectedInspect) {
-      params.append("inspector", JSON.stringify(selectedInspect.value));
-    }
-
-    if (selectedLey) {
-      params.append("leyes", JSON.stringify(selectedLey.value));
-    }
-
-    if (selectedSector) {
-      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
-    }
-
-    if (selectedTipoVeh) {
-      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
-    }
-
-    if (selectedVeh) {
-      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      //console.log(data);
-      if (data.expedientes.length === 0) {
-        alert("No existen datos para mostrar");
-      } else {
-        GlosaInspectPDF(
-          data.expedientes,
-          fechaInicioInfrac,
-          fechaFinInfrac,
-          fechaInicioCitacion,
-          fechaFinCitacion,
-          fechaInicio,
-          fechaFin
-        );
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handleClearFilter = () => {
     setFechaInicioInfrac(startDate);
     setFechaFinInfrac(datenow);
@@ -860,6 +282,114 @@ function StatisticsInspect() {
     setJplFilter({ jpl1: false, jpl2: false });
     setInspeccion([]);
   };
+
+  const handleChanges = async (e) => {
+    const { name, value } = e.target;
+    setRut_Contri({ ...rut_contri, value });
+    console.log(rut_contri);
+  };
+
+  const fetchResumen = async (endpoint, pdf) => {
+    const url = `${server_back}/${endpoint}?`;
+    let params = new URLSearchParams();
+
+    if (rut_contri && typeof rut_contri === "object" && rut_contri.value) {
+      params.append("rut_contri", rut_contri.value);
+    } else if (typeof rut_contri === "string") {
+      params.append("rut_contri", rut_contri);
+    }
+
+    if (fechaInicioInfrac && fechaFinInfrac) {
+      params.append("fechaInicioInfrac", fechaInicioInfrac);
+      params.append("fechaFinInfrac", fechaFinInfrac);
+    }
+
+    if (fechaInicioCitacion && fechaFinCitacion) {
+      params.append("fechaInicioCitacion", fechaInicioCitacion);
+      params.append("fechaFinCitacion", fechaFinCitacion);
+    }
+
+    if (fechaInicio && fechaFin) {
+      params.append("fechaInicio", fechaInicio);
+      params.append("fechaFin", fechaFin);
+    }
+
+    Object.keys(estadoFilter).forEach((estado_exp) => {
+      if (estadoFilter[estado_exp]) {
+        params.append("estado_exp", estado_exp);
+      }
+    });
+
+    Object.keys(tipoProced).forEach((tipo_proce) => {
+      if (tipoProced[tipo_proce]) {
+        params.append("tipo_proce", tipo_proce);
+      }
+    });
+
+    Object.keys(jplFilter).forEach((jpl) => {
+      if (jplFilter[jpl]) {
+        params.append("jpl", jpl);
+      }
+    });
+
+    if (selectedInspect) {
+      params.append("inspector", JSON.stringify(selectedInspect.value));
+    }
+
+    if (selectedLey) {
+      params.append("leyes", JSON.stringify(selectedLey.value));
+    }
+
+    if (selectedSector) {
+      params.append("sector_infraccion", JSON.stringify(selectedSector.label));
+    }
+
+    if (selectedTipoVeh) {
+      params.append("tipo_vehiculo", JSON.stringify(selectedTipoVeh.label));
+    }
+
+    if (selectedVeh) {
+      params.append("marca_vehiculo", JSON.stringify(selectedVeh.value));
+    }
+
+    try {
+      const res = await fetch(url + params.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      //console.log(data);
+      if (data.expedientes.length === 0) {
+        alert("No existen datos para mostrar");
+      } else {
+        pdf(
+          data.expedientes,
+          rut_contri,
+          fechaInicioInfrac,
+          fechaFinInfrac,
+          fechaInicioCitacion,
+          fechaFinCitacion,
+          fechaInicio,
+          fechaFin
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resumenEstadoInsp = () =>
+    fetchResumen("resumen_estado_inspe", estadoInspeccionPDF);
+  const resumenTipoExp = () =>
+    fetchResumen("resumen_tipo_inspe", TipoProceInspPDF);
+  const resumenLeyInspec = () =>
+    fetchResumen("resumen_ley_inspe", LeyInspeccionPDF);
+  const resumenInspector = () =>
+    fetchResumen("resumen_inspector_inspe", InspectResumenPDF);
+  const resumenVehi = () => fetchResumen("resumen_vehi_inspe", VehiInspectPDF);
+  const resumenSector = () =>
+    fetchResumen("resumen_sector_inspe", SectorInspectPDF);
+  const resumenGlosa = () =>
+    fetchResumen("resumen_glosa_inspe", GlosaInspectPDF);
 
   return (
     <>
@@ -985,6 +515,7 @@ function StatisticsInspect() {
                     className="form-control"
                     id="rut_contri"
                     name="rut_contri"
+                    onChange={handleChanges}
                   />
                 </div>
                 <div className="col-md-4">
