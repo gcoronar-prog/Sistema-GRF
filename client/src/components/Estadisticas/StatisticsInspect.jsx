@@ -25,7 +25,7 @@ function StatisticsInspect() {
   const datenow = dayjs().format("YYYY-MM-DDTHH:mm");
 
   const [inspeccion, setInspeccion] = useState([]);
-  const [rut_contri, setRut_Contri] = useState("");
+  const [rut_contri, setRut_Contri] = useState(null);
   const [fechaInicioInfrac, setFechaInicioInfrac] = useState("");
   const [fechaFinInfrac, setFechaFinInfrac] = useState("");
   const [fechaInicioCitacion, setFechaInicioCitacion] = useState("");
@@ -33,18 +33,21 @@ function StatisticsInspect() {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [estadoFilter, setEstadoFilter] = useState({
-    pendiente: false,
-    despachado: false,
-    resuelto: false,
-    nulo: false,
+    Pendiente: false,
+    Despachado: false,
+    Resuelto: false,
+    Nulo: false,
   });
   const [tipoProced, setTipoProced] = useState({
-    notificacion: false,
-    citacion: false,
-    causas: false,
-    solicitudes: false,
+    Notificación: false,
+    Citación: false,
+    Causas: false,
+    Solicitudes: false,
   });
-  const [jplFilter, setJplFilter] = useState({ jpl1: false, jpl2: false });
+  const [jplFilter, setJplFilter] = useState({
+    "JPL 1": false,
+    "JPL 2": false,
+  });
   const [selectedLey, setSelectedLey] = useState("");
   const [selectedInspect, setSelectedInspect] = useState("");
   const [selectedVeh, setSelectedVeh] = useState("");
@@ -244,13 +247,14 @@ function StatisticsInspect() {
         [name]: checked,
       }));
       console.log("tipo");
+      console.log(name, checked, value);
     } else if (dataset.type === "jpl") {
       setJplFilter((prev) => ({
         ...prev,
         [name]: checked,
       }));
-      console.log("jpl");
-      console.log(name, checked, value);
+      //console.log("jpl");
+      //console.log(name, checked, value);
     }
   };
 
@@ -268,18 +272,18 @@ function StatisticsInspect() {
     setSelectedVeh("");
     setSelectedLey("");
     setEstadoFilter({
-      pendiente: false,
-      despachado: false,
-      resuelto: false,
-      nulo: false,
+      Pendiente: false,
+      Despachado: false,
+      Resuelto: false,
+      Nulo: false,
     });
     setTipoProced({
-      notificacion: false,
-      citacion: false,
-      causas: false,
-      solicitudes: false,
+      Notificación: false,
+      Citación: false,
+      Causas: false,
+      Solicitudes: false,
     });
-    setJplFilter({ jpl1: false, jpl2: false });
+    setJplFilter({ "JPL 1": false, "JPL 2": false });
     setInspeccion([]);
   };
 

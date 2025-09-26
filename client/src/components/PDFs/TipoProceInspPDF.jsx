@@ -55,6 +55,15 @@ const TipoProceInspPDF = (
     });
   };
 
+  const tableBody = [];
+  datos.expediente.forEach((grupo) => {
+    grupo.datos.sort((a, b) => {
+      if (a.tipo_procedimiento === null) return -1;
+      if (b.tipo_procedimiento === null) return 1;
+      return 0;
+    });
+  });
+
   addHeader("Resumen por Tipo de procedimiento", "");
 
   let filtros = `Filtros aplicados:\n`;

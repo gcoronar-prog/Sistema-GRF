@@ -55,7 +55,96 @@ const estadoInspeccionPDF = (
     });
   };
 
-  addHeader("Resumen Inspeción por Estado", "");
+  /*let filtros = `Filtros aplicados:\n`;
+  if (fechaInicio && fechaFin)
+    filtros += `Fecha creación expedientes: ${formatDate(
+      fechaInicio
+    )} - ${formatDate(fechaFin)}\n`;
+  if (fechaInicioInfrac && fechaFinInfrac)
+    filtros += `Fecha Infracción: ${formatDate(
+      fechaInicioInfrac
+    )} - ${formatDate(fechaFinInfrac)}\n`;
+  if (fechaInicioCitacion && fechaFinCitacion)
+    filtros += `Fecha citación: ${formatDate(
+      fechaInicioCitacion
+    )} - ${formatDate(fechaFinCitacion)}\n`;
+
+  doc.setFontSize(11);
+  doc.setTextColor(80);
+  doc.text(filtros, 14, 25);*/
+
+  const tableBody = [];
+  datos.expediente.forEach((grupo) => {
+    grupo.datos.sort((a, b) => {
+      if (a.estado === null) return -1;
+      if (b.estado === null) return 1;
+      return 0;
+    });
+    grupo.datos.forEach((c) => {
+      if (c.estado === "Total estado") {
+        return;
+      }
+      if (c.estado === null) {
+        tableBody.push([
+          {
+            content: grupo.estado,
+            colSpan: 2,
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: c.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        tableBody.push([c.estado, c.proceso, c.cantidad.toString()]);
+      }
+    });
+  });
+
+  const tableColumn = ["Estado Expediente", "Tipo proceso", "Cantidad"];
+  const tableRows = datos.map((e) => [
+    e.estado_exp,
+    e.tipo_procedimiento,
+    e.cantidad,
+  ]);
+
+  const totalEstado = datos.total[0].count;
+
+  tableBody.push([
+    {
+      content: "Total expedientes",
+      colSpan: 2,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: totalEstado,
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
+  ]);
+
+  addHeader("Resumen Inspección por Estado", "");
 
   let filtros = `Filtros aplicados:\n`;
   if (fechaInicio && fechaFin)
@@ -75,16 +164,9 @@ const estadoInspeccionPDF = (
   doc.setTextColor(80);
   doc.text(filtros, 14, 25);
 
-  const tableColumn = ["Estado Expediente", "Tipo proceso", "Cantidad"];
-  const tableRows = datos.map((e) => [
-    e.estado_exp,
-    e.tipo_procedimiento,
-    e.cantidad,
-  ]);
-
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
     startY: 40,
     styles: { fontSize: 11, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
