@@ -132,6 +132,7 @@ const OrigenCentralPDF = (fechaInicio, fechaFin, origen) => {
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
     alternateRowStyles: { fillColor: [245, 245, 245] },
     margin: { left: margin, right: margin },
+
     columnStyles: {
       1: { halign: "center" },
       2: { halign: "center" },

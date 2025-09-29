@@ -81,7 +81,7 @@ const getResumenOrigen = async (req, res) => {
     let totalOrigen = `SELECT COUNT(*) FROM informes_central ic 
           JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
           JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe
-        WHERE 1=1 ${whereClause}`;
+        ${whereClause}`;
 
     let origenResumen = `SELECT 
       CASE 

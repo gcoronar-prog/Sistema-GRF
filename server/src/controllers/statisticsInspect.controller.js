@@ -68,23 +68,29 @@ const getEstadoExpe = async (req, res) => {
                             GROUP BY estado_exp, tipo_procedimiento ORDER BY estado_exp, tipo_procedimiento`;*/
 
     let estadoInspeccion = `SELECT 
-                            CASE WHEN expe.tipo_procedimiento IS NULL AND expe.estado_exp IS NULL THEN 'Total general'
-                              WHEN expe.tipo_procedimiento IS NULL THEN 'Total procesos'
-                              else expe.tipo_procedimiento
-                            END as proceso,
-                            CASE WHEN expe.estado_exp IS NULL THEN 'Total estado'
-                              else expe.estado_exp
-                            END as estado,
-                            COUNT(expe.estado_exp)
-                            FROM expedientes expe
-                            JOIN infracciones infra ON infra.id_expediente = expe.id_expediente
-                              JOIN contribuyentes contri ON contri.id_expediente=expe.id_expediente
-                              JOIN vehiculos_contri vehi ON vehi.id_expediente=expe.id_expediente
-                              JOIN funcionarios funci ON funci.id_funcionario=expe.id_inspector
-                            WHERE expe.estado_exp IS NOT NULL ${whereClause}
+                             	CASE
+                            WHEN expe.tipo_procedimiento IS NULL AND expe.estado_exp IS NULL THEN 'TOTAL GENERAL'
+                              WHEN expe.tipo_procedimiento IS NULL THEN 'total proce'
+                              ELSE expe.tipo_procedimiento
+                          END	AS proceso,
+                            CASE 
+                            WHEN expe.estado_exp IS NULL AND expe.tipo_procedimiento IS NOT NULL THEN 'total estado'
+                            ELSE expe.estado_exp
+                          END AS estado,
+
+                            COUNT(expe.estado_exp) AS cantidad
+
+                          FROM expedientes expe
+                          JOIN infracciones infra ON infra.id_expediente = expe.id_expediente
+                          JOIN contribuyentes contri ON contri.id_expediente = expe.id_expediente
+                          JOIN vehiculos_contri vehi ON vehi.id_expediente = expe.id_expediente
+                          JOIN funcionarios funci ON funci.id_funcionario = expe.id_inspector
+
+                          WHERE expe.estado_exp IS NOT NULL ${whereClause}
+
                           GROUP BY ROLLUP(expe.estado_exp, expe.tipo_procedimiento)
-                          HAVING expe.estado_exp IS NOT NULL
-                          ORDER BY proceso,estado NULLS LAST
+                          HAVING NOT (expe.estado_exp IS NULL OR expe.tipo_procedimiento IS NULL)
+                          ORDER BY estado, proceso NULLS LAST
                           `;
 
     const resultEstado = await client.query(estadoInspeccion, values);
@@ -92,21 +98,22 @@ const getEstadoExpe = async (req, res) => {
 
     const agrupado = {};
     resultEstado.rows.forEach((row) => {
-      const { proceso, estado } = row;
+      const { proceso, estado, cantidad } = row;
       if (!agrupado[estado]) {
         agrupado[estado] = [];
       }
 
-      agrupado[estado].push({ proceso, estado, cantidad: parseInt() });
+      agrupado[estado].push({ proceso, estado, cantidad: parseInt(cantidad) });
     });
-    const respuesta = Object.entries(agrupado).map(([estado, datos]) => {
-      estado, datos;
-    });
+    const respuesta = Object.entries(agrupado).map(([estado, datos]) => ({
+      estado,
+      datos,
+    }));
 
     await client.query("COMMIT");
 
     console.log("controller estado", estadoInspeccion);
-    console.log("informe estados", respuesta);
+    console.log("informe estados", JSON.stringify(respuesta, null, 2));
     return res
       .status(200)
       .json({ expedientes: respuesta, total: resultTotalEstado.rows });
@@ -149,13 +156,8 @@ const getTipoProce = async (req, res) => {
                               ORDER BY tipo_procedimiento`;*/
 
     let tipoProceso = `SELECT 
-                          CASE WHEN expe.tipo_procedimiento IS NULL AND funci.funcionario IS NULL THEN 'Total general'
-                            WHEN expe.tipo_procedimiento IS NULL THEN 'Total procesos'
-                            ELSE expe.tipo_procedimiento
-                          END AS procesos,
-                          CASE WHEN funci.funcionario IS NULL THEN 'Total funcionarios'
-                            else funci.funcionario
-                          END AS funcionarios,
+                          expe.tipo_procedimiento AS procesos,
+                          funci.funcionario AS funcionarios,
                           COUNT(expe.tipo_procedimiento) as cantidad
                           FROM  expedientes expe
                         JOIN infracciones infra ON infra.id_expediente = expe.id_expediente
@@ -172,15 +174,22 @@ const getTipoProce = async (req, res) => {
 
     const agrupado = {};
     result.rows.forEach((row) => {
-      const { procesos, funcionarios } = row;
+      const { procesos, funcionarios, cantidad } = row;
       if (!agrupado[procesos]) {
         agrupado[procesos] = [];
       }
-      agrupado[procesos].push({ procesos, funcionarios, cantidad: parseInt() });
+      agrupado[procesos].push({
+        procesos,
+        funcionarios,
+        cantidad: parseInt(cantidad),
+      });
     });
 
-    const respuesta = Object.entries(agrupado).map([procesos, datos]);
-
+    const respuesta = Object.entries(agrupado).map(([procesos, datos]) => ({
+      procesos,
+      datos,
+    }));
+    console.log(JSON.stringify(respuesta, null, 2));
     await client.query("COMMIT");
     return res
       .status(200)
@@ -200,21 +209,51 @@ const getLeyesInsp = async (req, res) => {
   const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
-    let leyesResumen = `SELECT DISTINCT l.ley,
-                          expe.tipo_procedimiento,
-                          infra.juzgado,
+    let totalLeyes = `SELECT COUNT(*) FROM expedientes expe
+                        JOIN infracciones infra
+                        ON infra.id_expediente=expe.id_expediente
+                        JOIN leyes l ON l.id_ley=expe.id_leyes
+                        ${whereClause}`;
+
+    let leyesResumen = `SELECT  l.ley AS ley,
+                          expe.tipo_procedimiento AS proceso,
+                          infra.juzgado AS juzgado,
                           COUNT(expe.id_expediente) AS cantidad
                           FROM expedientes expe
                         JOIN infracciones infra
                         ON infra.id_expediente=expe.id_expediente
                         JOIN leyes l ON l.id_ley=expe.id_leyes
                         WHERE 1=1 AND l.ley IS NOT NULL AND expe.tipo_procedimiento IS NOT NULL ${whereClause}
-                        GROUP BY l.ley,expe.tipo_procedimiento,infra.juzgado
-                        ORDER BY l.ley`;
+                        GROUP BY ROLLUP( l.ley,infra.juzgado,expe.tipo_procedimiento)
+                        HAVING l.ley IS NOT NULL
+                        ORDER BY ley,proceso,juzgado NULLS LAST`;
 
     const result = await client.query(leyesResumen, values);
+    const resultTotal = await client.query(totalLeyes, values);
+
+    const agrupado = {};
+    result.rows.forEach((row) => {
+      const { ley, proceso, juzgado, cantidad } = row;
+      if (!agrupado[ley]) {
+        agrupado[ley] = [];
+      }
+      agrupado[ley].push({
+        proceso,
+        juzgado,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([ley, datos]) => ({
+      ley,
+      datos,
+    }));
+    console.log(JSON.stringify(respuesta, null, 2));
+
     await client.query("COMMIT");
-    return res.status(200).json({ expedientes: result.rows });
+    return res
+      .status(200)
+      .json({ expedientes: respuesta, total: resultTotal.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.log(error);

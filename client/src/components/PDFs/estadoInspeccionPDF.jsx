@@ -13,7 +13,7 @@ const estadoInspeccionPDF = (
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 55;
+  const margin = 10;
 
   const addHeader = (title, subtitle = "") => {
     doc.setFont("helvetica", "bold");
@@ -74,21 +74,22 @@ const estadoInspeccionPDF = (
   doc.text(filtros, 14, 25);*/
 
   const tableBody = [];
-  datos.expediente.forEach((grupo) => {
+  console.log(datos);
+  datos.expedientes.forEach((grupo) => {
     grupo.datos.sort((a, b) => {
-      if (a.estado === null) return -1;
-      if (b.estado === null) return 1;
+      if (a.proceso === null) return -1;
+      if (b.proceso === null) return 1;
       return 0;
     });
     grupo.datos.forEach((c) => {
-      if (c.estado === "Total estado") {
+      if (c.proceso == "total proce") {
         return;
       }
-      if (c.estado === null) {
+      if (c.proceso === null) {
         tableBody.push([
           {
             content: grupo.estado,
-            colSpan: 2,
+            colSpan: 1,
             styles: {
               fillColor: [230, 230, 230],
               textColor: 20,
@@ -110,14 +111,35 @@ const estadoInspeccionPDF = (
         tableBody.push([c.estado, c.proceso, c.cantidad.toString()]);
       }
     });
+
+    const subtotal = grupo.datos.reduce((sum, c) => sum + c.cantidad, 0);
+    tableBody.push([
+      {
+        content: `Total ${grupo.estado}`,
+        colSpan: 2,
+        styles: {
+          fillColor: [230, 230, 230],
+          fontStyle: "bold",
+          halign: "right",
+        },
+      },
+      {
+        content: subtotal.toString(),
+        styles: {
+          fillColor: [230, 230, 230],
+          fontStyle: "bold",
+          halign: "center",
+        },
+      },
+    ]);
   });
 
   const tableColumn = ["Estado Expediente", "Tipo proceso", "Cantidad"];
-  const tableRows = datos.map((e) => [
+  /*const tableRows = datos.map((e) => [
     e.estado_exp,
     e.tipo_procedimiento,
     e.cantidad,
-  ]);
+  ]);*/
 
   const totalEstado = datos.total[0].count;
 
@@ -126,8 +148,8 @@ const estadoInspeccionPDF = (
       content: "Total expedientes",
       colSpan: 2,
       styles: {
-        fillColor: [230, 230, 230],
-        textColor: 20,
+        fillColor: [44, 62, 80],
+        textColor: 255,
         fontStyle: "bold",
         halign: "left",
       },
@@ -136,8 +158,8 @@ const estadoInspeccionPDF = (
       content: totalEstado,
       colSpan: 1,
       styles: {
-        fillColor: [230, 230, 230],
-        textColor: 20,
+        fillColor: [44, 62, 80],
+        textColor: 255,
         fontStyle: "bold",
         halign: "center",
       },
@@ -168,14 +190,16 @@ const estadoInspeccionPDF = (
     head: [tableColumn],
     body: tableBody,
     startY: 40,
-    styles: { fontSize: 11, cellPadding: 3, lineWidth: 0.3 },
+    styles: { fontSize: 14, cellPadding: 5, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
+    tableWidth: "full",
+
     alternateRowStyles: { fillColor: [245, 245, 245] },
     margin: { left: margin, right: margin },
     columnStyles: {
-      0: { halign: "center", cellWidth: 35 },
-      1: { halign: "center", cellWidth: 35 },
-      2: { halign: "center", cellWidth: 25 },
+      0: { halign: "center" },
+      1: { halign: "center" },
+      2: { halign: "center" },
     },
   });
 

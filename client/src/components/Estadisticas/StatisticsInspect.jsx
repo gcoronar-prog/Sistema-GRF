@@ -361,12 +361,12 @@ function StatisticsInspect() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      //console.log(data);
+      console.log(data);
       if (data.expedientes.length === 0) {
         alert("No existen datos para mostrar");
       } else {
         pdf(
-          data.expedientes,
+          data,
           rut_contri,
           fechaInicioInfrac,
           fechaFinInfrac,

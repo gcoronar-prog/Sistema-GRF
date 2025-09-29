@@ -56,12 +56,60 @@ const TipoProceInspPDF = (
   };
 
   const tableBody = [];
-  datos.expediente.forEach((grupo) => {
+
+  datos.expedientes.forEach((grupo) => {
     grupo.datos.sort((a, b) => {
-      if (a.tipo_procedimiento === null) return -1;
-      if (b.tipo_procedimiento === null) return 1;
+      if (a.funcionarios === null) return -1;
+      if (b.funcionarios === null) return 1;
       return 0;
     });
+    grupo.datos.forEach((c) => {
+      if (c.procesos === null) {
+        tableBody.push([
+          {
+            content: grupo.procesos,
+            colSpan: 2,
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: c.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              textColor: 20,
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        tableBody.push([c.procesos, c.funcionarios, c.cantidad.toString()]);
+      }
+    });
+    const subtotal = grupo.datos.reduce((sum, c) => sum + c.cantidad, 0);
+    tableBody.push([
+      {
+        content: `Total ${grupo.procesos}`,
+        colSpan: 2,
+        styles: {
+          fillColor: [230, 230, 230],
+          fontStyle: "bold",
+          halign: "right",
+        },
+      },
+      {
+        content: subtotal.toString(),
+        styles: {
+          fillColor: [230, 230, 230],
+          fontStyle: "bold",
+          halign: "center",
+        },
+      },
+    ]);
   });
 
   addHeader("Resumen por Tipo de procedimiento", "");
@@ -84,16 +132,40 @@ const TipoProceInspPDF = (
   doc.setTextColor(80);
   doc.text(filtros, 14, 25);
 
-  const tableColumn = ["Tipo de proceso", "Inspector", "Cantidad"];
-  const tableRows = datos.map((e) => [
+  /*const tableRows = datos.map((e) => [
     e.tipo_procedimiento,
     e.funcionario,
     e.cantidad,
-  ]);
+  ]);*/
 
+  const totalProce = datos.total[0].count;
+
+  tableBody.push([
+    {
+      content: "Total expedientes",
+      colSpan: 2,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: totalProce,
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
+  ]);
+  const tableColumn = ["Tipo de proceso", "Inspector", "Cantidad"];
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
     startY: 40,
     styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
