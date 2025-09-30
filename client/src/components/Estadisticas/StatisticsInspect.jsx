@@ -205,6 +205,7 @@ function StatisticsInspect() {
       body: tableRows,
       startY: 35,
       theme: "grid",
+      tableWidth: "full",
       styles: {
         fontSize: 9,
         cellPadding: 3,

@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import { autoTable } from "jspdf-autotable";
 
-const RecursosCentralPDF = (fechaInicio, fechaFin, recurso) => {
+const RecursosCentralPDF = (recurso, fechaInicio, fechaFin) => {
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -58,11 +58,37 @@ const RecursosCentralPDF = (fechaInicio, fechaFin, recurso) => {
   doc.text(filtros, 14, 25);
 
   const tableColumn = ["Recursos involucrados", "Cantidad"];
-  const tableRows = recurso.map((r) => [r.recursos, r.cantidad]);
+
+  const tableRows = recurso.informe.map((r) => [r.recursos, r.cantidad]);
+
+  const totalRecursos = recurso.total[0].count;
+  tableRows.push([
+    {
+      content: "Total expedientes",
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: totalRecursos,
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
+  ]);
 
   autoTable(doc, {
     head: [tableColumn],
     body: tableRows,
+    tableWidth: "full",
     startY: 40,
     styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },

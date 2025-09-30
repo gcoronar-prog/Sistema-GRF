@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import { autoTable } from "jspdf-autotable";
 
-const ClasifCentralPDF = (fechaInicio, fechaFin, clasi) => {
+const ClasifCentralPDF = (clasi, fechaInicio, fechaFin) => {
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();

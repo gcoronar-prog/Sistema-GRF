@@ -74,27 +74,83 @@ const GlosaInspectPDF = (
   doc.setTextColor(80);
   doc.text(filtros, 14, 25);
 
-  const tableColumn = ["Tipo de procedimiento", "Glosa", "Ley", "Cantidad"];
-  const tableRows = datos.map((e) => [
-    e.tipo_procedimiento,
-    e.glosa_ley,
-    e.ley,
-    e.cantidad,
+  const tableColumn = ["Ley", "Tipo de procedimiento", "Cantidad"];
+
+  const tableBody = [];
+
+  datos.expedientes.forEach((grupo) => {
+    grupo.datos.sort((a, b) => {
+      if (a.ley === null) return -1;
+      if (b.ley === null) return 1;
+      return 0;
+    });
+    grupo.datos.forEach((c) => {
+      if (c.ley === null) {
+        tableBody.push([
+          {
+            content: grupo.glosa,
+            colSpan: 2,
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: c.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        // fila normal
+        tableBody.push([c.ley, c.proceso, c.cantidad.toString()]);
+      }
+    });
+  });
+
+  const totalGlosa = datos.total[0].count;
+
+  tableBody.push([
+    {
+      content: "Total expedientes",
+      colSpan: 2,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: totalGlosa,
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
   ]);
 
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
     startY: 40,
+    tableWidth: "full",
     styles: { fontSize: 11, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
     alternateRowStyles: { fillColor: [245, 245, 245] },
     margin: { left: margin, right: margin },
     columnStyles: {
-      0: { halign: "center", cellWidth: 35 },
-      1: { halign: "center", cellWidth: 65 },
-      2: { halign: "center", cellWidth: 55 },
-      3: { halign: "center", cellWidth: 25 },
+      0: { halign: "center" },
+      1: { halign: "center" },
+      2: { halign: "center" },
+      3: { halign: "center" },
     },
   });
 

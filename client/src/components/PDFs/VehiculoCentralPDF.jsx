@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import { autoTable } from "jspdf-autotable";
 
-const VehiculoCentralPDF = (fechaInicio, fechaFin, data) => {
+const VehiculoCentralPDF = (data, fechaInicio, fechaFin) => {
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -57,17 +57,79 @@ const VehiculoCentralPDF = (fechaInicio, fechaFin, data) => {
   doc.setTextColor(80);
   doc.text(filtros, 14, 25);
 
-  const tableColumn = ["Clasificación", "Vehículo", "Cantidad"];
-  const tableRows = data.map((r) => [
+  const tableColumn = ["Clasificación", "Cantidad"];
+  /*const tableRows = data.informe.map((r) => [
     r.clasificacion,
     r.nombre_vehiculo,
     r.veces_que_aparece,
+  ]);*/
+
+  const tableBody = [];
+
+  data.informe.forEach((grupo) => {
+    grupo.datos.sort((a, b) => {
+      if (a.clasificacion === null) return -1;
+      if (b.clasificacion === null) return 1;
+      return 0;
+    });
+    grupo.datos.forEach((c) => {
+      if (c.clasificacion === null) {
+        tableBody.push([
+          {
+            content: grupo.nombre_vehiculo,
+            colSpan: 1,
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: c.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        // fila normal
+        tableBody.push([c.clasificacion, c.cantidad.toString()]);
+      }
+    });
+  });
+
+  const totalVehi = data.total[0].count;
+
+  tableBody.push([
+    {
+      content: "Total informes",
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: totalVehi,
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
   ]);
 
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
     startY: 40,
+    tableWidth: "full",
     styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
     alternateRowStyles: { fillColor: [245, 245, 245] },

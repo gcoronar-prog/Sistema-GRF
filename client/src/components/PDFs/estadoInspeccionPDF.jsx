@@ -82,13 +82,10 @@ const estadoInspeccionPDF = (
       return 0;
     });
     grupo.datos.forEach((c) => {
-      if (c.proceso == "total proce") {
-        return;
-      }
       if (c.proceso === null) {
         tableBody.push([
           {
-            content: grupo.estado,
+            content: `Total estado: ${grupo.estado}`,
             colSpan: 1,
             styles: {
               fillColor: [230, 230, 230],
@@ -108,11 +105,11 @@ const estadoInspeccionPDF = (
           },
         ]);
       } else {
-        tableBody.push([c.estado, c.proceso, c.cantidad.toString()]);
+        tableBody.push([c.proceso, c.cantidad.toString()]);
       }
     });
 
-    const subtotal = grupo.datos.reduce((sum, c) => sum + c.cantidad, 0);
+    /*const subtotal = grupo.datos.reduce((sum, c) => sum + c.cantidad, 0);
     tableBody.push([
       {
         content: `Total ${grupo.estado}`,
@@ -131,10 +128,10 @@ const estadoInspeccionPDF = (
           halign: "center",
         },
       },
-    ]);
+    ]);*/
   });
 
-  const tableColumn = ["Estado Expediente", "Tipo proceso", "Cantidad"];
+  const tableColumn = ["Tipo proceso", "Cantidad"];
   /*const tableRows = datos.map((e) => [
     e.estado_exp,
     e.tipo_procedimiento,

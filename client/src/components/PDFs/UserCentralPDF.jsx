@@ -55,19 +55,81 @@ const UserCentralPDF = (usuarios, fechaInicio, fechaFin) => {
   doc.setTextColor(80);
   doc.text(filtros, 14, 25);
 
-  const tableColumn = ["Usuario", "Tipo de informe", "Estado", "Cantidad"];
+  const tableColumn = ["Tipo de informe", "Cantidad"];
 
-  const tableRows = usuarios.map((e) => [
+  /* const tableRows = usuarios.informe.map((e) => [
     e.user_creador,
     e.tipo,
     e.estado_informe,
     e.cantidad,
+  ]);*/
+
+  const tableBody = [];
+
+  usuarios.informe.forEach((grupo) => {
+    grupo.datos.sort((a, b) => {
+      if (a.tipo === null) return -1;
+      if (b.tipo === null) return 1;
+      return 0;
+    });
+    grupo.datos.forEach((c) => {
+      if (c.tipo === null) {
+        tableBody.push([
+          {
+            content: `Usuario: ${grupo.users}`,
+            colSpan: 1,
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: c.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        // fila normal
+        tableBody.push([c.tipo, c.cantidad.toString()]);
+      }
+    });
+  });
+
+  const totalUser = usuarios.total[0].count;
+
+  tableBody.push([
+    {
+      content: "Total informes",
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: totalUser,
+      colSpan: 1,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
   ]);
 
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
     startY: 40,
+    tableWidth: "full",
     styles: { fontSize: 14, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
     alternateRowStyles: { fillColor: [245, 245, 245] },

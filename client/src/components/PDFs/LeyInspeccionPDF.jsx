@@ -79,31 +79,16 @@ const LeyInspeccionPDF = (
 
   datos.expedientes.forEach((grupo) => {
     grupo.datos.sort((a, b) => {
-      if (a.ley === null) return -1;
-      if (b.ley === null) return 1;
+      if (a.juzgado === null) return -1;
+      if (b.juzgado === null) return 1;
       return 0;
     });
     grupo.datos.forEach((c) => {
-      if (c.ley === null) {
+      if (c.juzgado === null) {
         tableBody.push([
           {
             content: grupo.ley,
-            styles: {
-              fillColor: [230, 230, 230],
-              fontStyle: "bold",
-              halign: "left",
-            },
-          },
-          {
-            content: grupo.proceso,
-            styles: {
-              fillColor: [230, 230, 230],
-              fontStyle: "bold",
-              halign: "left",
-            },
-          },
-          {
-            content: grupo.juzgado,
+            colSpan: 2,
             styles: {
               fillColor: [230, 230, 230],
               fontStyle: "bold",
@@ -121,34 +106,12 @@ const LeyInspeccionPDF = (
         ]);
       } else {
         // fila normal
-        tableBody.push([c.ley, c.proceso, c.juzgado, c.cantidad.toString()]);
+        tableBody.push([c.proceso, c.juzgado, c.cantidad.toString()]);
       }
     });
-
-    // Subtotal del grupo
-    const subtotal = grupo.datos.reduce((sum, c) => sum + c.cantidad, 0);
-    tableBody.push([
-      {
-        content: `Total ${grupo.ley}`,
-        colSpan: 3,
-        styles: {
-          fillColor: [230, 230, 230],
-          fontStyle: "bold",
-          halign: "right",
-        },
-      },
-      {
-        content: subtotal.toString(),
-        styles: {
-          fillColor: [230, 230, 230],
-          fontStyle: "bold",
-          halign: "center",
-        },
-      },
-    ]);
   });
 
-  const tableColumn = ["Ley", "Tipo de procedimiento", "Juzgado", "Cantidad"];
+  const tableColumn = ["Tipo de procedimiento", "Juzgado", "Cantidad"];
 
   const totalLey = datos.total[0].count;
 

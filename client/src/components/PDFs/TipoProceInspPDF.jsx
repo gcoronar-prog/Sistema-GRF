@@ -64,11 +64,11 @@ const TipoProceInspPDF = (
       return 0;
     });
     grupo.datos.forEach((c) => {
-      if (c.procesos === null) {
+      if (c.funcionarios === null) {
         tableBody.push([
           {
             content: grupo.procesos,
-            colSpan: 2,
+            colSpan: 1,
             styles: {
               fillColor: [230, 230, 230],
               textColor: 20,
@@ -87,14 +87,14 @@ const TipoProceInspPDF = (
           },
         ]);
       } else {
-        tableBody.push([c.procesos, c.funcionarios, c.cantidad.toString()]);
+        tableBody.push([c.funcionarios, c.cantidad.toString()]);
       }
     });
-    const subtotal = grupo.datos.reduce((sum, c) => sum + c.cantidad, 0);
+    /*const subtotal = grupo.datos.reduce((sum, c) => sum + c.cantidad, 0);
     tableBody.push([
       {
         content: `Total ${grupo.procesos}`,
-        colSpan: 2,
+        colSpan: 1,
         styles: {
           fillColor: [230, 230, 230],
           fontStyle: "bold",
@@ -109,7 +109,7 @@ const TipoProceInspPDF = (
           halign: "center",
         },
       },
-    ]);
+    ]);*/
   });
 
   addHeader("Resumen por Tipo de procedimiento", "");
@@ -162,7 +162,7 @@ const TipoProceInspPDF = (
       },
     },
   ]);
-  const tableColumn = ["Tipo de proceso", "Inspector", "Cantidad"];
+  const tableColumn = ["Inspector", "Cantidad"];
   autoTable(doc, {
     head: [tableColumn],
     body: tableBody,

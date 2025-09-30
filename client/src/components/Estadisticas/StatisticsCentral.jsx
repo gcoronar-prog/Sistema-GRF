@@ -22,7 +22,7 @@ function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
   const dateNow = dayjs().format("YYYY-MM-DDTHH:mm");
 
-  const server_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const server_back = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const token = localStorage.getItem("token");
 
   const defaultValues = {
@@ -68,7 +68,7 @@ function StatisticsCentral() {
   });
 
   const fetchData = async (tipoDoc) => {
-    let url = `${server_local}/estadisticaCentral?`;
+    let url = `${server_back}/estadisticaCentral?`;
     let params = new URLSearchParams();
 
     if (fechaInicio && fechaFin) {
@@ -173,7 +173,7 @@ function StatisticsCentral() {
       "Persona",
       "Fuente Captura",
       "Tipo de Informe",
-      "Descripción",
+      //"Descripción",
       "Sector",
       "Dirección",
     ];
@@ -187,7 +187,7 @@ function StatisticsCentral() {
       c.persona_informante?.label || "-",
       c.captura_informe || "-",
       c.tipo_informe?.label || "-",
-      c.descripcion_informe || "-",
+      //c.descripcion_informe || "-",
       c.sector_informe?.label || "-",
       c.direccion_informe || "-",
     ]);
@@ -198,6 +198,7 @@ function StatisticsCentral() {
       body: tableRows,
       startY: 35,
       theme: "grid",
+      tableWidth: "full",
       styles: {
         fontSize: 9,
         cellPadding: 3,
@@ -229,8 +230,52 @@ function StatisticsCentral() {
     doc.output("dataurlnewwindow");
   };
 
-  const resumenRecursosPDF = async () => {
-    const url = `${server_local}/resumen_recursos_central?`;
+  const handleCheckboxChange = (e) => {
+    const { name, checked, dataset, value } = e.target;
+
+    if (dataset.type === "estado") {
+      setEstadoFilter((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
+      console.log("estado");
+    } else if (dataset.type === "captura") {
+      setCapturaFilter((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
+      console.log("captura");
+    }
+    console.log(name, checked, value);
+  };
+
+  const handleClearFilter = () => {
+    setFechaInicio(startMonth);
+    setFechaFin(dateNow);
+    setSelectedOrigen([]);
+    setSelectedSector([]);
+    setSelectedVehiculo([]);
+    setSelectedTipo([]);
+    setSelectedRecursos([]);
+    setSelectedClasif([]);
+    setSelectedUser([]);
+    setEstadoFilter({
+      atendido: false,
+      progreso: false,
+      pendiente: false,
+    });
+    setCapturaFilter({
+      radios: false,
+      telefono: false,
+      rrss: false,
+      presencial: false,
+      email: false,
+    });
+    setCentral([]);
+  };
+
+  const fetchResumen = async (endpoint, pdf) => {
+    const url = `${server_back}/${endpoint}?`;
     let params = new URLSearchParams();
 
     if (fechaInicio && fechaFin) {
@@ -283,468 +328,31 @@ function StatisticsCentral() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-
+      console.log(data);
       if (data.informe.length === 0) {
-        alert("No existen registros");
+        alert("No existen datos para mostrar");
       } else {
-        RecursosCentralPDF(fechaInicio, fechaFin, data.informe);
+        pdf(data, fechaInicio, fechaFin);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  const resumenClasifPDF = async () => {
-    const url = `${server_local}/resumen_clasif_central?`;
-    const params = new URLSearchParams();
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado) => {
-      if (estadoFilter[estado]) {
-        params.append("estado", estado);
-      }
-    });
-
-    Object.keys(capturaFilter).forEach((captura) => {
-      if (capturaFilter[captura]) {
-        params.append("captura", captura);
-      }
-    });
-
-    if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
-    }
-
-    if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
-    }
-
-    if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
-    }
-
-    if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
-    }
-
-    if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
-    }
-
-    if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
-    }
-
-    const userCentral = selectedUser.value;
-    if (selectedUser) {
-      params.append("centralista", userCentral);
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-
-      if (data.informe.length === 0) {
-        alert("No existen registros");
-      } else {
-        ClasifCentralPDF(fechaInicio, fechaFin, data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenOrigenPDF = async () => {
-    const url = `${server_local}/resumen_origen_central?`;
-    const params = new URLSearchParams();
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado) => {
-      if (estadoFilter[estado]) {
-        params.append("estado", estado);
-      }
-    });
-
-    Object.keys(capturaFilter).forEach((captura) => {
-      if (capturaFilter[captura]) {
-        params.append("captura", captura);
-      }
-    });
-
-    if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
-    }
-
-    if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
-    }
-
-    if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
-    }
-
-    if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
-    }
-
-    if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
-    }
-
-    if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
-    }
-    const userCentral = selectedUser.value;
-    if (selectedUser) {
-      params.append("centralista", userCentral);
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-
-      if (data.informe.length === 0) {
-        alert("No existen registros");
-      } else {
-        OrigenCentralPDF(fechaInicio, fechaFin, data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenEstadoPDF = async () => {
-    const url = `${server_local}/resumen_estado_central?`;
-    const params = new URLSearchParams();
-
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado) => {
-      if (estadoFilter[estado]) {
-        params.append("estado", estado);
-      }
-    });
-
-    Object.keys(capturaFilter).forEach((captura) => {
-      if (capturaFilter[captura]) {
-        params.append("captura", captura);
-      }
-    });
-
-    if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
-    }
-
-    if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
-    }
-
-    if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
-    }
-
-    if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
-    }
-
-    if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
-    }
-
-    if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
-    }
-
-    const userCentral = selectedUser.value;
-    if (selectedUser) {
-      params.append("centralista", userCentral);
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-
-      if (data.informe.length === 0) {
-        alert("No existen registros");
-      } else {
-        EstadoCentralPDF(fechaInicio, fechaFin, data.informe);
-      }
-      console.log("filtro", data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenRangoPDF = async () => {
-    const url = `${server_local}/resumen_rango_central?`;
-    const params = new URLSearchParams();
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado) => {
-      if (estadoFilter[estado]) {
-        params.append("estado", estado);
-      }
-    });
-
-    Object.keys(capturaFilter).forEach((captura) => {
-      if (capturaFilter[captura]) {
-        params.append("captura", captura);
-      }
-    });
-
-    if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
-    }
-
-    if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
-    }
-
-    if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
-    }
-
-    if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
-    }
-
-    if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
-    }
-
-    if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
-    }
-
-    const userCentral = selectedUser.value;
-    if (selectedUser) {
-      params.append("centralista", userCentral);
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-
-      if (data.informe.length === 0) {
-        alert("No existen registros ");
-      } else {
-        RangoCentralPDF(fechaInicio, fechaFin, data.informe);
-      }
-      console.log("filtro origen", data.informe);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenUserPDF = async () => {
-    const url = `${server_local}/resumen_user_central?`;
-    const params = new URLSearchParams();
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado) => {
-      if (estadoFilter[estado]) {
-        params.append("estado", estado);
-      }
-    });
-
-    Object.keys(capturaFilter).forEach((captura) => {
-      if (capturaFilter[captura]) {
-        params.append("captura", captura);
-      }
-    });
-
-    if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
-    }
-
-    if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
-    }
-
-    if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
-    }
-
-    if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
-    }
-
-    if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
-    }
-
-    if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
-    }
-
-    const userCentral = selectedUser.value;
-    if (selectedUser) {
-      params.append("centralista", userCentral);
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-
-      if (data.informe.length === 0) {
-        alert("No existen registros ");
-      } else {
-        UserCentralPDF(data.informe, fechaInicio, fechaFin);
-      }
-      console.log("filtro origen", data.informe);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const resumenVehiPDF = async () => {
-    const url = `${server_local}/resumen_vehi_central?`;
-    const params = new URLSearchParams();
-    if (fechaInicio && fechaFin) {
-      params.append("fechaInicio", fechaInicio); // params.append("let,const de controlador", parametro frontend)
-      params.append("fechaFin", fechaFin);
-    }
-
-    Object.keys(estadoFilter).forEach((estado) => {
-      if (estadoFilter[estado]) {
-        params.append("estado", estado);
-      }
-    });
-
-    Object.keys(capturaFilter).forEach((captura) => {
-      if (capturaFilter[captura]) {
-        params.append("captura", captura);
-      }
-    });
-
-    if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
-    }
-
-    if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
-    }
-
-    if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
-    }
-
-    if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
-    }
-
-    if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
-    }
-
-    if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
-    }
-
-    const userCentral = selectedUser.value;
-    if (selectedUser) {
-      params.append("centralista", userCentral);
-    }
-
-    try {
-      const res = await fetch(url + params.toString(), {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-
-      if (data.informe.length === 0) {
-        alert("No existen registros ");
-      } else {
-        VehiculoCentralPDF(fechaInicio, fechaFin, data.informe);
-      }
-      console.log("filtro origen", data.informe);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleCheckboxChange = (e) => {
-    const { name, checked, dataset, value } = e.target;
-
-    if (dataset.type === "estado") {
-      setEstadoFilter((prev) => ({
-        ...prev,
-        [name]: checked,
-      }));
-      console.log("estado");
-    } else if (dataset.type === "captura") {
-      setCapturaFilter((prev) => ({
-        ...prev,
-        [name]: checked,
-      }));
-      console.log("captura");
-    }
-    console.log(name, checked, value);
-  };
-
-  const handleClearFilter = () => {
-    setFechaInicio(startMonth);
-    setFechaFin(dateNow);
-    setSelectedOrigen([]);
-    setSelectedSector([]);
-    setSelectedVehiculo([]);
-    setSelectedTipo([]);
-    setSelectedRecursos([]);
-    setSelectedClasif([]);
-    setSelectedUser([]);
-    setEstadoFilter({
-      atendido: false,
-      progreso: false,
-      pendiente: false,
-    });
-    setCapturaFilter({
-      radios: false,
-      telefono: false,
-      rrss: false,
-      presencial: false,
-      email: false,
-    });
-    setCentral([]);
-  };
+  const resumenRecursos = () =>
+    fetchResumen("resumen_recursos_central", RecursosCentralPDF);
+  const resumenClasi = () =>
+    fetchResumen("resumen_clasif_central", ClasifCentralPDF);
+  const resumenOrigen = () =>
+    fetchResumen("resumen_origen_central", OrigenCentralPDF);
+  const resumenEstado = () =>
+    fetchResumen("resumen_estado_central", EstadoCentralPDF);
+  const resumenRango = () =>
+    fetchResumen("resumen_rango_central", RangoCentralPDF);
+  const resumenUser = () =>
+    fetchResumen("resumen_user_central", UserCentralPDF);
+  const resumenVehi = () =>
+    fetchResumen("resumen_vehi_central", VehiculoCentralPDF);
 
   return (
     <>
@@ -941,31 +549,31 @@ function StatisticsCentral() {
               {[
                 {
                   text: "Recursos involucrados",
-                  handler: resumenRecursosPDF,
+                  handler: resumenRecursos,
                 },
                 {
                   text: "Clasificación",
-                  handler: resumenClasifPDF,
+                  handler: resumenClasi,
                 },
                 {
                   text: "Origen",
-                  handler: resumenOrigenPDF,
+                  handler: resumenOrigen,
                 },
                 {
                   text: "Rango Horario",
-                  handler: resumenRangoPDF,
+                  handler: resumenRango,
                 },
                 {
                   text: "Estado Informe",
-                  handler: resumenEstadoPDF,
+                  handler: resumenEstado,
                 },
                 {
                   text: "Informes por centralista",
-                  handler: resumenUserPDF,
+                  handler: resumenUser,
                 },
                 {
                   text: "Resumen vehículos",
-                  handler: resumenVehiPDF,
+                  handler: resumenVehi,
                 },
               ].map((btn, idx) => (
                 <div className="col-md-6" key={idx}>

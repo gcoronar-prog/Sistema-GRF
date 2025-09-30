@@ -74,32 +74,89 @@ const SectorInspectPDF = (
   doc.setTextColor(80);
   doc.text(filtros, 14, 25);
 
-  const tableColumn = [
-    "Sector infracción",
-    "Inspector",
-    "Tipo de procedimiento",
-    "Cantidad",
-  ];
-  const tableRows = datos.map((e) => [
+  const tableColumn = ["Inspector", "Tipo de procedimiento", "Cantidad"];
+
+  const tableBody = [];
+
+  datos.expedientes.forEach((grupo) => {
+    grupo.datos.sort((a, b) => {
+      if (a.inspect === null) return -1;
+      if (b.inspect === null) return 1;
+      return 0;
+    });
+    grupo.datos.forEach((c) => {
+      if (c.inspect === null) {
+        tableBody.push([
+          {
+            content: grupo.sector,
+            colSpan: 2,
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "left",
+            },
+          },
+          {
+            content: c.cantidad.toString(),
+            styles: {
+              fillColor: [230, 230, 230],
+              fontStyle: "bold",
+              halign: "center",
+            },
+          },
+        ]);
+      } else {
+        // fila normal
+        tableBody.push([c.inspect, c.proceso, c.cantidad.toString()]);
+      }
+    });
+  });
+
+  const totalSector = datos.total[0].count;
+
+  tableBody.push([
+    {
+      content: "Total expedientes",
+      colSpan: 2,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "left",
+      },
+    },
+    {
+      content: totalSector,
+      colSpan: 2,
+      styles: {
+        fillColor: [230, 230, 230],
+        textColor: 20,
+        fontStyle: "bold",
+        halign: "center",
+      },
+    },
+  ]);
+  /*const tableRows = datos.map((e) => [
     e.sector_infraccion,
     e.inspector,
     e.tipo_procedimiento,
     e.cantidad,
-  ]);
+  ]);*/
 
   autoTable(doc, {
     head: [tableColumn],
-    body: tableRows,
+    body: tableBody,
     startY: 40,
+    tableWidth: "full",
     styles: { fontSize: 11, cellPadding: 3, lineWidth: 0.3 },
     headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
     alternateRowStyles: { fillColor: [245, 245, 245] },
     margin: { left: margin, right: margin },
     columnStyles: {
-      0: { halign: "center", cellWidth: 50 },
-      1: { halign: "center", cellWidth: 35 },
-      2: { halign: "center", cellWidth: 35 },
-      3: { halign: "center", cellWidth: 25 },
+      0: { halign: "center" },
+      1: { halign: "center" },
+      2: { halign: "center" },
+      3: { halign: "center" },
     },
   });
 
