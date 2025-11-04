@@ -68,16 +68,8 @@ const getEstadoExpe = async (req, res) => {
                             GROUP BY estado_exp, tipo_procedimiento ORDER BY estado_exp, tipo_procedimiento`;*/
 
     let estadoInspeccion = `SELECT 
-                             	CASE
-                            WHEN expe.tipo_procedimiento IS NULL AND expe.estado_exp IS NULL THEN 'TOTAL GENERAL'
-                              WHEN expe.tipo_procedimiento IS NULL THEN 'total proce'
-                              ELSE expe.tipo_procedimiento
-                          END	AS proceso,
-                            CASE 
-                            WHEN expe.estado_exp IS NULL AND expe.tipo_procedimiento IS NOT NULL THEN 'total estado'
-                            ELSE expe.estado_exp
-                          END AS estado,
-
+                            expe.tipo_procedimiento AS proceso,
+                            expe.estado_exp AS estado,
                             COUNT(expe.estado_exp) AS cantidad
 
                           FROM expedientes expe
@@ -89,7 +81,7 @@ const getEstadoExpe = async (req, res) => {
                           WHERE expe.estado_exp IS NOT NULL ${whereClause}
 
                           GROUP BY ROLLUP(expe.estado_exp, expe.tipo_procedimiento)
-                          HAVING NOT (expe.estado_exp IS NULL OR expe.tipo_procedimiento IS NULL)
+                          HAVING NOT (expe.estado_exp IS NULL AND expe.tipo_procedimiento IS NULL)
                           ORDER BY estado, proceso NULLS LAST
                           `;
 
@@ -103,7 +95,7 @@ const getEstadoExpe = async (req, res) => {
         agrupado[estado] = [];
       }
 
-      agrupado[estado].push({ proceso, estado, cantidad: parseInt(cantidad) });
+      agrupado[estado].push({ proceso, cantidad: parseInt(cantidad) });
     });
     const respuesta = Object.entries(agrupado).map(([estado, datos]) => ({
       estado,
@@ -166,7 +158,7 @@ const getTipoProce = async (req, res) => {
                         JOIN funcionarios funci ON funci.id_funcionario=expe.id_inspector
                           WHERE funci.funcionario IS NOT NULL ${whereClause}
                         GROUP BY ROLLUP(expe.tipo_procedimiento,funci.funcionario)
-                        HAVING expe.tipo_procedimiento IS NOT NULL
+                        HAVING NOT (expe.tipo_procedimiento IS NULL)
                         ORDER BY procesos,funcionarios NULLS LAST`;
 
     const result = await client.query(tipoProceso, values);
@@ -179,7 +171,6 @@ const getTipoProce = async (req, res) => {
         agrupado[procesos] = [];
       }
       agrupado[procesos].push({
-        procesos,
         funcionarios,
         cantidad: parseInt(cantidad),
       });
@@ -215,7 +206,7 @@ const getLeyesInsp = async (req, res) => {
                         JOIN leyes l ON l.id_ley=expe.id_leyes
                         ${whereClause}`;
 
-    let leyesResumen = `SELECT  l.ley AS ley,
+    let leyesResumen = `SELECT l.ley AS ley,
                           expe.tipo_procedimiento AS proceso,
                           infra.juzgado AS juzgado,
                           COUNT(expe.id_expediente) AS cantidad
@@ -269,20 +260,49 @@ const getInspectResumen = async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    let inspectResumen = `SELECT DISTINCT  
-		func.funcionario,
-		expe.tipo_procedimiento,
-		COUNT(expe.id_expediente) AS cantidad
-    FROM expedientes expe 
-    JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
-    JOIN funcionarios func on expe.id_inspector=func.id_funcionario
-    WHERE 1=1 AND func.funcionario IS NOT NULL ${whereClause}
-    GROUP BY expe.id_inspector,expe.tipo_procedimiento,func.funcionario
-    ORDER BY func.funcionario`;
+
+    let totalInspect = `SELECT COUNT(*) FROM expedientes expe 
+                        JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
+                        JOIN funcionarios func on expe.id_inspector=func.id_funcionario
+                        WHERE func.funcionario IS NOT NULL ${whereClause}`;
+
+    let inspectResumen = `SELECT  
+                          func.funcionario AS inspect,
+                          expe.tipo_procedimiento AS proceso,
+                          COUNT(expe.id_expediente) AS cantidad
+                          FROM expedientes expe 
+                          JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
+                          JOIN funcionarios func on expe.id_inspector=func.id_funcionario
+                          ${whereClause}
+                          GROUP BY ROLLUP(func.funcionario,expe.tipo_procedimiento)
+                          HAVING NOT (func.funcionario IS NULL AND expe.tipo_procedimiento IS NULL)
+                          ORDER BY inspect,proceso NULLS LAST`;
 
     const result = await client.query(inspectResumen, values);
+    const resultTotal = await client.query(totalInspect, values);
+
+    const agrupado = {};
+    result.rows.forEach((row) => {
+      const { inspect, proceso, cantidad } = row;
+      if (!agrupado[inspect]) {
+        agrupado[inspect] = [];
+      }
+      agrupado[inspect].push({
+        proceso,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([inspect, datos]) => ({
+      inspect,
+      datos,
+    }));
+    console.log(JSON.stringify(respuesta, null, 2));
+
     await client.query("COMMIT");
-    return res.status(200).json({ expedientes: result.rows });
+    return res
+      .status(200)
+      .json({ expedientes: respuesta, total: resultTotal.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.log(error);
@@ -298,19 +318,46 @@ const getVehiculoResumen = async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    let vehiResumen = `SELECT DISTINCT vehi.tipo_vehi,
-                            vehi.marca_vehi,
+
+    let totalVehiculo = `SELECT COUNT(*) FROM vehiculos_contri vehi
+                            JOIN expedientes expe ON expe.id_expediente=vehi.id_expediente
+                            JOIN infracciones infra ON expe.id_expediente=infra.id_expediente                      
+                        WHERE vehi.tipo_vehi IS NOT NULL ${whereClause}`;
+
+    let vehiResumen = `SELECT vehi.tipo_vehi AS tipo,
+                            vehi.marca_vehi AS marca,
                             COUNT(vehi.id_vehiculos) AS cantidad
                           FROM vehiculos_contri vehi
                             JOIN expedientes expe ON expe.id_expediente=vehi.id_expediente
                             JOIN infracciones infra ON expe.id_expediente=infra.id_expediente                      
-                        WHERE 1=1 AND  vehi.tipo_vehi IS NOT NULL ${whereClause}
-                         GROUP BY vehi.tipo_vehi,vehi.marca_vehi 
-                          ORDER BY vehi.tipo_vehi`;
+                        WHERE vehi.tipo_vehi IS NOT NULL ${whereClause}
+                         GROUP BY ROLLUP( vehi.marca_vehi,vehi.tipo_vehi )
+                        HAVING NOT (vehi.marca_vehi IS NULL AND vehi.tipo_vehi IS NULL)
+                          ORDER BY marca,tipo NULLS LAST`;
 
     const result = await client.query(vehiResumen, values);
+    const totalVehi = await client.query(totalVehiculo, values);
+
+    const agrupado = {};
+    result.rows.forEach((row) => {
+      const { tipo, marca, cantidad } = row;
+      if (!agrupado[marca]) {
+        agrupado[marca] = [];
+      }
+      agrupado[marca].push({
+        tipo,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([marca, datos]) => ({
+      marca,
+      datos,
+    }));
     await client.query("COMMIT");
-    return res.status(200).json({ expedientes: result.rows });
+    return res
+      .status(200)
+      .json({ expedientes: respuesta, total: totalVehi.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.log(error);
@@ -326,19 +373,45 @@ const getSectorInfra = async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    let sectorResumen = `SELECT infra.sector_infraccion, 
-                          expe.id_inspector,
-                          expe.tipo_procedimiento,
-                          COUNT(expe.id_expediente) as cantidad
+
+    let totalSector = `SELECT COUNT(*) FROM infracciones infra
+                          JOIN expedientes expe ON expe.id_expediente=infra.id_expediente
+                          WHERE infra.sector_infraccion IS NOT NULL ${whereClause}`;
+
+    let sectorResumen = `SELECT infra.sector_infraccion AS sector, 
+                          expe.id_inspector AS inspect,
+                          expe.tipo_procedimiento AS proceso,
+                          COUNT(expe.id_expediente) AS cantidad
                           FROM infracciones infra
                           JOIN expedientes expe ON expe.id_expediente=infra.id_expediente
                           WHERE infra.sector_infraccion IS NOT NULL ${whereClause}
-                        GROUP BY infra.sector_infraccion, expe.id_inspector,expe.tipo_procedimiento 
-                          ORDER BY infra.sector_infraccion`;
+                          GROUP BY ROLLUP (infra.sector_infraccion, expe.id_inspector,expe.tipo_procedimiento )
+                          HAVING NOT (infra.sector_infraccion IS NULL)
+                          ORDER BY sector NULLS LAST`;
 
     const result = await client.query(sectorResumen, values);
+    const resultTotal = await client.query(totalSector, values);
+    const agrupado = {};
+    result.rows.forEach((row) => {
+      const { sector, inspect, proceso, cantidad } = row;
+      if (!agrupado[sector]) {
+        agrupado[sector] = [];
+      }
+      agrupado[sector].push({
+        inspect,
+        proceso,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([sector, datos]) => ({
+      sector,
+      datos,
+    }));
     await client.query("COMMIT");
-    return res.status(200).json({ expedientes: result.rows });
+    return res
+      .status(200)
+      .json({ expedientes: respuesta, total: resultTotal.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.log(error);
@@ -354,21 +427,51 @@ const getGlosasResumen = async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    let glosaResumen = `SELECT expe.tipo_procedimiento,
-                          gl.glosa_ley,
-                          l.ley,
+
+    let totalGlosa = `SELECT COUNT(*) FROM expedientes expe
+                        JOIN glosas_ley gl ON gl.id_glosa=expe.id_glosas
+                        JOIN leyes l ON l.id_ley=expe.id_leyes
+                        JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
+                        WHERE gl.glosa_ley IS NOT NULL ${whereClause}`;
+
+    let glosaResumen = `SELECT  gl.glosa_ley AS glosa,
+	                      expe.tipo_procedimiento AS proceso,
+                          l.ley AS ley,
                           COUNT(expe.id_expediente) AS cantidad
                           FROM expedientes expe
                         JOIN glosas_ley gl ON gl.id_glosa=expe.id_glosas
                         JOIN leyes l ON l.id_ley=expe.id_leyes
                         JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
                         WHERE gl.glosa_ley IS NOT NULL ${whereClause}
-                        GROUP BY expe.tipo_procedimiento,gl.glosa_ley,l.ley 
-                          ORDER BY expe.tipo_procedimiento`;
+                        GROUP BY ROLLUP (gl.glosa_ley,l.ley,expe.tipo_procedimiento )
+						            HAVING NOT (gl.glosa_ley IS NULL)
+                        ORDER BY glosa NULLS LAST`;
 
     const result = await client.query(glosaResumen, values);
+    const totalResult = await client.query(totalGlosa, values);
+
+    const agrupado = {};
+    result.rows.forEach((row) => {
+      const { glosa, ley, proceso, cantidad } = row;
+      if (!agrupado[glosa]) {
+        agrupado[glosa] = [];
+      }
+      agrupado[glosa].push({
+        ley,
+        proceso,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([glosa, datos]) => ({
+      glosa,
+      datos,
+    }));
+
     await client.query("COMMIT");
-    return res.status(200).json({ expedientes: result.rows });
+    return res
+      .status(200)
+      .json({ expedientes: respuesta, total: totalResult.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.log(error);

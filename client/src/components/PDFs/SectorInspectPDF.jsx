@@ -127,7 +127,7 @@ const SectorInspectPDF = (
     },
     {
       content: totalSector,
-      colSpan: 2,
+      colSpan: 1,
       styles: {
         fillColor: [230, 230, 230],
         textColor: 20,

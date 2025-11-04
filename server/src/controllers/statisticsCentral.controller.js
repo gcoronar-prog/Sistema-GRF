@@ -46,23 +46,51 @@ const getResumenEstado = async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    let estadoResumen = `SELECT DISTINCT doi.estado_informe,
-     dti.clasificacion_informe->>'label' as clasif,dti.tipo_informe->>'label' as tipo,
-      COUNT(doi.estado_informe) as cantidad
-        FROM informes_central ic
+
+    let totalEstado = `SELECT COUNT(*) FROM informes_central ic
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe
-        WHERE 1=1 AND doi.estado_informe IS NOT NULL ${whereClause}
-        GROUP BY doi.estado_informe, dti.clasificacion_informe->>'label',dti.tipo_informe->>'label'
-        ORDER BY doi.estado_informe ASC`;
+        WHERE doi.estado_informe IS NOT NULL ${whereClause}`;
+
+    let estadoResumen = `SELECT  doi.estado_informe AS estado,
+    dti.tipo_informe->>'label' as tipo,
+    dti.clasificacion_informe->>'label' as clasif,
+                        COUNT(doi.estado_informe) as cantidad
+                        FROM informes_central ic
+                        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
+                        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe
+                        WHERE doi.estado_informe IS NOT NULL ${whereClause}
+                         GROUP BY ROLLUP (doi.estado_informe, clasif,tipo)
+						            HAVING NOT (doi.estado_informe IS NULL)
+                        ORDER BY estado NULLS LAST`;
 
     const resultEstado = await client.query(estadoResumen, values);
+    const totalResult = await client.query(totalEstado, values);
+
+    const agrupado = {};
+    resultEstado.rows.forEach((row) => {
+      const { estado, clasif, tipo, cantidad } = row;
+      if (!agrupado[estado]) {
+        agrupado[estado] = [];
+      }
+      agrupado[estado].push({
+        tipo,
+        clasif,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([estado, datos]) => ({
+      estado,
+      datos,
+    }));
 
     await client.query("COMMIT");
     //console.log(estadoResumen, parameter);
 
     return res.status(200).json({
-      informe: resultEstado.rows,
+      informe: respuesta,
+      total: totalResult.rows,
     });
   } catch (error) {
     console.error(error);
@@ -215,6 +243,13 @@ const getResumenRecursos = async (req, res) => {
 
   try {
     await client.query("BEGIN");
+
+    let totalRecursos = `SELECT COUNT(*) from informes_central ic
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe,
+        LATERAL json_array_elements(dti.recursos_informe) AS recurso
+        WHERE recurso->>'label' IS NOT NULL ${whereClause}`;
+
     let recursosResumen = `SELECT recurso->>'label' as recursos,COUNT(ic.id_informes_central) as cantidad
         from informes_central ic
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
@@ -224,10 +259,14 @@ const getResumenRecursos = async (req, res) => {
         GROUP BY recurso->>'label' ORDER BY recurso->>'label'`;
 
     const resultRecursos = await client.query(recursosResumen, values);
+    const totalResult = await client.query(totalRecursos, values);
+
     await client.query("COMMIT");
 
     //console.log(recursosResumen, parameter);
-    return res.status(200).json({ informe: resultRecursos.rows });
+    return res
+      .status(200)
+      .json({ informe: resultRecursos.rows, total: totalResult.rows });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -240,20 +279,50 @@ const getResumenRango = async (req, res) => {
   const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
-    let rangoResumen = `SELECT doi.rango_horario, dti.clasificacion_informe->>'label' as clasif ,COUNT(ic.id_informes_central) as cantidad
+
+    let totalRango = `SELECT COUNT(*) FROM informes_central ic
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe
+        WHERE doi.rango_horario IS NOT NULL ${whereClause}`;
+
+    let rangoResumen = `SELECT doi.rango_horario AS rangos, 
+    dti.clasificacion_informe->>'label' as clasif 
+    ,COUNT(ic.id_informes_central) as cantidad
         FROM informes_central ic
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe
         WHERE 1=1 AND doi.rango_horario IS NOT NULL ${whereClause}
-        GROUP BY doi.rango_horario, dti.clasificacion_informe->>'label'\
-        ORDER BY doi.rango_horario`;
+        GROUP BY ROLLUP (doi.rango_horario, dti.clasificacion_informe->>'label')
+        HAVING NOT (doi.rango_horario IS NULL)
+        ORDER BY rangos NULLS LAST`;
 
     const resultRango = await client.query(rangoResumen, values);
+    const totalResult = await client.query(totalRango, values);
+
+    const agrupado = {};
+    resultRango.rows.forEach((row) => {
+      const { rangos, clasif, cantidad } = row;
+      if (!agrupado[rangos]) {
+        agrupado[rangos] = [];
+      }
+
+      agrupado[rangos].push({
+        clasif,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([horario, datos]) => ({
+      horario,
+      datos,
+    }));
+
     await client.query("COMMIT");
     //console.log(rangoResumen, parameter);
 
     return res.status(200).json({
-      informe: resultRango.rows,
+      informe: respuesta,
+      total: totalResult.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -268,19 +337,49 @@ const getResumenUser = async (req, res) => {
 
   try {
     await client.query("BEGIN");
-    let userResumen = `SELECT doi.user_creador,dti.tipo_informe->>'label' as tipo,doi.estado_informe,COUNT(doi.user_creador) as cantidad
+
+    let totalUser = `SELECT COUNT(*) FROM informes_central ic
+        JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe
+        JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
+        WHERE user_creador IS NOT NULL ${whereClause}`;
+
+    let userResumen = `SELECT doi.user_creador AS users,
+        dti.tipo_informe->>'label' as tipo,
+        COUNT(doi.user_creador) as cantidad
         FROM informes_central ic
         JOIN datos_origen_informe doi ON doi.id_origen_informe=ic.id_origen_informe
         JOIN datos_tipos_informes dti ON dti.id_tipos_informes=ic.id_tipos_informe
         WHERE user_creador IS NOT NULL ${whereClause}
-        GROUP BY doi.user_creador,dti.tipo_informe->>'label',doi.estado_informe
-        ORDER BY doi.user_creador`;
+        GROUP BY ROLLUP (doi.user_creador,dti.tipo_informe->>'label')
+        HAVING NOT (doi.user_creador IS NULL)
+        ORDER BY users NULLS LAST`;
 
-    const resultRango = await client.query(userResumen, values);
+    const resultUser = await client.query(userResumen, values);
+    const totalResult = await client.query(totalUser, values);
+
+    const agrupado = {};
+    resultUser.rows.forEach((row) => {
+      const { users, tipo, cantidad } = row;
+      if (!agrupado[users]) {
+        agrupado[users] = [];
+      }
+
+      agrupado[users].push({
+        tipo,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(([users, datos]) => ({
+      users,
+      datos,
+    }));
+
     await client.query("COMMIT");
 
     return res.status(200).json({
-      informe: resultRango.rows,
+      informe: respuesta,
+      total: totalResult.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -294,25 +393,58 @@ const getResumenVehi = async (req, res) => {
   const { whereClause, values } = buildWhereClause(req.query);
   try {
     await client.query("BEGIN");
+
+    let totalVehi = `SELECT COUNT(*) FROM informes_central ic
+      JOIN datos_tipos_informes dti ON dti.id_tipos_informes = ic.id_tipos_informe
+      JOIN datos_vehiculos_informe dvi ON dvi.id_vehiculos = ic.id_vehiculo_informe
+      JOIN datos_origen_informe doi ON doi.id_origen_informe = ic.id_origen_informe
+      JOIN datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion
+      JOIN LATERAL jsonb_array_elements(dvi.vehiculos_informe::jsonb) AS elem ON TRUE
+      WHERE elem->>'label' IS NOT NULL ${whereClause}`;
+
     let vehiResumen = `SELECT
-        dti.clasificacion_informe->>'label' AS clasificacion,
         elem->>'label' AS nombre_vehiculo,
-        COUNT(*) AS veces_que_aparece
+        dti.clasificacion_informe->>'label' AS clasificacion,
+        COUNT(*) AS cantidad
       FROM informes_central ic
       JOIN datos_tipos_informes dti ON dti.id_tipos_informes = ic.id_tipos_informe
       JOIN datos_vehiculos_informe dvi ON dvi.id_vehiculos = ic.id_vehiculo_informe
       JOIN datos_origen_informe doi ON doi.id_origen_informe = ic.id_origen_informe
       JOIN datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion
       JOIN LATERAL jsonb_array_elements(dvi.vehiculos_informe::jsonb) AS elem ON TRUE
-      WHERE elem->>'label' IS NOT NULL ${whereClause}
-      GROUP BY dti.clasificacion_informe->>'label',elem->>'label'\
-      ORDER BY veces_que_aparece DESC`;
+      ${whereClause}
+      GROUP BY ROLLUP (elem->>'label',dti.clasificacion_informe->>'label')
+	  HAVING NOT (elem->>'label' IS NULL)
+      ORDER BY nombre_vehiculo NULLS LAST`;
 
-    const resultRango = await client.query(vehiResumen, values);
+    const result = await client.query(vehiResumen, values);
+    const totalResult = await client.query(totalVehi, values);
+
+    const agrupado = {};
+    result.rows.forEach((row) => {
+      const { nombre_vehiculo, clasificacion, cantidad } = row;
+      if (!agrupado[nombre_vehiculo]) {
+        agrupado[nombre_vehiculo] = [];
+      }
+
+      agrupado[nombre_vehiculo].push({
+        clasificacion,
+        cantidad: parseInt(cantidad),
+      });
+    });
+
+    const respuesta = Object.entries(agrupado).map(
+      ([nombre_vehiculo, datos]) => ({
+        nombre_vehiculo,
+        datos,
+      })
+    );
+
     await client.query("COMMIT");
 
     return res.status(200).json({
-      informe: resultRango.rows,
+      informe: respuesta,
+      total: totalResult.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");

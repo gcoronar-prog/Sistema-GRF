@@ -1102,7 +1102,7 @@ function FormInspeccion() {
                         <label htmlFor="color_vehi" className="form-label">
                           Color de Vehiculo
                         </label>
-                        <select
+                        {/*<select
                           className="form-select"
                           name="color_vehi"
                           id=""
@@ -1116,7 +1116,15 @@ function FormInspeccion() {
                               {tipo.color}
                             </option>
                           ))}
-                        </select>
+                        </select>*/}
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="color_vehi"
+                          value={expedientes.color_vehi || ""}
+                          onChange={handleChanges}
+                          readOnly={editing}
+                        />
                       </div>
 
                       <div className="col-md-6">
