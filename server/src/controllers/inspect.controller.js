@@ -125,7 +125,7 @@ const deleteExFile = async (req, res) => {
 const getInspectores = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM funcionarios WHERE rol_func='INSP'"
+      "SELECT * FROM funcionarios WHERE rol_func IN ('INSP','SEGMUN')"
     );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen funcionarios" });
@@ -357,6 +357,38 @@ const deleteInfraccion = async (req, res) => {
 const getDatosVehi = async (req, res) => {
   try {
     const { rows } = await pool.query("SELECT * FROM datos_vehiculos");
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No existen registros" });
+    }
+    return res.json(rows);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
+const getMarcaVehi = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM datos_marcas_vehiculos ORDER BY marca ASC"
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No existen registros" });
+    }
+    return res.json(rows);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
+const getTipoVehi = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM datos_tipos_vehiculos ORDER BY tipo_vehi ASC"
+    );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
     }
@@ -1351,4 +1383,6 @@ export {
   getExpedTipo,
   getDigitador,
   despachoExpediente,
+  getMarcaVehi,
+  getTipoVehi,
 };

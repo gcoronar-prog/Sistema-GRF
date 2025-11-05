@@ -8,17 +8,17 @@ function DespachoExp() {
   const token = localStorage.getItem("token");
 
   // Hoy
-  const hoy = new Date();
+  /*const hoy = new Date();
   const hoyStr = hoy.toISOString().split("T")[0]; // "2025-09-11"
 
   // Mañana
   const ayer = new Date();
   ayer.setDate(ayer.getDate() - 1);
-  const ayerStr = ayer.toISOString().split("T")[0]; // "2025-09-12"
+  const ayerStr = ayer.toISOString().split("T")[0]; // "2025-09-12"*/
 
   const [busqueda, setBusqueda] = useState({
-    fecha_inicio: ayerStr,
-    fecha_fin: hoyStr,
+    fecha_inicio: "",
+    fecha_fin: "",
     jpl: "",
     digitador: "",
     proceso: "Citación",
@@ -209,10 +209,9 @@ function DespachoExp() {
             </label>
             <input
               name="fecha_inicio"
-              type="date"
+              type="datetime-local"
               className="form-control"
               onChange={handleChanges}
-              defaultValue={hoyStr}
               value={busqueda.fecha_inicio}
             />
           </div>
@@ -222,7 +221,7 @@ function DespachoExp() {
             </label>
             <input
               name="fecha_fin"
-              type="date"
+              type="datetime-local"
               className="form-control"
               onChange={handleChanges}
               value={busqueda.fecha_fin}

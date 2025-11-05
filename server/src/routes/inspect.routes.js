@@ -28,8 +28,10 @@ import {
   getInspectores,
   getLastExpediente,
   getLeyes,
+  getMarcaVehi,
   getNextExpediente,
   getPrevExpediente,
+  getTipoVehi,
   getVehiculoContri,
   getVehInfrac,
   searchExpedientes,
@@ -191,7 +193,9 @@ router.get(
   getNextExpediente
 );
 
-router.get("/datos_vehi", getDatosVehi); //solo para datos de vehiculos y rellenar campos de selección
+router.get("/datos_marca_vehi", getMarcaVehi); //solo para datos de vehiculos y rellenar campos de selección
+router.get("/datos_tipo_vehi", getTipoVehi);
+
 router.get(
   "/glosas",
   verifyToken,
@@ -232,8 +236,8 @@ router.get(
 );
 router.get(
   "/search_expediente",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  //verifyToken,
+  //verifyGroup("superadmin", "inspeccion", "noinspeccion"),
   searchExpedientes
 );
 

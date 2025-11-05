@@ -60,6 +60,7 @@ function FormInspeccion() {
   const [ley, setLey] = useState([]);
   const [glosas, setGlosas] = useState([]);
   const [datosVehiculos, setDatosVehiculos] = useState([]);
+  const [datosTipoVehi, setDatosTipoVehi] = useState([]);
   const [sectores, setSectores] = useState([]);
   const [testigos, setTestigos] = useState([]);
   const [editing, setEditing] = useState(true);
@@ -198,7 +199,7 @@ function FormInspeccion() {
 
   const loadDatosVeh = async () => {
     try {
-      const res = await fetch(`${servidor_local}/datos_vehi`, {
+      const res = await fetch(`${servidor_local}/datos_marca_vehi`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -207,6 +208,22 @@ function FormInspeccion() {
       if (!res.ok) throw new Error("Problemas obteniendo datos de vehículos");
       const data = await res.json();
       setDatosVehiculos(data);
+    } catch (error) {
+      console.error("Error cargando datos de vehículos", error);
+    }
+  };
+
+  const loadTiposVehi = async () => {
+    try {
+      const res = await fetch(`${servidor_local}/datos_tipo_vehi`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Problemas obteniendo datos de vehículos");
+      const data = await res.json();
+      setDatosTipoVehi(data);
     } catch (error) {
       console.error("Error cargando datos de vehículos", error);
     }
@@ -250,6 +267,7 @@ function FormInspeccion() {
     loadLeyes();
     loadGlosas();
     loadDatosVeh();
+    loadTiposVehi();
     loadSectores();
     loadTestigo();
     console.log("usuario", user);
@@ -1070,9 +1088,12 @@ function FormInspeccion() {
                           disabled={editing}
                         >
                           <option value="">Tipo de Vehiculo</option>
-                          {datosVehiculos.map((tipo) => (
-                            <option key={tipo.id_veh} value={tipo.tipo}>
-                              {tipo.tipo}
+                          {datosTipoVehi.map((tipo) => (
+                            <option
+                              key={tipo.id_tipo_vehi}
+                              value={tipo.tipo_vehi}
+                            >
+                              {tipo.tipo_vehi}
                             </option>
                           ))}
                         </select>
@@ -1092,7 +1113,7 @@ function FormInspeccion() {
                         >
                           <option value="">Marca del Vehiculo</option>
                           {datosVehiculos.map((tipo) => (
-                            <option key={tipo.marca} value={tipo.marca}>
+                            <option key={tipo.id_marca} value={tipo.marca}>
                               {tipo.marca}
                             </option>
                           ))}
