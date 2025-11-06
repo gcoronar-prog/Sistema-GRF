@@ -85,7 +85,7 @@ const estadoInspeccionPDF = (
       if (c.proceso === null) {
         tableBody.push([
           {
-            content: `Total estado: ${grupo.estado}`,
+            content: `Estado: ${grupo.estado}`,
             colSpan: 1,
             styles: {
               fillColor: [230, 230, 230],
@@ -143,10 +143,10 @@ const estadoInspeccionPDF = (
   tableBody.push([
     {
       content: "Total expedientes",
-      colSpan: 2,
+      colSpan: 1,
       styles: {
-        fillColor: [44, 62, 80],
-        textColor: 255,
+        fillColor: [230, 230, 230],
+        textColor: 20,
         fontStyle: "bold",
         halign: "left",
       },
@@ -155,8 +155,8 @@ const estadoInspeccionPDF = (
       content: totalEstado,
       colSpan: 1,
       styles: {
-        fillColor: [44, 62, 80],
-        textColor: 255,
+        fillColor: [230, 230, 230],
+        textColor: 20,
         fontStyle: "bold",
         halign: "center",
       },

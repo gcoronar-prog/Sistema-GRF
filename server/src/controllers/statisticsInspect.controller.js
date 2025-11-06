@@ -216,7 +216,7 @@ const getLeyesInsp = async (req, res) => {
                         JOIN leyes l ON l.id_ley=expe.id_leyes
                         WHERE 1=1 AND l.ley IS NOT NULL AND expe.tipo_procedimiento IS NOT NULL ${whereClause}
                         GROUP BY ROLLUP( l.ley,infra.juzgado,expe.tipo_procedimiento)
-                        HAVING l.ley IS NOT NULL
+                        HAVING infra.juzgado IS NOT NULL
                         ORDER BY ley,proceso,juzgado NULLS LAST`;
 
     const result = await client.query(leyesResumen, values);
@@ -379,14 +379,15 @@ const getSectorInfra = async (req, res) => {
                           WHERE infra.sector_infraccion IS NOT NULL ${whereClause}`;
 
     let sectorResumen = `SELECT infra.sector_infraccion AS sector, 
-                          expe.id_inspector AS inspect,
+                          funci.funcionario AS inspect,
                           expe.tipo_procedimiento AS proceso,
                           COUNT(expe.id_expediente) AS cantidad
                           FROM infracciones infra
                           JOIN expedientes expe ON expe.id_expediente=infra.id_expediente
+                          JOIN funcionarios funci ON expe.id_inspector=funci.id_funcionario
                           WHERE infra.sector_infraccion IS NOT NULL ${whereClause}
-                          GROUP BY ROLLUP (infra.sector_infraccion, expe.id_inspector,expe.tipo_procedimiento )
-                          HAVING NOT (infra.sector_infraccion IS NULL)
+                          GROUP BY ROLLUP (infra.sector_infraccion, funci.funcionario,expe.tipo_procedimiento )
+                          HAVING NOT (expe.tipo_procedimiento IS NULL)
                           ORDER BY sector NULLS LAST`;
 
     const result = await client.query(sectorResumen, values);
@@ -444,7 +445,7 @@ const getGlosasResumen = async (req, res) => {
                         JOIN infracciones infra ON infra.id_expediente=expe.id_expediente
                         WHERE gl.glosa_ley IS NOT NULL ${whereClause}
                         GROUP BY ROLLUP (gl.glosa_ley,l.ley,expe.tipo_procedimiento )
-						            HAVING NOT (gl.glosa_ley IS NULL)
+						            HAVING NOT (l.ley IS NULL)
                         ORDER BY glosa NULLS LAST`;
 
     const result = await client.query(glosaResumen, values);

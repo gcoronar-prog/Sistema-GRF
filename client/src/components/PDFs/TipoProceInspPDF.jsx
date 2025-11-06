@@ -143,7 +143,7 @@ const TipoProceInspPDF = (
   tableBody.push([
     {
       content: "Total expedientes",
-      colSpan: 2,
+      colSpan: 1,
       styles: {
         fillColor: [230, 230, 230],
         textColor: 20,

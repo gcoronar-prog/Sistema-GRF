@@ -344,8 +344,8 @@ function FormInformes() {
     setSelectedOrigin();
     setSelectedInformante();
     setSelectedSector();
-    setSelectedTipo();
-    setSelectedClasif();
+    setSelectedTipo("");
+    setSelectedClasif("");
     setSelectedRecursos();
     setEditing(false);
   };
@@ -755,16 +755,18 @@ function FormInformes() {
           </div>
 
           <div className="col-lg-5">
-            {selectedClasif.value === 1 && params.id && (
-              <FormAcciones tipo="central" />
-            )}
+            {selectedClasif.value != null
+              ? selectedClasif.value === 1 &&
+                params.id && <FormAcciones tipo="central" />
+              : ""}
+
             {editing && <ListPendiente refresh={refresh} />}
           </div>
         </div>
 
         {editing && (
           <div className="row mt-4">
-            <AttachFiles idInforme={params.id} />
+            <AttachFiles idInforme={informes.cod_informes_central} />
           </div>
         )}
       </div>

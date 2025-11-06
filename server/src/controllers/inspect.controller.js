@@ -158,7 +158,7 @@ const getInspectores = async (req, res) => {
 
 const getLeyes = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM leyes");
+    const { rows } = await pool.query("SELECT * FROM leyes ORDER BY ley ASC");
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros de leyes" });
@@ -402,7 +402,9 @@ const getTipoVehi = async (req, res) => {
 
 const getGlosaLey = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM glosas_ley");
+    const { rows } = await pool.query(
+      "SELECT * FROM glosas_ley ORDER BY glosa ASC"
+    );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
     }
@@ -1288,7 +1290,8 @@ const getDigitador = async (req, res) => {
   try {
     await client.query("BEGIN");
     const expediente = await client.query(
-      "SELECT cod_user, user_name, nombre,apellido FROM users_system WHERE user_rol='userinspeccion' OR user_rol='superadmin'"
+      "SELECT cod_user, user_name, nombre,apellido FROM users_system WHERE user_rol='userinspeccion' OR user_rol='superadmin'\
+       ORDER BY user_name ASC"
     );
     await client.query("COMMIT");
     return res.status(200).json({

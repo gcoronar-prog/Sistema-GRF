@@ -18,7 +18,9 @@ const getReports = async (req, res) => {
 
 const getRecursos = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM datos_recursos_informe");
+    const { rows } = await pool.query(
+      "SELECT * FROM datos_recursos_informe ORDER BY recursos ASC"
+    );
     if (rows.length === 0) {
       return res.json(404).json({ msg: "No existen recursos" });
     }
@@ -133,7 +135,7 @@ const deleteReport = async (req, res) => {
 const getChoferes = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * from funcionarios WHERE chofer=true"
+      "SELECT * from funcionarios WHERE chofer=true ORDER BY funcionario ASC"
     );
 
     if (rows.length === 0) {
@@ -150,7 +152,9 @@ const getChoferes = async (req, res) => {
 
 const getInformantes = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM informantes");
+    const { rows } = await pool.query(
+      "SELECT * FROM funcionarios ORDER BY funcionario ASC"
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
@@ -168,7 +172,9 @@ const getVehiculos = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const { rows } = await client.query("SELECT * FROM vehiculos");
+    const { rows } = await client.query(
+      "SELECT * FROM vehiculos ORDER BY id_vehiculo ASC"
+    );
     if (rows.length === 0) {
       await client.query("COMMIT");
       return res.status(404).json({ message: "No existen registros" });
@@ -188,7 +194,9 @@ const getVehiculos = async (req, res) => {
 
 const getTipoReportes = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM tipo_reportes");
+    const { rows } = await pool.query(
+      "SELECT * FROM tipo_reportes ORDER BY descripcion ASC"
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
@@ -235,7 +243,9 @@ const getTipoReporte = async (req, res) => {
 
 const getFuncionarios = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM funcionarios");
+    const { rows } = await pool.query(
+      "SELECT * FROM funcionarios ORDER BY funcionario ASC"
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
@@ -251,7 +261,9 @@ const getFuncionarios = async (req, res) => {
 
 const getOrigenes = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM origenes");
+    const { rows } = await pool.query(
+      "SELECT * FROM origenes ORDER BY origen ASC"
+    );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
     }
@@ -266,7 +278,7 @@ const getOrigenes = async (req, res) => {
 const getTripulantes = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM funcionarios WHERE chofer=false"
+      "SELECT * FROM funcionarios WHERE rol_func IN ('INSP','SEGMUN','GRD','FOREST','ALC','SEGPUB')"
     );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
@@ -281,7 +293,9 @@ const getTripulantes = async (req, res) => {
 
 const getSectores = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM sectores");
+    const { rows } = await pool.query(
+      "SELECT * FROM sectores ORDER BY sector ASC"
+    );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
     }

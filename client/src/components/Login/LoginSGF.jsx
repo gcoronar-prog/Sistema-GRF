@@ -52,7 +52,7 @@ function LoginSGF() {
         }
       }
       if (!res.ok) {
-        window.alert("Usuario y/o contrasela incorrectos");
+        window.alert("Usuario y/o contraseña incorrectos");
         setLogin(defaultValues);
       }
     } catch (error) {

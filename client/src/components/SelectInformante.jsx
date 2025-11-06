@@ -6,7 +6,7 @@ function SelectInformante({
   edition,
   selectRef,
 }) {
-  const loadInformante = async (inputValue) => {
+  const loadInformante = async () => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
       const response = await fetch(`${servidor}/informantes`);
@@ -15,14 +15,10 @@ function SelectInformante({
       }
       const data = await response.json();
 
-      return data
-        .filter((item) =>
-          item.informante.toLowerCase().includes(inputValue.toLowerCase())
-        )
-        .map((item) => ({
-          value: item.id_informante,
-          label: item.informante,
-        }));
+      return data.map((item) => ({
+        value: item.id_funcionario,
+        label: item.funcionario,
+      }));
     } catch (error) {
       console.error("Error:", error);
       return [];
