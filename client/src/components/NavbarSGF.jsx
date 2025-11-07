@@ -60,6 +60,21 @@ function NavbarSGF() {
     navigate(`/inspect/${id_informe}/edit`);
   };
 
+  const handleLastAtencion = async () => {
+    const res = await fetch(`${servidor_local}/atenciones/sgc/last`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const lastAtencion = await res.json();
+
+    const id_atencion = lastAtencion.atencion_ciudadana.id_atencion;
+
+    navigate(`/sgc/atencion/${id_atencion}`);
+  };
+
   const rol = user.user_rol;
   /*if (!user) {
     return null;
@@ -122,6 +137,11 @@ function NavbarSGF() {
               <i className="bi bi-clipboard2-data"></i> Rentas Municipal
             </>
           )}
+          {user.user_rol === "userseguridad" && (
+            <>
+              <i className="bi bi-shield-shaded"></i> Seguridad Ciudadana
+            </>
+          )}
         </h2>
         <img
           src={logoSGIE}
@@ -170,7 +190,7 @@ function NavbarSGF() {
                 </>
               )}
 
-              {/* User Inspección o JPL */}
+              {/* User Inspección , JPL o Rentas*/}
               {(user.user_rol === "userinspeccion" ||
                 user.user_rol === "userjpl" ||
                 user.user_rol === "userrentas") && (
@@ -190,6 +210,29 @@ function NavbarSGF() {
                     <Link className="nav-link" to="/galeriaImgExp">
                       <i className="bi bi-image me-1"></i> Galería de Imágenes
                     </Link>
+                  </li>
+                </>
+              )}
+
+              {/* User Seguridad Ciudadana */}
+              {user.user_rol === "userseguridad" && (
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link" onClick={handleLastAtencion}>
+                      <i className="bi bi-person-arms-up me-1">
+                        Atención público
+                      </i>
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <i className="bi bi-camera-video-fill me-1">
+                      Solicitud imágenes
+                    </i>
+                  </li>
+                  <li className="nav-item">
+                    <i className="bi bi-bar-chart me-1">
+                      Estadisticas Seguridad Ciudadana
+                    </i>
                   </li>
                 </>
               )}
@@ -221,6 +264,14 @@ function NavbarSGF() {
                           onClick={handleLastInforme}
                         >
                           Informes Central Municipal
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className="dropdown-item"
+                          onClick={handleLastAtencion}
+                        >
+                          Atención público
                         </Link>
                       </li>
                     </ul>

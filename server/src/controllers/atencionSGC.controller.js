@@ -610,6 +610,19 @@ const deleteArchivoAten = async (req, res) => {
   }
 };
 
+const getPoblaciones = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM datos_poblacion ORDER BY id_poblacion ASC"
+    );
+    return res.json(rows);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error de conexión con el servidor" });
+  }
+};
+
 export {
   getAtenciones,
   createAtencion,
@@ -625,4 +638,5 @@ export {
   findArchivosByIdAten,
   createArchivoAten,
   deleteArchivoAten,
+  getPoblaciones,
 };

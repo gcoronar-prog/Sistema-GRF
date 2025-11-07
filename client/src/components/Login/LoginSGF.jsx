@@ -46,7 +46,7 @@ function LoginSGF() {
         ) {
           navigate("/home/inspeccion");
         } else if (userRole === "userseguridad") {
-          navigate("/home/central");
+          navigate("/home/segciudadana");
         } else if (userRole === "usergrd") {
           navigate("/home/central");
         }

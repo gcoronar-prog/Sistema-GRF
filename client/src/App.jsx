@@ -31,6 +31,7 @@ import Layout from "./components/Layout";
 import HomeInspeccion from "./components/Inspeccion/HomeInspeccion";
 import ListUser from "./components/Admin/ListUser";
 import ChangePassword from "./components/Login/ChangePassword";
+import HomeSGC from "./components/Seg_ciudadana/HomeSGC";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
           <Route path="/home/admin" element={<HomeAdmin />} />
           <Route path="/home/central" element={<HomeCentral />} />
           <Route path="/home/inspeccion" element={<HomeInspeccion />} />
+          <Route path="/home/segciudadana" element={<HomeSGC />} />
 
           <Route path="/Reports/new" element={<FormCentral />} />
           <Route path="/Reports/:id/edit" element={<FormCentral />} />

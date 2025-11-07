@@ -11,6 +11,7 @@ import {
   getFirstAtencion,
   getLastAtencion,
   getNextAtencion,
+  getPoblaciones,
   getPrevAtencion,
   updateAtencion,
 } from "../controllers/atencionSGC.controller.js";
@@ -45,5 +46,7 @@ router.get("/acciones/seguridad/:id", getAccionesId);
 router.post("/acciones/seguridad/:id", createAccion);
 router.put("/acciones/seguridad/:id", updateAccion);
 router.delete("/acciones/seguridad/:id", deleteAccion);
+
+router.get("/poblaciones", getPoblaciones);
 
 export default router;

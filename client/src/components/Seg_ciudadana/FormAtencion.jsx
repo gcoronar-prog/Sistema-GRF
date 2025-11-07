@@ -5,6 +5,10 @@ import AttachFiles from "../AttachFiles";
 import FormAcciones from "../FormAcciones";
 import { BlobProvider } from "@react-pdf/renderer";
 import SCAtencionPDF from "../PDFs/SCAtencionPDF";
+import SelectSector from "../SelectSector";
+import { jwtDecode } from "jwt-decode";
+import { useTokenSession } from "../useTokenSession";
+import SelectPoblacion from "../SelectPoblacion";
 
 function FormAtencion() {
   const defaultAtencion = {
@@ -37,12 +41,17 @@ function FormAtencion() {
     tipo_solicitud: "",
     temas_atencion: "",
   };
+
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const navigate = useNavigate();
   const params = useParams();
+  const token = localStorage.getItem("token");
 
   const [atenciones, setAtenciones] = useState({ defaultAtencion });
   const [editing, setEditing] = useState(true);
   const [lastId, setLastId] = useState("");
+  const [selectedSector, setSelectedSector] = useState(null);
+  const [selectedPobla, setSelectedPobla] = useState(null);
 
   useEffect(() => {
     console.log(params);
@@ -55,9 +64,15 @@ function FormAtencion() {
   }, [params.id]);
 
   const loadAtenciones = async (id) => {
-    const res = await fetch(`${servidor}/atenciones/${id}/sgc`);
+    const res = await fetch(`${servidor}/atenciones/${id}/sgc`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
+
     const formattedFecha = dayjs(data.proceso[0].fecha_solicitud).format(
       "YYYY-MM-DDTHH:mm"
     );
@@ -72,8 +87,8 @@ function FormAtencion() {
 
       //sector
       direccion_solicitante: data.sector[0].direccion_solicitante,
-      sector_solicitante: data.sector[0].sector_solicitante,
-      poblacion_solicitante: data.sector[0].poblacion_solicitante,
+      //sector_solicitante: data.sector[0].sector_solicitante,
+      //poblacion_solicitante: data.sector[0].poblacion_solicitante,
       junta_vecinos: data.sector[0].junta_vecinos,
 
       //solicitud
@@ -90,6 +105,8 @@ function FormAtencion() {
       tipo_solicitud: data.proceso[0].tipo_solicitud,
       temas_atencion: data.proceso[0].temas_atencion,
     });
+    setSelectedSector(data.sector[0].sector_solicitante);
+    setSelectedPobla(data.sector[0].poblacion_solicitante);
   };
 
   const handleChanges = async (e) => {
@@ -100,7 +117,19 @@ function FormAtencion() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(atenciones);
+    const decoded = jwtDecode(token);
+    const user_decoded = decoded.user_name;
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) return;
+
+    const sectorFormateado = JSON.stringify(selectedSector);
+    const poblaFormateada = JSON.stringify(selectedPobla);
+    const datosAtencion = {
+      ...atenciones,
+      sector_solicitante: sectorFormateado,
+      poblacion_solicitante: poblaFormateada,
+      user_creador: user_decoded,
+    };
 
     try {
       const idAten = params.id;
@@ -112,7 +141,7 @@ function FormAtencion() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(atenciones),
+        body: JSON.stringify(datosAtencion),
       });
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
@@ -171,6 +200,22 @@ function FormAtencion() {
     }
   };
 
+  const handleCancel = async () => {
+    const id = params.id;
+
+    try {
+      if (!id) handleLastAten();
+      loadAtenciones(id);
+
+      setEditing(true);
+    } catch (error) {
+      console.error(error);
+    }
+    setEditing(true);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handlePrevious = async () => {
     const id = params.id;
     try {
@@ -225,6 +270,9 @@ function FormAtencion() {
   };
 
   const handleDeleteAten = async () => {
+    const eliminar = window.confirm("¿Deseas eliminar el informe?");
+    if (!eliminar) return;
+
     const id = params.id;
     await fetch(`${servidor}/atenciones/${id}/sgc`, {
       method: "DELETE",
@@ -240,267 +288,373 @@ function FormAtencion() {
   };
 
   return (
-    <div>
-      <button
-        type="button"
-        onClick={handleFirstAten}
-        disabled={
-          //disabledPrevButton
-          false
-        }
-      >
-        Primera solicitud
-      </button>
-      <button
-        type="button"
-        onClick={handlePrevious}
-        disabled={
-          //disabledPrevButton
-          false
-        }
-      >
-        Atras
-      </button>
-      <button
-        type="button"
-        onClick={handleNext}
-        disabled={
-          //disabledNextButton
-          false
-        }
-      >
-        Siguiente
-      </button>
-      <button
-        type="button"
-        onClick={handleLastAten}
-        disabled={
-          false
-          //disabledNextButton
-        }
-      >
-        Ultimo
-      </button>
-      <input
+    <div className="container-fluid mt-4">
+      <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={handleFirstAten}
+          disabled={
+            //disabledPrevButton
+            false
+          }
+        >
+          <i className="bi bi-skip-start me-1"></i> Primera solicitud
+        </button>
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={handlePrevious}
+          disabled={
+            //disabledPrevButton
+            false
+          }
+        >
+          <i className="bi bi-chevron-left me-1"></i> Atrás
+        </button>
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={handleNext}
+          disabled={
+            //disabledNextButton
+            false
+          }
+        >
+          Siguiente <i className="bi bi-chevron-right ms-1"></i>
+        </button>
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={handleLastAten}
+          disabled={
+            false
+            //disabledNextButton
+          }
+        >
+          Último <i className="bi bi-skip-end ms-1"></i>
+        </button>
+      </div>
+      {/* <input
         type="text"
         name="id_atencion"
         value={atenciones.cod_atencion}
         disabled
-      />
-      <form action="" onSubmit={handleSubmit}>
-        <label htmlFor="">Datos solicitud</label>
-        <label htmlFor="">Fecha Solicitud</label>
-        <input
-          type="datetime-local"
-          name="fecha_solicitud"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.fecha_solicitud}
-          disabled={editing}
-        />
-        <label htmlFor="">Estado de la solicitud</label>
-        <select
-          name="estado_solicitud"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.estado_solicitud}
-          disabled={editing}
-        >
-          <option value="en proceso">En proceso</option>
-          <option value="en seguimiento">En seguimiento</option>
-          <option value="visitado">Visitado</option>
-          <option value="atendido">Atendido</option>
-          <option value="derivado">Derivado</option>
-          <option value="desistido">Desistido</option>
-          <option value="anulado">Anulado</option>
-        </select>
-        <label htmlFor="">Responsable atención</label>
-        <select
-          name="responsable_solicitud"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.responsable_solicitud}
-          disabled={editing}
-        >
-          <option value="">Seleccione responsable</option>
-          <option value="giordana">María Giordana Ortiz</option>
-        </select>
-        <label htmlFor="">Medio de atención</label>
-        <select
-          name="medio_atencion"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.medio_atencion}
-          disabled={editing}
-        >
-          <option value="">Seleccione el medio de atención</option>
-          <option value="presencial">Presencial</option>
-        </select>
-        <label htmlFor="">Tipo de solicitud</label>
-        <select
-          name="tipo_solicitud"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.tipo_solicitud}
-          disabled={editing}
-        >
-          <option value="">Seleccione tipo</option>
-          <option value="peticion">Petición</option>
-        </select>
-        <textarea
-          name="temas_atencion"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.temas_atencion}
-          disabled={editing}
-        ></textarea>
-        <label htmlFor="">Datos usuario</label>
-        <label htmlFor="">Rut usuario</label>
-        <input
-          type="text"
-          name="rut_solicitante"
-          onChange={handleChanges}
-          value={atenciones.rut_solicitante}
-          disabled={editing}
-        />
-        <label htmlFor="">Nombre solicitante</label>
-        <input
-          type="text"
-          name="nombre_solicitante"
-          onChange={handleChanges}
-          value={atenciones.nombre_solicitante}
-          disabled={editing}
-        />
-        <label htmlFor="">Teléfono</label>
-        <input
-          type="text"
-          name="telefono_solicitante"
-          onChange={handleChanges}
-          value={atenciones.telefono_solicitante}
-          disabled={editing}
-        />
-        <label htmlFor="">Correo eléctronico</label>
-        <input
-          type="email"
-          name="correo_solicitante"
-          onChange={handleChanges}
-          value={atenciones.correo_solicitante}
-          disabled={editing}
-        />
-        <label htmlFor="">Dirección</label>
-        <input
-          type="text"
-          name="direccion_solicitante"
-          onChange={handleChanges}
-          value={atenciones.direccion_solicitante}
-          disabled={editing}
-        />
-        <label htmlFor="">Sector</label>
-        <select
-          name="sector_solicitante"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.sector_solicitante}
-          disabled={editing}
-        >
-          <option value="">Seleccione sector</option>
-        </select>
-        <label htmlFor="">Población</label>
-        <select
-          name="poblacion_solicitante"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.poblacion_solicitante}
-          disabled={editing}
-        >
-          <option value="">Seleccione población</option>
-        </select>
-        <label htmlFor="">Junta de vecinos</label>
-        <select
-          name="junta_vecinos"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.junta_vecinos}
-          disabled={editing}
-        >
-          <option value="">Seleccione junta de vecinos</option>
-        </select>
-        <textarea
-          name="descripcion_solicitud"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.descripcion_solicitud}
-          disabled={editing}
-        ></textarea>
-        <textarea
-          name="observaciones_solicitud"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.observaciones_solicitud}
-          disabled={editing}
-        ></textarea>
-        <textarea
-          name="medidas_seguridad"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.medidas_seguridad}
-          disabled={editing}
-        ></textarea>
-        <textarea
-          name="espacios_publicos"
-          id=""
-          onChange={handleChanges}
-          value={atenciones.espacios_publicos}
-          disabled={editing}
-        ></textarea>
+      />*/}
 
-        {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
-        <button type="button" onClick={handleNewAten}>
-          Nuevo Expediente
-        </button>
-        <button
-          type="button"
-          onClick={handleEdit}
-          style={{ display: editing ? "" : "none" }}
-        >
-          Editar
-        </button>
-        <button type="submit" style={{ display: editing ? "none" : "" }}>
-          Guardar Informe
-        </button>
-        <button
-          type="button"
-          onClick={handleLastAten}
-          style={{ display: editing ? "none" : "" }}
-        >
-          Cancelar
-        </button>
-        <button type="button" onClick={handleDeleteAten}>
-          Eliminar
-        </button>
-      </form>
-      <div>
-        <BlobProvider document={<SCAtencionPDF />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando...</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Generar PDF
-              </button>
-            )
-          }
-        </BlobProvider>
+      <div className="row">
+        <div className="col-lg-7">
+          <div className="card shadow-sm mb-4">
+            <div className="card-header bg-success text-white d-flex justify-content-between">
+              <div>
+                <strong>Código atención: {atenciones.cod_atencion}</strong>
+              </div>
+            </div>
+            <div className="card-body">
+              <form onSubmit={handleSubmit} className="was-validated">
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <label className="form-label">Fecha Solicitud</label>
+                    <input
+                      type="datetime-local"
+                      className="form-control"
+                      name="fecha_solicitud"
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.fecha_solicitud}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Estado de la solicitud</label>
+                    <select
+                      className="form-select"
+                      name="estado_solicitud"
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.estado_solicitud}
+                      disabled={editing}
+                    >
+                      <option value="en proceso">En proceso</option>
+                      <option value="en seguimiento">En seguimiento</option>
+                      <option value="visitado">Visitado</option>
+                      <option value="atendido">Atendido</option>
+                      <option value="derivado">Derivado</option>
+                      <option value="desistido">Desistido</option>
+                      <option value="anulado">Anulado</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Responsable atención</label>
+                    <select
+                      name="responsable_solicitud"
+                      className="form-select"
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.responsable_solicitud}
+                      disabled={editing}
+                    >
+                      <option value="">Seleccione responsable</option>
+                      <option value="giordana">María Giordana Ortiz</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Medio de atención</label>
+                    <select
+                      name="medio_atencion"
+                      className="form-select"
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.medio_atencion}
+                      disabled={editing}
+                    >
+                      <option value="">Seleccione el medio de atención</option>
+                      <option value="">Seleccione opción</option>
+                      <option value="CCSP">CCSP</option>
+                      <option value="e-mail">E-mail</option>
+                      <option value="memorandum">Memorandum/Oficio</option>
+                      <option value="presencial">Presencial</option>
+                      <option value="radio">Radio</option>
+                      <option value="reunion">Reunión Oficina</option>
+                      <option value="rrss">RRSS</option>
+                      <option value="telefono">Teléfono</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Tipo de solicitud</label>
+                    <select
+                      className="form-select"
+                      name="tipo_solicitud"
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.tipo_solicitud}
+                      disabled={editing}
+                    >
+                      <option value="">Seleccione tipo</option>
+                      <option value="asesoria">Asesoría</option>
+                      <option value="consulta">Consulta información</option>
+                      <option value="denuncia">Denuncia</option>
+                      <option value="mesa trabajo">Mesa de trabajo</option>
+                      <option value="peticion">Petición</option>
+                      <option value="prevencion">Prevención situacional</option>
+                      <option value="propuesta">Propuesta</option>
+                      <option value="queja">Queja</option>
+                      <option value="reclamo">Reclamo</option>
+                      <option value="sugerencia">Sugerencia</option>
+                      <option value="tramite">Trámite</option>
+                    </select>
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label">Temas de la atención</label>
+                    <textarea
+                      name="temas_atencion"
+                      className="form-control"
+                      rows="3"
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.temas_atencion}
+                      disabled={editing}
+                    ></textarea>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label">Rut usuario</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="rut_solicitante"
+                      onChange={handleChanges}
+                      value={atenciones.rut_solicitante}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Nombre solicitante</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="nombre_solicitante"
+                      onChange={handleChanges}
+                      value={atenciones.nombre_solicitante}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Teléfono</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="telefono_solicitante"
+                      onChange={handleChanges}
+                      value={atenciones.telefono_solicitante}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Correo eléctronico</label>
+                    <input
+                      className="form-control"
+                      type="email"
+                      name="correo_solicitante"
+                      onChange={handleChanges}
+                      value={atenciones.correo_solicitante}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Dirección</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="direccion_solicitante"
+                      onChange={handleChanges}
+                      value={atenciones.direccion_solicitante}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Sector</label>
+                    <SelectSector
+                      {...{
+                        selectedSector,
+                        setSelectedSector,
+                        edition: editing,
+                      }}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Población</label>
+                    <SelectPoblacion
+                      {...{ selectedPobla, setSelectedPobla, edition: editing }}
+                    />
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">
+                      Descripcion de la solicitud
+                    </label>
+                    <textarea
+                      className="form-control"
+                      rows={3}
+                      name="descripcion_solicitud"
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.descripcion_solicitud}
+                      disabled={editing}
+                    ></textarea>
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">Observaciones</label>
+                    <textarea
+                      className="form-control"
+                      name="observaciones_solicitud"
+                      rows={3}
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.observaciones_solicitud}
+                      disabled={editing}
+                    ></textarea>
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label">
+                      Medidas de seguridad implementadas
+                    </label>
+                    <textarea
+                      className="form-control"
+                      name="medidas_seguridad"
+                      rows={3}
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.medidas_seguridad}
+                      disabled={editing}
+                    ></textarea>
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">
+                      Espacios públicos involucrados
+                    </label>
+                    <textarea
+                      className="form-control"
+                      name="espacios_publicos"
+                      rows={3}
+                      id=""
+                      onChange={handleChanges}
+                      value={atenciones.espacios_publicos}
+                      disabled={editing}
+                    ></textarea>
+                  </div>
+                </div>
+
+                {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+                <div className="d-flex flex-wrap gap-2 mt-4">
+                  {!editing && (
+                    <div className="d-flex flex-wrap gap-2 mt-4">
+                      <button type="submit" className="btn btn-primary">
+                        <i className="bi bi-save"></i> Guardar Informe
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="btn btn-danger"
+                      >
+                        <i className="bi bi-x-octagon"></i> Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </form>
+              {editing && (
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    className="btn btn-success"
+                    type="button"
+                    onClick={handleNewAten}
+                  >
+                    <i className="bi bi-clipboard2-plus"></i> Nueva atención
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleEdit}
+                  >
+                    <i className="bi bi-pencil-square"></i> Editar
+                  </button>
+
+                  <button
+                    className="btn btn-danger"
+                    type="button"
+                    onClick={handleDeleteAten}
+                  >
+                    <i className="bi bi-trash"></i> Eliminar
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="card-footer text-end">
+              {editing && (
+                <button className="btn btn-danger">
+                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+        {params.id ? (
+          <>
+            <div className="col-lg-5">
+              <FormAcciones tipo={"seguridad"} />
+            </div>
+          </>
+        ) : (
+          ""
+        )}
       </div>
 
-      {params.id ? (
-        <div>
-          <AttachFiles />
-          <FormAcciones tipo={"seguridad"} />{" "}
-        </div>
-      ) : (
-        ""
-      )}
+      <div className="row mt-4">
+        <AttachFiles />{" "}
+      </div>
     </div>
   );
 }
