@@ -198,8 +198,8 @@ router.get("/datos_tipo_vehi", getTipoVehi);
 
 router.get(
   "/glosas",
-  verifyToken,
-  verifyGroup("superadmin", "inspeccion", "noinspeccion"),
+  //verifyToken,
+  //verifyGroup("superadmin", "inspeccion", "noinspeccion"),
   getGlosaLey
 );
 

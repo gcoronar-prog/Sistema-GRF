@@ -22,30 +22,101 @@ import {
   getAccionesId,
   updateAccion,
 } from "../controllers/acciones.controller.js";
+import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 
 const router = Router();
 
-router.get("/atenciones/sgc", getAtenciones);
-router.get("/atenciones/:id/sgc", getAtencion);
-router.post("/atenciones/sgc", createAtencion);
-router.put("/atenciones/:id/sgc", updateAtencion);
-router.delete("/atenciones/:id/sgc", deleteAtencion);
+router.get(
+  "/atenciones/sgc",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  getAtenciones
+);
+router.get(
+  "/atenciones/:id",
+  //verifyToken,
+  //verifyGroup("superadmin", "seguridad"),
+  getAtencion
+);
+router.post(
+  "/atenciones/sgc",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  createAtencion
+);
+router.put(
+  "/atenciones/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  updateAtencion
+);
+router.delete(
+  "/atenciones/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  deleteAtencion
+);
 
 router.get("/atenciones/sgc/last", getLastAtencion);
 router.get("/atenciones/sgc/first", getFirstAtencion);
 router.get("/atenciones/:id/sgc/prev", getPrevAtencion);
 router.get("/atenciones/:id/sgc/next", getNextAtencion);
 
-router.get("/fileAttach", getArchivosAten);
-router.get("/fileAttach/:id", findArchivosAten);
-router.post("/fileAttach", createArchivoAten);
-router.delete("/fileAttach/:id", deleteArchivoAten);
+router.get(
+  "/fileAttach",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  getArchivosAten
+);
+router.get(
+  "/fileAttach/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  findArchivosAten
+);
+router.post(
+  "/fileAttach",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  createArchivoAten
+);
+router.delete(
+  "/fileAttach/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  deleteArchivoAten
+);
 
-router.get("/acciones/seguridad", getAcciones);
-router.get("/acciones/seguridad/:id", getAccionesId);
-router.post("/acciones/seguridad/:id", createAccion);
-router.put("/acciones/seguridad/:id", updateAccion);
-router.delete("/acciones/seguridad/:id", deleteAccion);
+router.get(
+  "/acciones/seguridad",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  getAcciones
+);
+router.get(
+  "/acciones/seguridad/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  getAccionesId
+);
+router.post(
+  "/acciones/seguridad/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  createAccion
+);
+router.put(
+  "/acciones/seguridad/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  updateAccion
+);
+router.delete(
+  "/acciones/seguridad/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  deleteAccion
+);
 
 router.get("/poblaciones", getPoblaciones);
 

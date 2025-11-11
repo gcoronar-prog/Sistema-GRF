@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AttachFiles from "../AttachFiles";
 import FormAcciones from "../FormAcciones";
@@ -47,15 +47,13 @@ function FormAtencion() {
   const params = useParams();
   const token = localStorage.getItem("token");
 
-  const [atenciones, setAtenciones] = useState({ defaultAtencion });
+  const [atenciones, setAtenciones] = useState(defaultAtencion);
   const [editing, setEditing] = useState(true);
   const [lastId, setLastId] = useState("");
   const [selectedSector, setSelectedSector] = useState(null);
   const [selectedPobla, setSelectedPobla] = useState(null);
 
   useEffect(() => {
-    console.log(params);
-    console.log(params.id);
     if (params.id) {
       loadAtenciones(params.id);
     } else {
@@ -64,7 +62,7 @@ function FormAtencion() {
   }, [params.id]);
 
   const loadAtenciones = async (id) => {
-    const res = await fetch(`${servidor}/atenciones/${id}/sgc`, {
+    const res = await fetch(`${servidor}/atenciones/${id}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -134,13 +132,17 @@ function FormAtencion() {
     try {
       const idAten = params.id;
       const url = idAten
-        ? `${servidor}/atenciones/${params.id}/sgc`
+        ? `${servidor}/atenciones/${params.id}`
         : `${servidor}/atenciones/sgc`;
       const method = idAten ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
         body: JSON.stringify(datosAtencion),
       });
       if (!res.ok) {
@@ -150,11 +152,11 @@ function FormAtencion() {
       const lastAtencionData = await fetch(`${servidor}/atenciones/sgc/last`);
 
       const lastAtencion = await lastAtencionData.json();
-      setLastId(lastAtencion.atencion_ciudadana[0].id_atencion);
+      setLastId(lastAtencion.atencion_ciudadana.id_atencion);
 
       if (lastAtencion && lastAtencion.atencion_ciudadana[0]) {
         const idAtencionFinal =
-          lastAtencion.atencion_ciudadana[0].atencion_ciudadana;
+          lastAtencion.atencion_ciudadana.atencion_ciudadana;
         navigate(`/sgc/atencion/${idAtencionFinal + 1}`);
       }
 
@@ -190,7 +192,7 @@ function FormAtencion() {
     if (res.ok) {
       const lastAten = await res.json();
       if (lastAten) {
-        const id_aten = lastAten.atencion_ciudadana[0].id_atencion;
+        const id_aten = lastAten.atencion_ciudadana.id_atencion;
         navigate(`/sgc/atencion/${id_aten}`);
       } else {
         console.log("No hay registros");
@@ -261,8 +263,11 @@ function FormAtencion() {
   };
 
   const handleNewAten = () => {
+    setSelectedPobla("");
+    setSelectedSector("");
     navigate("/sgc/atencion/new");
     setEditing(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleEdit = async () => {
@@ -274,7 +279,7 @@ function FormAtencion() {
     if (!eliminar) return;
 
     const id = params.id;
-    await fetch(`${servidor}/atenciones/${id}/sgc`, {
+    await fetch(`${servidor}/atenciones/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
@@ -299,7 +304,7 @@ function FormAtencion() {
             false
           }
         >
-          <i className="bi bi-skip-start me-1"></i> Primera solicitud
+          <i className="bi bi-skip-start me-1"></i> Primer registro
         </button>
         <button
           className="btn btn-outline-primary"
@@ -332,7 +337,7 @@ function FormAtencion() {
             //disabledNextButton
           }
         >
-          Último <i className="bi bi-skip-end ms-1"></i>
+          Último registro <i className="bi bi-skip-end ms-1"></i>
         </button>
       </div>
       {/* <input
@@ -455,7 +460,7 @@ function FormAtencion() {
                       id=""
                       onChange={handleChanges}
                       value={atenciones.temas_atencion}
-                      disabled={editing}
+                      readOnly={editing}
                     ></textarea>
                   </div>
 
@@ -467,7 +472,7 @@ function FormAtencion() {
                       name="rut_solicitante"
                       onChange={handleChanges}
                       value={atenciones.rut_solicitante}
-                      disabled={editing}
+                      readOnly={editing}
                     />
                   </div>
                   <div className="col-md-6">
@@ -478,7 +483,7 @@ function FormAtencion() {
                       name="nombre_solicitante"
                       onChange={handleChanges}
                       value={atenciones.nombre_solicitante}
-                      disabled={editing}
+                      readOnly={editing}
                     />
                   </div>
                   <div className="col-md-6">
@@ -489,7 +494,7 @@ function FormAtencion() {
                       name="telefono_solicitante"
                       onChange={handleChanges}
                       value={atenciones.telefono_solicitante}
-                      disabled={editing}
+                      readOnly={editing}
                     />
                   </div>
                   <div className="col-md-6">
@@ -500,7 +505,7 @@ function FormAtencion() {
                       name="correo_solicitante"
                       onChange={handleChanges}
                       value={atenciones.correo_solicitante}
-                      disabled={editing}
+                      readOnly={editing}
                     />
                   </div>
                   <div className="col-md-6">
@@ -511,7 +516,7 @@ function FormAtencion() {
                       name="direccion_solicitante"
                       onChange={handleChanges}
                       value={atenciones.direccion_solicitante}
-                      disabled={editing}
+                      readOnly={editing}
                     />
                   </div>
                   <div className="col-md-6">
@@ -541,7 +546,7 @@ function FormAtencion() {
                       id=""
                       onChange={handleChanges}
                       value={atenciones.descripcion_solicitud}
-                      disabled={editing}
+                      readOnly={editing}
                     ></textarea>
                   </div>
                   <div className="col-12">
@@ -553,7 +558,7 @@ function FormAtencion() {
                       id=""
                       onChange={handleChanges}
                       value={atenciones.observaciones_solicitud}
-                      disabled={editing}
+                      readOnly={editing}
                     ></textarea>
                   </div>
 
@@ -568,7 +573,7 @@ function FormAtencion() {
                       id=""
                       onChange={handleChanges}
                       value={atenciones.medidas_seguridad}
-                      disabled={editing}
+                      readOnly={editing}
                     ></textarea>
                   </div>
                   <div className="col-12">
@@ -582,7 +587,7 @@ function FormAtencion() {
                       id=""
                       onChange={handleChanges}
                       value={atenciones.espacios_publicos}
-                      disabled={editing}
+                      readOnly={editing}
                     ></textarea>
                   </div>
                 </div>
@@ -653,7 +658,7 @@ function FormAtencion() {
       </div>
 
       <div className="row mt-4">
-        <AttachFiles />{" "}
+        <AttachFiles idInforme={atenciones.cod_atencion} />
       </div>
     </div>
   );

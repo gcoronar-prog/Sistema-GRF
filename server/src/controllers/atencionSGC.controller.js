@@ -32,10 +32,39 @@ const getAtenciones = async (req, res) => {
   }
 };
 
+const getAtencion2 = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
+
+    await client.query("BEGIN");
+    const atencion = await client.query(
+      `
+      SELECT * FROM atencion_ciudadana ac
+      JOIN datos_atencion_usuario dau ON dau.id_atencion_usuarios=ac.id_atencion_usuario
+      JOIN datos_atencion_sector das ON das.id_atencion_sector=ac.id_atencion_sector
+      JOIN datos_atencion_solicitud daso ON daso.id_atencion_solicitud=ac.id_atencion_solicitud
+      JOIN datos_atencion_procesos dap ON dap.id_atencion_proceso=ac.id_atencion_proceso
+      WHERE ac.id_atencion_ciudadana=$1`,
+      [id]
+    );
+    await client.query("COMMIT");
+    return res.json({
+      atencion_ciudadana: atencion.rows,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ msg: "error de conexion con el servidor" });
+  } finally {
+    client.release();
+  }
+};
+
 const getAtencion = async (req, res) => {
   const client = await pool.connect();
   try {
     const { id } = req.params;
+
     await client.query("BEGIN");
     const atencion = await client.query(
       "SELECT * FROM atencion_ciudadana WHERE id_atencion = $1",
@@ -67,6 +96,7 @@ const getAtencion = async (req, res) => {
     ]);
 
     await client.query("COMMIT");
+    console.log("backend", atencion.rows);
     return res.json({
       atencion_ciudadana: atencion.rows,
       usuario: usuario.rows,
@@ -345,11 +375,11 @@ const getLastAtencion = async (req, res) => {
     await client.query("COMMIT");
 
     return res.json({
-      atencion_ciudadana: atencion.rows,
-      usuario: usuario.rows,
-      sector: sector.rows,
-      proceso: proceso.rows,
-      solicitud: solicitud.rows,
+      atencion_ciudadana: atencion.rows[0],
+      usuario: usuario.rows[0],
+      sector: sector.rows[0],
+      proceso: proceso.rows[0],
+      solicitud: solicitud.rows[0],
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -536,6 +566,7 @@ const getArchivosAten = async (req, res) => {
 const findArchivosAten = async (id) => {
   try {
     //const { id } = req.params;
+
     const { rows } = await pool.query(
       "SELECT * FROM doc_adjuntos WHERE id_atencion=($1)",
       [id]
@@ -567,18 +598,13 @@ const findArchivosByIdAten = async (id) => {
 
 const createArchivoAten = async (fileUrl, idAtencion) => {
   try {
-    /*const data = req.body;*/
+    console.log("id atencion: ", idAtencion);
     const { rows } = await pool.query(
       "INSERT INTO doc_adjuntos (path_document,id_atencion) VALUES ($1,$2) RETURNING *",
       [fileUrl, idAtencion]
     );
-
-    /* return res.json(rows[0]).json({ message: "Archivo subido" });*/
     return rows[0];
   } catch (error) {
-    /* return res
-        .status(500)
-        .json({ message: "Error de conexión con el servidor" });*/
     console.log(error);
   }
 };

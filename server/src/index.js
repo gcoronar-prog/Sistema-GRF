@@ -79,13 +79,14 @@ app.use(
 app.post(
   "/api/upload/:entityType/:id",
   verifyToken,
-  verifyGroup("superadmin", "central", "inspeccion"),
+  verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
   upload.single("image"),
   async (req, res) => {
     const { entityType, id } = req.params;
 
     // Registro del valor de entityType
     console.log("Entity Type recibido:", entityType);
+    console.log("id recibido:", id);
 
     if (!req.file) {
       return res
@@ -100,19 +101,16 @@ app.post(
 
       switch (entityType) {
         case "informes":
-          console.log("Procesando para: informes");
           result = await createArchivo(fileUrl, id);
           break;
         case "inspect":
-          console.log("Procesando para: inspect");
           result = await createArchivoExp(fileUrl, id);
+
           break;
         case "atencion":
-          console.log("Procesando para: atencion");
-          result = await createArchivoAten(fileUrl, "SGC" + id);
+          result = await createArchivoAten(fileUrl, id);
           break;
         default:
-          console.log("Tipo de entidad no válido:", entityType);
           return res.status(400).json({ message: "Tipo de entidad no válido" });
       }
 
@@ -133,7 +131,7 @@ app.post(
 app.get(
   "/api/imagenes/:entityType/:id",
   verifyToken,
-  verifyGroup("superadmin", "central", "inspeccion"),
+  verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
   async (req, res) => {
     const { entityType, id } = req.params;
     console.log(`Buscando imágenes con ID: ${id}`);
@@ -201,7 +199,7 @@ app.get("/api/galeria/:entityType/:id", async (req, res) => {
 app.delete(
   "/api/galeria/:entityType/:id",
   verifyToken,
-  verifyGroup("superadmin", "central", "inspeccion"),
+  verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
   deleteArchivo
 );
 

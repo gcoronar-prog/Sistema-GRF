@@ -403,7 +403,7 @@ const getTipoVehi = async (req, res) => {
 const getGlosaLey = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM glosas_ley ORDER BY glosa ASC"
+      "SELECT * FROM glosas_ley ORDER BY glosa_ley ASC"
     );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No existen registros" });
