@@ -45,12 +45,18 @@ const getAtencion2 = async (req, res) => {
       JOIN datos_atencion_sector das ON das.id_atencion_sector=ac.id_atencion_sector
       JOIN datos_atencion_solicitud daso ON daso.id_atencion_solicitud=ac.id_atencion_solicitud
       JOIN datos_atencion_procesos dap ON dap.id_atencion_proceso=ac.id_atencion_proceso
-      WHERE ac.id_atencion_ciudadana=$1`,
+      WHERE ac.id_atencion=$1`,
       [id]
+    );
+
+    const accion_seg = await client.query(
+      "SELECT * FROM acciones WHERE cod_document=$1",
+      ["SGC" + id]
     );
     await client.query("COMMIT");
     return res.json({
       atencion_ciudadana: atencion.rows,
+      acciones: accion_seg.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -665,4 +671,5 @@ export {
   createArchivoAten,
   deleteArchivoAten,
   getPoblaciones,
+  getAtencion2,
 };

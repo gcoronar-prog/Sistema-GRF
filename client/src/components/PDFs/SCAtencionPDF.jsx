@@ -3,10 +3,11 @@ import { autoTable } from "jspdf-autotable";
 
 const SCAtencionPDF = async (id) => {
   const response = await fetch(
-    `${import.meta.env.VITE_SERVER_ROUTE_BACK}/atenciones/${id}`
+    `${import.meta.env.VITE_SERVER_ROUTE_BACK}/aten/sgc/${id}`
   );
   const data = await response.json();
-  const expediente = data.atencion[0];
+  const atenc_segciud = data.atencion_ciudadana[0];
+  const acciones = data.acciones;
 
   const doc = new jsPDF();
 
@@ -57,14 +58,13 @@ const SCAtencionPDF = async (id) => {
   addHeader("Expediente Inspección Municipal", "Datos generales");
 
   const rows = [
-    ["N° Boleta/Control", expediente.num_control],
-    ["Fecha documento", formatDate(expediente.fecha_documento)],
-    ["Fecha cierre documento", formatDate(expediente.fecha_resolucion)],
-    ["Estado", expediente.estado_exp || "-"],
-    ["Juzgado", expediente.juzgado || "-"],
+    ["Fecha de solicitud/atención", formatDate(atenc_segciud.fecha_solicitud)],
+    ["Responsable solicitud", atenc_segciud.responsable_solicitud || "-"],
+    ["Modalidad de atención", atenc_segciud.medio_atencion || "-"],
+    ["Tema atención", atenc_segciud.tema_atencion || "-"],
     [
       {
-        content: "Datos contribuyente",
+        content: "Datos usuario",
         colSpan: 2,
         styles: {
           fontStyle: "bolditalic",
@@ -74,15 +74,21 @@ const SCAtencionPDF = async (id) => {
         },
       },
     ],
-    ["Rut Contribuyente", expediente.rut_contri || "-"],
-    ["Nombre Contribuyente", expediente.nombre || "-"],
-    ["Rol Contribuyente", expediente.rol_contri || "-"],
-    ["Giro Contribuyente", expediente.giro_contri || "-"],
-    ["Dirección Contribuyente", expediente.direccion || "-"],
+    ["Nombre usuario", atenc_segciud.nombre_solicitante || "-"],
+    ["Rut usuario", atenc_segciud.rut_solicitante || "-"],
+    ["Teléfono", atenc_segciud.telefono_solicitante || "-"],
+    ["E-mail", atenc_segciud.correo_solicitante || "-"],
+    ["Dirección residencia", atenc_segciud.direccion_solicitante || "-"],
+    ["Sector", atenc_segciud.sector_solicitante.label || "-"],
+    ["Población", atenc_segciud.poblacion_solicitante.label || "-"],
+    ["JJ.VV", atenc_segciud.junta_vecinos.label || "-"],
+  ];
+
+  const rows3 = [
     [
       {
-        content: "Datos Infracción",
-        colSpan: 2,
+        content: "Detalles Solicitud",
+        colSpan: 1,
         styles: {
           fontStyle: "bolditalic",
           fontSize: 14,
@@ -91,18 +97,10 @@ const SCAtencionPDF = async (id) => {
         },
       },
     ],
-    ["Fecha de infracción", formatDate(expediente.fecha_infraccion) || "-"],
-    ["Dirección infracción", expediente.direccion_infraccion || "-"],
-    ["Sector infracción", expediente.sector_infraccion || "-"],
-    ["Observaciones", expediente.observaciones || "-"],
-    [
-      "Fecha de citación",
-      formatDate(expediente.fecha_citacion) != null
-        ? formatDate(expediente.fecha_citacion)
-        : "-",
-    ],
-    ["Ley que se aplica", expediente.ley || "-"],
-    ["Glosa de ley", expediente.glosa_ley || "-"],
+    ["Descripción de la solicitud"],
+    [atenc_segciud.descripcion_solicitud || "-"],
+    ["Observaciones"],
+    [atenc_segciud.observaciones_solicitud || "-"],
   ];
 
   autoTable(doc, {
@@ -110,7 +108,7 @@ const SCAtencionPDF = async (id) => {
     head: [
       [
         {
-          content: "Datos de Expediente cód. " + expediente.id_expediente,
+          content: "Datos de Solicitud cód. " + atenc_segciud.cod_atencion,
           colSpan: 2,
           styles: { fontStyle: "bold", fontSize: 14 },
         },
@@ -123,21 +121,28 @@ const SCAtencionPDF = async (id) => {
     margin: { left: margin, right: margin },
   });
 
+  autoTable(doc, {
+    body: rows3,
+    styles: { fontSize: 12, cellPadding: 3, lineWidth: 0.3 },
+    headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    margin: { left: margin, right: margin },
+  });
+
   const rows1 = [
-    ["PPU", expediente.ppu || "-"],
-    ["Marca", expediente.marca_vehi || "-"],
-    ["Tipo", expediente.tipo_vehi || "-"],
-    ["Color", expediente.color_vehi || "-"],
+    ["Código acción", acciones[0].cod_accion || "-"],
+    ["Fecha y hora", formatDate(acciones[0].fecha_accion) || "-"],
+    ["Descripción", acciones[0].desc_acciones || "-"],
   ];
-  if (expediente.ppu && expediente.ppu.length > 0) {
+  if (acciones && acciones.length > 0) {
     doc.addPage();
-    addHeader("Expediente Inspección Municipal", "Datos Vehiculo");
+    addHeader("Acciones realizadas", "");
     autoTable(doc, {
       startY: 30,
       head: [
         [
           {
-            content: "Datos vehículo de contribuyente",
+            content: "Acciones",
             colSpan: 2,
             styles: { fontStyle: "bold", fontSize: 14 },
           },
@@ -145,7 +150,11 @@ const SCAtencionPDF = async (id) => {
       ],
       body: rows1,
       styles: { fontSize: 12, cellPadding: 3, lineWidth: 0.3 },
-      headStyles: { fillColor: [44, 62, 80], textColor: 255, halign: "center" },
+      headStyles: {
+        fillColor: [39, 174, 96],
+        textColor: 255,
+        halign: "center",
+      },
       alternateRowStyles: { fillColor: [245, 245, 245] },
       margin: { left: margin, right: margin },
     });
@@ -153,31 +162,6 @@ const SCAtencionPDF = async (id) => {
 
   addFooter();
   doc.output("dataurlnewwindow");
-  /* 
-  codigo reporte
-  fecha y hora
-  turno (pendiente)
-  centralista (pendiente)
-  
-  clasificacion
-  fuente de captura
-  origen
-  informante
-  vehiculo si es que hay
-  tripulantes si es que hay
-  tipo de reporte
-  direccion
-  sector
-  tipo de ubicacion 
-  descripcion
-  
-  recursos involucrados
-  otros recursos si es que hay
-  resolucion (pendiente)
-
-  acciones si es que aparecen
-  
-  */
 };
 
 export default SCAtencionPDF;

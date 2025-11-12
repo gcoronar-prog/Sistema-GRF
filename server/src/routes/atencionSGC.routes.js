@@ -7,6 +7,7 @@ import {
   findArchivosAten,
   getArchivosAten,
   getAtencion,
+  getAtencion2,
   getAtenciones,
   getFirstAtencion,
   getLastAtencion,
@@ -27,6 +28,13 @@ import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 const router = Router();
 
 router.get(
+  "/aten/sgc/:id",
+  //verifyToken,
+  //verifyGroup("superadmin", "seguridad"),
+  getAtencion2
+);
+
+router.get(
   "/atenciones/sgc",
   verifyToken,
   verifyGroup("superadmin", "seguridad"),
@@ -34,8 +42,8 @@ router.get(
 );
 router.get(
   "/atenciones/:id",
-  //verifyToken,
-  //verifyGroup("superadmin", "seguridad"),
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
   getAtencion
 );
 router.post(

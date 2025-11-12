@@ -281,7 +281,10 @@ function FormAtencion() {
     const id = params.id;
     await fetch(`${servidor}/atenciones/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
     const updatedAten = { ...atenciones };
     delete updatedAten[id];
@@ -289,7 +292,7 @@ function FormAtencion() {
 
     const res = await fetch(`${servidor}/atenciones/sgc/last`);
     const data = await res.json();
-    navigate(`/sgc/atencion/${data.atencion_ciudadana[0].id_atencion}`);
+    navigate(`/sgc/atencion/${data.atencion_ciudadana.id_atencion}`);
   };
 
   return (
@@ -368,6 +371,7 @@ function FormAtencion() {
                       onChange={handleChanges}
                       value={atenciones.fecha_solicitud}
                       disabled={editing}
+                      required
                     />
                   </div>
                   <div className="col-md-6">
@@ -379,7 +383,9 @@ function FormAtencion() {
                       onChange={handleChanges}
                       value={atenciones.estado_solicitud}
                       disabled={editing}
+                      required
                     >
+                      <option value="">Seleccione estado</option>
                       <option value="en proceso">En proceso</option>
                       <option value="en seguimiento">En seguimiento</option>
                       <option value="visitado">Visitado</option>
@@ -399,6 +405,7 @@ function FormAtencion() {
                       onChange={handleChanges}
                       value={atenciones.responsable_solicitud}
                       disabled={editing}
+                      required
                     >
                       <option value="">Seleccione responsable</option>
                       <option value="giordana">María Giordana Ortiz</option>
@@ -413,6 +420,7 @@ function FormAtencion() {
                       onChange={handleChanges}
                       value={atenciones.medio_atencion}
                       disabled={editing}
+                      required
                     >
                       <option value="">Seleccione el medio de atención</option>
                       <option value="">Seleccione opción</option>
@@ -435,6 +443,7 @@ function FormAtencion() {
                       onChange={handleChanges}
                       value={atenciones.tipo_solicitud}
                       disabled={editing}
+                      required
                     >
                       <option value="">Seleccione tipo</option>
                       <option value="asesoria">Asesoría</option>
@@ -484,6 +493,7 @@ function FormAtencion() {
                       onChange={handleChanges}
                       value={atenciones.nombre_solicitante}
                       readOnly={editing}
+                      required
                     />
                   </div>
                   <div className="col-md-6">
@@ -639,7 +649,10 @@ function FormAtencion() {
             </div>
             <div className="card-footer text-end">
               {editing && (
-                <button className="btn btn-danger">
+                <button
+                  className="btn btn-danger"
+                  onClick={() => SCAtencionPDF(params.id)}
+                >
                   <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
                 </button>
               )}
