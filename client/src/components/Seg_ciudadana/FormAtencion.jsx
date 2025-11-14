@@ -9,6 +9,7 @@ import SelectSector from "../SelectSector";
 import { jwtDecode } from "jwt-decode";
 import { useTokenSession } from "../useTokenSession";
 import SelectPoblacion from "../SelectPoblacion";
+import SelectJJVV from "../SelectJJVV";
 
 function FormAtencion() {
   const defaultAtencion = {
@@ -52,6 +53,7 @@ function FormAtencion() {
   const [lastId, setLastId] = useState("");
   const [selectedSector, setSelectedSector] = useState(null);
   const [selectedPobla, setSelectedPobla] = useState(null);
+  const [selectedJJVV, setSelectedJJVV] = useState(null);
 
   useEffect(() => {
     if (params.id) {
@@ -87,7 +89,7 @@ function FormAtencion() {
       direccion_solicitante: data.sector[0].direccion_solicitante,
       //sector_solicitante: data.sector[0].sector_solicitante,
       //poblacion_solicitante: data.sector[0].poblacion_solicitante,
-      junta_vecinos: data.sector[0].junta_vecinos,
+      // junta_vecinos: data.sector[0].junta_vecinos,
 
       //solicitud
       descripcion_solicitud: data.solicitud[0].descripcion_solicitud,
@@ -105,6 +107,7 @@ function FormAtencion() {
     });
     setSelectedSector(data.sector[0].sector_solicitante);
     setSelectedPobla(data.sector[0].poblacion_solicitante);
+    setSelectedJJVV(data.sector[0].junta_vecinos);
   };
 
   const handleChanges = async (e) => {
@@ -122,10 +125,12 @@ function FormAtencion() {
 
     const sectorFormateado = JSON.stringify(selectedSector);
     const poblaFormateada = JSON.stringify(selectedPobla);
+    const jjvvFormateada = JSON.stringify(selectedJJVV);
     const datosAtencion = {
       ...atenciones,
       sector_solicitante: sectorFormateado,
       poblacion_solicitante: poblaFormateada,
+      junta_vecinos: jjvvFormateada,
       user_creador: user_decoded,
     };
 
@@ -153,8 +158,7 @@ function FormAtencion() {
 
       const lastAtencion = await lastAtencionData.json();
       setLastId(lastAtencion.atencion_ciudadana.id_atencion);
-
-      if (lastAtencion && lastAtencion.atencion_ciudadana[0]) {
+      if (lastAtencion && lastAtencion.atencion_ciudadana) {
         const idAtencionFinal =
           lastAtencion.atencion_ciudadana.atencion_ciudadana;
         navigate(`/sgc/atencion/${idAtencionFinal + 1}`);
@@ -163,6 +167,7 @@ function FormAtencion() {
       const metodo = idAten ? "" : `/sgc/atencion/${lastId + 1}`;
       navigate(metodo);
       setEditing(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       console.error(error);
       return res
@@ -265,6 +270,7 @@ function FormAtencion() {
   const handleNewAten = () => {
     setSelectedPobla("");
     setSelectedSector("");
+    setSelectedJJVV("");
     navigate("/sgc/atencion/new");
     setEditing(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -272,6 +278,7 @@ function FormAtencion() {
 
   const handleEdit = async () => {
     setEditing(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteAten = async () => {
@@ -293,6 +300,7 @@ function FormAtencion() {
     const res = await fetch(`${servidor}/atenciones/sgc/last`);
     const data = await res.json();
     navigate(`/sgc/atencion/${data.atencion_ciudadana.id_atencion}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -543,6 +551,12 @@ function FormAtencion() {
                     <label className="form-label">Población</label>
                     <SelectPoblacion
                       {...{ selectedPobla, setSelectedPobla, edition: editing }}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Junta de vecinos</label>
+                    <SelectJJVV
+                      {...{ selectedJJVV, setSelectedJJVV, edition: editing }}
                     />
                   </div>
                   <div className="col-12">

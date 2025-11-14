@@ -655,6 +655,19 @@ const getPoblaciones = async (req, res) => {
   }
 };
 
+const getJuntaVecinos = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM juntas_vecinos ORDER BY nombre_jjvv ASC"
+    );
+    return res.json(rows);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error de conexión con el servidor" });
+  }
+};
+
 export {
   getAtenciones,
   createAtencion,
@@ -672,4 +685,5 @@ export {
   deleteArchivoAten,
   getPoblaciones,
   getAtencion2,
+  getJuntaVecinos,
 };

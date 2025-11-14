@@ -10,6 +10,7 @@ import {
   getAtencion2,
   getAtenciones,
   getFirstAtencion,
+  getJuntaVecinos,
   getLastAtencion,
   getNextAtencion,
   getPoblaciones,
@@ -127,5 +128,6 @@ router.delete(
 );
 
 router.get("/poblaciones", getPoblaciones);
+router.get("/jjvv", getJuntaVecinos);
 
 export default router;

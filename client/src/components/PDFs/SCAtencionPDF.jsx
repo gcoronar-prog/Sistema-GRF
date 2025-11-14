@@ -97,10 +97,13 @@ const SCAtencionPDF = async (id) => {
         },
       },
     ],
-    ["Descripción de la solicitud"],
-    [atenc_segciud.descripcion_solicitud || "-"],
-    ["Observaciones"],
-    [atenc_segciud.observaciones_solicitud || "-"],
+
+    [
+      "Descripción de la solicitud: " + atenc_segciud.descripcion_solicitud ||
+        "-",
+    ],
+
+    ["Observaciones: " + atenc_segciud.observaciones_solicitud || "-"],
   ];
 
   autoTable(doc, {

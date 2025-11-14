@@ -97,6 +97,9 @@ function NavbarSGF() {
       case "usercentral":
         navigate("/home/central");
         break;
+      case "userseguridad":
+        navigate("/home/segciudadana");
+        break;
       case "superadmin":
         navigate("/home/admin");
         break;
@@ -219,20 +222,21 @@ function NavbarSGF() {
                 <>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleLastAtencion}>
-                      <i className="bi bi-person-arms-up me-1">
-                        Atención público
-                      </i>
+                      <i className="bi bi-person-arms-up me-1"></i>
+                      Atención público
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <i className="bi bi-camera-video-fill me-1">
+                    <Link className="nav-link">
+                      <i className="bi bi-camera-video-fill me-1"></i>
                       Solicitud imágenes
-                    </i>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <i className="bi bi-bar-chart me-1">
+                    <Link className="nav-link">
+                      <i className="bi bi-bar-chart me-1"></i>
                       Estadisticas Seguridad Ciudadana
-                    </i>
+                    </Link>
                   </li>
                 </>
               )}
