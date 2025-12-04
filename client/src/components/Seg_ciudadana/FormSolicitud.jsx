@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BlobProvider } from "@react-pdf/renderer";
 import SGCImagenPDF from "../PDFs/SGCImagenPDF";
+import SelectSector from "../SelectSector";
 
 function FormSolicitud() {
   const navigate = useNavigate();
   const params = useParams();
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const defaultSolicitudes = {
     //denuncia usuario
     entidad: "",
@@ -35,17 +37,26 @@ function FormSolicitud() {
   const [solicitudes, setSolicitudes] = useState({ defaultSolicitudes });
   const [lastId, setLastId] = useState("");
   const [editing, setEditing] = useState(true);
+  const [selectedSector, setSelectedSector] = useState(null);
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (params.id) {
       loadImagenes(params.id);
     } else {
       setSolicitudes(defaultSolicitudes);
+      setSelectedSector("");
     }
   }, [params.id]);
 
   const loadImagenes = async (id) => {
-    const res = await fetch(`${servidor}/imagenes/seg/${id}/edit`);
+    const res = await fetch(`${servidor}/imagenes/seg/${id}/edit`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
 
@@ -58,6 +69,9 @@ function FormSolicitud() {
     ).format("YYYY-MM-DDTHH:mm");
 
     setSolicitudes({
+      //solicitud
+      cod_solicitud: data.solicitud[0].cod_solicitud,
+
       //denuncia usuario
       entidad: data.soliDenuncia[0].entidad,
       num_parte: data.soliDenuncia[0].num_parte,
@@ -66,7 +80,7 @@ function FormSolicitud() {
       descripcion_solicitud: data.soliGrabacion[0].descripcion_solicitud,
       fecha_siniestro: formattedFecha,
       direccion_solicitud: data.soliGrabacion[0].direccion_solicitud,
-      sector_solicitud: data.soliGrabacion[0].sector_solicitud,
+      // sector_solicitud: data.soliGrabacion[0].sector_solicitud,
       estado_solicitud: data.soliGrabacion[0].estado_solicitud,
 
       //datos responsable
@@ -81,6 +95,7 @@ function FormSolicitud() {
       telefono_solicitante: data.soliUsuarios[0].telefono_solicitante,
       e_mail_solicitante: data.soliUsuarios[0].e_mail_solicitante,
     });
+    setSelectedSector(data.soliGrabacion[0].sector_solicitud);
   };
 
   const handleChanges = (e) => {
@@ -98,11 +113,15 @@ function FormSolicitud() {
         : `${servidor}/imagenes/seg/new`;
 
       const method = params.id ? "PUT" : "POST";
-
+      const solicitudIMG = { ...solicitudes, sector_solicitud: selectedSector };
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(solicitudes),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify(solicitudIMG),
       });
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
@@ -233,7 +252,10 @@ function FormSolicitud() {
     const id = params.id;
     await fetch(`${servidor}/imagenes/seg/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
     const updatedSoli = { ...solicitudes };
     delete updatedSoli[id];
@@ -245,255 +267,370 @@ function FormSolicitud() {
   };
 
   return (
-    <div>
-      <button
-        type="button"
-        onClick={handleFirstSoli}
-        disabled={
-          //disabledPrevButton
-          false
-        }
-      >
-        Primera solicitud
-      </button>
-      <button
-        type="button"
-        onClick={handlePrevious}
-        disabled={
-          //disabledPrevButton
-          false
-        }
-      >
-        Atras
-      </button>
-      <button
-        type="button"
-        onClick={handleNext}
-        disabled={
-          //disabledNextButton
-          false
-        }
-      >
-        Siguiente
-      </button>
-      <button
-        type="button"
-        onClick={handleLastSoli}
-        disabled={
-          false
-          //disabledNextButton
-        }
-      >
-        Ultimo
-      </button>
-
-      <form action="" onSubmit={handleSubmit}>
-        <label htmlFor="">Datos Solicitante</label>
-        <label htmlFor="">Fecha de solicitud</label>
-        <input
-          type="datetime-local"
-          name="fecha_solicitud"
-          value={solicitudes.fecha_solicitud}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Rut Solicitante</label>
-        <input
-          type="text"
-          name="rut_solicitante"
-          value={solicitudes.rut_solicitante}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Nombre del solicitante</label>
-        <input
-          type="text"
-          name="nombre_solicitante"
-          value={solicitudes.nombre_solicitante}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Teléfono solicitante</label>
-        <input
-          type="text"
-          name="telefono_solicitante"
-          value={solicitudes.telefono_solicitante}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">E-mail solicitante</label>
-        <input
-          type="email"
-          name="e_mail_solicitante"
-          value={solicitudes.e_mail_solicitante}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Datos Responsable</label>
-        <label htmlFor="">Nombre Responsable</label>
-        <input
-          type="text"
-          name="nombre_responsable"
-          value={solicitudes.nombre_responsable}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Institución</label>
-        <input
-          type="text"
-          name="institucion"
-          value={solicitudes.institucion}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Rut Responsable</label>
-        <input
-          type="text"
-          name="rut_responsable"
-          value={solicitudes.rut_responsable}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Datos solicitud</label>
-        <label htmlFor="">Descripción de la solicitud</label>
-        <textarea
-          name="descripcion_solicitud"
-          id=""
-          value={solicitudes.descripcion_solicitud}
-          onChange={handleChanges}
-          disabled={editing}
-        ></textarea>
-        <label htmlFor="">Fecha solicitada</label>
-        <input
-          type="datetime-local"
-          name="fecha_siniestro"
-          value={solicitudes.fecha_siniestro}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Dirección</label>
-        <input
-          type="text"
-          name="direccion_solicitud"
-          value={solicitudes.direccion_solicitud}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Sector</label>
-        <select
-          name="sector_solicitud"
-          id=""
-          value={solicitudes.sector_solicitud}
-          onChange={handleChanges}
-          disabled={editing}
-        >
-          <option value="">Seleccione Sector</option>
-          <option value="Barrancas">Barrancas</option>
-          <option value="San Antonio">San Antonio</option>
-        </select>
-
-        <label htmlFor="">Estado de la solicitud</label>
-        <input
-          type="radio"
-          name="estado_solicitud"
-          id="pendiente"
-          value={"Pendiente"}
-          checked={solicitudes.estado_solicitud === "Pendiente"}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="pendiente">Pendiente</label>
-        <input
-          type="radio"
-          name="estado_solicitud"
-          id="revision"
-          value={"Revisión"}
-          checked={solicitudes.estado_solicitud === "Revisión"}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="revision">Revisión</label>
-        <input
-          type="radio"
-          name="estado_solicitud"
-          id="entregada"
-          value={"Entregada"}
-          checked={solicitudes.estado_solicitud === "Entregada"}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="entregada">Entregada</label>
-        <input
-          type="radio"
-          name="estado_solicitud"
-          id="nula"
-          value={"Nula"}
-          checked={solicitudes.estado_solicitud === "Nula"}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="nula">Nula</label>
-        <label htmlFor="">Datos Denuncia</label>
-        <label htmlFor="">Entidad en la que se denuncia</label>
-        <select
-          name="entidad"
-          id=""
-          value={solicitudes.entidad}
-          onChange={handleChanges}
-          disabled={editing}
-        >
-          <option value="">Seleccione entidad</option>
-          <option value="jpl1">JPL 1</option>
-          <option value="jpl2">JPL 2</option>
-          <option value="carabineros">Carabineros</option>
-        </select>
-
-        <label htmlFor="">N° de parte / documento</label>
-        <input
-          type="text"
-          name="num_parte"
-          value={solicitudes.num_parte}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-
-        {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
-        <button type="button" onClick={handleNewSoli}>
-          Nuevo Expediente
-        </button>
+    <div className="container-fluid mt-4">
+      <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
         <button
+          className="btn btn-outline-primary"
           type="button"
-          onClick={handleEdit}
-          style={{ display: editing ? "" : "none" }}
-        >
-          Editar
-        </button>
-        <button type="submit" style={{ display: editing ? "none" : "" }}>
-          Guardar Informe
-        </button>
-        <button
-          type="button"
-          onClick={handleCancel}
-          style={{ display: editing ? "none" : "" }}
-        >
-          Cancelar
-        </button>
-        <button type="button" onClick={handleDeleteSoli}>
-          Eliminar
-        </button>
-      </form>
-      <div>
-        <BlobProvider document={<SGCImagenPDF />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando...</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Generar PDF
-              </button>
-            )
+          onClick={handleFirstSoli}
+          disabled={
+            //disabledPrevButton
+            false
           }
-        </BlobProvider>
+        >
+          <i className="bi bi-skip-start me-1"></i> Primera solicitud
+        </button>
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={handlePrevious}
+          disabled={
+            //disabledPrevButton
+            false
+          }
+        >
+          <i className="bi bi-chevron-left me-1"></i> Anterior
+        </button>
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={handleNext}
+          disabled={
+            //disabledNextButton
+            false
+          }
+        >
+          Siguiente <i className="bi bi-chevron-right ms-1"></i>
+        </button>
+        <button
+          className="btn btn-outline-primary"
+          type="button"
+          onClick={handleLastSoli}
+          disabled={
+            false
+            //disabledNextButton
+          }
+        >
+          Última solicitud <i className="bi bi-skip-end ms-1"></i>
+        </button>
+      </div>
+
+      <div className="row">
+        <div className="col-lg-7">
+          <div className="card shadow-sm mb-4">
+            <div className="card-header bg-success text-white d-flex justify-content-between">
+              <div>
+                <h4 className="card-title mb-0">
+                  Formulario Solicitud de Imágenes
+                </h4>
+                <strong>Código solicitud: {solicitudes.cod_solicitud}</strong>
+              </div>
+            </div>
+            <div className="card-body">
+              <form className="was-validated" onSubmit={handleSubmit}>
+                <div className="row g-3">
+                  <label htmlFor="">Datos Solicitante</label>
+                  <div className="col-md-6">
+                    <label className="form-label">Fecha de solicitud</label>
+                    <input
+                      className="form-control"
+                      type="datetime-local"
+                      name="fecha_solicitud"
+                      value={solicitudes.fecha_solicitud}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Rut Solicitante</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="rut_solicitante"
+                      value={solicitudes.rut_solicitante}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Nombre del solicitante</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="nombre_solicitante"
+                      value={solicitudes.nombre_solicitante}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Teléfono solicitante</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="telefono_solicitante"
+                      value={solicitudes.telefono_solicitante}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">E-mail solicitante</label>
+                    <input
+                      className="form-control"
+                      type="email"
+                      name="e_mail_solicitante"
+                      value={solicitudes.e_mail_solicitante}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <label htmlFor="">Datos Responsable</label>
+                  <div className="col-md-6">
+                    <label className="form-label">Nombre Responsable</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="nombre_responsable"
+                      value={solicitudes.nombre_responsable}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Institución</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="institucion"
+                      value={solicitudes.institucion}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Rut Responsable</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="rut_responsable"
+                      value={solicitudes.rut_responsable}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <label htmlFor="">Datos solicitud</label>
+                  <div className="col-md-6">
+                    <label className="form-label">
+                      Descripción de la solicitud
+                    </label>
+                    <textarea
+                      className="form-control"
+                      cols={6}
+                      name="descripcion_solicitud"
+                      id=""
+                      value={solicitudes.descripcion_solicitud}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    ></textarea>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Fecha solicitada</label>
+                    <input
+                      className="form-control"
+                      type="datetime-local"
+                      name="fecha_siniestro"
+                      value={solicitudes.fecha_siniestro}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Dirección</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="direccion_solicitud"
+                      value={solicitudes.direccion_solicitud}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Sector</label>
+                    <SelectSector
+                      selectedSector={selectedSector}
+                      setSelectedSector={setSelectedSector}
+                      edition={editing}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="d-flex form-label">
+                      Estado de la solicitud
+                    </label>
+                    <div className="row">
+                      <div className="col">
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_solicitud"
+                            id="pendiente"
+                            value={"Pendiente"}
+                            checked={
+                              solicitudes.estado_solicitud === "Pendiente"
+                            }
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                          <label htmlFor="pendiente">Pendiente</label>
+                        </div>
+                      </div>
+                      <div className="col">
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_solicitud"
+                            id="revision"
+                            value={"Revisión"}
+                            checked={
+                              solicitudes.estado_solicitud === "Revisión"
+                            }
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                          <label htmlFor="revision">Revisión</label>
+                        </div>
+                      </div>
+
+                      <div className="col">
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_solicitud"
+                            id="entregada"
+                            value={"Entregada"}
+                            checked={
+                              solicitudes.estado_solicitud === "Entregada"
+                            }
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                          <label htmlFor="entregada">Entregada</label>
+                        </div>
+                      </div>
+                      <div className="col">
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="estado_solicitud"
+                            id="nula"
+                            value={"Nula"}
+                            checked={solicitudes.estado_solicitud === "Nula"}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                          <label htmlFor="nula">Nula</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <label htmlFor="">Datos Denuncia</label>
+                  <div className="col-md-6">
+                    <label className="form-label">
+                      Entidad en la que se denuncia
+                    </label>
+                    <select
+                      className="form-select"
+                      name="entidad"
+                      id=""
+                      value={solicitudes.entidad}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    >
+                      <option value="">Seleccione entidad</option>
+                      <option value="jpl1">JPL 1</option>
+                      <option value="jpl2">JPL 2</option>
+                      <option value="carabineros">Carabineros</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">
+                      N° de parte / documento
+                    </label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="num_parte"
+                      value={solicitudes.num_parte}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
+                </div>
+
+                {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+                <div className="d-flex flex-wrap gap-2 mt-4">
+                  {!editing && (
+                    <div className="d-flex flex-wrap gap-2 mt-4">
+                      <button type="submit" className="btn btn-primary">
+                        <i className="bi bi-save"></i> Guardar Informe
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        type="button"
+                        onClick={handleCancel}
+                      >
+                        <i className="bi bi-x-octagon"></i> Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </form>
+              {editing && (
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    className="btn btn-success"
+                    type="button"
+                    onClick={handleNewSoli}
+                  >
+                    <i className="bi bi-clipboard2-plus"></i> Nueva solicitud
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleEdit}
+                  >
+                    <i className="bi bi-pencil-square"></i> Editar
+                  </button>
+
+                  <button
+                    className="btn btn-danger"
+                    type="button"
+                    onClick={handleDeleteSoli}
+                  >
+                    <i className="bi bi-trash"></i> Eliminar
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="card-footer text-end">
+              {editing && (
+                <button
+                  className="btn btn-danger"
+                  onClick={() => SGCImagenPDF(params.id)}
+                >
+                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

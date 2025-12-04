@@ -75,6 +75,21 @@ function NavbarSGF() {
     navigate(`/sgc/atencion/${id_atencion}`);
   };
 
+  const handleLastImagenes = async () => {
+    const res = await fetch(`${servidor_local}/seg/imagenes/last`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const lastImagen = await res.json();
+
+    const id_imagenes = lastImagen.ultima[0].id_solicitud;
+
+    navigate(`/sgc/imagenes/${id_imagenes}`);
+  };
+
   const rol = user.user_rol;
   /*if (!user) {
     return null;
@@ -227,7 +242,7 @@ function NavbarSGF() {
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link">
+                    <Link className="nav-link" onClick={handleLastImagenes}>
                       <i className="bi bi-camera-video-fill me-1"></i>
                       Solicitud imágenes
                     </Link>

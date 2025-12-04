@@ -128,9 +128,9 @@ function FormAtencion() {
     const jjvvFormateada = JSON.stringify(selectedJJVV);
     const datosAtencion = {
       ...atenciones,
-      sector_solicitante: sectorFormateado,
-      poblacion_solicitante: poblaFormateada,
-      junta_vecinos: jjvvFormateada,
+      sector_solicitante: selectedSector,
+      poblacion_solicitante: selectedPobla,
+      junta_vecinos: selectedJJVV,
       user_creador: user_decoded,
     };
 
@@ -540,23 +540,25 @@ function FormAtencion() {
                   <div className="col-md-6">
                     <label className="form-label">Sector</label>
                     <SelectSector
-                      {...{
-                        selectedSector,
-                        setSelectedSector,
-                        edition: editing,
-                      }}
+                      selectedSector={selectedSector}
+                      setSelectedSector={setSelectedSector}
+                      edition={editing}
                     />
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Población</label>
                     <SelectPoblacion
-                      {...{ selectedPobla, setSelectedPobla, edition: editing }}
+                      selectedPobla={selectedPobla}
+                      setSelectedPobla={setSelectedPobla}
+                      edition={editing}
                     />
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Junta de vecinos</label>
                     <SelectJJVV
-                      {...{ selectedJJVV, setSelectedJJVV, edition: editing }}
+                      selectedJJVV={selectedJJVV}
+                      setSelectedJJVV={setSelectedJJVV}
+                      edition={editing}
                     />
                   </div>
                   <div className="col-12">

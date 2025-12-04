@@ -38,6 +38,11 @@ const getSolicitud = async (req, res) => {
     const { id } = req.params;
     await client.query("BEGIN");
 
+    const solicitud = await client.query(
+      "SELECT * FROM solicitudes_imagenes WHERE id_solicitud=$1",
+      [id]
+    );
+
     const denuncia = await client.query(
       "SELECT * FROM datos_solicitud_denuncia WHERE \
           id_denuncia = (SELECT id_denuncia FROM solicitudes_imagenes WHERE id_solicitud=$1)",
@@ -64,6 +69,7 @@ const getSolicitud = async (req, res) => {
 
     await client.query("COMMIT");
     return res.json({
+      solicitud: solicitud.rows,
       soliDenuncia: denuncia.rows,
       soliGrabacion: grabacion.rows,
       soliResponsable: responsable.rows,

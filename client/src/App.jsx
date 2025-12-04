@@ -68,6 +68,9 @@ function App() {
           <Route path="/sgc/atencion/new" element={<FormAtencion />} />
           <Route path="/sgc/atencion/:id" element={<FormAtencion />} />
 
+          <Route path="/sgc/imagenes/new" element={<FormSolicitud />} />
+          <Route path="/sgc/imagenes/:id" element={<FormSolicitud />} />
+
           <Route path="/reporte/new" element={<FormReportes />} />
           <Route path="/reporte/:id" element={<FormReportes />} />
 
