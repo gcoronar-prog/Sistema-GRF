@@ -51,9 +51,9 @@ function FormAtencion() {
   const [atenciones, setAtenciones] = useState(defaultAtencion);
   const [editing, setEditing] = useState(true);
   const [lastId, setLastId] = useState("");
-  const [selectedSector, setSelectedSector] = useState(null);
-  const [selectedPobla, setSelectedPobla] = useState(null);
-  const [selectedJJVV, setSelectedJJVV] = useState(null);
+  const [selectedSector, setSelectedSector] = useState("");
+  const [selectedPobla, setSelectedPobla] = useState("");
+  const [selectedJJVV, setSelectedJJVV] = useState("");
 
   useEffect(() => {
     if (params.id) {
@@ -123,15 +123,11 @@ function FormAtencion() {
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) return;
 
-    const sectorFormateado = JSON.stringify(selectedSector);
-    const poblaFormateada = JSON.stringify(selectedPobla);
-    const jjvvFormateada = JSON.stringify(selectedJJVV);
     const datosAtencion = {
       ...atenciones,
       sector_solicitante: selectedSector,
       poblacion_solicitante: selectedPobla,
-      junta_vecinos: selectedJJVV,
-      user_creador: user_decoded,
+      junta_vecinos: selectedJJVV || null,
     };
 
     try {
@@ -158,11 +154,11 @@ function FormAtencion() {
 
       const lastAtencion = await lastAtencionData.json();
       setLastId(lastAtencion.atencion_ciudadana.id_atencion);
+      /*console.log(lastAtencion.atencion_ciudadana.id_atencion);
       if (lastAtencion && lastAtencion.atencion_ciudadana) {
-        const idAtencionFinal =
-          lastAtencion.atencion_ciudadana.atencion_ciudadana;
-        navigate(`/sgc/atencion/${idAtencionFinal + 1}`);
-      }
+        const idAtencionFinal = lastAtencion.atencion_ciudadana.id_atencion;
+      }*/
+      navigate(`/sgc/atencion/${lastAtencion.atencion_ciudadana.id_atencion}`);
 
       const metodo = idAten ? "" : `/sgc/atencion/${lastId + 1}`;
       navigate(metodo);
@@ -363,6 +359,7 @@ function FormAtencion() {
           <div className="card shadow-sm mb-4">
             <div className="card-header bg-success text-white d-flex justify-content-between">
               <div>
+                <h4 className="card-title mb-0">Atención de público</h4>
                 <strong>Código atención: {atenciones.cod_atencion}</strong>
               </div>
             </div>
@@ -394,13 +391,13 @@ function FormAtencion() {
                       required
                     >
                       <option value="">Seleccione estado</option>
-                      <option value="en proceso">En proceso</option>
-                      <option value="en seguimiento">En seguimiento</option>
-                      <option value="visitado">Visitado</option>
-                      <option value="atendido">Atendido</option>
-                      <option value="derivado">Derivado</option>
-                      <option value="desistido">Desistido</option>
-                      <option value="anulado">Anulado</option>
+                      <option value="En proceso">En proceso</option>
+                      <option value="En seguimiento">En seguimiento</option>
+                      <option value="Visitado">Visitado</option>
+                      <option value="Atendido">Atendido</option>
+                      <option value="Derivado">Derivado</option>
+                      <option value="Desistido">Desistido</option>
+                      <option value="Anulado">Anulado</option>
                     </select>
                   </div>
 

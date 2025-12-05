@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
-import NavbarSGF from "../NavbarSGF";
+import { useState } from "react";
+
 import SelectLey from "../SelectLey";
 import SelectInspect from "../SelectInspect";
 import SelectVehContri from "../SelectVehContri";
@@ -12,7 +12,7 @@ import TipoProceInspPDF from "../PDFs/TipoProceInspPDF";
 import LeyInspeccionPDF from "../PDFs/LeyInspeccionPDF";
 import InspectResumenPDF from "../PDFs/InspectResumenPDF";
 import VehiInspectPDF from "../PDFs/VehiInspectPDF";
-import SesctorInspectPDF from "../PDFs/SectorInspectPDF";
+
 import GlosaInspectPDF from "../PDFs/GlosaInspectPDF";
 import { exportExcel } from "../exportExcel";
 import SectorInspectPDF from "../PDFs/SectorInspectPDF";

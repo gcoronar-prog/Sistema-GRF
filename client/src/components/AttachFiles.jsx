@@ -8,13 +8,13 @@ const AttachFiles = ({ idInforme }) => {
 
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   // Define entityType basado en la ruta
-  const entityType = location.pathname.includes("informes")
+  /* const entityType = location.pathname.includes("informes")
     ? "informes"
     : location.pathname.includes("inspect")
     ? "inspect"
     : location.pathname.includes("atencion")
     ? "atencion"
-    : null;
+    : null;*/
 
   const [selectedId, setSelectedId] = useState(null);
   const [listImagen, setListImagen] = useState([]);
@@ -54,7 +54,7 @@ const AttachFiles = ({ idInforme }) => {
 
     try {
       const response = await fetch(
-        `${servidor_local}/api/upload/${entityType}/${idInforme}`,
+        `${servidor_local}/api/upload/${idInforme}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           method: "POST",
@@ -63,7 +63,7 @@ const AttachFiles = ({ idInforme }) => {
       );
 
       if (response.ok) {
-        const data = await response.json();
+        //const data = await response.json();
         //setUploadStatus("Archivo subido exitosamente: " + file.name);
         setFile(null);
       } else {
@@ -80,7 +80,7 @@ const AttachFiles = ({ idInforme }) => {
   const handleDeleteFile = async (id) => {
     const confirmar = window.confirm("¿Desea eliminar la imagen?");
     if (!confirmar) return;
-    await fetch(`${servidor_local}/api/galeria/${entityType}/${id}`, {
+    await fetch(`${servidor_local}/api/galeria/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
       method: "DELETE",
     });
@@ -89,12 +89,9 @@ const AttachFiles = ({ idInforme }) => {
 
   const loadListaImagen = async (id) => {
     try {
-      const res = await fetch(
-        `${servidor_local}/api/imagenes/${entityType}/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`${servidor_local}/api/imagenes/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setListImagen(data);
       console.log(data);
@@ -191,12 +188,12 @@ const AttachFiles = ({ idInforme }) => {
               <div className="text-center">
                 {selectedId && listImagen ? (
                   <a
-                    href={`${servidor_local}/api/galeria/${entityType}/${selectedId}`}
+                    href={`${servidor_local}/api/galeria/${selectedId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <img
-                      src={`${servidor_local}/api/galeria/${entityType}/${selectedId}`}
+                      src={`${servidor_local}/api/galeria/${selectedId}`}
                       className="img-thumbnail border border-primary-subtle w-75 h-auto"
                       alt={`ID ${selectedId}`}
                     />

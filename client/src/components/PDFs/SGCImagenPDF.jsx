@@ -12,8 +12,9 @@ const SGCImagenPDF = async (id) => {
     }
   );
   const data = await response.json();
-  const solicitud = data.solicitud[0];
+  const solicitud = data;
 
+  console.log("solipdf", solicitud);
   const doc = new jsPDF();
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -64,15 +65,15 @@ const SGCImagenPDF = async (id) => {
 
   const rows = [
     //["Codigo solicitud", solicitud.cod_solicitud],
-    ["Estado solicitud", solicitud.estado_solicitud],
-    ["Fecha solicitud", formatDate(solicitud.fecha_solicitud)],
-    ["Rut usuario", solicitud.rut_solicitante],
-    ["Nombre usuario", solicitud.nombre_solicitante || "-"],
-    ["Contacto", solicitud.telefono_solicitante || "-"],
-    ["E-mail", solicitud.e_mail_solicitante || "-"],
+    ["Estado solicitud", solicitud.soliGrabacion[0].estado_solicitud],
+    ["Fecha solicitud", formatDate(solicitud.soliUsuarios[0].fecha_solicitud)],
+    ["Rut usuario", solicitud.soliUsuarios[0].rut_solicitante],
+    ["Nombre usuario", solicitud.soliUsuarios[0].nombre_solicitante || "-"],
+    ["Contacto", solicitud.soliUsuarios[0].telefono_solicitante || "-"],
+    ["E-mail", solicitud.soliUsuarios[0].e_mail_solicitante || "-"],
     [
       {
-        content: "Descripción responsable",
+        content: "Descripción responsable entrega imágenes",
         colSpan: 2,
         styles: {
           fontStyle: "bolditalic",
@@ -82,11 +83,12 @@ const SGCImagenPDF = async (id) => {
         },
       },
     ],
-    ["Nombre responsable", solicitud.nombre_responsable || "-"],
-    ["Rut responsable", solicitud.rut_responsable || "-"],
+    [
+      "Nombre responsable",
+      solicitud.soliResponsable[0].nombre_responsable || "-",
+    ],
+    ["Rut responsable", solicitud.soliResponsable[0].rut_responsable || "-"],
     ["Institución", "I. Municipalidad de San Antonio"],
-    ["Giro Contribuyente", expediente.giro_contri || "-"],
-    ["Dirección Contribuyente", expediente.direccion || "-"],
     [
       {
         content: "Datos solicitud",
@@ -99,13 +101,19 @@ const SGCImagenPDF = async (id) => {
         },
       },
     ],
-    ["Fecha grabación", formatDate(solicitud.fecha_siniestro) || "-"],
-    ["Sector", solicitud.sector_solicitud.label || "-"],
-    ["Dirección", solicitud.direccion_solicitud || "-"],
-    ["Descripción solicitud", solicitud.descripcion_solicitud || "-"],
+    [
+      "Fecha grabación",
+      formatDate(solicitud.soliGrabacion[0].fecha_siniestro) || "-",
+    ],
+    ["Sector", solicitud.soliGrabacion[0].sector_solicitud.label || "-"],
+    ["Dirección", solicitud.soliGrabacion[0].direccion_solicitud || "-"],
+    [
+      "Descripción solicitud",
+      solicitud.soliGrabacion[0].descripcion_solicitud || "-",
+    ],
 
-    ["Institución denuncia", solicitud.entidad || "-"],
-    ["N° parte / documento", solicitud.num_parte || "-"],
+    ["Institución denuncia", solicitud.soliDenuncia[0].entidad || "-"],
+    ["N° parte / documento", solicitud.soliDenuncia[0].num_parte || "-"],
   ];
 
   autoTable(doc, {
@@ -113,7 +121,7 @@ const SGCImagenPDF = async (id) => {
     head: [
       [
         {
-          content: "Datos de solicitud cód. " + solicitud.cod_solicitud,
+          content: "Código solicitud: " + solicitud.solicitud[0].cod_solicitud,
           colSpan: 2,
           styles: { fontStyle: "bold", fontSize: 14 },
         },

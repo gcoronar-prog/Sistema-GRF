@@ -1,9 +1,10 @@
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { BlobProvider } from "@react-pdf/renderer";
+
 import SGCImagenPDF from "../PDFs/SGCImagenPDF";
 import SelectSector from "../SelectSector";
+import AttachFiles from "../AttachFiles";
 
 function FormSolicitud() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ function FormSolicitud() {
     e_mail_solicitante: "",
   };
 
-  const [solicitudes, setSolicitudes] = useState({ defaultSolicitudes });
+  const [solicitudes, setSolicitudes] = useState(defaultSolicitudes);
   const [lastId, setLastId] = useState("");
   const [editing, setEditing] = useState(true);
   const [selectedSector, setSelectedSector] = useState(null);
@@ -99,13 +100,17 @@ function FormSolicitud() {
   };
 
   const handleChanges = (e) => {
-    const { name, value } = e.target;
-    setSolicitudes({ ...solicitudes, [name]: value });
+    const { name, value, type, checked } = e.target;
+    setSolicitudes({
+      ...solicitudes,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("datos enviados", solicitudes);
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) return;
 
     try {
       const url = params.id
@@ -140,6 +145,7 @@ function FormSolicitud() {
       const metodo = params.id ? "" : `/sc/imagenes/${lastId + 1}`;
       navigate(metodo);
       setEditing(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       console.error(error);
     }
@@ -219,10 +225,12 @@ function FormSolicitud() {
   const handleNewSoli = () => {
     navigate("/sc/imagenes/new");
     setEditing(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleEdit = async () => {
     setEditing(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCancel = async () => {
@@ -246,9 +254,12 @@ function FormSolicitud() {
       console.error(error);
     }
     setEditing(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteSoli = async () => {
+    const eliminar = window.confirm("¿Deseas eliminar el informe?");
+    if (!eliminar) return;
     const id = params.id;
     await fetch(`${servidor}/imagenes/seg/${id}`, {
       method: "DELETE",
@@ -264,6 +275,7 @@ function FormSolicitud() {
     const res = await fetch(`${servidor}/seg/imagenes/last`);
     const data = await res.json();
     navigate(`/sc/imagenes/${data.ultima[0].id_solicitud}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -554,9 +566,12 @@ function FormSolicitud() {
                       disabled={editing}
                     >
                       <option value="">Seleccione entidad</option>
-                      <option value="jpl1">JPL 1</option>
-                      <option value="jpl2">JPL 2</option>
-                      <option value="carabineros">Carabineros</option>
+                      <option value="JPL 1">JPL 1</option>
+                      <option value="JPL 2">JPL 2</option>
+                      <option value="Carabineros">Carabineros</option>
+                      <option value="PDI">PDI</option>
+                      <option value="Fiscalía">Fiscalía</option>
+                      <option value="Otra institución">Otra institución</option>
                     </select>
                   </div>
                   <div className="col-md-6">
@@ -632,6 +647,13 @@ function FormSolicitud() {
           </div>
         </div>
       </div>
+      {editing && (
+        <div className="row mt-4">
+          <div className="col-12">
+            <AttachFiles idInforme={solicitudes.cod_solicitud} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

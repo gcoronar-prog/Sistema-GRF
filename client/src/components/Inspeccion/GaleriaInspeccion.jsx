@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -7,14 +7,16 @@ const GaleriaVisual = () => {
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const token = localStorage.getItem("token");
 
-  const [listImagen, setListImagen] = useState([]);
-  const [selectedId, setSelectedId] = useState(null);
-  const [filtro, setFiltro] = useState({
+  const defaultValues = {
     id_expe: "",
     rut_contri: "",
     num_control: "",
     ppu: "",
-  });
+  };
+
+  const [listImagen, setListImagen] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [filtro, setFiltro] = useState(defaultValues);
 
   const loadListaImagen = async (id_expe, rut, ppu, num_control) => {
     try {
@@ -22,6 +24,12 @@ const GaleriaVisual = () => {
         `${servidor_local}/listaImagen?id_expe=${id_expe}&rut=${rut}&ppu=${ppu}&num_control=${num_control}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      if (!res.ok) {
+        window.alert("No existen imagenes en este expediente");
+        setFiltro(defaultValues);
+        return;
+      }
+
       const data = await res.json();
       setListImagen(data.imgExpedientes || []);
     } catch (error) {
@@ -46,13 +54,13 @@ const GaleriaVisual = () => {
           <div className="align-middle text-center">
             {selectedId && (
               <a
-                href={`${servidor_local}/api/galeria/inspect/${selectedId}`}
+                href={`${servidor_local}/api/galeria/${selectedId}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <img
                   className="img-thumbnail shadow-sm"
-                  src={`${servidor_local}/api/galeria/inspect/${selectedId}`}
+                  src={`${servidor_local}/api/galeria/${selectedId}`}
                   alt={`Imagen con id ${selectedId}`}
                   style={{ maxWidth: "100%", width: "500px" }}
                 />
@@ -161,12 +169,12 @@ const GaleriaVisual = () => {
                             {" "}
                             {l.path_document}
                           </td>
-                          <td className="text-center">{l.id_expediente}</td>
+                          <td className="text-center">{l.id_formulario}</td>
                           <td className="text-center">
                             <button
                               className="btn btn-outline-primary btn-sm"
                               onClick={() =>
-                                navigate(`/inspect/${l.id_expediente}/edit`)
+                                navigate(`/inspect/${l.id_formulario}/edit`)
                               }
                             >
                               <i className="bi bi-arrow-right-square"></i>
