@@ -248,7 +248,7 @@ function NavbarSGF() {
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link">
+                    <Link className="nav-link" to="/statistics/seguridad/v1">
                       <i className="bi bi-bar-chart me-1"></i>
                       Estadisticas Seguridad Ciudadana
                     </Link>
@@ -320,6 +320,14 @@ function NavbarSGF() {
                           to="/statistics/central/v1"
                         >
                           Estadísticas Central
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className="dropdown-item"
+                          to="/statistics/seguridad/v1"
+                        >
+                          Estadísticas SGC
                         </Link>
                       </li>
                     </ul>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SelectOrigin from "../SelectOrigin";
 import SelectSector from "../SelectSector";
 import SelectVehiculo from "../SelectVehiculo";

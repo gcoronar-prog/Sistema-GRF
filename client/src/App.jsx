@@ -32,6 +32,7 @@ import HomeInspeccion from "./components/Inspeccion/HomeInspeccion";
 import ListUser from "./components/Admin/ListUser";
 import ChangePassword from "./components/Login/ChangePassword";
 import HomeSGC from "./components/Seg_ciudadana/HomeSGC";
+import StatisticsSGC from "./components/Estadisticas/StatisticsSGC";
 
 function App() {
   return (
@@ -93,7 +94,8 @@ function App() {
             path="/statistics/inspeccion/v1"
             element={<StatisticsInspect />}
           />
-          <Route />
+
+          <Route path="/statistics/seguridad/v1" element={<StatisticsSGC />} />
         </Route>
       </Routes>
     </BrowserRouter>
