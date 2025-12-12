@@ -391,8 +391,8 @@ function FormAtencion() {
                       required
                     >
                       <option value="">Seleccione estado</option>
-                      <option value="En proceso">En proceso</option>
-                      <option value="En seguimiento">En seguimiento</option>
+                      <option value="Proceso">En proceso</option>
+                      <option value="Seguimiento">En seguimiento</option>
                       <option value="Visitado">Visitado</option>
                       <option value="Atendido">Atendido</option>
                       <option value="Derivado">Derivado</option>
@@ -451,17 +451,17 @@ function FormAtencion() {
                       required
                     >
                       <option value="">Seleccione tipo</option>
-                      <option value="asesoria">Asesoría</option>
-                      <option value="consulta">Consulta información</option>
-                      <option value="denuncia">Denuncia</option>
-                      <option value="mesa trabajo">Mesa de trabajo</option>
-                      <option value="peticion">Petición</option>
-                      <option value="prevencion">Prevención situacional</option>
-                      <option value="propuesta">Propuesta</option>
-                      <option value="queja">Queja</option>
-                      <option value="reclamo">Reclamo</option>
-                      <option value="sugerencia">Sugerencia</option>
-                      <option value="tramite">Trámite</option>
+                      <option value="Asesoría">Asesoría</option>
+                      <option value="Consulta">Consulta información</option>
+                      <option value="Denuncia">Denuncia</option>
+                      <option value="Mesa trabajo">Mesa de trabajo</option>
+                      <option value="Peticion">Petición</option>
+                      <option value="Prevención">Prevención situacional</option>
+                      <option value="Propuesta">Propuesta</option>
+                      <option value="Queja">Queja</option>
+                      <option value="Reclamo">Reclamo</option>
+                      <option value="Sugerencia">Sugerencia</option>
+                      <option value="Trámite">Trámite</option>
                     </select>
                   </div>
 

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import SelectSector from "../SelectSector";
 import SelectPoblacion from "../SelectPoblacion";
 import SelectJJVV from "../SelectJJVV";
+import { exportExcel } from "../exportExcel";
 
 function StatisticsSGC() {
   const server_back = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -24,7 +25,7 @@ function StatisticsSGC() {
     Anulado: false,
   });
   const [tipo_soli, setTipo_soli] = useState({
-    Asesoria: false,
+    Asesoría: false,
     Denuncia: false,
     "Mesa Trabajo": false,
     Petición: false,
@@ -63,14 +64,14 @@ function StatisticsSGC() {
       }
     });
 
-    if (selectedSector) {
+    if (selectedSector && selectedSector.value) {
       params.append("sector_solicitud", JSON.stringify(selectedSector));
     }
 
-    if (selectedPobla) {
+    if (selectedPobla && selectedPobla.value) {
       params.append("poblacion", JSON.stringify(selectedPobla));
     }
-    if (selectedJJVV) {
+    if (selectedJJVV && selectedJJVV.value) {
       params.append("jjvv", JSON.stringify(selectedJJVV));
     }
 
@@ -89,7 +90,7 @@ function StatisticsSGC() {
         if (tipoDoc === 1) {
           generarPDFSGC(data.atencion);
         } else if (tipoDoc === 2) {
-          // generarExcelCentral(data.atencion, "Atenciones.xlsx",);
+          exportExcel(data.atencion, "Atenciones.xlsx", "SGC");
         }
       }
     } catch (error) {
@@ -139,9 +140,9 @@ function StatisticsSGC() {
       d.nombre_solicitante,
       d.rut_solicitante,
       d.telefono_solicitante,
-      d.selectedSector.label,
-      d.selectedPobla.label,
-      d.selectedJJVV.label,
+      d.sector_solicitante?.label || "-",
+      d.poblacion_solicitante?.label || "-",
+      d.junta_vecinos?.label || "-",
     ]);
 
     autoTable(doc, {

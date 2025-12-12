@@ -58,6 +58,26 @@ export const exportExcel = (data, filename, formu) => {
       Marca_vehiculo: item.marca_vehi || "-",
       Color_vehiculo: item.color_vehi || "-",
     }));
+  } else if (formu === "SGC") {
+    flatData = data.map((item) => ({
+      ID: item.id_atencion_solicitud || "-",
+      Código: item.cod_atencion_solicitud || "-",
+      Fecha_solicitud:
+        new Date(item.fecha_solicitud).toLocaleString("es-ES") || "-",
+      Estado_solicitud: item.estado_solicitud || "-",
+      Tipo_solicitud: item.tipo_solicitud || "-",
+      Sector_solicitante: item.sector_solicitante || "-",
+      Poblacion_solicitante: item.poblacion_solicitante || "-",
+      Junta_vecinos: item.junta_vecinos || "-",
+      Descripcion_solicitud: item.descripcion_solicitud || "-",
+      Fecha_atencion:
+        new Date(item.fecha_atencion).toLocaleString("es-ES") || "-",
+      Acciones_realizadas: item.acciones_realizadas || "-",
+      Funcionario_responsable: item.funcionario_responsable || "-",
+    }));
+  } else {
+    console.error("Formulario no reconocido para exportar");
+    return;
   }
 
   const worksheet = XLSX.utils.json_to_sheet(flatData);

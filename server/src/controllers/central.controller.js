@@ -324,7 +324,7 @@ const getLastReport = async (req, res) => {
   }
 };
 
-const getArchivos = async (req, res) => {
+/*const getArchivos = async (req, res) => {
   try {
     const { rows } = await pool.query("select * from doc_adjuntos");
     if (rows.length === 0) {
@@ -350,7 +350,7 @@ const findArchivos = async (id) => {
     console.log(error);
     /*return res
       .status(500)
-      .json({ message: "Error de conexión con el servidor" });*/
+      .json({ message: "Error de conexión con el servidor" });
   }
 };
 
@@ -366,24 +366,24 @@ const findArchivosById = async (id) => {
     console.log(error);
     /*return res
       .status(500)
-      .json({ message: "Error de conexión con el servidor" });*/
+      .json({ message: "Error de conexión con el servidor" });
   }
 };
 
 const createArchivo = async (fileUrl, idReporte) => {
   try {
-    /*const data = req.body;*/
-    const { rows } = await pool.query(
-      "INSERT INTO doc_adjuntos (path_document,id_reporte) VALUES ($1,$2) RETURNING *",
-      [fileUrl, idReporte]
-    );
+    /*const data = req.body;
+const { rows } = await pool.query(
+  "INSERT INTO doc_adjuntos (path_document,id_reporte) VALUES ($1,$2) RETURNING *",
+  [fileUrl, idReporte]
+);
 
-    /* return res.json(rows[0]).json({ message: "Archivo subido" });*/
+/* return res.json(rows[0]).json({ message: "Archivo subido" });
     return rows[0];
   } catch (error) {
     /* return res
       .status(500)
-      .json({ message: "Error de conexión con el servidor" });*/
+      .json({ message: "Error de conexión con el servidor" });
     console.log(error);
   }
 };
@@ -413,7 +413,7 @@ const deleteArchivo = async (req, res) => {
       .status(500)
       .json({ message: "Error de conexión con el servidor" });
   }
-};
+};*/
 
 export {
   getReports,
@@ -432,9 +432,9 @@ export {
   getTripulantes,
   getSectores,
   getLastReport,
-  getArchivos,
+  /* getArchivos,
   findArchivos,
   createArchivo,
   deleteArchivo,
-  findArchivosById,
+  findArchivosById,*/
 };

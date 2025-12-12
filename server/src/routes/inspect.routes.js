@@ -1,19 +1,19 @@
 import { Router } from "express";
 import {
-  createArchivoExp,
+  //  createArchivoExp,
   createEXfiles,
   createExpediente,
   createInfraccion,
   createVehiInfra,
-  deleteArchivoExp,
+  //  deleteArchivoExp,
   deleteExFile,
   deleteExpediente,
   deleteInfraccion,
   deleteVehiInfra,
   despachoExpediente,
-  findArchivosExp,
+  // findArchivosExp,
   getAllExpedientes,
-  getArchivosExp,
+  //getArchivosExp,
   getDatosVehi,
   getDigitador,
   getExpedEstado,
@@ -203,7 +203,7 @@ router.get(
   getGlosaLey
 );
 
-router.get(
+/*router.get(
   "/fileAttach",
   verifyToken,
   verifyGroup("superadmin", "inspeccion"),
@@ -226,7 +226,7 @@ router.delete(
   verifyToken,
   verifyGroup("superadmin", "inspeccion"),
   deleteArchivoExp
-);
+);*/
 
 router.get(
   "/search_exped",

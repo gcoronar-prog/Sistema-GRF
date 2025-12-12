@@ -704,7 +704,7 @@ const getAllExpedientes = async (req, res) => {
   }
 };
 
-const getArchivosExp = async (req, res) => {
+/*const getArchivosExp = async (req, res) => {
   try {
     const { rows } = await pool.query("select * from doc_adjuntos");
     if (rows.length === 0) {
@@ -730,7 +730,7 @@ const findArchivosExp = async (id) => {
     console.log(error);
     /*return res
       .status(500)
-      .json({ message: "Error de conexión con el servidor" });*/
+      .json({ message: "Error de conexión con el servidor" });
   }
 };
 
@@ -746,24 +746,24 @@ const findArchivosByIdExp = async (id) => {
     console.log(error);
     /*return res
       .status(500)
-      .json({ message: "Error de conexión con el servidor" });*/
+      .json({ message: "Error de conexión con el servidor" });
   }
 };
 
 const createArchivoExp = async (fileUrl, idExpediente) => {
   try {
-    /*const data = req.body;*/
+    /*const data = req.body;
     const { rows } = await pool.query(
       "INSERT INTO doc_adjuntos (path_document,id_expediente) VALUES ($1,$2) RETURNING *",
       [fileUrl, idExpediente]
     );
 
-    /* return res.json(rows[0]).json({ message: "Archivo subido" });*/
+    /* return res.json(rows[0]).json({ message: "Archivo subido" });
     return rows[0];
   } catch (error) {
     /* return res
       .status(500)
-      .json({ message: "Error de conexión con el servidor" });*/
+      .json({ message: "Error de conexión con el servidor" });
     console.log(error);
   }
 };
@@ -793,7 +793,7 @@ const deleteArchivoExp = async (req, res) => {
       .status(500)
       .json({ message: "Error de conexión con el servidor" });
   }
-};
+};*/
 
 const getLastExpediente = async (req, res) => {
   const client = await pool.connect();
@@ -1171,7 +1171,7 @@ const getImgExpedientes = async (req, res) => {
       `SELECT expe.num_control,expe.id_expediente,docu.*,contri.rut_contri
       FROM doc_adjuntos docu
       JOIN expedientes expe 
-      ON docu.id_expediente=expe.id_expediente
+      ON docu.id_formulario=expe.id_expediente
       JOIN contribuyentes contri
       ON expe.id_expediente=contri.id_expediente 
       JOIN vehiculos_contri vehi 
@@ -1369,11 +1369,11 @@ export {
   deleteExpediente,
   getGlosaLey,
   getAllExpedientes,
-  getArchivosExp,
+  /* getArchivosExp,
   findArchivosExp,
   createArchivoExp,
   deleteArchivoExp,
-  findArchivosByIdExp,
+  findArchivosByIdExp,*/
   getLastExpediente,
   getFirstExpediente,
   getPrevExpediente,

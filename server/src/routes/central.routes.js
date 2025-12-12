@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
-  createArchivo,
+  //createArchivo,
   createReport,
-  deleteArchivo,
+  //deleteArchivo,
   deleteReport,
-  findArchivos,
-  getArchivos,
+  //findArchivos,
+  //getArchivos,
   getChoferes,
   getFuncionarios,
   getInformantes,
@@ -51,7 +51,7 @@ router.get("/tripulantes", getTripulantes);
 
 router.get("/sectores", getSectores);
 //ruta adjuntar archivos
-router.get(
+/*router.get(
   "/fileAttach",
   verifyToken,
   verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
@@ -74,6 +74,6 @@ router.delete(
   verifyToken,
   verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
   deleteArchivo
-);
+);*/
 
 export default router;

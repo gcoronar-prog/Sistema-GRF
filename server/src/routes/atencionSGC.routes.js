@@ -1,11 +1,5 @@
 import { Router } from "express";
 import {
-  createArchivoAten,
-  createAtencion,
-  deleteArchivoAten,
-  deleteAtencion,
-  findArchivosAten,
-  getArchivosAten,
   getAtencion,
   getAtencion2,
   getAtenciones,
@@ -16,6 +10,8 @@ import {
   getPoblaciones,
   getPrevAtencion,
   updateAtencion,
+  createAtencion,
+  deleteAtencion,
 } from "../controllers/atencionSGC.controller.js";
 import {
   createAccion,
@@ -71,7 +67,7 @@ router.get("/atenciones/sgc/first", getFirstAtencion);
 router.get("/atenciones/:id/sgc/prev", getPrevAtencion);
 router.get("/atenciones/:id/sgc/next", getNextAtencion);
 
-router.get(
+/*router.get(
   "/fileAttach",
   verifyToken,
   verifyGroup("superadmin", "seguridad"),
@@ -94,7 +90,7 @@ router.delete(
   verifyToken,
   verifyGroup("superadmin", "seguridad"),
   deleteArchivoAten
-);
+);*/
 
 router.get(
   "/acciones/seguridad",
@@ -129,5 +125,30 @@ router.delete(
 
 router.get("/poblaciones", getPoblaciones);
 router.get("/jjvv", getJuntaVecinos);
+
+/*router.get(
+  "/fileAttach",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  getArchivosAten
+);
+router.get(
+  "/fileAttach/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  findArchivosAten
+);
+router.post(
+  "/fileAttach",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  createArchivoAten
+);
+router.delete(
+  "/fileAttach/:id",
+  verifyToken,
+  verifyGroup("superadmin", "seguridad"),
+  deleteArchivoAten
+);*/
 
 export default router;

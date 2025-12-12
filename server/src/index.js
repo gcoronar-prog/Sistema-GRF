@@ -10,6 +10,7 @@ import atencionSGC from "./routes/atencionSGC.routes.js";
 import loginUser from "./routes/login.routes.js";
 import statisticsCentral from "./routes/statisticsCentral.routes.js";
 import StatisticsInspect from "./routes/statisticsInspect.routes.js";
+import statisticsSGC from "./routes/statisticsSGC.route.js";
 
 import informesCentral from "./routes/informes.routes.js";
 
@@ -20,27 +21,15 @@ import cors from "cors";
 import path from "path";
 import multer from "multer";
 import {
-  createArchivo,
-  deleteArchivo,
+  getArchivos,
   findArchivos,
   findArchivosById,
-} from "./controllers/informes.controller.js";
+  createArchivo,
+  deleteArchivo,
+} from "./controllers/doc_adjunto.controller.js";
 
 import { fileURLToPath } from "url";
-import {
-  createArchivoExp,
-  deleteArchivoExp,
-  findArchivosByIdExp,
-  findArchivosExp,
-} from "./controllers/inspect.controller.js";
 
-import {
-  getArchivosAten,
-  findArchivosAten,
-  findArchivosByIdAten,
-  createArchivoAten,
-  deleteArchivoAten,
-} from "./controllers/atencionSGC.controller.js";
 import { verifyGroup, verifyToken } from "./middlewares/jwt.middleware.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -73,19 +62,20 @@ app.use(
   informesCentral,
   loginUser,
   statisticsCentral,
-  StatisticsInspect
+  StatisticsInspect,
+  statisticsSGC
 );
 
 app.post(
-  "/api/upload/:entityType/:id",
+  "/api/upload/:id",
   verifyToken,
   verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
   upload.single("image"),
   async (req, res) => {
-    const { entityType, id } = req.params;
+    const { id } = req.params;
 
     // Registro del valor de entityType
-    console.log("Entity Type recibido:", entityType);
+
     console.log("id recibido:", id);
 
     if (!req.file) {
@@ -98,21 +88,7 @@ app.post(
 
     try {
       let result;
-
-      switch (entityType) {
-        case "informes":
-          result = await createArchivo(fileUrl, id);
-          break;
-        case "inspect":
-          result = await createArchivoExp(fileUrl, id);
-
-          break;
-        case "atencion":
-          result = await createArchivoAten(fileUrl, id);
-          break;
-        default:
-          return res.status(400).json({ message: "Tipo de entidad no válido" });
-      }
+      result = await createArchivo(fileUrl, id);
 
       res.json({
         message: "Archivo subido con éxito",
@@ -129,28 +105,15 @@ app.post(
 );
 
 app.get(
-  "/api/imagenes/:entityType/:id",
+  "/api/imagenes/:id",
   verifyToken,
   verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
   async (req, res) => {
-    const { entityType, id } = req.params;
+    const { id } = req.params;
     console.log(`Buscando imágenes con ID: ${id}`);
     try {
-      if (entityType === "informes") {
-        const images = await findArchivos(id); // Asegúrate de implementar esta función
-        /* if (!images.length) {
-        return res.status(404).json({ msg: "No se encontraron imágenes" });
-        }*/
-
-        // Retornar la lista de imágenes.
-        res.json(images);
-      } else if (entityType === "inspect") {
-        const images = await findArchivosExp(id);
-        res.json(images);
-      } else if (entityType === "atencion") {
-        const images = await findArchivosAten(id);
-        res.json(images);
-      }
+      const images = await findArchivos(id); // Asegúrate de implementar esta función
+      res.status(200).json(images);
     } catch (error) {
       console.error("Error al obtener las imágenes:", error);
       res.status(500).json({ msg: "Error del servidor" });
@@ -158,38 +121,18 @@ app.get(
   }
 );
 
-app.get("/api/galeria/:entityType/:id", async (req, res) => {
-  const { entityType, id } = req.params;
+app.get("/api/galeria/:id", async (req, res) => {
+  const { id } = req.params;
   console.log(`Buscando imágenes con ID de imagen: ${id}`);
   try {
-    if (entityType === "informes") {
-      const images = await findArchivosById(id); // Asegúrate de implementar esta función
-      if (!images.length) {
-        return res.status(404).json({ msg: "No se encontraron imágenes" });
-      }
-
-      const image = images[0];
-      const imagePath = path.join(__dirname, "../uploads", image.path_document);
-      res.sendFile(imagePath);
-    } else if (entityType === "inspect") {
-      const images = await findArchivosByIdExp(id); // Asegúrate de implementar esta función
-      if (!images.length) {
-        return res.status(404).json({ msg: "No se encontraron imágenes" });
-      }
-
-      const image = images[0];
-      const imagePath = path.join(__dirname, "../uploads", image.path_document);
-      res.sendFile(imagePath);
-    } else if (entityType === "atencion") {
-      const images = await findArchivosByIdAten(id); // Asegúrate de implementar esta función
-      if (!images.length) {
-        return res.status(404).json({ msg: "No se encontraron imágenes" });
-      }
-
-      const image = images[0];
-      const imagePath = path.join(__dirname, "../uploads", image.path_document);
-      res.sendFile(imagePath);
+    const images = await findArchivosById(id); // Asegúrate de implementar esta función
+    if (!images.length) {
+      return res.status(404).json({ msg: "No se encontraron imágenes" });
     }
+
+    const image = images[0];
+    const imagePath = path.join(__dirname, "../uploads", image.path_document);
+    res.sendFile(imagePath);
   } catch (error) {
     console.error("Error al obtener las imágenes:", error);
     res.status(500).json({ msg: "Error del servidor" });
@@ -197,7 +140,7 @@ app.get("/api/galeria/:entityType/:id", async (req, res) => {
 });
 
 app.delete(
-  "/api/galeria/:entityType/:id",
+  "/api/galeria/:id",
   verifyToken,
   verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
   deleteArchivo

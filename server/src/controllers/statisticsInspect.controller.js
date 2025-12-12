@@ -52,21 +52,6 @@ const getEstadoExpe = async (req, res) => {
       JOIN vehiculos_contri vehi ON vehi.id_expediente=expe.id_expediente
       JOIN funcionarios funci ON funci.id_funcionario=expe.id_inspector ${whereClause}`;
 
-    /*let estadoInspeccion = `SELECT DISTINCT estado_exp, 
-                              tipo_procedimiento ,
-                              COUNT(id_exp) as cantidad
-                              FROM  expedientes expe
-                              JOIN infracciones infra
-                              ON infra.id_expediente = expe.id_expediente
-                              JOIN contribuyentes contri 
-                              ON contri.id_expediente=expe.id_expediente
-                              JOIN vehiculos_contri vehi
-                              ON vehi.id_expediente=expe.id_expediente
-                              JOIN funcionarios funci
-                              ON funci.id_funcionario=expe.id_inspector
-                            WHERE 1=1 AND estado_exp IS NOT NULL AND tipo_procedimiento IS NOT NULL ${whereClause}
-                            GROUP BY estado_exp, tipo_procedimiento ORDER BY estado_exp, tipo_procedimiento`;*/
-
     let estadoInspeccion = `SELECT 
                             expe.tipo_procedimiento AS proceso,
                             expe.estado_exp AS estado,
@@ -130,22 +115,6 @@ const getTipoProce = async (req, res) => {
                           JOIN contribuyentes contri ON contri.id_expediente=expe.id_expediente
                           JOIN vehiculos_contri vehi ON vehi.id_expediente=expe.id_expediente
                           JOIN funcionarios funci ON funci.id_funcionario=expe.id_inspector ${whereClause}`;
-
-    /*let tipoProceso = `SELECT DISTINCT tipo_procedimiento, 
-                              funci.funcionario,
-                              COUNT(id_exp) as cantidad
-                              FROM  expedientes expe
-                              JOIN infracciones infra
-                              ON infra.id_expediente = expe.id_expediente
-                              JOIN contribuyentes contri 
-                              ON contri.id_expediente=expe.id_expediente
-                              JOIN vehiculos_contri vehi
-                              ON vehi.id_expediente=expe.id_expediente
-                              JOIN funcionarios funci
-                              ON funci.id_funcionario=expe.id_inspector
-                              WHERE 1=1 AND tipo_procedimiento IS NOT NULL ${whereClause}
-                              GROUP BY funci.funcionario,tipo_procedimiento
-                              ORDER BY tipo_procedimiento`;*/
 
     let tipoProceso = `SELECT 
                           expe.tipo_procedimiento AS procesos,
