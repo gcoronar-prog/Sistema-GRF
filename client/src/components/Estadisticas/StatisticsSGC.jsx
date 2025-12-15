@@ -92,6 +92,8 @@ function StatisticsSGC() {
         } else if (tipoDoc === 2) {
           exportExcel(data.atencion, "Atenciones.xlsx", "SGC");
         }
+      } else {
+        alert("No existen datos para mostrar");
       }
     } catch (error) {
       console.error(error);

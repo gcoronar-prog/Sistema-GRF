@@ -7,7 +7,23 @@ const SCAtencionPDF = async (id) => {
   );
   const data = await response.json();
   const atenc_segciud = data.atencion_ciudadana[0];
-  const acciones = data.acciones;
+
+  const response2 = await fetch(
+    `${import.meta.env.VITE_SERVER_ROUTE_BACK}/acciones/seguridad/${id}`
+    /*{
+      "Content-Type": "application/json",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }*/
+  );
+  const data2 = await response2.json();
+  if (data2.acciones.length !== 0) {
+    const acciones = data2.acciones[0];
+    console.log("acciones", acciones);
+  } else {
+    console.log("holi");
+  }
 
   const doc = new jsPDF();
 
@@ -133,9 +149,9 @@ const SCAtencionPDF = async (id) => {
   });
 
   const rows1 = [
-    ["Código acción", acciones[0].cod_accion || "-"],
-    ["Fecha y hora", formatDate(acciones[0].fecha_accion) || "-"],
-    ["Descripción", acciones[0].desc_acciones || "-"],
+    ["Código acción", acciones.cod_accion],
+    ["Fecha y hora", formatDate(acciones.fecha_accion) || "-"],
+    ["Descripción", acciones.desc_acciones || "-"],
   ];
   if (acciones && acciones.length > 0) {
     doc.addPage();
@@ -161,6 +177,8 @@ const SCAtencionPDF = async (id) => {
       alternateRowStyles: { fillColor: [245, 245, 245] },
       margin: { left: margin, right: margin },
     });
+  } else {
+    ("No hay acciones registradas para esta atención.");
   }
 
   addFooter();

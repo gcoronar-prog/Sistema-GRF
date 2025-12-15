@@ -153,15 +153,18 @@ function FormAtencion() {
       const lastAtencionData = await fetch(`${servidor}/atenciones/sgc/last`);
 
       const lastAtencion = await lastAtencionData.json();
-      setLastId(lastAtencion.atencion_ciudadana.id_atencion);
-      /*console.log(lastAtencion.atencion_ciudadana.id_atencion);
+      console.log(lastAtencion.atencion_ciudadana.id_atencion);
+      navigate(`/sgc/atencion/${lastAtencion.atencion_ciudadana.id_atencion}`);
+      /* setLastId(lastAtencion.atencion_ciudadana.id_atencion);
+      console.log(lastAtencion.atencion_ciudadana.id_atencion);
       if (lastAtencion && lastAtencion.atencion_ciudadana) {
         const idAtencionFinal = lastAtencion.atencion_ciudadana.id_atencion;
-      }*/
-      navigate(`/sgc/atencion/${lastAtencion.atencion_ciudadana.id_atencion}`);
+      }
 
+      console.log(idAtencionFinal);
       const metodo = idAten ? "" : `/sgc/atencion/${lastId + 1}`;
-      navigate(metodo);
+      navigate(metodo);*/
+
       setEditing(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {

@@ -100,8 +100,8 @@ router.get(
 );
 router.get(
   "/acciones/seguridad/:id",
-  verifyToken,
-  verifyGroup("superadmin", "seguridad"),
+  //verifyToken,
+  //verifyGroup("superadmin", "seguridad"),
   getAccionesId
 );
 router.post(
