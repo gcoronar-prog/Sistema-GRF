@@ -127,7 +127,7 @@ function FormAtencion() {
       ...atenciones,
       sector_solicitante: selectedSector,
       poblacion_solicitante: selectedPobla,
-      junta_vecinos: selectedJJVV || null,
+      junta_vecinos: selectedJJVV,
     };
 
     try {

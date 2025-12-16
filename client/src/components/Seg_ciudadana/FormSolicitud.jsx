@@ -341,7 +341,6 @@ function FormSolicitud() {
             <div className="card-body">
               <form className="was-validated" onSubmit={handleSubmit}>
                 <div className="row g-3">
-                  <label htmlFor="">Datos Solicitante</label>
                   <div className="col-md-6">
                     <label className="form-label">Fecha de solicitud</label>
                     <input
@@ -351,129 +350,6 @@ function FormSolicitud() {
                       value={solicitudes.fecha_solicitud}
                       onChange={handleChanges}
                       disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Rut Solicitante</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="rut_solicitante"
-                      value={solicitudes.rut_solicitante}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Nombre del solicitante</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="nombre_solicitante"
-                      value={solicitudes.nombre_solicitante}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Teléfono solicitante</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="telefono_solicitante"
-                      value={solicitudes.telefono_solicitante}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">E-mail solicitante</label>
-                    <input
-                      className="form-control"
-                      type="email"
-                      name="e_mail_solicitante"
-                      value={solicitudes.e_mail_solicitante}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <label htmlFor="">Datos Responsable</label>
-                  <div className="col-md-6">
-                    <label className="form-label">Nombre Responsable</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="nombre_responsable"
-                      value={solicitudes.nombre_responsable}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Institución</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="institucion"
-                      value={solicitudes.institucion}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Rut Responsable</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="rut_responsable"
-                      value={solicitudes.rut_responsable}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <label htmlFor="">Datos solicitud</label>
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Descripción de la solicitud
-                    </label>
-                    <textarea
-                      className="form-control"
-                      cols={6}
-                      name="descripcion_solicitud"
-                      id=""
-                      value={solicitudes.descripcion_solicitud}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    ></textarea>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Fecha solicitada</label>
-                    <input
-                      className="form-control"
-                      type="datetime-local"
-                      name="fecha_siniestro"
-                      value={solicitudes.fecha_siniestro}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Dirección</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="direccion_solicitud"
-                      value={solicitudes.direccion_solicitud}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Sector</label>
-                    <SelectSector
-                      selectedSector={selectedSector}
-                      setSelectedSector={setSelectedSector}
-                      edition={editing}
                     />
                   </div>
 
@@ -551,42 +427,188 @@ function FormSolicitud() {
                       </div>
                     </div>
                   </div>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Datos solicitante
+                    </legend>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label className="form-label">Rut</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="rut_solicitante"
+                          value={solicitudes.rut_solicitante}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Nombre</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="nombre_solicitante"
+                          value={solicitudes.nombre_solicitante}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Teléfono</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="telefono_solicitante"
+                          value={solicitudes.telefono_solicitante}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">E-mail</label>
+                        <input
+                          className="form-control"
+                          type="email"
+                          name="e_mail_solicitante"
+                          value={solicitudes.e_mail_solicitante}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
 
-                  <label htmlFor="">Datos Denuncia</label>
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      Entidad en la que se denuncia
-                    </label>
-                    <select
-                      className="form-select"
-                      name="entidad"
-                      id=""
-                      value={solicitudes.entidad}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    >
-                      <option value="">Seleccione entidad</option>
-                      <option value="JPL 1">JPL 1</option>
-                      <option value="JPL 2">JPL 2</option>
-                      <option value="Carabineros">Carabineros</option>
-                      <option value="PDI">PDI</option>
-                      <option value="Fiscalía">Fiscalía</option>
-                      <option value="Otra institución">Otra institución</option>
-                    </select>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">
-                      N° de parte / documento
-                    </label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="num_parte"
-                      value={solicitudes.num_parte}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    />
-                  </div>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Datos responsable
+                    </legend>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label className="form-label">Rut</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="rut_responsable"
+                          value={solicitudes.rut_responsable}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Nombre</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="nombre_responsable"
+                          value={solicitudes.nombre_responsable}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Institución</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="institucion"
+                          value={solicitudes.institucion}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Datos Solicitud
+                    </legend>
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label className="form-label">Fecha solicitada</label>
+                        <input
+                          className="form-control"
+                          type="datetime-local"
+                          name="fecha_siniestro"
+                          value={solicitudes.fecha_siniestro}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Sector</label>
+                        <SelectSector
+                          selectedSector={selectedSector}
+                          setSelectedSector={setSelectedSector}
+                          edition={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Dirección</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="direccion_solicitud"
+                          value={solicitudes.direccion_solicitud}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label">
+                          Descripción de la solicitud
+                        </label>
+                        <textarea
+                          className="form-control"
+                          cols={6}
+                          name="descripcion_solicitud"
+                          id=""
+                          value={solicitudes.descripcion_solicitud}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        ></textarea>
+                      </div>
+
+                      <div className="col-md-6">
+                        <label className="form-label">
+                          Entidad en la que se denuncia
+                        </label>
+                        <select
+                          className="form-select"
+                          name="entidad"
+                          id=""
+                          value={solicitudes.entidad}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        >
+                          <option value="">Seleccione entidad</option>
+                          <option value="JPL 1">JPL 1</option>
+                          <option value="JPL 2">JPL 2</option>
+                          <option value="Carabineros">Carabineros</option>
+                          <option value="PDI">PDI</option>
+                          <option value="Fiscalía">Fiscalía</option>
+                          <option value="Otra institución">
+                            Otra institución
+                          </option>
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">
+                          N° de parte / documento
+                        </label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="num_parte"
+                          value={solicitudes.num_parte}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                    </div>
+                  </fieldset>
                 </div>
 
                 {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}

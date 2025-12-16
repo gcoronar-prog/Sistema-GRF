@@ -18,12 +18,9 @@ const SCAtencionPDF = async (id) => {
     }*/
   );
   const data2 = await response2.json();
-  if (data2.acciones.length !== 0) {
-    const acciones = data2.acciones[0];
-    console.log("acciones", acciones);
-  } else {
-    console.log("holi");
-  }
+  console.log("acciones", data2);
+
+  const acciones = data2.acciones[0];
 
   const doc = new jsPDF();
 
@@ -148,12 +145,12 @@ const SCAtencionPDF = async (id) => {
     margin: { left: margin, right: margin },
   });
 
-  const rows1 = [
-    ["Código acción", acciones.cod_accion],
-    ["Fecha y hora", formatDate(acciones.fecha_accion) || "-"],
-    ["Descripción", acciones.desc_acciones || "-"],
-  ];
-  if (acciones && acciones.length > 0) {
+  if (acciones !== null && acciones !== undefined) {
+    const rows1 = [
+      ["Código acción", acciones?.cod_accion],
+      ["Fecha y hora", formatDate(acciones?.fecha_accion) || "-"],
+      ["Descripción", acciones?.desc_acciones || "-"],
+    ];
     doc.addPage();
     addHeader("Acciones realizadas", "");
     autoTable(doc, {
