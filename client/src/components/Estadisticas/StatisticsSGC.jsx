@@ -252,28 +252,28 @@ function StatisticsSGC() {
                 <div className="card-header">
                   <strong>Estado de atenciones</strong>
                 </div>
-                <div className="card-body">
-                  <div className="row">
-                    {Object.keys(estadoFilter).map((key) => (
-                      <div className="col" key={key}>
-                        <div className="form-check form-check-inline" key={key}>
-                          <input
-                            type="checkbox"
-                            className="form-check-input"
-                            id={key}
-                            data-type="estado"
-                            name={key}
-                            value={key}
-                            checked={estadoFilter[key] || false}
-                            onChange={handleCheckboxChange}
-                          />
-                          <label className="form-check-label" htmlFor={key}>
-                            {key.charAt(0).toUpperCase() + key.slice(1)}
-                          </label>
-                        </div>
+              </div>
+              <div className="card-body">
+                <div className="row">
+                  {Object.keys(estadoFilter).map((key) => (
+                    <div className="col" key={key}>
+                      <div className="form-check form-check-inline" key={key}>
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id={key}
+                          data-type="estado"
+                          name={key}
+                          value={key}
+                          checked={estadoFilter[key] || false}
+                          onChange={handleCheckboxChange}
+                        />
+                        <label className="form-check-label" htmlFor={key}>
+                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                        </label>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

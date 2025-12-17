@@ -11,6 +11,7 @@ import loginUser from "./routes/login.routes.js";
 import statisticsCentral from "./routes/statisticsCentral.routes.js";
 import StatisticsInspect from "./routes/statisticsInspect.routes.js";
 import statisticsSGC from "./routes/statisticsSGC.route.js";
+import statisticsSoliImg from "./routes/statisticsSoliImg.routes.js";
 
 import informesCentral from "./routes/informes.routes.js";
 
@@ -63,7 +64,8 @@ app.use(
   loginUser,
   statisticsCentral,
   StatisticsInspect,
-  statisticsSGC
+  statisticsSGC,
+  statisticsSoliImg
 );
 
 app.post(

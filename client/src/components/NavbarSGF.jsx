@@ -247,11 +247,36 @@ function NavbarSGF() {
                       Solicitud imágenes
                     </Link>
                   </li>
-                  <li className="nav-item">
-                    <Link className="nav-link" to="/statistics/seguridad/v1">
-                      <i className="bi bi-bar-chart me-1"></i>
-                      Estadisticas Seguridad Ciudadana
-                    </Link>
+                  <li className="nav-item dropdown">
+                    <a
+                      href="#"
+                      className="nav-link dropdown-toggle"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                    >
+                      Estadisticas del sistema
+                    </a>
+
+                    <ul className="dropdown-menu">
+                      <li className="nav-item">
+                        <Link
+                          className="nav-link"
+                          to="/statistics/seguridad/v1"
+                        >
+                          {/*<i className="bi bi-bar-chart me-1"></i>*/}
+                          Estadisticas atenciones
+                        </Link>
+                      </li>
+                      <li className="nav-item">
+                        <Link
+                          className="nav-link"
+                          to="/statistics/seguridad/imagenes/v1"
+                        >
+                          {/*<i className="bi bi-bar-chart me-1"></i>*/}
+                          Estadisticas solicitudes imágenes
+                        </Link>
+                      </li>
+                    </ul>
                   </li>
                 </>
               )}
@@ -328,6 +353,15 @@ function NavbarSGF() {
                           to="/statistics/seguridad/v1"
                         >
                           Estadísticas SGC
+                        </Link>
+                      </li>
+                      <li className="nav-item">
+                        <Link
+                          className="nav-link"
+                          to="/statistics/seguridad/imagenes/v1"
+                        >
+                          {/*<i className="bi bi-bar-chart me-1"></i>*/}
+                          Estadisticas solicitudes imágenes
                         </Link>
                       </li>
                     </ul>
