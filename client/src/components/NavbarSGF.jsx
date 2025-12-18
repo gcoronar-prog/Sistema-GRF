@@ -355,9 +355,9 @@ function NavbarSGF() {
                           Estadísticas SGC
                         </Link>
                       </li>
-                      <li className="nav-item">
+                      <li>
                         <Link
-                          className="nav-link"
+                          className="dropdown-item"
                           to="/statistics/seguridad/imagenes/v1"
                         >
                           {/*<i className="bi bi-bar-chart me-1"></i>*/}

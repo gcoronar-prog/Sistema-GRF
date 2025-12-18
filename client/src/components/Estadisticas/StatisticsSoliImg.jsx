@@ -1,5 +1,8 @@
 import { useState } from "react";
 import SelectSector from "../SelectSector";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { exportExcel } from "../exportExcel";
 
 function StatisicsSoliImg() {
   const server_back = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -42,14 +45,14 @@ function StatisicsSoliImg() {
     }
 
     if (rut_usuario) {
-      params.append("rut_solicitante", rut_usuario);
+      params.append("rut_usuario", rut_usuario);
     }
 
     if (rut_responsable) {
       params.append("rut_resp", rut_responsable);
     }
 
-    if (selectedSector) {
+    if (selectedSector && selectedSector.value) {
       params.append("sector", JSON.stringify(selectedSector));
     }
 
@@ -77,9 +80,9 @@ function StatisicsSoliImg() {
 
       if (data.solicitud.length !== 0) {
         if (tipoDoc === 1) {
-          //pdf
-        } else {
-          //excel
+          generarPDFSoli(data.solicitud);
+        } else if (tipoDoc === 2) {
+          exportExcel(data.solicitud, "soliGrabacion.xlsx", "SGCIMG");
         }
       } else {
         alert("No existen datos para mostrar");
@@ -114,6 +117,7 @@ function StatisicsSoliImg() {
     const tableColumn = [
       "ID Solicitud",
       "Fecha documento",
+      "Rut solicitante",
       "Estado solicitud",
       "Fecha grabación",
       "Sector solicitado",
@@ -125,9 +129,10 @@ function StatisicsSoliImg() {
     const tableRows = data.map((d) => [
       d.cod_solicitud,
       new Date(d.fecha_solicitud).toLocaleDateString("es-ES"),
+      d.rut_solicitante,
       d.estado_solicitud,
       new Date(d.fecha_siniestro).toLocaleDateString("es-ES"),
-      d.sector_solicitud,
+      d.sector_solicitud?.label,
       d.direccion_solicitud,
       d.entidad,
       d.num_parte,
@@ -167,6 +172,29 @@ function StatisicsSoliImg() {
     } else if (dataset.type === "estado") {
       setEstado_solicitud((prev) => ({ ...prev, [name]: checked }));
     }
+  };
+
+  const handleClearFilter = () => {
+    setFecha_solicitud_inicio("");
+    setFecha_solicitud_fin("");
+    setFecha_siniestro_inicio("");
+    setFecha_siniestro_fin("");
+    setRut_usuario("");
+    setRut_responsable("");
+    setSelectedSector([]);
+    setEstado_solicitud({
+      Pendiente: false,
+      Revisión: false,
+      Entregada: false,
+      Nula: false,
+    });
+    setEntidad({
+      "JPL 1": false,
+      "JPL 2": false,
+      Carabineros: false,
+      Fiscalía: false,
+      "Otras Instituciones": false,
+    });
   };
 
   return (
@@ -288,15 +316,26 @@ function StatisicsSoliImg() {
           <div className="row g-4 mt-3">
             <div className="col-md-4">
               <label htmlFor="rut_usuario" className="form-label fw-bold">
-                Rut usuario
+                Rut Solicitante
               </label>
-              <input type="text" className="form-control" name="rut_usuario" />
+              <input
+                type="text"
+                className="form-control"
+                name="rut_usuario"
+                onChange={(e) => setRut_usuario(e.target.value)}
+              />
             </div>
             <div className="col-md-4">
               <label htmlFor="rut_resp" className="form-label fw-bold">
                 Rut responsable
               </label>
-              <input type="text" className="form-control" name="rut_resp" />
+              <input
+                type="text"
+                className="form-control"
+                name="rut_resp"
+                id="rut_resp"
+                onChange={(e) => setRut_responsable(e.target.value)}
+              />
             </div>
             <div className="col-md-4">
               <label htmlFor="rut_resp" className="form-label fw-bold">
@@ -306,6 +345,37 @@ function StatisicsSoliImg() {
                 selectedSector={selectedSector}
                 setSelectedSector={setSelectedSector}
               />
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div className="row g-4">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-header bg-success text-white">
+              <strong>Acciones</strong>
+            </div>
+            <div className="card-body d-flex flex-column gap-3 align-items-center">
+              <button
+                className="btn btn-danger w-75"
+                onClick={() => fetchDatos(1)}
+              >
+                <i className="bi bi-file-pdf me-1"></i> Descargar PDF
+              </button>
+              <button
+                className="btn btn-success w-75"
+                onClick={() => fetchDatos(2)}
+              >
+                <i className="bi bi-file-earmark-excel me-1"></i> Exportar a
+                Excel
+              </button>
+              <button
+                className="btn btn-primary w-75"
+                onClick={handleClearFilter}
+              >
+                <i className="bi bi-stars me-1"></i> Limpiar filtros
+              </button>
             </div>
           </div>
         </div>

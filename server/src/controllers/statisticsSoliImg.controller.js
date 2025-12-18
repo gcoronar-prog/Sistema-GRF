@@ -72,7 +72,7 @@ function buildWhereClause({
     addCondition(`dsu.rut_solicitante = $${values.length + 1}`, rut_usuario);
   }
 
-  if (sector) {
+  if (sector && sector.length > 0) {
     addCondition(`dsg.sector_solicitud = $${values.length + 1}`, sector);
   }
 

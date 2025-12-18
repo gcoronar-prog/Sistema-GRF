@@ -75,6 +75,25 @@ export const exportExcel = (data, filename, formu) => {
       Acciones_realizadas: item.acciones_realizadas || "-",
       Funcionario_responsable: item.funcionario_responsable || "-",
     }));
+  } else if (formu === "SGCIMG") {
+    flatData = data.map((item) => ({
+      ID: item.id_solicitud,
+      Codigo: item.cod_solicitud,
+      Fecha_documento: new Date(item.fecha_solicitud),
+      Fecha_solicitada: new Date(item.fecha_siniestro),
+      Rut_solicitante: item.rut_solicitante || "-",
+      Nombre_solicitante: item.nombre_solicitante || "-",
+      Telefono: item.telefono_solicitante || "-",
+      E_mail: item.e_mail_solicitante || "-",
+      Rut_responsable: item.rut_responsable || "-",
+      Nombre_responsable: item.nombre_responsable || "-",
+      sector_solicitud: item.sector_solicitud?.label || "-",
+      direccion_solicitud: item.direccion_solicitud || "-",
+      estado_solicitud: item.estado_solicitud || "-",
+      desc_solicitud: item.descripcion_solicitud || "-",
+      entidad_denuncia: item.entidad || "-",
+      Num_parte: item.num_parte || "-",
+    }));
   } else {
     console.error("Formulario no reconocido para exportar");
     return;
