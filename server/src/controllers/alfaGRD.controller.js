@@ -19,19 +19,24 @@ const getAllInformesALFA = async (req, res) => {
     await client.query("BEGIN");
 
     // Consultas en paralelo para mejorar rendimiento
-    const [informes, sectores, danios] = await Promise.all([
-      client.query("SELECT * FROM informes_alfa"),
-      client.query("SELECT * FROM sectores_alfa"),
-      client.query("SELECT * FROM danios_y_montos"),
-    ]);
+    const [informes, danios, evaluacion, eventos, responsable] =
+      await Promise.all([
+        client.query("SELECT * FROM informes_alfa"),
+        client.query("SELECT * FROM danios_alfa"),
+        client.query("SELECT * FROM evaluacion_alfa"),
+        client.query("SELECT * FROM eventos_alfa"),
+        client.query("SELECT * FROM responsable_alfa"),
+      ]);
 
     await client.query("COMMIT");
 
     // Respuesta con todos los datos
     return res.json({
       informes: informes.rows,
-      sectores: sectores.rows,
       danios: danios.rows,
+      evaluacion: evaluacion.rows,
+      eventos: eventos.rows,
+      responsable: responsable.rows,
     });
   } catch (error) {
     console.error("Error al obtener informes ALFA:", error);
@@ -51,24 +56,22 @@ const getInformesALFA = async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    // Consultas en paralelo para mejorar rendimiento
-    const [informes, sectores, danios] = await Promise.all([
-      client.query("SELECT * FROM informes_alfa WHERE cod_alfa=$1", [id]),
-      client.query("SELECT * FROM sectores_alfa WHERE cod_alfa_sector=$1", [
-        id,
-      ]),
-      client.query("SELECT * FROM danios_y_montos WHERE cod_alfa_daños=$1", [
-        id,
-      ]),
-    ]);
+    const informeAlfa = await client.query(
+      `SELECT * FROM informes_alfa ia
+        JOIN danios_alfa da ON ia.id_danios=da.id_danios
+        JOIN evaluacion_alfa ea ON ia.id_evaluacion=ea.id_evaluacion
+        JOIN eventos_alfa eva ON ia.id_evento=eva.id_evento
+        JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
+        JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
+        WHERE ia.id_alfa = $1`,
+      [id]
+    );
 
     await client.query("COMMIT");
 
     // Respuesta con todos los datos
-    return res.json({
-      informes: informes.rows,
-      sectores: sectores.rows,
-      danios: danios.rows,
+    return res.status(200).json({
+      informe_alfa: informeAlfa.rows,
     });
   } catch (error) {
     console.error("Error al obtener informes ALFA:", error);
@@ -475,6 +478,19 @@ const getNextAlfa = async (req, res) => {
     client.release();
   }
 };
+
+const cteAlfa = `
+WITH danios_cte AS (
+  INSERT INTO danios_alfa (tipo_afectados, danio_vivienda,no_evaluado,danios_servicio,monto_danio) 
+  VALUES ($1, $2, $3, $4, $5) RETURNING *
+),
+eval_cte AS (
+  INSERT INTO evaluacion_alfa (acciones,oportunidad,recursos,necesidades,desc_necesidades,cap_respuesta,observaciones)
+  VALUES ($6, $7, $8, $9, $10, $11, $12) RETURNING *
+),
+event_cte AS (
+
+`;
 
 export {
   getAllInformesALFA,

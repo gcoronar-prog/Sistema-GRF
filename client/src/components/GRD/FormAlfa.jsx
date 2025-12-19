@@ -3,10 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BlobProvider } from "@react-pdf/renderer";
 import AlfaPDF from "../PDFs/AlfaPDF";
+import { useTokenSession } from "../useTokenSession";
 
 function FormAlfa() {
   const params = useParams();
   const navigate = useNavigate();
+  const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const token = localStorage.getItem("token");
+  const user = useTokenSession();
 
   const [informesALFA, setInformesALFA] = useState({
     fuente: "I. Municipalidad de San Antonio",
@@ -67,16 +71,23 @@ function FormAlfa() {
   }, [params.id]);
 
   const loadFuncionario = async () => {
-    const res = await fetch(`${servidor}/funciongrd`);
+    const res = await fetch(`${servidor_local}/funciongrd`);
     if (!res.ok) throw new Error("Problemas obteniendo datos inspectores");
     const data = await res.json();
     setFuncionarios(data);
   };
 
   const loadInformes = async (id) => {
-    const res = await fetch(`${servidor}/alfa/${id}`);
+    const res = await fetch(`${servidor_local}/alfa/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (!res.ok) throw new Error("Problemas obteniendo datos de informes");
     const data = await res.json();
+    console.log("alfa", data);
+
     const info = data;
     const formattedOcurrencia = dayjs(info.informes.ocurrencia).format(
       "YYYY-MM-DDTHH:mm"
@@ -84,47 +95,45 @@ function FormAlfa() {
     const formattedFechaHora = dayjs(info.informes.fecha_hora).format(
       "YYYY-MM-DDTHH:mm"
     );
-    console.log(info.informes.ocurrencia);
 
-    console.log(data.informes[0].cod_alfa);
-    console.log(informesALFA.tipo_evento);
+    //console.log(data.informes[0].cod_alfa);
 
     setInformesALFA({
-      fuente: info.informes[0].fuente,
-      fono: info.informes[0].fono,
-      sismo_escala: info.informes[0].sismo_escala,
-      tipo_evento: info.informes[0].tipo_evento,
-      otro_evento: info.informes[0].otro_evento,
-      descripcion: info.informes[0].descripcion,
+      fuente: info.informes.fuente,
+      fono: info.informes.fono,
+      sismo_escala: info.informes.sismo_escala,
+      tipo_evento: info.informes.tipo_evento,
+      otro_evento: info.informes.otro_evento,
+      descripcion: info.informes.descripcion,
       ocurrencia: formattedOcurrencia,
       //ocurrencia: info.informes[0].ocurrencia,
-      acciones: info.informes[0].acciones,
-      oportunidad_tpo: info.informes[0].oportunidad_tpo,
-      recursos_involucrados: info.informes[0].recursos_involucrados,
-      evaluacion_necesidades: info.informes[0].evolucion_necesidades,
-      capacidad_respuesta: info.informes[0].capacidad_respuesta,
-      observaciones: info.informes[0].observaciones,
-      usuario_grd: info.informes[0].usuario_grd,
+      acciones: info.informes.acciones,
+      oportunidad_tpo: info.informes.oportunidad_tpo,
+      recursos_involucrados: info.informes.recursos_involucrados,
+      evaluacion_necesidades: info.informes.evolucion_necesidades,
+      capacidad_respuesta: info.informes.capacidad_respuesta,
+      observaciones: info.informes.observaciones,
+      usuario_grd: info.informes.usuario_grd,
       fecha_hora: formattedFechaHora,
       //fecha_hora: info.informes[0].fecha_hora,
-      otras_necesidades: info.informes[0].otras_necesidades,
+      otras_necesidades: info.informes.otras_necesidades,
 
-      daños_vivienda: info.danios[0].daños_vivienda,
-      daños_infra: info.danios[0].daños_infra,
-      daños_personas: info.danios[0].daños_personas,
-      monto_estimado: info.danios[0].monto_estimado,
-      cod_alfa_daños: info.danios[0].cod_alfa_daños,
+      daños_vivienda: info.danios.daños_vivienda,
+      daños_infra: info.danios.daños_infra,
+      daños_personas: info.danios.daños_personas,
+      monto_estimado: info.danios.monto_estimado,
+      cod_alfa_daños: info.danios.cod_alfa_daños,
 
-      region: info.sectores[0].region,
-      provincia: info.sectores[0].provincia,
-      comuna: info.sectores[0].comuna,
-      direccion: info.sectores[0].direccion,
-      tipo_ubicacion: info.sectores[0].tipo_ubicacion,
-      cod_alfa_sector: info.sectores[0].cod_alfa_sector,
+      region: info.sectores.region,
+      provincia: info.sectores.provincia,
+      comuna: info.sectores.comuna,
+      direccion: info.sectores.direccion,
+      tipo_ubicacion: info.sectores.tipo_ubicacion,
+      cod_alfa_sector: info.sectores.cod_alfa_sector,
     });
 
     setSelectedValues(
-      Array.isArray(info.informes[0].tipo_evento)
+      Array.isArray(info.informes.tipo_evento)
         ? info.informes[0].tipo_evento
         : []
     );
@@ -144,8 +153,8 @@ function FormAlfa() {
 
       // Configuración de la URL y método HTTP
       const url = params.id
-        ? `${servidor}/alfa/${params.id}`
-        : `${servidor}/alfa/`;
+        ? `${servidor_local}/alfa/${params.id}`
+        : `${servidor_local}/alfa/`;
       const method = params.id ? "PUT" : "POST";
 
       // Realizar la solicitud al servidor
@@ -173,14 +182,14 @@ function FormAlfa() {
   const handleDeleteInforme = async () => {
     const id = params.id;
 
-    await fetch(`${servidor}/alfa/${id}`, {
+    await fetch(`${servidor_local}/alfa/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
     const updateAlfa = { ...informesALFA };
     delete updateAlfa[id];
     setInformesALFA(updateAlfa);
-    const res = await fetch(`${servidor}/lastalfa`);
+    const res = await fetch(`${servidor_local}/lastalfa`);
     const data = await res.json();
     //console.log(data.informe_Alfa.cod_alfa);
     navigate(`/alfa/${data.informe_Alfa.cod_alfa}/edit`);
@@ -188,6 +197,7 @@ function FormAlfa() {
   };
 
   const defaultInformes = {
+    cod_alfa: "",
     fuente: "I. Municipalidad de San Antonio",
     fono: "352337133",
     sismo_escala: "",
@@ -252,7 +262,7 @@ function FormAlfa() {
   };*/
 
   const handleLastAlfa = async () => {
-    const res = await fetch(`${servidor}/lastalfa`);
+    const res = await fetch(`${servidor_local}/lastalfa`);
     if (res.ok) {
       const lastAlfa = await res.json();
       //console.log(lastAlfa);
@@ -272,7 +282,7 @@ function FormAlfa() {
   };
 
   const handleFirstAlfa = async () => {
-    const res = await fetch(`${servidor}/firstalfa`);
+    const res = await fetch(`${servidor_local}/firstalfa`);
     if (res.ok) {
       const firstAlfa = await res.json();
       //console.log(lastAlfa);
@@ -294,7 +304,7 @@ function FormAlfa() {
 
   const handlePrevious = async () => {
     try {
-      const response = await fetch(`${servidor}/alfa/prev/${params.id}`);
+      const response = await fetch(`${servidor_local}/alfa/prev/${params.id}`);
       const data = await response.json();
 
       if (data?.informesRows?.length > 0 && data.informesRows[0].cod_alfa) {
@@ -312,7 +322,7 @@ function FormAlfa() {
 
   const handleNext = async () => {
     try {
-      const response = await fetch(`${servidor}/alfa/next/${params.id}`);
+      const response = await fetch(`${servidor_local}/alfa/next/${params.id}`);
       const data = await response.json();
 
       if (data?.informesRows?.length > 0 && data?.informesRows[0].cod_alfa) {
@@ -352,7 +362,7 @@ function FormAlfa() {
     const id = params.id;
 
     try {
-      const res = await fetch(`${servidor}/lastalfa`);
+      const res = await fetch(`${servidor_local}/lastalfa`);
 
       if (!id) {
         if (res.ok) {

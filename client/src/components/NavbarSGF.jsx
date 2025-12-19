@@ -90,6 +90,21 @@ function NavbarSGF() {
     navigate(`/sgc/imagenes/${id_imagenes}`);
   };
 
+  const handleLastALFA = async () => {
+    const res = await fetch(`${servidor_local}/lastalfa`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const lastALFA = await res.json();
+
+    const idAlfa = lastALFA.informe_Alfa.id_alfa;
+
+    navigate(`/alfa/${idAlfa}/edit`);
+  };
+
   const rol = user.user_rol;
   /*if (!user) {
     return null;
@@ -316,6 +331,22 @@ function NavbarSGF() {
                           onClick={handleLastAtencion}
                         >
                           Atención público
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className="dropdown-item"
+                          onClick={handleLastImagenes}
+                        >
+                          Solicitud Imágenes
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className="dropdown-item"
+                          onClick={handleLastALFA}
+                        >
+                          Informes ALFA
                         </Link>
                       </li>
                     </ul>

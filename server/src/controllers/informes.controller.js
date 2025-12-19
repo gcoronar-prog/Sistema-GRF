@@ -318,23 +318,23 @@ const getLastInformeCentral = async (req, res) => {
   try {
     await client.query("BEGIN");
     const informe = await client.query(
-      "SELECT \
-          ic.*,\
-          doi.* AS origen_informe,\
-          dti.* AS tipo_informe,\
-          dui.* AS ubicacion_informe,\
-          dvi.* AS vehiculo_informe\
-      FROM \
-          informes_central ic\
-      LEFT JOIN \
-          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe\
-      LEFT JOIN \
-          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes\
-      LEFT JOIN \
-          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion\
-      LEFT JOIN \
-          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos\
-        ORDER BY ic.id_informes_central DESC LIMIT 1"
+      `SELECT 
+          ic.*,
+          doi.* AS origen_informe,
+          dti.* AS tipo_informe,
+          dui.* AS ubicacion_informe,
+          dvi.* AS vehiculo_informe
+      FROM 
+          informes_central ic
+      LEFT JOIN 
+          datos_origen_informe doi ON ic.id_origen_informe = doi.id_origen_informe
+      LEFT JOIN 
+          datos_tipos_informes dti ON ic.id_tipos_informe = dti.id_tipos_informes
+      LEFT JOIN
+          datos_ubicacion_informe dui ON ic.id_ubicacion_informe = dui.id_ubicacion
+      LEFT JOIN 
+          datos_vehiculos_informe dvi ON ic.id_vehiculo_informe = dvi.id_vehiculos
+        ORDER BY ic.id_informes_central DESC LIMIT 1`
     );
 
     await client.query("COMMIT");

@@ -11,11 +11,16 @@ import {
   getPrevAlfa,
   updateALFA,
 } from "../controllers/alfaGRD.controller.js";
-
+import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 const router = Router();
 
 router.get("/informe_alfa", getAllInformesALFA);
-router.get("/alfa/:id", getInformesALFA);
+router.get(
+  "/alfa/:id",
+  //verifyToken,
+  //verifyGroup("superadmin", "grd"),
+  getInformesALFA
+);
 router.post("/alfa", createAlfa);
 router.put("/alfa/:id", updateALFA);
 router.delete("/alfa/:id", deleteAlfa);
