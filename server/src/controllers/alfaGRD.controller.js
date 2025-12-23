@@ -54,20 +54,16 @@ const getInformesALFA = async (req, res) => {
   const client = await pool.connect(); // Asegúrate de usar await
   const { id } = req.params;
   try {
-    await client.query("BEGIN");
-
     const informeAlfa = await client.query(
       `SELECT * FROM informes_alfa ia
-        JOIN danios_alfa da ON ia.id_danios=da.id_danios
-        JOIN evaluacion_alfa ea ON ia.id_evaluacion=ea.id_evaluacion
-        JOIN eventos_alfa eva ON ia.id_evento=eva.id_evento
-        JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
-        JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
+        LEFT JOIN danios_alfa da ON ia.id_danios=da.id_danios
+        LEFT JOIN evaluacion_alfa ea ON ia.id_evaluacion=ea.id_evaluacion
+        LEFT JOIN eventos_alfa eva ON ia.id_evento=eva.id_evento
+        LEFT JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
+        LEFT JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
         WHERE ia.id_alfa = $1`,
       [id]
     );
-
-    await client.query("COMMIT");
 
     // Respuesta con todos los datos
     return res.status(200).json({
@@ -86,166 +82,99 @@ const getInformesALFA = async (req, res) => {
 };
 
 const createAlfa = async (req, res) => {
-  const client = await pool.connect();
+  //const client = await pool.connect();
+  const data = req.body;
   try {
-    const data = req.body;
-
-    await client.query("BEGIN");
-
-    const { rows: informesALFA } = await client.query(
-      "INSERT INTO informes_alfa(fuente,\
-         fono, sismo_escala, tipo_evento, otro_evento,descripcion,\
-          ocurrencia, acciones, oportunidad_tpo, recursos_involucrados,\
-           evaluacion_necesidades,capacidad_respuesta,observaciones,\
-           usuario_grd,fecha_hora,otras_necesidades) \
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *",
-      [
-        data.fuente,
-        data.fono,
-        data.sismo_escala,
-        data.tipo_evento,
-        data.otro_evento,
-        data.descripcion,
-        data.ocurrencia,
-        data.acciones,
-        data.oportunidad_tpo,
-        data.recursos_involucrados,
-        data.evaluacion_necesidades,
-        data.capacidad_respuesta,
-        data.observaciones,
-        data.usuario_grd,
-        data.fecha_hora,
-        data.otras_necesidades,
-      ]
-    );
-    const idAlfas = informesALFA[0].cod_alfa;
-
-    const [damages, sectores] = await Promise.all([
-      client.query(
-        "INSERT INTO danios_y_montos (daños_vivienda, daños_infra,\
-            daños_personas, monto_estimado,cod_alfa_daños)\
-             VALUES ($1,$2,$3,$4,$5) RETURNING *",
-        [
-          data.daños_vivienda,
-          data.daños_infra,
-          data.daños_personas,
-          data.monto_estimado,
-          idAlfas,
-        ]
-      ),
-
-      client.query(
-        "INSERT INTO sectores_alfa (region, provincia,comuna,direccion, tipo_ubicacion,cod_alfa_sector) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
-        [
-          data.region,
-          data.provincia,
-          data.comuna,
-          data.direccion,
-          data.tipo_ubicacion,
-          idAlfas,
-        ]
-      ),
+    const {
+      rows: [result],
+    } = await pool.query(cteAlfa, [
+      //danios_cte
+      data.tipo_afectados,
+      data.danio_vivienda,
+      data.no_evaluado,
+      data.danios_servicio,
+      data.monto_danio,
+      //eval_cte
+      data.acciones,
+      data.oportunidad,
+      data.recursos,
+      data.necesidades,
+      data.desc_necesidades,
+      data.cap_respuesta,
+      data.observaciones,
+      //event_cte
+      data.fuente_info,
+      data.telefono,
+      data.tipo_evento,
+      data.escala_sismo,
+      data.otro_evento,
+      data.direccion,
+      data.tipo_ubicacion,
+      data.desc_evento,
+      data.fecha_ocurrencia,
+      //resp_cte
+      data.funcionario,
+      data.fecha_documento,
+      //sector_cte
+      data.region,
+      data.provincia,
+      data.comuna,
     ]);
 
-    await client.query("COMMIT");
-
-    return res.json({
-      InformeAlfa: informesALFA[0],
-      Daños: damages.rows[0],
-      Sectores: sectores.rows[0],
-    });
+    return res.status(201).json(result);
   } catch (error) {
     console.log(error);
-
-    await client.query("ROLLBACK");
     return res
       .status(500)
       .json({ message: "Problema de conexion con servidor" });
-  } finally {
-    client.release();
   }
 };
 
 const updateALFA = async (req, res) => {
-  const client = await pool.connect();
+  const { id } = req.params;
+  const data = req.body;
   try {
-    const { id } = req.params;
-    const data = req.body;
-
-    await client.query("BEGIN");
-
-    const { rows: informesALFA } = await client.query(
-      "UPDATE informes_alfa SET fuente=$1,\
-         fono=$2, sismo_escala=$3, tipo_evento=$4, otro_evento=$5, descripcion=$6,\
-          ocurrencia=$7, acciones=$8, oportunidad_tpo=$9, recursos_involucrados=$10,\
-           evaluacion_necesidades=$11,capacidad_respuesta=$12,observaciones=$13,\
-           usuario_grd=$14,fecha_hora=$15,otras_necesidades=$16 \
-           WHERE cod_alfa=$17 RETURNING *",
-      [
-        data.fuente,
-        data.fono,
-        data.sismo_escala,
-        data.tipo_evento,
-        data.otro_evento,
-        data.descripcion,
-        data.ocurrencia,
-        data.acciones,
-        data.oportunidad_tpo,
-        data.recursos_involucrados,
-        data.evaluacion_necesidades,
-        data.capacidad_respuesta,
-        data.observaciones,
-        data.usuario_grd,
-        data.fecha_hora,
-        data.otras_necesidades,
-        id,
-      ]
-    );
-
-    const [damages, sectores] = await Promise.all([
-      client.query(
-        "UPDATE danios_y_montos SET daños_vivienda=$1, daños_infra=$2,\
-            daños_personas=$3, monto_estimado=$4 \
-            WHERE cod_alfa_daños = $5 RETURNING *",
-        [
-          data.daños_vivienda,
-          data.daños_infra,
-          data.daños_personas,
-          data.monto_estimado,
-          id,
-        ]
-      ),
-
-      client.query(
-        "UPDATE sectores_alfa SET region=$1, provincia=$2,comuna=$3,direccion=$4, \
-        tipo_ubicacion=$5 WHERE cod_alfa_sector=$6 RETURNING *",
-        [
-          data.region,
-          data.provincia,
-          data.comuna,
-          data.direccion,
-          data.tipo_ubicacion,
-          id,
-        ]
-      ),
+    const { rows: result } = await pool.query(cteUpdateAlfa, [
+      id,
+      //danios_cte
+      data.tipo_afectados,
+      data.danio_vivienda,
+      data.no_evaluado,
+      data.danios_servicio,
+      data.monto_danio,
+      //eval_cte
+      data.acciones,
+      data.oportunidad,
+      data.recursos,
+      data.necesidades,
+      data.desc_necesidades,
+      data.cap_respuesta,
+      data.observaciones,
+      //event_cte
+      data.fuente_info,
+      data.telefono,
+      data.tipo_evento,
+      data.escala_sismo,
+      data.otro_evento,
+      data.direccion,
+      data.tipo_ubicacion,
+      data.desc_evento,
+      data.fecha_ocurrencia,
+      //resp_cte
+      data.funcionario,
+      data.fecha_documento,
+      //sector_cte
+      data.region,
+      data.provincia,
+      data.comuna,
     ]);
 
-    await client.query("COMMIT");
-
-    return res.json({
-      InformeAlfa: informesALFA[0],
-      Daños: damages.rows[0],
-      Sectores: sectores.rows[0],
-    });
+    return res.status(201).json(result);
   } catch (error) {
     console.log(error);
-
-    await client.query("ROLLBACK");
     return res
       .status(500)
       .json({ message: "Problema de conexion con servidor" });
-  } finally {
-    client.release();
   }
 };
 
@@ -481,7 +410,7 @@ const getNextAlfa = async (req, res) => {
 
 const cteAlfa = `
 WITH danios_cte AS (
-  INSERT INTO danios_alfa (tipo_afectados, danio_vivienda,no_evaluado,danios_servicio,monto_danio) 
+  INSERT INTO danios_alfa (tipo_afectados, danio_vivienda,no_evaluado,danios_servicios,monto_danio) 
   VALUES ($1, $2, $3, $4, $5) RETURNING *
 ),
 eval_cte AS (
@@ -489,9 +418,51 @@ eval_cte AS (
   VALUES ($6, $7, $8, $9, $10, $11, $12) RETURNING *
 ),
 event_cte AS (
+  INSERT INTO eventos_alfa (fuente_info, telefono,tipo_evento,escala_sismo,otro_evento,direccion,tipo_ubicacion,desc_evento,fecha_ocurrencia)
+  VALUES ($13, $14, $15, $16, $17, $18, $19, $20, $21) RETURNING *
+),
+resp_cte AS (
+  INSERT INTO responsable_alfa (funcionario, fecha_documento)
+  VALUES ($22, $23) RETURNING *
+),
+sector_cte AS (
+  INSERT INTO sectores_alfa (region, provincia, comuna)
+  VALUES ($24, $25, $26) RETURNING *
+  )
+  INSERT INTO informes_alfa (id_danios,id_evaluacion,id_evento,id_responsable,id_sector)
+  VALUES (
+    (SELECT id_danios FROM danios_cte),
+    (SELECT id_evaluacion FROM eval_cte),
+    (SELECT id_evento FROM event_cte),
+    (SELECT id_responsable FROM resp_cte),
+    (SELECT id_sector FROM sector_cte)
+    ) RETURNING *`;
 
-`;
+const cteUpdateAlfa = `WITH upd_alfa AS 
+(SELECT * FROM informes_alfa WHERE id_alfa=$1),
 
+danios_cte AS (
+  UPDATE danios_alfa SET tipo_afectados=$2, danio_vivienda=$3,no_evaluado=$4,danios_servicios=$5,monto_danio=$6
+  WHERE id_danios=(SELECT id_danios FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
+eval_cte AS (UPDATE evaluacion_alfa SET acciones=$7,oportunidad=$8,recursos=$9,necesidades=$10,desc_necesidades=$11,
+cap_respuesta=$12,observaciones=$13
+  WHERE id_evaluacion=(SELECT id_evaluacion FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
+event_cte AS (UPDATE eventos_alfa SET fuente_info=$14, telefono=$15,tipo_evento=$16,escala_sismo=$17,otro_evento=$18,
+direccion=$19,tipo_ubicacion=$20,desc_evento=$21,fecha_ocurrencia=$22
+  WHERE id_evento=(SELECT id_evento FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
+resp_cte AS (UPDATE responsable_alfa SET funcionario=$23, fecha_documento=$24
+  WHERE id_responsable=(SELECT id_responsable FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
+sector_cte AS (UPDATE sectores_alfa SET region=$25, provincia=$26, comuna=$27
+  WHERE id_sector=(SELECT id_sector FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *)
+
+  SELECT
+    (SELECT id_danios FROM danios_cte) AS id_danios,
+  (SELECT id_evaluacion FROM eval_cte) AS id_evaluacion,
+  (SELECT id_evento FROM event_cte) AS id_evento,
+  (SELECT id_responsable FROM resp_cte) AS id_responsable
+  `;
+const cteDeleteAlfa = ``;
+const cteGetAlfa = ``;
 export {
   getAllInformesALFA,
   getInformesALFA,
