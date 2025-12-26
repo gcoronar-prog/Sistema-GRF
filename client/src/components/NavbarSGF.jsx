@@ -100,7 +100,7 @@ function NavbarSGF() {
 
     const lastALFA = await res.json();
 
-    const idAlfa = lastALFA.informe_Alfa.id_alfa;
+    const idAlfa = lastALFA[0].id_alfa;
 
     navigate(`/alfa/${idAlfa}/edit`);
   };

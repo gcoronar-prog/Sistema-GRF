@@ -179,36 +179,11 @@ const updateALFA = async (req, res) => {
 };
 
 const deleteAlfa = async (req, res) => {
-  const client = await pool.connect();
+  const { id } = req.params;
   try {
-    const { id } = req.params;
+    const { rows: result } = await pool.query(cteDeleteAlfa, [id]);
 
-    await client.query("BEGIN");
-
-    const { rows: informesALFA } = await client.query(
-      "DELETE FROM informes_alfa WHERE cod_alfa=$1 RETURNING *",
-      [id]
-    );
-
-    const [damages, sectores] = await Promise.all([
-      client.query(
-        "DELETE FROM danios_y_montos WHERE cod_alfa_daños = $1 RETURNING *",
-        [id]
-      ),
-
-      client.query(
-        "DELETE FROM sectores_alfa WHERE cod_alfa_sector=$1 RETURNING *",
-        [id]
-      ),
-    ]);
-
-    await client.query("COMMIT");
-
-    return res.json({
-      InformeAlfa: informesALFA[0],
-      Daños: damages.rows[0],
-      Sectores: sectores.rows[0],
-    });
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
 
@@ -216,8 +191,6 @@ const deleteAlfa = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Problema de conexion con servidor" });
-  } finally {
-    client.release();
   }
 };
 
@@ -238,173 +211,101 @@ const getFuncionarioGRD = async (req, res) => {
 };
 
 const getLastAlfa = async (req, res) => {
-  const client = await pool.connect();
-
   try {
-    await client.query("BEGIN");
-
-    const [informe, damages, sectores] = await Promise.all([
-      client.query("SELECT * FROM informes_alfa ORDER BY id_alfa DESC LIMIT 1"),
-      client.query(
-        "SELECT * FROM danios_y_montos ORDER BY id_daños DESC LIMIT 1"
-      ),
-      client.query(
-        "SELECT * FROM sectores_alfa ORDER BY id_sectores_alfa DESC LIMIT 1"
-      ),
-    ]);
-
-    await client.query("COMMIT");
-
-    return res.json({
-      informe_Alfa: informe.rows[0],
-      daños: damages.rows[0],
-      sector: sectores.rows[0],
-    });
+    const { rows: result } = await pool.query(`
+        SELECT * FROM informes_alfa ia
+          LEFT JOIN danios_alfa da ON ia.id_danios=da.id_danios
+          LEFT JOIN evaluacion_alfa ea ON ia.id_evaluacion=ea.id_evaluacion
+          LEFT JOIN eventos_alfa eva ON ia.id_evento=eva.id_evento
+          LEFT JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
+          LEFT JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
+          ORDER BY ia.id_alfa DESC LIMIT 1`);
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    await client.query("ROLLBACK");
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
-  } finally {
-    client.release();
   }
 };
 
 const getFirstAlfa = async (req, res) => {
-  const client = await pool.connect();
-
   try {
-    await client.query("BEGIN");
+    const { rows: result } = await pool.query(`
+          SELECT * FROM informes_alfa ia
+              LEFT JOIN danios_alfa da ON ia.id_danios=da.id_danios
+              LEFT JOIN evaluacion_alfa ea ON ia.id_evaluacion=ea.id_evaluacion
+              LEFT JOIN eventos_alfa eva ON ia.id_evento=eva.id_evento
+              LEFT JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
+              LEFT JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
+      ORDER BY ia.id_alfa ASC LIMIT 1`);
 
-    const [informe, damages, sectores] = await Promise.all([
-      client.query("SELECT * FROM informes_alfa ORDER BY id_alfa ASC LIMIT 1"),
-      client.query(
-        "SELECT * FROM danios_y_montos ORDER BY id_daños ASC LIMIT 1"
-      ),
-      client.query(
-        "SELECT * FROM sectores_alfa ORDER BY id_sectores_alfa ASC LIMIT 1"
-      ),
-    ]);
-
-    await client.query("COMMIT");
-
-    return res.json({
-      informe_Alfa: informe.rows[0],
-      daños: damages.rows[0],
-      sector: sectores.rows[0],
-    });
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
-    await client.query("ROLLBACK");
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
-  } finally {
-    client.release();
   }
 };
 
 const getPrevAlfa = async (req, res) => {
-  const client = await pool.connect();
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-
-    await client.query("BEGIN");
-
-    // 1. Obtener el expediente previo
-    const { rows: informesRows } = await client.query(
-      "SELECT * FROM informes_alfa WHERE id_alfa < (SELECT id_alfa FROM informes_alfa WHERE cod_alfa = $1) ORDER BY id_alfa DESC LIMIT 1",
+    const { rows: result } = await pool.query(
+      `SELECT * FROM informes_alfa ia
+          LEFT JOIN danios_alfa da ON ia.id_danios=da.id_danios
+          LEFT JOIN evaluacion_alfa ea ON ia.id_evaluacion=ea.id_evaluacion
+          LEFT JOIN eventos_alfa eva ON ia.id_evento=eva.id_evento
+          LEFT JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
+          LEFT JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
+      WHERE ia.id_alfa < $1
+      ORDER BY ia.id_alfa DESC LIMIT 1
+      `,
       [id]
     );
 
-    if (informesRows.length === 0) {
-      await client.query("ROLLBACK");
-      return res
-        .status(404)
-        .json({ message: "No se encontró expediente previo" });
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No se encontró informe previo" });
     }
 
-    const informe = informesRows[0];
-
-    const { rows: dañosRows } = await client.query(
-      "SELECT * FROM danios_y_montos WHERE cod_alfa_daños=$1 ORDER BY id_daños DESC LIMIT 1",
-      [id]
-    );
-
-    const { rows: sectorRows } = await client.query(
-      "SELECT * FROM sectores_alfa WHERE cod_alfa_sector = $1 ORDER BY id_sectores_alfa DESC LIMIT 1",
-      [id]
-    );
-
-    //contribuyente = contriRows.length > 0 ? contriRows[0] : null;
-
-    await client.query("COMMIT");
-
-    return res.json({
-      informesRows,
-      dañosRows,
-      sectorRows,
-    });
+    return res.status(200).json(result);
   } catch (error) {
     console.error("Error en getPrevAlfa:", error);
-    await client.query("ROLLBACK");
+
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
-  } finally {
-    client.release();
   }
 };
 
 const getNextAlfa = async (req, res) => {
-  const client = await pool.connect();
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-
-    await client.query("BEGIN");
-
-    const { rows: informesRows } = await client.query(
-      "SELECT * FROM informes_alfa WHERE id_alfa > (SELECT id_alfa FROM informes_alfa WHERE cod_alfa = $1) ORDER BY id_alfa ASC LIMIT 1",
+    const { rows: result } = await pool.query(
+      `
+      SELECT * FROM informes_alfa ia
+          LEFT JOIN danios_alfa da ON ia.id_danios=da.id_danios
+          LEFT JOIN evaluacion_alfa ea ON ia.id_evaluacion=ea.id_evaluacion
+          LEFT JOIN eventos_alfa eva ON ia.id_evento=eva.id_evento
+          LEFT JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
+          LEFT JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
+      WHERE ia.id_alfa > $1
+      ORDER BY ia.id_alfa ASC LIMIT 1`,
       [id]
     );
 
-    if (informesRows.length === 0) {
-      await client.query("ROLLBACK");
-      return res
-        .status(404)
-        .json({ message: "No se encontró expediente previo" });
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No se encontró informe previo" });
     }
 
-    const informe = informesRows[0];
-
-    const { rows: dañosRows } = await client.query(
-      "SELECT * FROM danios_y_montos WHERE cod_alfa_daños=$1 ORDER BY id_daños ASC LIMIT 1",
-      [id]
-    );
-
-    const { rows: sectorRows } = await client.query(
-      "SELECT * FROM sectores_alfa WHERE cod_alfa_sector = $1 ORDER BY id_sectores_alfa ASC LIMIT 1",
-      [id]
-    );
-
-    //contribuyente = contriRows.length > 0 ? contriRows[0] : null;
-
-    await client.query("COMMIT");
-
-    return res.json({
-      informesRows,
-      dañosRows,
-      sectorRows,
-    });
+    return res.status(200).json(result);
   } catch (error) {
     console.error("Error en getNextAlfa:", error);
-    await client.query("ROLLBACK");
+
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
-  } finally {
-    client.release();
   }
 };
 
@@ -442,18 +343,32 @@ const cteUpdateAlfa = `WITH upd_alfa AS
 (SELECT * FROM informes_alfa WHERE id_alfa=$1),
 
 danios_cte AS (
-  UPDATE danios_alfa SET tipo_afectados=$2, danio_vivienda=$3,no_evaluado=$4,danios_servicios=$5,monto_danio=$6
-  WHERE id_danios=(SELECT id_danios FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
-eval_cte AS (UPDATE evaluacion_alfa SET acciones=$7,oportunidad=$8,recursos=$9,necesidades=$10,desc_necesidades=$11,
-cap_respuesta=$12,observaciones=$13
-  WHERE id_evaluacion=(SELECT id_evaluacion FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
-event_cte AS (UPDATE eventos_alfa SET fuente_info=$14, telefono=$15,tipo_evento=$16,escala_sismo=$17,otro_evento=$18,
-direccion=$19,tipo_ubicacion=$20,desc_evento=$21,fecha_ocurrencia=$22
-  WHERE id_evento=(SELECT id_evento FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
-resp_cte AS (UPDATE responsable_alfa SET funcionario=$23, fecha_documento=$24
-  WHERE id_responsable=(SELECT id_responsable FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *),
-sector_cte AS (UPDATE sectores_alfa SET region=$25, provincia=$26, comuna=$27
-  WHERE id_sector=(SELECT id_sector FROM informes_alfa WHERE id_alfa=(SELECT id_alfa FROM upd_alfa)) RETURNING *)
+  UPDATE danios_alfa d SET tipo_afectados=$2, danio_vivienda=$3,no_evaluado=$4,danios_servicios=$5,monto_danio=$6
+  FROM upd_alfa u
+  WHERE d.id_danios=u.id_danios RETURNING d.id_danios
+  ),
+eval_cte AS (
+  UPDATE evaluacion_alfa e SET acciones=$7,oportunidad=$8,recursos=$9,necesidades=$10,desc_necesidades=$11,
+  cap_respuesta=$12,observaciones=$13
+  FROM upd_alfa u
+    WHERE e.id_evaluacion=u.id_evaluacion RETURNING e.id_evaluacion
+    ),
+event_cte AS (
+  UPDATE eventos_alfa ev SET fuente_info=$14, telefono=$15,tipo_evento=$16,escala_sismo=$17,otro_evento=$18,
+  direccion=$19,tipo_ubicacion=$20,desc_evento=$21,fecha_ocurrencia=$22
+  FROM upd_alfa u
+    WHERE ev.id_evento=u.id_evento RETURNING ev.id_evento
+    ),
+resp_cte AS (
+  UPDATE responsable_alfa r SET funcionario=$23, fecha_documento=$24
+  FROM upd_alfa u
+    WHERE r.id_responsable=u.id_responsable RETURNING r.id_responsable
+    ),
+sector_cte AS (
+  UPDATE sectores_alfa s SET region=$25, provincia=$26, comuna=$27
+  FROM upd_alfa u
+    WHERE s.id_sector=u.id_sector RETURNING s.id_sector
+  )
 
   SELECT
     (SELECT id_danios FROM danios_cte) AS id_danios,
@@ -461,8 +376,65 @@ sector_cte AS (UPDATE sectores_alfa SET region=$25, provincia=$26, comuna=$27
   (SELECT id_evento FROM event_cte) AS id_evento,
   (SELECT id_responsable FROM resp_cte) AS id_responsable
   `;
-const cteDeleteAlfa = ``;
-const cteGetAlfa = ``;
+const cteDeleteAlfa = `
+WITH del_alfa AS 
+(SELECT * FROM informes_alfa WHERE id_alfa=$1),
+danios_cte AS (
+  DELETE FROM danios_alfa d 
+  USING del_alfa u
+  WHERE d.id_danios=u.id_danios RETURNING d.*
+  ),
+eval_cte AS (
+  DELETE FROM evaluacion_alfa e 
+  USING del_alfa u
+    WHERE e.id_evaluacion=u.id_evaluacion RETURNING e.*
+    ),
+event_cte AS (
+  DELETE FROM eventos_alfa ev
+  USING del_alfa u
+    WHERE ev.id_evento=u.id_evento RETURNING ev.*
+    ),
+resp_cte AS (
+  DELETE FROM responsable_alfa r 
+  USING del_alfa u
+    WHERE r.id_responsable=u.id_responsable RETURNING r.*
+    ),
+sector_cte AS (
+  DELETE FROM sectores_alfa s 
+  USING del_alfa u
+    WHERE s.id_sector=u.id_sector RETURNING s.*
+  )
+  DELETE FROM informes_alfa ia
+  USING del_alfa u
+  WHERE ia.id_alfa=u.id_alfa RETURNING ia.*
+`;
+const cteGeLastAlfa = `
+WITH last_alfa AS (
+  SELECT * FROM informes_alfa ORDER BY id_alfa DESC LIMIT 1
+  ),
+  last_danios AS (
+  SELECT * FROM danios_alfa WHERE id_danios = (SELECT id_danios FROM last_alfa)
+  ),
+  last_sector AS(
+  SELECT * FROM sectores_alfa WHERE id_sector = (SELECT id_sector FROM last_alfa)
+  ),
+  last_evaluacion AS(
+  SELECT * FROM evaluacion_alfa WHERE id_evaluacion = (SELECT id_evaluacion FROM last_alfa)
+  ),
+  last_evento AS( 
+  SELECT * FROM eventos_alfa WHERE id_evento = (SELECT id_evento FROM last_alfa)
+  ),
+  last_responsable AS (
+  SELECT * FROM responsable_alfa WHERE id_responsable = (SELECT id_responsable FROM last_alfa)
+  )
+ SELECT
+  (SELECT id_alfa FROM last_alfa) AS informe_alfa,
+  (SELECT id_danios FROM last_danios) AS danios,
+  (SELECT id_sector FROM last_sector) AS sector,
+  (SELECT id_evaluacion FROM last_evaluacion) AS evaluacion,
+  (SELECT id_evento FROM last_evento) AS evento,
+  (SELECT id_responsable FROM last_responsable) AS responsable
+  `;
 export {
   getAllInformesALFA,
   getInformesALFA,
