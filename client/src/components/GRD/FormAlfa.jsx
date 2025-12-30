@@ -1,8 +1,7 @@
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { BlobProvider } from "@react-pdf/renderer";
-import AlfaPDF from "../PDFs/AlfaPDF";
+import { jwtDecode } from "jwt-decode";
 import { useTokenSession } from "../useTokenSession";
 
 function FormAlfa() {
@@ -142,6 +141,9 @@ function FormAlfa() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const decoded = jwtDecode(token);
+    const user_decoded = decoded.user_name;
+
     const arrayFormateado = `{${selectedValues.join(",")}}`;
     const datosActualizados = {
       ...informesALFA,
@@ -197,36 +199,37 @@ function FormAlfa() {
   };
 
   const defaultInformes = {
-    cod_alfa: "",
-    fuente: "I. Municipalidad de San Antonio",
-    fono: "352337133",
-    sismo_escala: "",
-    tipo_evento: "",
-    otro_evento: "",
-    descripcion: "",
-    ocurrencia: "",
+    //danios_cte
+    tipo_afectados: "",
+    danio_vivienda: "",
+    no_evaluado: "",
+    danios_servicio: "",
+    monto_danio: "",
+    //eval_cte
     acciones: "",
-    oportunidad_tpo: "",
-    recursos_involucrados: "",
-    evaluacion_necesidades: "",
-    capacidad_respuesta: "",
+    oportunidad: "",
+    recursos: "",
+    necesidades: "",
+    desc_necesidades: "",
+    cap_respuesta: "",
     observaciones: "",
-    usuario_grd: "",
-    fecha_hora: "",
-    otras_necesidades: "",
-
-    daños_vivienda: "",
-    daños_infra: "",
-    daños_personas: "",
-    monto_estimado: "",
-    cod_alfa_daños: "",
-
+    //event_cte
+    fuente_info: "",
+    telefono: "",
+    tipo_evento: "",
+    escala_sismo: "",
+    otro_evento: "",
+    direccion: "",
+    tipo_ubicacion: "",
+    desc_evento: "",
+    fecha_ocurrencia: "",
+    //resp_cte
+    funcionario: "",
+    fecha_documento: "",
+    //sector_cte
     region: "V Región",
     provincia: "San Antonio",
     comuna: "San Antonio",
-    direccion: "",
-    tipo_ubicacion: "",
-    cod_alfa_sector: "",
   };
 
   const handleCheckbox = (event) => {
@@ -246,29 +249,14 @@ function FormAlfa() {
     console.log("Valores seleccionados: ", selectedValues);
   };
 
-  /* const handleDañosPersonasChange = (e, category, gender) => {
-    const { value } = e.target;
-
-    setInformesALFA((prevState) => ({
-      ...prevState,
-      daños_personas: {
-        ...prevState.daños_personas,
-        [category]: {
-          ...prevState.daños_personas[category],
-          [gender]: value,
-        },
-      },
-    }));
-  };*/
-
   const handleLastAlfa = async () => {
     const res = await fetch(`${servidor_local}/lastalfa`);
     if (res.ok) {
       const lastAlfa = await res.json();
-      //console.log(lastAlfa);
-      if (lastAlfa) {
-        console.log(lastAlfa.informe_Alfa.cod_alfa);
-        const id_alfa = lastAlfa.informe_Alfa.cod_alfa;
+      //console.log(lastAlfa[0]);
+      if (lastAlfa[0]) {
+        //console.log(lastAlfa[0].cod_alfa);
+        const id_alfa = lastAlfa[0].id_alfa;
         navigate(`/alfa/${id_alfa}/edit`);
         setLastIdAlfa(id_alfa);
         setDisabledNextButton(true);
@@ -287,8 +275,8 @@ function FormAlfa() {
       const firstAlfa = await res.json();
       //console.log(lastAlfa);
       if (firstAlfa) {
-        console.log(firstAlfa.informe_Alfa.cod_alfa);
-        const id_alfa = firstAlfa.informe_Alfa.cod_alfa;
+        console.log(firstAlfa[0].id_alfa);
+        const id_alfa = firstAlfa[0].id_alfa;
         navigate(`/alfa/${id_alfa}/edit`);
         //setLastIdAlfa(id_alfa);
         console.log("Primer id", firstAlfa);
@@ -307,9 +295,8 @@ function FormAlfa() {
       const response = await fetch(`${servidor_local}/alfa/prev/${params.id}`);
       const data = await response.json();
 
-      if (data?.informesRows?.length > 0 && data.informesRows[0].cod_alfa) {
-        //console.log(data.informesRows[0].cod_alfa);
-        navigate(`/alfa/${data.informesRows[0].cod_alfa}/edit`);
+      if (data?.length > 0 && data[0]?.id_alfa) {
+        navigate(`/alfa/${data[0].id_alfa}/edit`);
         setDisabledNextButton(false);
       } else {
         setDisabledPrevButton(true);
@@ -325,9 +312,9 @@ function FormAlfa() {
       const response = await fetch(`${servidor_local}/alfa/next/${params.id}`);
       const data = await response.json();
 
-      if (data?.informesRows?.length > 0 && data?.informesRows[0].cod_alfa) {
+      if (data?.length > 0 && data[0]?.id_alfa) {
         //console.log(data.informesRows[0].cod_alfa);
-        navigate(`/alfa/${data.informesRows[0].cod_alfa}/edit`);
+        navigate(`/alfa/${data[0].id_alfa}/edit`);
         setDisabledPrevButton(false);
       } else {
         setDisabledNextButton(true);
@@ -1234,82 +1221,159 @@ function FormAlfa() {
                     </div>
                   </fieldset>
 
-                  <h3>5. Recursos involucrados</h3>
-                  <label htmlFor="">
-                    Tipo humano, material,técnico,monetario
-                  </label>
-                  <textarea
-                    name="recursos_involucrados"
-                    id=""
-                    value={informesALFA.recursos_involucrados}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  ></textarea>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Recursos involucrados
+                    </legend>
+                    <div className="col-md-6">
+                      <label
+                        className="form-label"
+                        htmlFor="recursos_involucrados"
+                      >
+                        Tipo humano, material,técnico,monetario
+                      </label>
+                      <textarea
+                        className="form-control"
+                        name="recursos_involucrados"
+                        rows={3}
+                        id="recursos_involucrados"
+                        value={informesALFA.recursos_involucrados}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      ></textarea>
+                    </div>
+                  </fieldset>
 
-                  <h3>6. Evaluación de necesidades</h3>
-                  <input
-                    type="radio"
-                    name="evaluacion_necesidades"
-                    id=""
-                    value={"No se requiere"}
-                    checked={
-                      informesALFA.evaluacion_necesidades === "No se requiere"
-                    }
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-                  <label htmlFor="">
-                    No se requiere (recursos insuficientes)
-                  </label>
-                  <input
-                    type="radio"
-                    name="evaluacion_necesidades"
-                    id=""
-                    value={"Se requiere"}
-                    checked={
-                      informesALFA.evaluacion_necesidades === "Se requiere"
-                    }
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-                  <label htmlFor="">
-                    Se requiere (Indicar cantidad, tipo y motivo)
-                  </label>
-                  <textarea
-                    name="otras_necesidades"
-                    id=""
-                    value={informesALFA.otras_necesidades}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  ></textarea>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Evaluación de necesidades
+                    </legend>
+                    <div className="row">
+                      <div className="col">
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="evaluacion_necesidades"
+                            id="no_requerida"
+                            value={"No se requiere"}
+                            checked={
+                              informesALFA.evaluacion_necesidades ===
+                              "No se requiere"
+                            }
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="no_requerida"
+                          >
+                            No se requiere (recursos insuficientes)
+                          </label>
+                        </div>
+                      </div>
+                      <div className="col">
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="evaluacion_necesidades"
+                            id="requerida"
+                            value={"Se requiere"}
+                            checked={
+                              informesALFA.evaluacion_necesidades ===
+                              "Se requiere"
+                            }
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="requerida"
+                          >
+                            Se requiere
+                          </label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <textarea
+                          className="form-control"
+                          name="otras_necesidades"
+                          placeholder="Indicar cantidad, tipo y motivo"
+                          id=""
+                          value={informesALFA.otras_necesidades}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        ></textarea>
+                      </div>
+                    </div>
+                    <hr />
+                    <div className="row">
+                      <div className="col-md-6">
+                        <label htmlFor="" className="form-label fw-bold">
+                          Capacidad de respuesta
+                        </label>
+                        <select
+                          className="form-select"
+                          name="capacidad_respuesta"
+                          id=""
+                          value={informesALFA.capacidad_respuesta}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        >
+                          <option value="">Seleccione nivel</option>
+                          <option value="1">
+                            Nivel I: Recurso local habitual
+                          </option>
+                          <option value="2">
+                            Nivel II: Recurso local reforzado
+                          </option>
+                          <option value="3">
+                            Nivel III: Recurso Apoyo local regional
+                          </option>
+                          <option value="4">
+                            Nivel IV: Recurso Apoyo nivel nacional
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </fieldset>
 
-                  <h3>7. Capacidad de respuesta</h3>
-                  <select
-                    name="capacidad_respuesta"
-                    id=""
-                    value={informesALFA.capacidad_respuesta}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  >
-                    <option value="">Seleccione nivel</option>
-                    <option value="1">Nivel I: Recurso local habitual</option>
-                    <option value="2">Nivel II: Recurso local reforzado</option>
-                    <option value="3">
-                      Nivel III: Recurso Apoyo local regional
-                    </option>
-                    <option value="4">
-                      Nivel IV: Recurso Apoyo nivel nacional
-                    </option>
-                  </select>
-
-                  <h3>8. Observaciones</h3>
-                  <textarea
-                    name="observaciones"
-                    id=""
-                    value={informesALFA.observaciones}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  ></textarea>
+                  <fieldset className="border rounded-3 p-3 mb-4">
+                    <legend className="float-none w-auto px-2 h6 mb-0">
+                      Observaciones
+                    </legend>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <textarea
+                          className="form-control"
+                          rows={4}
+                          name="observaciones"
+                          id=""
+                          value={informesALFA.observaciones}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        ></textarea>
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="fecha_hora" className="form-label">
+                          Fecha y hora
+                        </label>
+                        <input
+                          className="form-control"
+                          type="datetime-local"
+                          name="fecha_hora"
+                          id="fecha_hora"
+                          value={informesALFA.fecha_hora}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <span>{}</span>
+                      </div>
+                    </div>
+                  </fieldset>
 
                   <h3>9. Responsable del Informe</h3>
                   <select
@@ -1326,63 +1390,62 @@ function FormAlfa() {
                       </option>
                     ))}
                   </select>
-                  <label htmlFor="">Fecha y hora</label>
-                  <input
-                    type="datetime-local"
-                    name="fecha_hora"
-                    id=""
-                    value={informesALFA.fecha_hora}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
                 </div>
 
-                <br />
-                <br />
-                <button type="button" onClick={handleNewAlfa}>
-                  Nuevo Expediente
-                </button>
-                <button
-                  type="button"
-                  onClick={handleEdit}
-                  style={{ display: editing ? "" : "none" }}
-                >
-                  Editar
-                </button>
-                <button
-                  type="submit"
-                  style={{ display: editing ? "none" : "" }}
-                >
-                  Guardar Informe
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  style={{ display: editing ? "none" : "" }}
-                >
-                  Cancelar
-                </button>
-                <button type="button" onClick={handleDeleteInforme}>
-                  Eliminar
-                </button>
+                {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+                <div className="d-flex flex-wrap gap-2 mt-4">
+                  {!editing && (
+                    <div className="d-flex flex-wrap gap-2 mt-4">
+                      <button type="submit" className="btn btn-primary">
+                        <i className="bi bi-save"></i> Guardar Informe
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        type="button"
+                        onClick={handleCancel}
+                      >
+                        <i className="bi bi-x-octagon"></i> Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
               </form>
+              {editing && (
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    className="btn btn-success"
+                    type="button"
+                    onClick={handleNewAlfa}
+                  >
+                    <i className="bi bi-clipboard2-plus"></i> Nueva solicitud
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleEdit}
+                  >
+                    <i className="bi bi-pencil-square"></i> Editar
+                  </button>
+
+                  <button
+                    className="btn btn-danger"
+                    type="button"
+                    onClick={handleDeleteInforme}
+                  >
+                    <i className="bi bi-trash"></i> Eliminar
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="card-footer text-end">
+              {editing && (
+                <button className="btn btn-danger">
+                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                </button>
+              )}
             </div>
           </div>
         </div>
-      </div>
-
-      <div>
-        <BlobProvider document={<AlfaPDF />}>
-          {({ url, loading }) =>
-            loading ? (
-              <button>Cargando documento</button>
-            ) : (
-              <button onClick={() => window.open(url, "_blank")}>
-                Generar PDF
-              </button>
-            )
-          }
-        </BlobProvider>
       </div>
     </div>
   );
