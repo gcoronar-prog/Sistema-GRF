@@ -12,41 +12,44 @@ function FormAlfa() {
   const user = useTokenSession();
 
   const [informesALFA, setInformesALFA] = useState({
-    fuente: "I. Municipalidad de San Antonio",
-    fono: "352337133",
-    sismo_escala: "",
-    tipo_evento: [],
-    otro_evento: "",
-    descripcion: "",
-    ocurrencia: "",
-    acciones: "",
-    oportunidad_tpo: "",
-    recursos_involucrados: "",
-    evaluacion_necesidades: "",
-    capacidad_respuesta: "",
-    observaciones: "",
-    usuario_grd: "",
-    fecha_hora: "",
-
-    daños_vivienda: "",
-    daños_infra: "",
-    daños_personas: {
-      afectadas: { hombres: "", mujeres: "" },
-      damnificadas: { hombres: "", mujeres: "" },
-      heridas: { hombres: "", mujeres: "" },
-      muertes: { hombres: "", mujeres: "" },
-      desaparecidas: { hombres: "", mujeres: "" },
-      albergados: { hombres: "", mujeres: "" },
+    //danios_cte
+    tipo_afectados: {
+      afectadas: { hombres: 0, mujeres: 0 },
+      damnificadas: { hombres: 0, mujeres: 0 },
+      heridas: { hombres: 0, mujeres: 0 },
+      muertes: { hombres: 0, mujeres: 0 },
+      desaparecidas: { hombres: 0, mujeres: 0 },
+      albergados: { hombres: 0, mujeres: 0 },
     },
-    monto_estimado: "",
-    cod_alfa_daños: "",
-
+    danio_vivienda: "",
+    no_evaluado: "",
+    danios_servicio: "",
+    monto_danio: "",
+    //eval_cte
+    acciones: "",
+    oportunidad: "",
+    recursos: "",
+    necesidades: "",
+    desc_necesidades: "",
+    cap_respuesta: "",
+    observaciones: "",
+    //event_cte
+    fuente_info: "",
+    telefono: "35-2337133",
+    tipo_evento: "",
+    escala_sismo: "",
+    otro_evento: "",
+    direccion: "",
+    tipo_ubicacion: "",
+    desc_evento: "",
+    fecha_ocurrencia: "",
+    //resp_cte
+    funcionario: "",
+    fecha_documento: "",
+    //sector_cte
     region: "V Región",
     provincia: "San Antonio",
     comuna: "San Antonio",
-    direccion: "",
-    tipo_ubicacion: "",
-    cod_alfa_sector: "",
   });
 
   const [funcionarios, setFuncionarios] = useState([]);
@@ -83,56 +86,56 @@ function FormAlfa() {
         Authorization: `Bearer ${token}`,
       },
     });
+    //console.log("alfa", data.informe_alfa[0]);
     if (!res.ok) throw new Error("Problemas obteniendo datos de informes");
     const data = await res.json();
-    console.log("alfa", data);
 
     const info = data;
-    const formattedOcurrencia = dayjs(info.informes.ocurrencia).format(
-      "YYYY-MM-DDTHH:mm"
-    );
-    const formattedFechaHora = dayjs(info.informes.fecha_hora).format(
-      "YYYY-MM-DDTHH:mm"
-    );
+    const formattedOcurrencia = dayjs(
+      info.informe_alfa[0].fecha_ocurrencia
+    ).format("YYYY-MM-DDTHH:mm");
+
+    const date = new Date();
+    const formattedDate = date.toISOString().split("T")[0];
 
     //console.log(data.informes[0].cod_alfa);
 
     setInformesALFA({
-      fuente: info.informes.fuente,
-      fono: info.informes.fono,
-      sismo_escala: info.informes.sismo_escala,
-      tipo_evento: info.informes.tipo_evento,
-      otro_evento: info.informes.otro_evento,
-      descripcion: info.informes.descripcion,
-      ocurrencia: formattedOcurrencia,
-      //ocurrencia: info.informes[0].ocurrencia,
-      acciones: info.informes.acciones,
-      oportunidad_tpo: info.informes.oportunidad_tpo,
-      recursos_involucrados: info.informes.recursos_involucrados,
-      evaluacion_necesidades: info.informes.evolucion_necesidades,
-      capacidad_respuesta: info.informes.capacidad_respuesta,
-      observaciones: info.informes.observaciones,
-      usuario_grd: info.informes.usuario_grd,
-      fecha_hora: formattedFechaHora,
-      //fecha_hora: info.informes[0].fecha_hora,
-      otras_necesidades: info.informes.otras_necesidades,
-
-      daños_vivienda: info.danios.daños_vivienda,
-      daños_infra: info.danios.daños_infra,
-      daños_personas: info.danios.daños_personas,
-      monto_estimado: info.danios.monto_estimado,
-      cod_alfa_daños: info.danios.cod_alfa_daños,
-
-      region: info.sectores.region,
-      provincia: info.sectores.provincia,
-      comuna: info.sectores.comuna,
-      direccion: info.sectores.direccion,
-      tipo_ubicacion: info.sectores.tipo_ubicacion,
-      cod_alfa_sector: info.sectores.cod_alfa_sector,
+      //danios_cte
+      tipo_afectados: info.informe_alfa[0].tipo_afectados,
+      danio_vivienda: info.informe_alfa[0].danio_vivienda,
+      no_evaluado: info.informe_alfa[0].no_evaluado,
+      danios_servicio: info.informe_alfa[0].danios_servicio,
+      monto_danio: info.informe_alfa[0].monto_danio,
+      //eval_cte
+      acciones: info.informe_alfa[0].acciones,
+      oportunidad: info.informe_alfa[0].oportunidad,
+      recursos: info.informe_alfa[0].recursos,
+      necesidades: info.informe_alfa[0].necesidades,
+      desc_necesidades: info.informe_alfa[0].desc_necesidades,
+      cap_respuesta: info.informe_alfa[0].cap_respuesta,
+      observaciones: info.informe_alfa[0].observaciones,
+      //event_cte
+      fuente_info: "I Municipalidad de San Antonio",
+      telefono: "35-2337133",
+      tipo_evento: info.informe_alfa[0].tipo_evento,
+      escala_sismo: info.informe_alfa[0].escala_sismo,
+      otro_evento: info.informe_alfa[0].otro_evento,
+      direccion: info.informe_alfa[0].direccion,
+      tipo_ubicacion: info.informe_alfa[0].tipo_ubicacion,
+      desc_evento: info.informe_alfa[0].desc_evento,
+      fecha_ocurrencia: formattedOcurrencia,
+      //resp_cte
+      funcionario: info.informe_alfa[0].funcionario,
+      fecha_documento: formattedDate,
+      //sector_cte
+      region: "V Región",
+      provincia: "San Antonio",
+      comuna: "San Antonio",
     });
 
     setSelectedValues(
-      Array.isArray(info.informes.tipo_evento)
+      Array.isArray(info.informe_alfa[0].tipo_evento)
         ? info.informes[0].tipo_evento
         : []
     );
@@ -144,12 +147,14 @@ function FormAlfa() {
     const decoded = jwtDecode(token);
     const user_decoded = decoded.user_name;
 
-    const arrayFormateado = `{${selectedValues.join(",")}}`;
+    const arrayFormateado = selectedValues.join(",");
     const datosActualizados = {
       ...informesALFA,
-      tipo_evento: arrayFormateado, // Formato compatible con varchar[]
+      tipo_evento: arrayFormateado,
     };
+
     setSelectedValues(arrayFormateado);
+
     try {
       console.log("Datos informe:", informesALFA);
 
@@ -194,13 +199,20 @@ function FormAlfa() {
     const res = await fetch(`${servidor_local}/lastalfa`);
     const data = await res.json();
     //console.log(data.informe_Alfa.cod_alfa);
-    navigate(`/alfa/${data.informe_Alfa.cod_alfa}/edit`);
+    navigate(`/alfa/${data.informe_alfa[0].id_alfa}/edit`);
     // setDisabledNextButton(false);
   };
 
   const defaultInformes = {
     //danios_cte
-    tipo_afectados: "",
+    tipo_afectados: {
+      afectadas: { hombres: 0, mujeres: 0 },
+      damnificadas: { hombres: 0, mujeres: 0 },
+      heridas: { hombres: 0, mujeres: 0 },
+      muertes: { hombres: 0, mujeres: 0 },
+      desaparecidas: { hombres: 0, mujeres: 0 },
+      albergados: { hombres: 0, mujeres: 0 },
+    },
     danio_vivienda: "",
     no_evaluado: "",
     danios_servicio: "",
@@ -215,7 +227,7 @@ function FormAlfa() {
     observaciones: "",
     //event_cte
     fuente_info: "",
-    telefono: "",
+    telefono: "35-2337133",
     tipo_evento: "",
     escala_sismo: "",
     otro_evento: "",
@@ -233,19 +245,19 @@ function FormAlfa() {
   };
 
   const handleCheckbox = (event) => {
-    const { value, checked } = event.target;
+    const { name, value, checked } = event.target;
 
     setSelectedValues((prev) => {
       if (checked) {
-        // Agregar al arreglo si está marcado
         return [...prev, value];
       } else {
-        // Quitar del arreglo si se desmarca
         return prev.filter((item) => item !== value);
       }
     });
-
-    // Importante: Ver el estado actualizado en tiempo real
+    setInformesALFA({
+      ...informesALFA,
+      [name]: type === "checkbox" ? checked : value,
+    });
     console.log("Valores seleccionados: ", selectedValues);
   };
 
@@ -355,8 +367,8 @@ function FormAlfa() {
         if (res.ok) {
           const lastInforme = await res.json();
           if (lastInforme) {
-            navigate(`/alfa/${lastInforme.informe_Alfa.cod_alfa}/edit`);
-            console.log("ultima id", lastInforme.informe_Alfa.cod_alfa);
+            console.log("ultima id", lastInforme.informe_alfa[0].id_alfa);
+            navigate(`/alfa/${lastInforme.informe_alfa[0].id_alfa}/edit`);
           }
         }
       }
@@ -429,9 +441,9 @@ function FormAlfa() {
                         <input
                           className="form-control"
                           type="datetime-local"
-                          name="ocurrencia"
+                          name="fecha_ocurrencia"
                           id="ocurrencia"
-                          value={informesALFA.ocurrencia}
+                          value={informesALFA.fecha_ocurrencia}
                           onChange={handleChanges}
                           disabled={editing}
                         />
@@ -587,7 +599,7 @@ function FormAlfa() {
                                   id="acc_multiples_victim"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"acc_multiples"}
+                                  value={"acc_multiples_victim"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={selectedValues.includes(
@@ -1357,17 +1369,9 @@ function FormAlfa() {
                       </div>
                       <div className="col-md-6">
                         <label htmlFor="fecha_hora" className="form-label">
-                          Fecha y hora
+                          Fecha y hora documento
                         </label>
-                        <input
-                          className="form-control"
-                          type="datetime-local"
-                          name="fecha_hora"
-                          id="fecha_hora"
-                          value={informesALFA.fecha_hora}
-                          onChange={handleChanges}
-                          disabled={editing}
-                        />
+                        <span>{informesALFA.fecha_documento}</span>
                       </div>
                       <div className="col-md-6">
                         <span>{}</span>

@@ -114,7 +114,6 @@ const createAlfa = async (req, res) => {
       data.fecha_ocurrencia,
       //resp_cte
       data.funcionario,
-      data.fecha_documento,
       //sector_cte
       data.region,
       data.provincia,
@@ -323,12 +322,12 @@ event_cte AS (
   VALUES ($13, $14, $15, $16, $17, $18, $19, $20, $21) RETURNING *
 ),
 resp_cte AS (
-  INSERT INTO responsable_alfa (funcionario, fecha_documento)
-  VALUES ($22, $23) RETURNING *
+  INSERT INTO responsable_alfa (funcionario)
+  VALUES ($22) RETURNING *
 ),
 sector_cte AS (
   INSERT INTO sectores_alfa (region, provincia, comuna)
-  VALUES ($24, $25, $26) RETURNING *
+  VALUES ($23, $24, $25) RETURNING *
   )
   INSERT INTO informes_alfa (id_danios,id_evaluacion,id_evento,id_responsable,id_sector)
   VALUES (
