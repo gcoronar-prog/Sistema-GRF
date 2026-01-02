@@ -423,7 +423,7 @@ function FormInspeccion() {
 
       if (response.ok) {
         const lastExpediente = await response.json();
-        console.log(lastExpediente.expediente.id_expediente);
+        //console.log(lastExpediente.expediente.id_expediente);
         if (lastExpediente) {
           console.log("Último expediente:", lastExpediente);
           navigate(`/inspect/${lastExpediente.expediente.id_expediente}/edit`);

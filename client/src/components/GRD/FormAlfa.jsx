@@ -1,10 +1,20 @@
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { useTokenSession } from "../useTokenSession";
+import AlfaPDF from "../PDFs/AlfaPDF.jsx";
+import { useReactToPrint } from "react-to-print";
 
-function FormAlfa() {
+const FormAlfa = () => {
+  const printRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: "Informe ALFA",
+  });
+
   const params = useParams();
   const navigate = useNavigate();
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -52,16 +62,18 @@ function FormAlfa() {
     comuna: "San Antonio",
   });
 
-  const [funcionarios, setFuncionarios] = useState([]);
+  const decoded = jwtDecode(token);
+  const user_decoded = decoded;
+  const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
+    .filter(Boolean)
+    .join(" ");
+
   const [editing, setEditing] = useState(true);
   const [selectedValues, setSelectedValues] = useState([]);
   const [lastIdAlfa, setLastIdAlfa] = useState(null);
+  const [hiddenRequerido, setHiddenRequerido] = useState(true);
   const [disabledPrevButton, setDisabledPrevButton] = useState(false);
   const [disabledNextButton, setDisabledNextButton] = useState(false);
-
-  useEffect(() => {
-    loadFuncionario();
-  }, []);
 
   useEffect(() => {
     if (params.id) {
@@ -72,14 +84,8 @@ function FormAlfa() {
     }
   }, [params.id]);
 
-  const loadFuncionario = async () => {
-    const res = await fetch(`${servidor_local}/funciongrd`);
-    if (!res.ok) throw new Error("Problemas obteniendo datos inspectores");
-    const data = await res.json();
-    setFuncionarios(data);
-  };
-
   const loadInformes = async (id) => {
+    console.log(decoded);
     const res = await fetch(`${servidor_local}/alfa/${id}`, {
       headers: {
         "Content-Type": "application/json",
@@ -126,7 +132,7 @@ function FormAlfa() {
       desc_evento: info.informe_alfa[0].desc_evento,
       fecha_ocurrencia: formattedOcurrencia,
       //resp_cte
-      funcionario: info.informe_alfa[0].funcionario,
+      funcionario: nombre_responsable,
       fecha_documento: formattedDate,
       //sector_cte
       region: "V Región",
@@ -134,26 +140,19 @@ function FormAlfa() {
       comuna: "San Antonio",
     });
 
-    setSelectedValues(
-      Array.isArray(info.informe_alfa[0].tipo_evento)
-        ? info.informes[0].tipo_evento
-        : []
-    );
+    setSelectedValues(info.informe_alfa[0].tipo_evento || []);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const decoded = jwtDecode(token);
-    const user_decoded = decoded.user_name;
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) handleCancel();
 
-    const arrayFormateado = selectedValues.join(",");
     const datosActualizados = {
       ...informesALFA,
-      tipo_evento: arrayFormateado,
+      tipo_evento: selectedValues,
     };
-
-    setSelectedValues(arrayFormateado);
 
     try {
       console.log("Datos informe:", informesALFA);
@@ -187,20 +186,25 @@ function FormAlfa() {
   };
 
   const handleDeleteInforme = async () => {
+    const eliminar = window.confirm("¿Deseas eliminar el informe?");
+    if (!eliminar) return;
+
     const id = params.id;
 
-    await fetch(`${servidor_local}/alfa/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
-    const updateAlfa = { ...informesALFA };
-    delete updateAlfa[id];
-    setInformesALFA(updateAlfa);
-    const res = await fetch(`${servidor_local}/lastalfa`);
-    const data = await res.json();
-    //console.log(data.informe_Alfa.cod_alfa);
-    navigate(`/alfa/${data.informe_alfa[0].id_alfa}/edit`);
-    // setDisabledNextButton(false);
+    try {
+      await fetch(`${servidor_local}/alfa/${id}`, {
+        method: "DELETE",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      });
+      const updateAlfa = { ...informesALFA };
+      delete updateAlfa[id];
+      setInformesALFA(updateAlfa);
+      handleLastAlfa();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const defaultInformes = {
@@ -244,31 +248,35 @@ function FormAlfa() {
     comuna: "San Antonio",
   };
 
-  const handleCheckbox = (event) => {
-    const { name, value, checked } = event.target;
+  const handleCheckbox = (e) => {
+    const { value, checked } = e.target;
 
-    setSelectedValues((prev) => {
-      if (checked) {
-        return [...prev, value];
-      } else {
-        return prev.filter((item) => item !== value);
-      }
-    });
-    setInformesALFA({
-      ...informesALFA,
-      [name]: type === "checkbox" ? checked : value,
-    });
-    console.log("Valores seleccionados: ", selectedValues);
+    setSelectedValues((prev) =>
+      checked ? [...prev, value] : prev.filter((v) => v !== value)
+    );
+
+    if (value === "otro") {
+      setInformesALFA((prev) => ({
+        ...prev,
+        otro_evento: "",
+      }));
+    }
   };
 
   const handleLastAlfa = async () => {
-    const res = await fetch(`${servidor_local}/lastalfa`);
+    const res = await fetch(`${servidor_local}/lastalfa`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (res.ok) {
       const lastAlfa = await res.json();
-      //console.log(lastAlfa[0]);
+      //console.log("lastalfa ",lastAlfa[0]);
       if (lastAlfa[0]) {
-        //console.log(lastAlfa[0].cod_alfa);
+        //console.log("idlast ",lastAlfa[0].id_alfa);
         const id_alfa = lastAlfa[0].id_alfa;
+
         navigate(`/alfa/${id_alfa}/edit`);
         setLastIdAlfa(id_alfa);
         setDisabledNextButton(true);
@@ -339,6 +347,7 @@ function FormAlfa() {
 
   const handleNewAlfa = () => {
     navigate("/alfa/new");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(false);
   };
 
@@ -349,40 +358,53 @@ function FormAlfa() {
       [name]: value,
     });
 
-    console.log(name);
-    console.log(value);
+    if (value === "Se requiere") {
+      setInformesALFA((prev) => ({
+        ...prev,
+        desc_necesidades: "",
+      }));
+    }
   };
 
   const handleEdit = async () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(false);
   };
 
   const handleCancel = async () => {
     const id = params.id;
-
     try {
-      const res = await fetch(`${servidor_local}/lastalfa`);
-
-      if (!id) {
-        if (res.ok) {
-          const lastInforme = await res.json();
-          if (lastInforme) {
-            console.log("ultima id", lastInforme.informe_alfa[0].id_alfa);
-            navigate(`/alfa/${lastInforme.informe_alfa[0].id_alfa}/edit`);
-          }
-        }
-      }
+      if (!id) handleLastAlfa();
+      loadInformes(id);
 
       setEditing(true);
     } catch (error) {
       console.error(error);
     }
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(true);
+  };
+
+  const gruposAfectados = [
+    ["afectadas", "damnificadas", "heridas"],
+    ["muertes", "desaparecidas", "albergados"],
+  ];
+  const updateAfectados = (grupo, sexo, valor) => {
+    setInformesALFA((prev) => ({
+      ...prev,
+      tipo_afectados: {
+        ...prev.tipo_afectados,
+        [grupo]: {
+          ...prev.tipo_afectados[grupo],
+          [sexo]: Number(valor),
+        },
+      },
+    }));
   };
 
   return (
     <div className="container-fluid mt-4">
-      <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
+      <div className="d-flex flex-wrap gap-2 mb-4">
         <button
           className="btn btn-outline-primary"
           type="button"
@@ -429,11 +451,11 @@ function FormAlfa() {
             <div className="card-body">
               <form className="was-validated" onSubmit={handleSubmit}>
                 <div className="row g-3">
-                  <fieldset className="border rounded-3 p-3 mb-4">
+                  <fieldset className="border border-primary rounded p-3">
                     <legend className="float-none w-auto px-2 h6 mb-0">
                       Tipo de evento
                     </legend>
-                    <div className="row g-4 justify-content-center">
+                    <div className="row g-4">
                       <div className="col-md-auto">
                         <label htmlFor="ocurrencia" className="form-label">
                           Fecha de ocurrencia
@@ -454,9 +476,9 @@ function FormAlfa() {
                         </label>
                         <select
                           className="form-control"
-                          name="sismo_escala"
+                          name="escala_sismo"
                           id="sismo_escala"
-                          value={informesALFA.sismo_escala}
+                          value={informesALFA.escala_sismo}
                           onChange={handleChanges}
                           disabled={editing}
                         >
@@ -603,7 +625,7 @@ function FormAlfa() {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={selectedValues.includes(
-                                    "acc_multiples"
+                                    "acc_multiples_victim"
                                   )}
                                 />
                               </div>
@@ -661,20 +683,33 @@ function FormAlfa() {
                                 />
                               </div>
                             </div>
+                            {selectedValues.includes("otro") && (
+                              <div className="col">
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  id="otro_evento"
+                                  name="otro_evento"
+                                  placeholder="indique evento"
+                                  disabled={editing}
+                                  value={informesALFA.otro_evento}
+                                  onChange={handleChanges}
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
                       </fieldset>
-
                       <div className="col-md-6">
-                        <label htmlFor="descripcion" className="form-label">
+                        <label htmlFor="desc_evento" className="form-label">
                           Descripción del evento
                         </label>
                         <textarea
                           className="form-control"
-                          rows="3"
-                          name="descripcion"
-                          id="descripcion"
-                          value={informesALFA.descripcion}
+                          rows="2"
+                          name="desc_evento"
+                          id="desc_evento"
+                          value={informesALFA.desc_evento}
                           disabled={editing}
                           onChange={handleChanges}
                         ></textarea>
@@ -745,435 +780,68 @@ function FormAlfa() {
                     </div>
                   </fieldset>
 
-                  <fieldset className="border rounded-3 p-3 mb-4">
+                  <fieldset className="border border-primary rounded p-3">
                     <legend className="float-none w-auto px-2 h6 mb-0">
                       Daños provocados
                     </legend>
-                    <div className="row justify-content-center">
-                      <div className="col">
-                        <table className="table w-25">
-                          <tr>
-                            <th> </th>
-                            <th>Hombres</th>
-                            <th>Mujeres</th>
-                          </tr>
-                          <tr>
-                            <td>Afectadas</td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.afectadas
-                                    ?.hombres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      afectadas: {
-                                        ...(prevState.daños_personas
-                                          ?.afectadas || {}),
-                                        hombres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.afectadas
-                                    ?.mujeres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      afectadas: {
-                                        ...(prevState.daños_personas
-                                          ?.afectadas || {}),
-                                        mujeres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Damnificadas</td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.damnificadas
-                                    ?.hombres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      damnificadas: {
-                                        ...(prevState.daños_personas
-                                          ?.damnificadas || {}),
-                                        hombres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.damnificadas
-                                    ?.mujeres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      damnificadas: {
-                                        ...(prevState.daños_personas
-                                          ?.damnificadas || {}),
-                                        mujeres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Heridas</td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.heridas
-                                    ?.hombres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      heridas: {
-                                        ...(prevState.daños_personas?.heridas ||
-                                          {}),
-                                        hombres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.heridas
-                                    ?.mujeres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      heridas: {
-                                        ...(prevState.daños_personas?.heridas ||
-                                          {}),
-                                        mujeres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                          </tr>
-                        </table>
-                      </div>
-                      <div className="col">
-                        <table className="table w-25">
-                          <tr>
-                            <th> </th>
-                            <th>Hombres</th>
-                            <th>Mujeres</th>
-                          </tr>
-                          <tr>
-                            <td>Muertes</td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.muertes
-                                    ?.hombres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      muertes: {
-                                        ...(prevState.daños_personas?.muertes ||
-                                          {}),
-                                        hombres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.muertes
-                                    ?.mujeres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      muertes: {
-                                        ...(prevState.daños_personas?.muertes ||
-                                          {}),
-                                        mujeres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Desaparecidas</td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.desaparecidas
-                                    ?.hombres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      desaparecidas: {
-                                        ...(prevState.daños_personas
-                                          ?.desaparecidas || {}),
-                                        hombres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.desaparecidas
-                                    ?.mujeres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      desaparecidas: {
-                                        ...(prevState.daños_personas
-                                          ?.desaparecidas || {}),
-                                        mujeres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Albergados</td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.albergados
-                                    ?.hombres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      albergados: {
-                                        ...(prevState.daños_personas
-                                          ?.albergados || {}),
-                                        hombres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="form-control"
-                                type="number"
-                                value={
-                                  informesALFA.daños_personas?.albergados
-                                    ?.mujeres || ""
-                                }
-                                onChange={(e) =>
-                                  setInformesALFA((prevState) => ({
-                                    ...prevState,
-                                    daños_personas: {
-                                      ...prevState.daños_personas,
-                                      albergados: {
-                                        ...(prevState.daños_personas
-                                          ?.albergados || {}),
-                                        mujeres: e.target.value,
-                                      },
-                                    },
-                                  }))
-                                }
-                                disabled={editing}
-                              />
-                            </td>
-                          </tr>
-                        </table>
-                      </div>
-                      <div className="col">
-                        <h4>Daños a viviendas</h4>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="daños_vivienda"
-                            id="daño_menor"
-                            value={"Daño menor, habitable"}
-                            checked={
-                              informesALFA.daños_vivienda ===
-                              "Daño menor, habitable"
-                            }
-                            onChange={handleChanges}
-                            disabled={editing}
-                          />
-                          <label
-                            htmlFor="daño_menor"
-                            className="form-check-label"
-                          >
-                            Daño menor, habitable
-                          </label>
+                    <div className="row">
+                      {gruposAfectados.map((bloque, i) => (
+                        <div key={i} className="col-md-4">
+                          <table className="table table-sm">
+                            <thead>
+                              <tr>
+                                <th></th>
+                                <th>Hombres</th>
+                                <th>Mujeres</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {bloque.map((grupo) => (
+                                <tr key={grupo}>
+                                  <td className="text-start fw-semibold text-capitalize">
+                                    {grupo}
+                                  </td>
+                                  {["hombres", "mujeres"].map((sexo) => (
+                                    <td key={sexo}>
+                                      <input
+                                        type="number"
+                                        className="form-control form-control-sm text-center"
+                                        value={
+                                          informesALFA.tipo_afectados?.[
+                                            grupo
+                                          ]?.[sexo] ?? ""
+                                        }
+                                        disabled={editing}
+                                        onChange={(e) =>
+                                          updateAfectados(
+                                            grupo,
+                                            sexo,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="daños_vivienda"
-                            id="daño_mayor"
-                            value={"Daño mayor, no habitable"}
-                            checked={
-                              informesALFA.daños_vivienda ===
-                              "Daño mayor, no habitable"
-                            }
-                            onChange={handleChanges}
-                            disabled={editing}
-                          />
-                          <label
-                            htmlFor="daño_mayor"
-                            className="form-check-label"
-                          >
-                            Daño mayor, no habitable
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="daños_vivienda"
-                            id="destruida"
-                            value={"Destruida, irrecuperable"}
-                            checked={
-                              informesALFA.daños_vivienda ===
-                              "Destruida, irrecuperable"
-                            }
-                            onChange={handleChanges}
-                            disabled={editing}
-                          />
-                          <label
-                            htmlFor="destruida"
-                            className="form-check-label"
-                          >
-                            Destruida, irrecuperable
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="daños_vivienda"
-                            id="no_evaluados"
-                            checked={
-                              informesALFA.daños_vivienda === "No evaluados"
-                            }
-                            value={"No evaluados"}
-                            onChange={handleChanges}
-                            disabled={editing}
-                          />
-                          <label
-                            htmlFor="no_evaluados"
-                            className="form-check-label"
-                          >
-                            No evaluados
-                          </label>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                     <hr />
                     <div className="row">
                       <div className="col-md-6">
-                        <label htmlFor="daños_infra" className="form-label">
+                        <label htmlFor="danio_vivienda" className="form-label">
                           Servicios básicos, infraestructura y otros
                         </label>
                         <br />
                         <textarea
                           className="form-control"
-                          rows={3}
-                          name="daños_infra"
-                          id="daños_infra"
-                          value={informesALFA.daños_infra}
+                          rows={2}
+                          name="danio_vivienda"
+                          id="danio_vivienda"
+                          value={informesALFA.danio_vivienda}
                           onChange={handleChanges}
                           disabled={editing}
                         ></textarea>
@@ -1181,219 +849,212 @@ function FormAlfa() {
 
                       <br />
                       <div className="col-md-4">
-                        <label htmlFor="monto_estimado" className="form-label">
+                        <label htmlFor="monto_danio" className="form-label">
                           Monto estimado en daños
                         </label>
                         <input
                           className="form-control"
-                          rows="3"
-                          name="monto_estimado"
-                          id="monto_estimado"
+                          name="monto_danio"
+                          id="monto_danio"
                           type="text"
-                          value={informesALFA.monto_estimado}
+                          value={informesALFA.monto_danio}
                           onChange={handleChanges}
                           disabled={editing}
                         />
                       </div>
                     </div>
                   </fieldset>
-                  <fieldset className="border rounded-3 p-3 mb-4">
-                    <legend className="float-none w-auto px-2 h6 mb-0">
-                      Medidas tomadas
-                    </legend>
-                    <div className="row">
-                      <div className="col-md-6">
-                        <label htmlFor="acciones" className="form-label">
-                          Acciones y soluciones inmediatas
-                        </label>
-                        <textarea
-                          className="form-control"
-                          rows={3}
-                          name="acciones"
-                          id="acciones"
-                          value={informesALFA.acciones}
-                          onChange={handleChanges}
-                          disabled={editing}
-                        ></textarea>
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="oportunidad_tpo" className="form-label">
-                          Oportunidad (TPO)
-                        </label>
-                        <textarea
-                          className="form-control"
-                          rows={3}
-                          name="oportunidad_tpo"
-                          id="oportunidad_tpo"
-                          value={informesALFA.oportunidad_tpo}
-                          onChange={handleChanges}
-                          disabled={editing}
-                        ></textarea>
-                      </div>
-                    </div>
-                  </fieldset>
 
-                  <fieldset className="border rounded-3 p-3 mb-4">
+                  <fieldset className="border border-primary rounded p-3">
                     <legend className="float-none w-auto px-2 h6 mb-0">
-                      Recursos involucrados
+                      Respuesta institucional
                     </legend>
-                    <div className="col-md-6">
-                      <label
-                        className="form-label"
-                        htmlFor="recursos_involucrados"
-                      >
-                        Tipo humano, material,técnico,monetario
-                      </label>
-                      <textarea
-                        className="form-control"
-                        name="recursos_involucrados"
-                        rows={3}
-                        id="recursos_involucrados"
-                        value={informesALFA.recursos_involucrados}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      ></textarea>
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="border rounded-3 p-3 mb-4">
-                    <legend className="float-none w-auto px-2 h6 mb-0">
-                      Evaluación de necesidades
-                    </legend>
-                    <div className="row">
-                      <div className="col">
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="evaluacion_necesidades"
-                            id="no_requerida"
-                            value={"No se requiere"}
-                            checked={
-                              informesALFA.evaluacion_necesidades ===
-                              "No se requiere"
-                            }
+                    <fieldset className="border rounded-3 p-3 mb-4">
+                      <legend className="float-none w-auto px-2 h6 mb-0">
+                        Medidas tomadas
+                      </legend>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <label htmlFor="acciones" className="form-label">
+                            Acciones y soluciones inmediatas
+                          </label>
+                          <textarea
+                            className="form-control"
+                            rows={2}
+                            name="acciones"
+                            id="acciones"
+                            value={informesALFA.acciones}
                             onChange={handleChanges}
                             disabled={editing}
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="no_requerida"
-                          >
-                            No se requiere (recursos insuficientes)
-                          </label>
+                          ></textarea>
                         </div>
-                      </div>
-                      <div className="col">
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="evaluacion_necesidades"
-                            id="requerida"
-                            value={"Se requiere"}
-                            checked={
-                              informesALFA.evaluacion_necesidades ===
-                              "Se requiere"
-                            }
+                        <div className="col-md-6">
+                          <label htmlFor="oportunidad" className="form-label">
+                            Oportunidad (TPO)
+                          </label>
+                          <textarea
+                            className="form-control"
+                            rows={2}
+                            name="oportunidad"
+                            id="oportunidad"
+                            value={informesALFA.oportunidad}
                             onChange={handleChanges}
                             disabled={editing}
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="requerida"
-                          >
-                            Se requiere
-                          </label>
+                          ></textarea>
                         </div>
                       </div>
+                    </fieldset>
+
+                    <fieldset className="border rounded-3 p-3 mb-4">
+                      <legend className="float-none w-auto px-2 h6 mb-0">
+                        Recursos involucrados
+                      </legend>
                       <div className="col-md-6">
+                        <label className="form-label" htmlFor="recursos">
+                          Tipo humano, material,técnico,monetario
+                        </label>
                         <textarea
                           className="form-control"
-                          name="otras_necesidades"
-                          placeholder="Indicar cantidad, tipo y motivo"
-                          id=""
-                          value={informesALFA.otras_necesidades}
+                          name="recursos"
+                          rows={2}
+                          id="recursos"
+                          value={informesALFA.recursos}
                           onChange={handleChanges}
                           disabled={editing}
                         ></textarea>
                       </div>
-                    </div>
-                    <hr />
-                    <div className="row">
-                      <div className="col-md-6">
-                        <label htmlFor="" className="form-label fw-bold">
-                          Capacidad de respuesta
-                        </label>
-                        <select
-                          className="form-select"
-                          name="capacidad_respuesta"
-                          id=""
-                          value={informesALFA.capacidad_respuesta}
-                          onChange={handleChanges}
-                          disabled={editing}
-                        >
-                          <option value="">Seleccione nivel</option>
-                          <option value="1">
-                            Nivel I: Recurso local habitual
-                          </option>
-                          <option value="2">
-                            Nivel II: Recurso local reforzado
-                          </option>
-                          <option value="3">
-                            Nivel III: Recurso Apoyo local regional
-                          </option>
-                          <option value="4">
-                            Nivel IV: Recurso Apoyo nivel nacional
-                          </option>
-                        </select>
+                    </fieldset>
+                    <fieldset className="border rounded-3 p-3 mb-4">
+                      <legend className="float-none w-auto px-2 h6 mb-0">
+                        Evaluación de necesidades
+                      </legend>
+                      <div className="row">
+                        <div className="col">
+                          <div className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="radio"
+                              name="necesidades"
+                              id="no_requerida"
+                              value={"No se requiere"}
+                              checked={
+                                informesALFA.necesidades === "No se requiere"
+                              }
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor="no_requerida"
+                            >
+                              No se requiere (recursos insuficientes)
+                            </label>
+                          </div>
+                        </div>
+                        <div className="col">
+                          <div className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="radio"
+                              name="necesidades"
+                              id="requerida"
+                              value={"Se requiere"}
+                              checked={
+                                informesALFA.necesidades === "Se requiere"
+                              }
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor="requerida"
+                            >
+                              Se requiere
+                            </label>
+                          </div>
+                        </div>
+                        {informesALFA.necesidades === "Se requiere" && (
+                          <div className="col-md-6">
+                            <textarea
+                              className="form-control"
+                              name="desc_necesidades"
+                              placeholder="Indicar cantidad, tipo y motivo"
+                              id=""
+                              value={informesALFA.desc_necesidades}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            ></textarea>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </fieldset>
+                      <hr />
+                      <div className="row">
+                        <div className="col-md-6">
+                          <label htmlFor="" className="form-label fw-bold">
+                            Capacidad de respuesta
+                          </label>
+                          <select
+                            className="form-select"
+                            name="cap_respuesta"
+                            id=""
+                            value={informesALFA.cap_respuesta}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          >
+                            <option value="">Seleccione nivel</option>
+                            <option value="1">
+                              Nivel I: Recurso local habitual
+                            </option>
+                            <option value="2">
+                              Nivel II: Recurso local reforzado
+                            </option>
+                            <option value="3">
+                              Nivel III: Recurso Apoyo local regional
+                            </option>
+                            <option value="4">
+                              Nivel IV: Recurso Apoyo nivel nacional
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </fieldset>
 
-                  <fieldset className="border rounded-3 p-3 mb-4">
-                    <legend className="float-none w-auto px-2 h6 mb-0">
-                      Observaciones
-                    </legend>
-                    <div className="row">
-                      <div className="col-md-6">
-                        <textarea
-                          className="form-control"
-                          rows={4}
-                          name="observaciones"
-                          id=""
-                          value={informesALFA.observaciones}
-                          onChange={handleChanges}
-                          disabled={editing}
-                        ></textarea>
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="fecha_hora" className="form-label">
-                          Fecha y hora documento
-                        </label>
-                        <span>{informesALFA.fecha_documento}</span>
-                      </div>
-                      <div className="col-md-6">
-                        <span>{}</span>
-                      </div>
-                    </div>
-                  </fieldset>
+                    <fieldset className="border rounded-3 p-3 mb-4">
+                      <legend className="float-none w-auto px-2 h6 mb-0">
+                        Observaciones
+                      </legend>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <textarea
+                            className="form-control"
+                            rows={4}
+                            name="observaciones"
+                            id=""
+                            value={informesALFA.observaciones}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          ></textarea>
+                        </div>
+                        <div className="col-md-6">
+                          <label
+                            htmlFor="fecha_hora"
+                            className="form-label fst-italic fw-bold"
+                          >
+                            Fecha y hora documento:
+                          </label>
+                          <span> {informesALFA.fecha_documento}</span>
 
-                  <h3>9. Responsable del Informe</h3>
-                  <select
-                    name="usuario_grd"
-                    id=""
-                    value={informesALFA.usuario_grd}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  >
-                    <option value="">Seleccione Responsable del informe</option>
-                    {funcionarios.map((f) => (
-                      <option key={f.id_funcionario} value={f.funcionario}>
-                        {f.funcionario}
-                      </option>
-                    ))}
-                  </select>
+                          <label
+                            htmlFor=""
+                            className="form-label fst-italic fw-bold"
+                          >
+                            Responsable del informe:
+                          </label>
+                          <span> {nombre_responsable}</span>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </fieldset>
                 </div>
 
                 {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
@@ -1444,15 +1105,22 @@ function FormAlfa() {
             <div className="card-footer text-end">
               {editing && (
                 <button className="btn btn-danger">
-                  <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
+                  <i
+                    className="bi bi-file-earmark-pdf"
+                    onClick={handlePrint}
+                  ></i>{" "}
+                  Descargar PDF
                 </button>
               )}
+            </div>
+            <div style={{ display: "none" }}>
+              <AlfaPDF ref={printRef} data={informesALFA} />
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default FormAlfa;

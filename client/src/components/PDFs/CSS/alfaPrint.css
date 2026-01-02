@@ -1,0 +1,23 @@
+.alfa-pdf {
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.line-box {
+  border-bottom: 1px solid #000;
+  min-height: 20px;
+}
+
+.checkbox {
+  display: inline-block;
+  width: 16px;
+  border: 1px solid black;
+  text-align: center;
+  margin-right: 4px;
+}
+
+.eventos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}

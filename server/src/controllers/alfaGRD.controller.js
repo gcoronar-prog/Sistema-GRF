@@ -89,7 +89,7 @@ const createAlfa = async (req, res) => {
       rows: [result],
     } = await pool.query(cteAlfa, [
       //danios_cte
-      data.tipo_afectados,
+      JSON.stringify(data.tipo_afectados),
       data.danio_vivienda,
       data.no_evaluado,
       data.danios_servicio,
@@ -105,7 +105,7 @@ const createAlfa = async (req, res) => {
       //event_cte
       data.fuente_info,
       data.telefono,
-      data.tipo_evento,
+      JSON.stringify(data.tipo_evento),
       data.escala_sismo,
       data.otro_evento,
       data.direccion,
@@ -136,7 +136,7 @@ const updateALFA = async (req, res) => {
     const { rows: result } = await pool.query(cteUpdateAlfa, [
       id,
       //danios_cte
-      data.tipo_afectados,
+      JSON.stringify(data.tipo_afectados),
       data.danio_vivienda,
       data.no_evaluado,
       data.danios_servicio,
@@ -152,7 +152,7 @@ const updateALFA = async (req, res) => {
       //event_cte
       data.fuente_info,
       data.telefono,
-      data.tipo_evento,
+      JSON.stringify(data.tipo_evento),
       data.escala_sismo,
       data.otro_evento,
       data.direccion,
@@ -311,7 +311,7 @@ const getNextAlfa = async (req, res) => {
 const cteAlfa = `
 WITH danios_cte AS (
   INSERT INTO danios_alfa (tipo_afectados, danio_vivienda,no_evaluado,danios_servicios,monto_danio) 
-  VALUES ($1, $2, $3, $4, $5) RETURNING *
+  VALUES ($1::jsonb, $2, $3, $4, $5) RETURNING *
 ),
 eval_cte AS (
   INSERT INTO evaluacion_alfa (acciones,oportunidad,recursos,necesidades,desc_necesidades,cap_respuesta,observaciones)
@@ -319,7 +319,7 @@ eval_cte AS (
 ),
 event_cte AS (
   INSERT INTO eventos_alfa (fuente_info, telefono,tipo_evento,escala_sismo,otro_evento,direccion,tipo_ubicacion,desc_evento,fecha_ocurrencia)
-  VALUES ($13, $14, $15, $16, $17, $18, $19, $20, $21) RETURNING *
+  VALUES ($13, $14, $15::jsonb, $16, $17, $18, $19, $20, $21) RETURNING *
 ),
 resp_cte AS (
   INSERT INTO responsable_alfa (funcionario)
@@ -342,7 +342,7 @@ const cteUpdateAlfa = `WITH upd_alfa AS
 (SELECT * FROM informes_alfa WHERE id_alfa=$1),
 
 danios_cte AS (
-  UPDATE danios_alfa d SET tipo_afectados=$2, danio_vivienda=$3,no_evaluado=$4,danios_servicios=$5,monto_danio=$6
+  UPDATE danios_alfa d SET tipo_afectados=$2::jsonb, danio_vivienda=$3,no_evaluado=$4,danios_servicios=$5,monto_danio=$6
   FROM upd_alfa u
   WHERE d.id_danios=u.id_danios RETURNING d.id_danios
   ),
@@ -353,7 +353,7 @@ eval_cte AS (
     WHERE e.id_evaluacion=u.id_evaluacion RETURNING e.id_evaluacion
     ),
 event_cte AS (
-  UPDATE eventos_alfa ev SET fuente_info=$14, telefono=$15,tipo_evento=$16,escala_sismo=$17,otro_evento=$18,
+  UPDATE eventos_alfa ev SET fuente_info=$14, telefono=$15,tipo_evento=$16::jsonb,escala_sismo=$17,otro_evento=$18,
   direccion=$19,tipo_ubicacion=$20,desc_evento=$21,fecha_ocurrencia=$22
   FROM upd_alfa u
     WHERE ev.id_evento=u.id_evento RETURNING ev.id_evento
