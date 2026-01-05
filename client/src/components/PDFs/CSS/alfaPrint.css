@@ -1,6 +1,25 @@
 .alfa-pdf {
-  font-size: 12px;
   font-family: Arial, Helvetica, sans-serif;
+  width: 190mm;
+  min-height: 259mm;
+  font-size: 10.5px;
+  line-height: 1.2;
+}
+
+.alfa-pdf table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.alfa-pdf th,
+.alfa-pdf td {
+  padding: 2px 4px;
+  font-size: 10px;
+}
+
+.alfa-pdf section {
+  padding: 4px;
+  margin-bottom: 4px;
 }
 
 .line-box {
@@ -16,8 +35,29 @@
   margin-right: 4px;
 }
 
+.escala-grid {
+  display: grid;
+  grid-template-columns: repeat(12, auto);
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.escala-grid h6 {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
 .eventos-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
+}
+@media print {
+  .alfa-pdf * {
+    page-break-inside: avoid;
+  }
+  @page {
+    size: letter;
+    margin: 10mm;
+  }
 }

@@ -8,10 +8,10 @@ import AlfaPDF from "../PDFs/AlfaPDF.jsx";
 import { useReactToPrint } from "react-to-print";
 
 const FormAlfa = () => {
-  const printRef = useRef();
+  const printRef = useRef(null);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    contentRef: printRef,
     documentTitle: "Informe ALFA",
   });
 
@@ -108,6 +108,7 @@ const FormAlfa = () => {
 
     setInformesALFA({
       //danios_cte
+      cod_alfa: info.informe_alfa[0].cod_alfa,
       tipo_afectados: info.informe_alfa[0].tipo_afectados,
       danio_vivienda: info.informe_alfa[0].danio_vivienda,
       no_evaluado: info.informe_alfa[0].no_evaluado,
@@ -251,16 +252,17 @@ const FormAlfa = () => {
   const handleCheckbox = (e) => {
     const { value, checked } = e.target;
 
-    setSelectedValues((prev) =>
-      checked ? [...prev, value] : prev.filter((v) => v !== value)
-    );
+    setInformesALFA((prev) => {
+      const nuevosEventos = checked
+        ? [...prev.tipo_evento, value]
+        : prev.tipo_evento.filter((v) => v !== value);
 
-    if (value === "otro") {
-      setInformesALFA((prev) => ({
+      return {
         ...prev,
-        otro_evento: "",
-      }));
-    }
+        tipo_evento: nuevosEventos,
+        otro_evento: value === "otro" && !checked ? "" : prev.otro_evento,
+      };
+    });
   };
 
   const handleLastAlfa = async () => {
@@ -511,11 +513,11 @@ const FormAlfa = () => {
                                   id="inundacion"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"inundacion"}
+                                  value={"INUNDACIÓN"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "inundacion"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "INUNDACIÓN"
                                   )}
                                 />
                               </div>
@@ -528,10 +530,31 @@ const FormAlfa = () => {
                                   id="temporal"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"temporal"}
+                                  value={"TEMPORAL"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes("temporal")}
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "TEMPORAL"
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            <div className="col">
+                              <div className="form-check form-check-inline">
+                                <label htmlFor="deslizamiento">
+                                  Activ. Volcánica
+                                </label>
+                                <input
+                                  className="form-check-input"
+                                  id="deslizamiento"
+                                  name="tipo_evento"
+                                  type="checkbox"
+                                  value={"DESLIZAMIENTO"}
+                                  onChange={handleCheckbox}
+                                  disabled={editing}
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "DESLIZAMIENTO"
+                                  )}
                                 />
                               </div>
                             </div>
@@ -545,11 +568,11 @@ const FormAlfa = () => {
                                   id="activ_volcanica"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"activ_volcanica"}
+                                  value={"ACT. VOLCÁNICA"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "activ_volcanica"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "ACT. VOLCÁNICA"
                                   )}
                                 />
                               </div>
@@ -564,11 +587,11 @@ const FormAlfa = () => {
                                   id="incendio_forestal"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"incendio_forestal"}
+                                  value={"INC. FORESTAL"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "incendio_forestal"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "INC. FORESTAL"
                                   )}
                                 />
                               </div>
@@ -583,11 +606,11 @@ const FormAlfa = () => {
                                   id="incendio_urbano"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"incendio_urbano"}
+                                  value={"INCENDIO URBANO"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "incendio_urbano"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "INCENDIO URBANO"
                                   )}
                                 />
                               </div>
@@ -602,11 +625,11 @@ const FormAlfa = () => {
                                   id="sust_peligrosas"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"sust_peligrosas"}
+                                  value={"SUST. PELIGROSAS"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "sust_peligrosas"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "SUST. PELIGROSAS"
                                   )}
                                 />
                               </div>
@@ -621,11 +644,11 @@ const FormAlfa = () => {
                                   id="acc_multiples_victim"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"acc_multiples_victim"}
+                                  value={"ACC. MULT. VÍCTIMAS"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "acc_multiples_victim"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "ACC. MULT. VÍCTIMAS"
                                   )}
                                 />
                               </div>
@@ -640,11 +663,11 @@ const FormAlfa = () => {
                                   id="corte_energia"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"corte_energia"}
+                                  value={"CORTE ENERGÍA"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "corte_energia"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "CORTE ENERGÍA"
                                   )}
                                 />
                               </div>
@@ -659,11 +682,11 @@ const FormAlfa = () => {
                                   id="corte_agua"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"corte_agua"}
+                                  value={"CORTE AGUA"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes(
-                                    "corte_agua"
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "CORTE AGUA"
                                   )}
                                 />
                               </div>
@@ -676,14 +699,16 @@ const FormAlfa = () => {
                                   id="otro"
                                   name="tipo_evento"
                                   type="checkbox"
-                                  value={"otro"}
+                                  value={"OTRO"}
                                   onChange={handleCheckbox}
                                   disabled={editing}
-                                  checked={selectedValues.includes("otro")}
+                                  checked={informesALFA.tipo_evento.includes(
+                                    "OTRO"
+                                  )}
                                 />
                               </div>
                             </div>
-                            {selectedValues.includes("otro") && (
+                            {informesALFA.tipo_evento.includes("OTRO") && (
                               <div className="col">
                                 <input
                                   className="form-control"
@@ -1104,11 +1129,8 @@ const FormAlfa = () => {
             </div>
             <div className="card-footer text-end">
               {editing && (
-                <button className="btn btn-danger">
-                  <i
-                    className="bi bi-file-earmark-pdf"
-                    onClick={handlePrint}
-                  ></i>{" "}
+                <button className="btn btn-danger" onClick={handlePrint}>
+                  <i className="bi bi-file-earmark-pdf"></i>
                   Descargar PDF
                 </button>
               )}

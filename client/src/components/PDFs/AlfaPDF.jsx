@@ -2,11 +2,19 @@ import { forwardRef } from "react";
 import "./CSS/alfaPrint.css";
 
 const AlfaPDF = forwardRef(({ data }, ref) => {
+  if (!data) return null;
+
+  const afectados = Object.fromEntries(
+    Object.entries(data.tipo_afectados || {}).map(([k, v]) => [
+      k.toUpperCase(),
+      v,
+    ])
+  );
   return (
     <div ref={ref} className="alfa-pdf">
       {/* ================= HEADER ================= */}
       <div className="text-center fw-bold mb-2">
-        INFORME DE INCIDENTE O EMERGENCIA Nº {data.id_reporte}
+        INFORME DE INCIDENTE O EMERGENCIA Nº {data.cod_alfa}
       </div>
 
       {/* ================= 1. IDENTIFICACIÓN ================= */}
@@ -28,10 +36,40 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       {/* ================= 2. TIPO DE EVENTO ================= */}
       <section className="border p-2 mb-2">
         <div className="fw-bold mb-1">2. TIPO DE EVENTO</div>
-
+        <div className="escala-grid">
+          <h6>SISMO (ESCALA MERCALI) </h6>
+          {[
+            "I",
+            "II",
+            "III",
+            "IV",
+            "V",
+            "VI",
+            "VII",
+            "VIII",
+            "IX",
+            "X",
+            "XI",
+            "XII",
+          ].map((nivel) => (
+            <div key={nivel}>
+              <label
+                htmlFor=""
+                style={{
+                  borderStyle: data.escala_sismo.includes(nivel)
+                    ? "solid"
+                    : "none",
+                  padding: "1px",
+                }}
+              >
+                {nivel}
+              </label>
+            </div>
+          ))}
+        </div>
+        <br />
         <div className="eventos-grid">
           {[
-            "SISMO",
             "INUNDACIÓN",
             "TEMPORAL",
             "DESLIZAMIENTO",
@@ -42,6 +80,7 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
             "ACC. MULT. VÍCTIMAS",
             "CORTE ENERGÍA",
             "CORTE AGUA",
+            "OTRO",
           ].map((evento) => (
             <div key={evento}>
               <span className="checkbox">
@@ -62,12 +101,12 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
           <div className="line-box">{data.direccion}</div>
         </div>
 
-        <div className="row mt-1">
+        {/* <div className="row mt-1">
           <div className="col">HORA: {data.hora}</div>
           <div className="col">DÍA: {data.dia}</div>
           <div className="col">MES: {data.mes}</div>
           <div className="col">AÑO: {data.anio}</div>
-        </div>
+        </div>*/}
       </section>
 
       {/* ================= 3. DAÑOS ================= */}
@@ -92,8 +131,8 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
               "DESAPARECIDAS",
               "ALBERGADOS",
             ].map((tipo) => {
-              const h = data.tipo_afectados[tipo]?.hombres || 0;
-              const m = data.tipo_afectados[tipo]?.mujeres || 0;
+              const h = afectados[tipo]?.hombres || 0;
+              const m = afectados[tipo]?.mujeres || 0;
               return (
                 <tr key={tipo}>
                   <td>{tipo}</td>
@@ -146,9 +185,8 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       {/* ================= 9. RESPONSABLE ================= */}
       <section className="border p-2">
         <div className="fw-bold">9. RESPONSABLE DEL INFORME</div>
-        <div>Nombre: {data.responsable}</div>
-        <div>Fecha: {data.fecha}</div>
-        <div>Hora: {data.hora_reporte}</div>
+        <div>Nombre: {data.funcionario}</div>
+        <div>Fecha: {data.fecha_documento}</div>
       </section>
     </div>
   );
