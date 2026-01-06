@@ -10,6 +10,17 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       v,
     ])
   );
+
+  const ocurrencia =
+    data.fecha_ocurrencia.slice(0, 10).split("-").reverse().join("-") +
+      data.fecha_ocurrencia.slice(10).replace("T", " HORA: ") || "";
+
+  const horaOcurrencia =
+    data.fecha_ocurrencia.slice(10).replace("T", " HORA: ") || "";
+  const diaOcurrencia = "   DÍA " + data.fecha_ocurrencia.slice(8, 10) || "";
+  const mesOcurrencia = "   MES " + data.fecha_ocurrencia.slice(5, 7) || "";
+  const anioOcurrencia = "   AÑO " + data.fecha_ocurrencia.slice(0, 4) || "";
+
   return (
     <div ref={ref} className="alfa-pdf">
       {/* ================= HEADER ================= */}
@@ -36,69 +47,111 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       {/* ================= 2. TIPO DE EVENTO ================= */}
       <section className="border p-2 mb-2">
         <div className="fw-bold mb-1">2. TIPO DE EVENTO</div>
-        <div className="escala-grid">
-          <h6>SISMO (ESCALA MERCALI) </h6>
-          {[
-            "I",
-            "II",
-            "III",
-            "IV",
-            "V",
-            "VI",
-            "VII",
-            "VIII",
-            "IX",
-            "X",
-            "XI",
-            "XII",
-          ].map((nivel) => (
-            <div key={nivel}>
-              <label
-                htmlFor=""
-                style={{
-                  borderStyle: data.escala_sismo.includes(nivel)
-                    ? "solid"
-                    : "none",
-                  padding: "1px",
-                }}
-              >
-                {nivel}
-              </label>
-            </div>
-          ))}
-        </div>
+
         <br />
-        <div className="eventos-grid">
-          {[
-            "INUNDACIÓN",
-            "TEMPORAL",
-            "DESLIZAMIENTO",
-            "ACT. VOLCÁNICA",
-            "INC. FORESTAL",
-            "INCENDIO URBANO",
-            "SUST. PELIGROSAS",
-            "ACC. MULT. VÍCTIMAS",
-            "CORTE ENERGÍA",
-            "CORTE AGUA",
-            "OTRO",
-          ].map((evento) => (
-            <div key={evento}>
-              <span className="checkbox">
-                {data.tipo_evento.includes(evento) ? "X" : ""}
-              </span>
-              {evento}
+        <div className="row">
+          <div className="col">
+            <div className="escala-grid">
+              <h6>SISMO (ESCALA MERCALI) </h6>
+              {[
+                "I",
+                "II",
+                "III",
+                "IV",
+                "V",
+                "VI",
+                "VII",
+                "VIII",
+                "IX",
+                "X",
+                "XI",
+                "XII",
+              ].map((nivel) => (
+                <div key={nivel}>
+                  <label
+                    htmlFor=""
+                    style={{
+                      borderStyle: data.escala_sismo.includes(nivel)
+                        ? "solid"
+                        : "none",
+                      padding: "1px",
+                    }}
+                  >
+                    {nivel}
+                  </label>
+                </div>
+              ))}
             </div>
-          ))}
+            <br />
+            <div className="eventos-grid">
+              {[
+                "INUNDACIÓN",
+                "TEMPORAL",
+                "DESLIZAMIENTO",
+                "ACT. VOLCÁNICA",
+                "INC. FORESTAL",
+                "INCENDIO URBANO",
+                "SUST. PELIGROSAS",
+                "ACC. MULT. VÍCTIMAS",
+                "CORTE ENERGÍA",
+                "CORTE AGUA",
+                "OTRO",
+              ].map((evento) => (
+                <div className="evento-item" key={evento}>
+                  <span className="checkbox">
+                    {data.tipo_evento.includes(evento) ? "X" : ""}
+                  </span>
+                  <span className="evento-texto">{evento}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="col">
+            <div className="mt-1">
+              <strong>DESCRIPCIÓN DEL EVENTO:</strong>
+              <div className="line-box">{data.desc_evento}</div>
+            </div>
+          </div>
         </div>
-
-        <div className="mt-1">
-          <strong>DESCRIPCIÓN DEL EVENTO:</strong>
-          <div className="line-box">{data.desc_evento}</div>
-        </div>
-
-        <div className="mt-1">
-          <strong>DIRECCIÓN / UBICACIÓN:</strong>
-          <div className="line-box">{data.direccion}</div>
+        <div className="row">
+          <div className="col-6">
+            <div className="mt-1">
+              <div className="col">
+                <strong>OCURRENCIA:</strong>
+              </div>
+              <br />
+              <div className="col d-flex">
+                <div className="me-auto">
+                  <ul className="list-inline">
+                    <li className="list-inline-item me-4">{horaOcurrencia}</li>
+                    <li className="list-inline-item me-4">{diaOcurrencia}</li>
+                    <li className="list-inline-item me-4">{mesOcurrencia}</li>
+                    <li className="list-inline-item me-4">{anioOcurrencia}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col">
+            <div className="mt-1">
+              <strong>DIRECCIÓN / UBICACIÓN:</strong>
+              <div className="">{data.direccion}</div>
+            </div>
+          </div>
+          <div className="col-1">
+            <div
+              className="row"
+              style={{ borderStyle: "solid", borderWidth: "1px" }}
+            >
+              U {data.tipo_ubicacion.includes("Urbana") ? "X" : ""}
+            </div>
+            <div
+              className="row"
+              style={{ borderStyle: "solid", borderWidth: "1px" }}
+            >
+              R {data.tipo_ubicacion.includes("Rural") ? "X" : ""}
+            </div>
+          </div>
         </div>
 
         {/* <div className="row mt-1">
