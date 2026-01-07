@@ -6,11 +6,6 @@
   line-height: 1.2;
 }
 
-.alfa-pdf table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
 .alfa-pdf th,
 .alfa-pdf td {
   padding: 2px 4px;
@@ -54,11 +49,6 @@
   margin-bottom: 4px;
 }
 
-.eventos-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-}
 @media print {
   .alfa-pdf * {
     page-break-inside: avoid;

@@ -51,71 +51,83 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
         <br />
         <div className="row">
           <div className="col">
-            <div className="escala-grid">
+            <div className="col">
               <h6>SISMO (ESCALA MERCALI) </h6>
-              {[
-                "I",
-                "II",
-                "III",
-                "IV",
-                "V",
-                "VI",
-                "VII",
-                "VIII",
-                "IX",
-                "X",
-                "XI",
-                "XII",
-              ].map((nivel) => (
-                <div key={nivel}>
-                  <label
-                    htmlFor=""
-                    style={{
-                      borderStyle: data.escala_sismo.includes(nivel)
-                        ? "solid"
-                        : "none",
-                      padding: "1px",
-                    }}
-                  >
-                    {nivel}
-                  </label>
+              <div className="escala-grid">
+                {[
+                  "I",
+                  "II",
+                  "III",
+                  "IV",
+                  "V",
+                  "VI",
+                  "VII",
+                  "VIII",
+                  "IX",
+                  "X",
+                  "XI",
+                  "XII",
+                ].map((nivel) => (
+                  <div key={nivel}>
+                    <label
+                      htmlFor=""
+                      style={{
+                        borderStyle: data.escala_sismo.includes(nivel)
+                          ? "solid"
+                          : "none",
+                        padding: "1px",
+                      }}
+                    >
+                      {nivel}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <div className="row">
+                <div className="col">
+                  {[
+                    "INUNDACIÓN",
+                    "TEMPORAL",
+                    "DESLIZAMIENTO",
+                    "ACT. VOLCÁNICA",
+                    "INC. FORESTAL",
+                    "OTRO",
+                  ].map((evento) => (
+                    <div key={evento}>
+                      <span className="checkbox">
+                        {data.tipo_evento.includes(evento) ? "X" : ""}
+                      </span>
+                      <span>{evento}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <br />
-            <div className="eventos-grid">
-              {[
-                "INUNDACIÓN",
-                "TEMPORAL",
-                "DESLIZAMIENTO",
-                "ACT. VOLCÁNICA",
-                "INC. FORESTAL",
-                "INCENDIO URBANO",
-                "SUST. PELIGROSAS",
-                "ACC. MULT. VÍCTIMAS",
-                "CORTE ENERGÍA",
-                "CORTE AGUA",
-                "OTRO",
-              ].map((evento) => (
-                <div className="evento-item" key={evento}>
-                  <span className="checkbox">
-                    {data.tipo_evento.includes(evento) ? "X" : ""}
-                  </span>
-                  <span className="evento-texto">{evento}</span>
+                <div className="col">
+                  {[
+                    "INCENDIO URBANO",
+                    "SUST. PELIGROSAS",
+                    "ACC. MULT. VÍCTIMAS",
+                    "CORTE ENERGÍA ELECT.",
+                    "CORTE AGUA POTABLE",
+                  ].map((evento) => (
+                    <div key={evento}>
+                      <span className="checkbox">
+                        {data.tipo_evento.includes(evento) ? "X" : ""}
+                      </span>
+                      <span>{evento}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
           <div className="col">
-            <div className="mt-1">
-              <strong>DESCRIPCIÓN DEL EVENTO:</strong>
-              <div className="line-box">{data.desc_evento}</div>
-            </div>
+            <strong>DESCRIPCIÓN DEL EVENTO:</strong>
+            <div className="line-box">{data.desc_evento}</div>
           </div>
         </div>
         <div className="row">
           <div className="col-6">
-            <div className="mt-1">
+            <div className="mt-1 p-1">
               <div className="col">
                 <strong>OCURRENCIA:</strong>
               </div>
@@ -133,70 +145,128 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
             </div>
           </div>
           <div className="col">
-            <div className="mt-1">
+            <div className="mt-1 p-1">
               <strong>DIRECCIÓN / UBICACIÓN:</strong>
-              <div className="">{data.direccion}</div>
+              <div className="me-1 p-1">{data.direccion}</div>
             </div>
           </div>
-          <div className="col-1">
+          <div className="col-1 me-1">
             <div
-              className="row"
+              className="row p-2"
               style={{ borderStyle: "solid", borderWidth: "1px" }}
             >
               U {data.tipo_ubicacion.includes("Urbana") ? "X" : ""}
             </div>
             <div
-              className="row"
+              className="row p-2"
               style={{ borderStyle: "solid", borderWidth: "1px" }}
             >
               R {data.tipo_ubicacion.includes("Rural") ? "X" : ""}
             </div>
           </div>
         </div>
-
-        {/* <div className="row mt-1">
-          <div className="col">HORA: {data.hora}</div>
-          <div className="col">DÍA: {data.dia}</div>
-          <div className="col">MES: {data.mes}</div>
-          <div className="col">AÑO: {data.anio}</div>
-        </div>*/}
       </section>
 
       {/* ================= 3. DAÑOS ================= */}
       <section className="border p-2 mb-2">
         <div className="fw-bold mb-1">3. DAÑOS</div>
+        <div className="row">
+          <div className="col">
+            <div className="row">
+              <div className="col d-flex justify-content-center">
+                <table
+                  className="table table-bordered table-sm m-0 mx-auto"
+                  style={{ width: "25%" }}
+                >
+                  <thead>
+                    <tr>
+                      <th style={{ width: "52%" }}></th>
+                      <th style={{ width: "16%" }} className="text-center p-2">
+                        H
+                      </th>
+                      <th style={{ width: "16%" }} className="text-center p-2">
+                        M
+                      </th>
+                      <th style={{ width: "16%" }} className="text-center">
+                        Total
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="px-0 ps-1">
+                    {[
+                      "AFECTADAS",
+                      "DAMNIFICADAS",
+                      "HERIDAS",
+                      "MUERTAS",
+                      "DESAPARECIDAS",
+                      "ALBERGADOS",
+                    ].map((tipo) => {
+                      const h = afectados[tipo]?.hombres || "";
+                      const m = afectados[tipo]?.mujeres || "";
+                      return (
+                        <tr key={tipo}>
+                          <td className="px-1">{tipo}</td>
+                          <td className="px-1 text-center">{h}</td>
+                          <td className="px-1 text-center">{m}</td>
+                          <td className="px-1 text-center">{h + m}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="col me-n4" style={{ border: "solid" }}>
+                <div className="fw-bold mb-1">VIVIENDAS</div>
+                {[
+                  "DAÑO MENOR HABITABLE",
+                  "DAÑO MAYOR NO HABITABLE",
+                  "DESTRUIDAS, IRRECUPERABLES",
+                ].map((danio) => (
+                  <div className="row" key={danio}>
+                    <div className="col m-0 p-0">
+                      <span style={{ fontSize: "10px" }}>{danio}</span>
+                    </div>
 
-        <table className="table table-bordered table-sm">
-          <thead>
-            <tr>
-              <th></th>
-              <th>H</th>
-              <th>M</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              "AFECTADAS",
-              "DAMNIFICADAS",
-              "HERIDAS",
-              "MUERTAS",
-              "DESAPARECIDAS",
-              "ALBERGADOS",
-            ].map((tipo) => {
-              const h = afectados[tipo]?.hombres || 0;
-              const m = afectados[tipo]?.mujeres || 0;
-              return (
-                <tr key={tipo}>
-                  <td>{tipo}</td>
-                  <td>{h}</td>
-                  <td>{m}</td>
-                  <td>{h + m}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    <div className="col-auto m-0 p-0">
+                      <table
+                        className="table table-bordered m-0"
+                        style={{ width: "40px", tableLayout: "fixed" }}
+                      >
+                        <tbody>
+                          <tr>
+                            <td style={{ height: "26px" }}></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+                <br />
+                <br />
+                <div className="row">
+                  <div className="col">
+                    <span>NO EVALUADAS</span>
+                  </div>
+                  <div className="col ps-0">
+                    <table className="table table-bordered m-0 ms-n1 w-50">
+                      <tbody>
+                        <tr>
+                          <td style={{ height: "26px" }}></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col p-0 ms-5">
+            <div className="mt-1">
+              <strong>SERVICIOS BÁSICOS, INFRAESTRUCTURAS Y OTROS:</strong>
+              <div className="me-1 p-1">{data.danio_vivienda}</div>
+            </div>
+          </div>
+        </div>
 
         <div className="mt-1">
           <strong>MONTO ESTIMADO DE DAÑOS ($):</strong> {data.monto_danio}

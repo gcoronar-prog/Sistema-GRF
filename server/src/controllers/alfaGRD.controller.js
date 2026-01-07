@@ -91,7 +91,7 @@ const createAlfa = async (req, res) => {
       //danios_cte
       JSON.stringify(data.tipo_afectados),
       data.danio_vivienda,
-      data.no_evaluado,
+      data.ev_danio,
       data.danios_servicio,
       data.monto_danio,
       //eval_cte
@@ -138,7 +138,7 @@ const updateALFA = async (req, res) => {
       //danios_cte
       JSON.stringify(data.tipo_afectados),
       data.danio_vivienda,
-      data.no_evaluado,
+      data.ev_danio,
       data.danios_servicio,
       data.monto_danio,
       //eval_cte
@@ -310,7 +310,7 @@ const getNextAlfa = async (req, res) => {
 
 const cteAlfa = `
 WITH danios_cte AS (
-  INSERT INTO danios_alfa (tipo_afectados, danio_vivienda,no_evaluado,danios_servicios,monto_danio) 
+  INSERT INTO danios_alfa (tipo_afectados, danio_vivienda,ev_danio,danios_servicios,monto_danio) 
   VALUES ($1::jsonb, $2, $3, $4, $5) RETURNING *
 ),
 eval_cte AS (
@@ -342,7 +342,7 @@ const cteUpdateAlfa = `WITH upd_alfa AS
 (SELECT * FROM informes_alfa WHERE id_alfa=$1),
 
 danios_cte AS (
-  UPDATE danios_alfa d SET tipo_afectados=$2::jsonb, danio_vivienda=$3,no_evaluado=$4,danios_servicios=$5,monto_danio=$6
+  UPDATE danios_alfa d SET tipo_afectados=$2::jsonb, danio_vivienda=$3,ev_danio=$4,danios_servicios=$5,monto_danio=$6
   FROM upd_alfa u
   WHERE d.id_danios=u.id_danios RETURNING d.id_danios
   ),

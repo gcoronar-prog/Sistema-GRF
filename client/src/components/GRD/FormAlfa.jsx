@@ -32,7 +32,7 @@ const FormAlfa = () => {
       albergados: { hombres: 0, mujeres: 0 },
     },
     danio_vivienda: "",
-    no_evaluado: "",
+    ev_danio: "",
     danios_servicio: "",
     monto_danio: "",
     //eval_cte
@@ -111,7 +111,7 @@ const FormAlfa = () => {
       cod_alfa: info.informe_alfa[0].cod_alfa,
       tipo_afectados: info.informe_alfa[0].tipo_afectados,
       danio_vivienda: info.informe_alfa[0].danio_vivienda,
-      no_evaluado: info.informe_alfa[0].no_evaluado,
+      ev_danio: info.informe_alfa[0].ev_danio,
       danios_servicio: info.informe_alfa[0].danios_servicio,
       monto_danio: info.informe_alfa[0].monto_danio,
       //eval_cte
@@ -219,7 +219,7 @@ const FormAlfa = () => {
       albergados: { hombres: 0, mujeres: 0 },
     },
     danio_vivienda: "",
-    no_evaluado: "",
+    ev_danio: "",
     danios_servicio: "",
     monto_danio: "",
     //eval_cte
@@ -807,7 +807,7 @@ const FormAlfa = () => {
 
                   <fieldset className="border border-primary rounded p-3">
                     <legend className="float-none w-auto px-2 h6 mb-0">
-                      Daños provocados
+                      Daños identificados
                     </legend>
                     <div className="row">
                       {gruposAfectados.map((bloque, i) => (
@@ -853,7 +853,40 @@ const FormAlfa = () => {
                           </table>
                         </div>
                       ))}
+                      <div className="col">
+                        {[
+                          "Daño menor habitable",
+                          "Daño mayor no habitable",
+                          "Destuidas, irrecuperables",
+                          "No evaluadas",
+                        ].map((danio) => {
+                          const idDanio = danio
+                            .toLowerCase()
+                            .replace(/\s+/g, "-");
+                          return (
+                            <div className="form-check" key={danio.length}>
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                name="ev_danio"
+                                id={idDanio}
+                                value={danio}
+                                checked={informesALFA.ev_danio === danio}
+                                onChange={handleChanges}
+                                disabled={editing}
+                              />
+                              <label
+                                htmlFor={idDanio}
+                                className="form-check-label"
+                              >
+                                {danio}
+                              </label>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
+
                     <hr />
                     <div className="row">
                       <div className="col-md-6">
