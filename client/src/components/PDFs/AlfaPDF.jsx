@@ -15,6 +15,19 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
     data.fecha_ocurrencia.slice(0, 10).split("-").reverse().join("-") +
       data.fecha_ocurrencia.slice(10).replace("T", " HORA: ") || "";
 
+  const arrayEmergencia = [
+    "Emergencia Menor:",
+    "Emergencia Mayor:",
+    "Desastre:",
+    "Catástrofe:",
+  ];
+  const detalleEmergencia = [
+    " situación con un nivel de afectación que permite ser gestionada con capacidades comunales y, eventualmente, con refuerzos o apoyos desde otras zonas, a través de una coordinacion ade nivel comunal.",
+    " situación con un nivel de afectación que permite ser gestionada con capacidades regionales y, eventualmente, con refuerzos o apoyos desde otras zonas, a través de una coordinacion de nivel provincial o regional.",
+    " situación con un nivel de afectación e impacto que no permite ser gestionada con capacidades regionales, requiriendo de refuerzos o apoyos desde otras zonas del país, a través de una coordinación de nivel nacional.",
+    " situación con un nivel de afectación e impacto que requiere de asistencia internacional, como apoyo a las capacidades del país, a través de una coordinación a nivel nacional.",
+  ];
+
   const horaOcurrencia =
     data.fecha_ocurrencia.slice(10).replace("T", " HORA: ") || "";
   const diaOcurrencia = "   DÍA " + data.fecha_ocurrencia.slice(8, 10) || "";
@@ -176,18 +189,24 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                 <table className="m-0 " style={{ width: "30%" }}>
                   <thead>
                     <tr>
-                      <th>
+                      <th className="p-2">
                         <span className="fw-bold m-0 text-break">
                           3. DAÑOS PERSONAS
                         </span>
                       </th>
-                      <th style={{ width: "16%" }} className="text-center p-2">
+                      <th
+                        style={{ width: "16%" }}
+                        className="text-center align-bottom p-2"
+                      >
                         H
                       </th>
-                      <th style={{ width: "16%" }} className="text-center p-2">
+                      <th
+                        style={{ width: "16%" }}
+                        className="text-center align-bottom p-2"
+                      >
                         M
                       </th>
-                      <th className="text-center p-1">Total</th>
+                      <th className="text-center align-bottom p-2">Total</th>
                     </tr>
                   </thead>
                   <tbody className="px-0 ps-1">
@@ -213,8 +232,8 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                   </tbody>
                 </table>
               </div>
-              <div className="col me-n4 mt-2">
-                <div className="fw-bold mb-1">VIVIENDAS</div>
+              <div className="col me-n4 mt-3">
+                <div className="fw-bold mb-1 ">VIVIENDAS</div>
                 {[
                   "DAÑO MENOR HABITABLE",
                   "DAÑO MAYOR NO HABITABLE",
@@ -259,11 +278,13 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                   </div>
                 </div>
               </div>
+              <span className="mt-1">
+                (*) OBLIGATORIEDAD DE DESAGREGAR POR SEXO
+              </span>
             </div>
-            <span>(*) OBLIGATORIEDAD DE DESAGREGAR POR SEXO</span>
           </div>
           <div className="col p-0 ms-3 d-flex flex-column">
-            <div className="mt-1">
+            <div className="mt-3">
               <strong>SERVICIOS BÁSICOS, INFRAESTRUCTURAS Y OTROS:</strong>
               <div className="me-1 p-1">{data.danio_vivienda}</div>
             </div>
@@ -275,37 +296,118 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       </section>
 
       {/* ================= 4. ACCIONES ================= */}
-      <section className="border p-2 mb-2">
-        <div className="fw-bold">
-          4. DECISIONES, ACCIONES Y SOLUCIONES INMEDIATAS
+      <section className="border p-2">
+        <div className="row g-2">
+          <div className="col mt-0 p-0">
+            <div className="mt-0 p-0">
+              <span className="fw-bold mt-0 p-0 ms-1">4. DECISIONES</span>
+              <span className="p-1">
+                &nbsp; ACCIONES Y SOLUCIONES INMEDIATAS:&nbsp;&nbsp; &nbsp;
+              </span>
+              <div className="ms-3 me-4">
+                <div className="line-box mt-0 align-bottom">
+                  <span>{data.acciones}</span>
+                </div>
+                <div className="line-box mt-0"></div>
+                <div className="line-box mt-0"></div>
+              </div>
+            </div>
+          </div>
+          <div className="col-4 m-0 p-1">
+            <div className="fw-bold ms-1 me-1">
+              OPORTUNIDAD (TPO) RESTABLECIMIENTO:
+            </div>
+            <div className="line-box p-0">{data.oportunidad}</div>
+            <div className="line-box"></div>
+          </div>
         </div>
-        <div className="line-box">{data.acciones}</div>
       </section>
 
       {/* ================= 5. RECURSOS ================= */}
-      <section className="border p-2 mb-2">
-        <div className="fw-bold">5. RECURSOS INVOLUCRADOS</div>
-        <div className="line-box">{data.recursos}</div>
+      <section className="border p-0 m-0">
+        <div className="mt-0 p-0">
+          <span className="fw-bold ms-1 mt-0 p-0">
+            5. RECURSOS INVOLUCRADOS
+          </span>
+          &nbsp;&nbsp; <span>TIPO (HUMANO-MATERIAL)</span>
+        </div>
+        <div className="line-box me-4 ms-1">{data.recursos}</div>
+        <div className="line-box me-4 ms-1"></div>
+        <div className="line-box me-4 ms-1"></div>
       </section>
 
       {/* ================= 6. EVALUACIÓN ================= */}
-      <section className="border p-2 mb-2">
-        <div className="fw-bold">6. EVALUACIÓN DE NECESIDADES</div>
-        <div>{data.necesidades}</div>
-      </section>
+      <section className="border">
+        <div className="row">
+          <div className="col">
+            <div className="fw-bold ms-2">6. EVALUACIÓN DE NECESIDADES</div>
+            <div className="ms-1">
+              <table className="m-0 ">
+                <thead></thead>
+                <tbody className="px-0 ps-1">
+                  {[
+                    "NO SE REQUIERE",
+                    "SE REQUIERE (INDICAR CANTIDAD, TIPO Y MOTIVO)",
+                  ].map((tipo) => {
+                    return (
+                      <tr key={tipo}>
+                        <td className="border">
+                          {data.necesidades.includes("") ? "X" : ""}
+                        </td>
+                        <td className="ms-5">{tipo}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="col">
+            {/* ================= 7. CAPACIDAD ================= */}
 
-      {/* ================= 7. CAPACIDAD ================= */}
-      <section className="border p-2 mb-2">
-        <div className="fw-bold">7. CAPACIDAD DE RESPUESTA</div>
-        <div>NIVEL: {data.cap_respuesta}</div>
-      </section>
+            <div className="fw-bold">7. NIVELES DE EMERGENCIA</div>
+            <table className="m-0">
+              <thead></thead>
+              <tbody>
+                {/*  {arrayEmergencia.map((emer) => {
+                    return (
+                      <tr key={emer}>
+                        <td className="border"></td>
+                        <td>{emer}</td>
+                      </tr>
+                    );
+                  })}
+                  {detalleEmergencia.map((emerg) => {
+                    return (
+                      <tr key={emerg}>
+                        <td className="border"></td>
+                        <td>{emerg}</td>
+                      </tr>
+                    );
+                  })}*/}
+                {arrayEmergencia.map((e, i) => {
+                  return (
+                    <tr>
+                      <td className="border" style={{ width: "5%" }}></td>
+                      <td>
+                        <span>{e}</span>
+                        <span style={{ fontSize: "7px" }}>
+                          {detalleEmergencia[i]}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
 
-      {/* ================= 8. OBSERVACIONES ================= */}
-      <section className="border p-2 mb-2">
-        <div className="fw-bold">8. OBSERVACIONES</div>
-        <div className="line-box">{data.observaciones}</div>
-      </section>
+            {/* ================= 8. OBSERVACIONES ================= */}
 
+            <div className="fw-bold">8. OBSERVACIONES</div>
+            <div className="line-box">{data.observaciones}</div>
+          </div>
+        </div>
+      </section>
       {/* ================= 9. RESPONSABLE ================= */}
       <section className="border p-2">
         <div className="fw-bold">9. RESPONSABLE DEL INFORME</div>
