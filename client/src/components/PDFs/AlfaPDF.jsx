@@ -365,10 +365,10 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
           <div className="col">
             {/* ================= 7. CAPACIDAD ================= */}
 
-            <div className="fw-bold">7. NIVELES DE EMERGENCIA</div>
+            <div className="fw-bold mb-1">7. NIVELES DE EMERGENCIA</div>
             <table className="m-0">
               <thead></thead>
-              <tbody>
+              <tbody className="m-4">
                 {/*  {arrayEmergencia.map((emer) => {
                     return (
                       <tr key={emer}>
@@ -387,10 +387,15 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                   })}*/}
                 {arrayEmergencia.map((e, i) => {
                   return (
-                    <tr>
+                    <tr className="">
                       <td className="border" style={{ width: "5%" }}></td>
-                      <td>
-                        <span>{e}</span>
+                      <td className="m-0 mt-0 pt-0" style={{ width: "90%" }}>
+                        <span
+                          className="fw-bold p-0 m-0"
+                          style={{ fontSize: "8px" }}
+                        >
+                          {e}
+                        </span>
                         <span style={{ fontSize: "7px" }}>
                           {detalleEmergencia[i]}
                         </span>
