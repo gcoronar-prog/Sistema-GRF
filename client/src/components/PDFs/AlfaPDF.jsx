@@ -58,14 +58,14 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       </section>
 
       {/* ================= 2. TIPO DE EVENTO ================= */}
-      <section className="border p-2 mb-2">
+      <section className="border p-2 mb-0">
         <div className="fw-bold mb-1">2. TIPO DE EVENTO</div>
 
         <br />
         <div className="row">
           <div className="col">
             <div className="col">
-              <h6>SISMO (ESCALA MERCALI) </h6>
+              <span style={{ fontSize: "11px" }}>SISMO (ESCALA MERCALI) </span>
               <div className="escala-grid">
                 {[
                   "I",
@@ -138,15 +138,15 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
             <div className="line-box">{data.desc_evento}</div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-6">
-            <div className="mt-1 p-1">
-              <div className="col">
+        <div className="row mb-0">
+          <div className="col-6 border mb-0 mt-0">
+            <div className="mt-0 p-1">
+              <div className="col mb-0">
                 <strong>OCURRENCIA:</strong>
               </div>
-              <br />
-              <div className="col d-flex">
-                <div className="me-auto">
+
+              <div className="col d-flex mt-0">
+                <div className="me-auto mt-0 p-0">
                   <ul className="list-inline">
                     <li className="list-inline-item me-4">{horaOcurrencia}</li>
                     <li className="list-inline-item me-4">{diaOcurrencia}</li>
@@ -158,30 +158,34 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
             </div>
           </div>
           <div className="col">
-            <div className="mt-1 p-1">
+            <div className="mt-0 p-1">
               <strong>DIRECCIÓN / UBICACIÓN:</strong>
               <div className="me-1 p-1">{data.direccion}</div>
             </div>
           </div>
-          <div className="col-1 me-1">
+          <div className="col-1 me-1 mb-0">
             <div
-              className="row p-2"
+              className="row p-0"
               style={{ borderStyle: "solid", borderWidth: "1px" }}
             >
-              U {data.tipo_ubicacion.includes("Urbana") ? "X" : ""}
+              <p className="p-0 m-0 text-center">
+                U {data.tipo_ubicacion.includes("Urbana") ? "X" : ""}{" "}
+              </p>
             </div>
             <div
-              className="row p-2"
+              className="row p-0"
               style={{ borderStyle: "solid", borderWidth: "1px" }}
             >
-              R {data.tipo_ubicacion.includes("Rural") ? "X" : ""}
+              <p className="p-0 m-0 text-center">
+                R {data.tipo_ubicacion.includes("Rural") ? "X" : ""}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ================= 3. DAÑOS ================= */}
-      <section className="border p-2 mb-2">
+      <section className="border p-2 mb-0">
         <div className="row">
           <div className="col border">
             <div className="row">
@@ -296,15 +300,15 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       </section>
 
       {/* ================= 4. ACCIONES ================= */}
-      <section className="border p-2">
-        <div className="row g-2">
+      <section className="border p-0">
+        <div className="row g-2 mt-0">
           <div className="col mt-0 p-0">
             <div className="mt-0 p-0">
               <span className="fw-bold mt-0 p-0 ms-1">4. DECISIONES</span>
               <span className="p-1">
                 &nbsp; ACCIONES Y SOLUCIONES INMEDIATAS:&nbsp;&nbsp; &nbsp;
               </span>
-              <div className="ms-3 me-4">
+              <div className="ms-3 me-4 mt-0">
                 <div className="line-box mt-0 align-bottom">
                   <span>{data.acciones}</span>
                 </div>
@@ -332,7 +336,6 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
           &nbsp;&nbsp; <span>TIPO (HUMANO-MATERIAL)</span>
         </div>
         <div className="line-box me-4 ms-1">{data.recursos}</div>
-        <div className="line-box me-4 ms-1"></div>
         <div className="line-box me-4 ms-1"></div>
       </section>
 
