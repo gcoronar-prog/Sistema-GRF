@@ -1,9 +1,9 @@
 .alfa-pdf {
   font-family: Arial, Helvetica, sans-serif;
-  width: 190mm;
+  /* width: 190mm;*/
   min-height: 259mm;
-  font-size: 10.5px;
-  line-height: 1.2;
+  font-size: 10px;
+  line-height: 1;
 }
 
 .alfa-pdf th,
@@ -13,13 +13,13 @@
 }
 
 .alfa-pdf section {
-  padding: 4px;
-  margin-bottom: 4px;
+  padding: 0px;
+  margin-bottom: 0px;
 }
 
 .line-box {
   border-bottom: 1px solid #000;
-  min-height: 20px;
+  min-height: 10px;
 }
 
 .checkbox {

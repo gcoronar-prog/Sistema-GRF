@@ -34,6 +34,8 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
   const mesOcurrencia = "   MES " + data.fecha_ocurrencia.slice(5, 7) || "";
   const anioOcurrencia = "   AÑO " + data.fecha_ocurrencia.slice(0, 4) || "";
 
+  const horaDocumento = "";
+
   return (
     <div ref={ref} className="alfa-pdf">
       {/* ================= HEADER ================= */}
@@ -58,7 +60,7 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       </section>
 
       {/* ================= 2. TIPO DE EVENTO ================= */}
-      <section className="border p-2 mb-0">
+      <section className="border p-0 mb-0">
         <div className="fw-bold mb-1">2. TIPO DE EVENTO</div>
 
         <br />
@@ -114,7 +116,7 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                     </div>
                   ))}
                 </div>
-                <div className="col">
+                <div className="col mb-0">
                   {[
                     "INCENDIO URBANO",
                     "SUST. PELIGROSAS",
@@ -133,52 +135,44 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
               </div>
             </div>
           </div>
-          <div className="col">
+          <div className="col mb-0">
             <strong>DESCRIPCIÓN DEL EVENTO:</strong>
             <div className="line-box">{data.desc_evento}</div>
           </div>
         </div>
-        <div className="row mb-0">
-          <div className="col-6 border mb-0 mt-0">
-            <div className="mt-0 p-1">
-              <div className="col mb-0">
-                <strong>OCURRENCIA:</strong>
-              </div>
+      </section>
+      <section
+        style={{
+          border: "1px solid",
+          padding: "0px 0px",
+        }}
+      >
+        <div className="row m-0">
+          <div className="col-6">
+            <strong>OCURRENCIA:</strong>
+            <ul className="list-inline mb-0 ms-2">
+              <li className="list-inline-item me-3">{horaOcurrencia}</li>
+              <li className="list-inline-item me-3">{diaOcurrencia}</li>
+              <li className="list-inline-item me-3">{mesOcurrencia}</li>
+              <li className="list-inline-item me-3">{anioOcurrencia}</li>
+            </ul>
+          </div>
 
-              <div className="col d-flex mt-0">
-                <div className="me-auto mt-0 p-0">
-                  <ul className="list-inline">
-                    <li className="list-inline-item me-4">{horaOcurrencia}</li>
-                    <li className="list-inline-item me-4">{diaOcurrencia}</li>
-                    <li className="list-inline-item me-4">{mesOcurrencia}</li>
-                    <li className="list-inline-item me-4">{anioOcurrencia}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
           <div className="col">
-            <div className="mt-0 p-1">
-              <strong>DIRECCIÓN / UBICACIÓN:</strong>
-              <div className="me-1 p-1">{data.direccion}</div>
-            </div>
+            <strong>DIRECCIÓN / UBICACIÓN:</strong>
+            <div className="small">{data.direccion}</div>
           </div>
-          <div className="col-1 me-1 mb-0">
-            <div
-              className="row p-0"
-              style={{ borderStyle: "solid", borderWidth: "1px" }}
-            >
-              <p className="p-0 m-0 text-center">
-                U {data.tipo_ubicacion.includes("Urbana") ? "X" : ""}{" "}
-              </p>
+
+          <div className="col-1 p-0 text-center">
+            <div style={{ border: "1px solid", height: "15px" }}>
+              <span className="fw-bold">
+                U {data.tipo_ubicacion.includes("Urbana") ? "X" : ""}
+              </span>
             </div>
-            <div
-              className="row p-0"
-              style={{ borderStyle: "solid", borderWidth: "1px" }}
-            >
-              <p className="p-0 m-0 text-center">
+            <div style={{ border: "1px solid", height: "15px" }}>
+              <span className="fw-bold">
                 R {data.tipo_ubicacion.includes("Rural") ? "X" : ""}
-              </p>
+              </span>
             </div>
           </div>
         </div>
@@ -395,11 +389,21 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                       <td className="m-0 mt-0 pt-0" style={{ width: "90%" }}>
                         <span
                           className="fw-bold p-0 m-0"
-                          style={{ fontSize: "8px" }}
+                          style={{
+                            fontSize: "8px",
+                            letterSpacing: "-1px",
+                            lineHeight: "-1px",
+                          }}
                         >
                           {e}
                         </span>
-                        <span style={{ fontSize: "7px" }}>
+                        <span
+                          style={{
+                            fontSize: "7px",
+                            letterSpacing: "-1px",
+                            lineHeight: "-1px",
+                          }}
+                        >
                           {detalleEmergencia[i]}
                         </span>
                       </td>
@@ -419,8 +423,9 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       {/* ================= 9. RESPONSABLE ================= */}
       <section className="border p-2">
         <div className="fw-bold">9. RESPONSABLE DEL INFORME</div>
-        <div>Nombre: {data.funcionario}</div>
-        <div>Fecha: {data.fecha_documento}</div>
+        <span>IDENTIFICACIÓN: {data.funcionario}</span>
+        <span>FECHA: {data.fecha_documento}</span>
+        <span>{horaDocumento}</span>
       </section>
     </div>
   );
