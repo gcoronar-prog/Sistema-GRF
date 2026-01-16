@@ -11,9 +11,22 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
     ])
   );
 
-  const ocurrencia =
-    data.fecha_ocurrencia.slice(0, 10).split("-").reverse().join("-") +
-      data.fecha_ocurrencia.slice(10).replace("T", " HORA: ") || "";
+  const eventoIzq = [
+    "INUNDACIÓN",
+    "TEMPORAL",
+    "DESLIZAMIENTO",
+    "ACT. VOLCÁNICA",
+    "INC. FORESTAL",
+    "OTRO",
+  ];
+
+  const eventoDere = [
+    "INCENDIO URBANO",
+    "SUST. PELIGROSAS",
+    "ACC. MULT. VÍCTIMAS",
+    "CORTE ENERGÍA ELECT.",
+    "CORTE AGUA POTABLE",
+  ];
 
   const arrayEmergencia = [
     "Emergencia Menor:",
@@ -61,76 +74,97 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
 
       {/* ================= 2. TIPO DE EVENTO ================= */}
       <section className="border p-0 mb-0">
-        <div className="fw-bold mb-1">2. TIPO DE EVENTO</div>
-
-        <br />
-        <div className="row">
+        <div className="fw-bold mb-0 ms-2">2. TIPO DE EVENTO</div>
+        <div className="row mb-0" style={{ marginInlineStart: "1.5px" }}>
           <div className="col">
             <div className="col">
-              <span style={{ fontSize: "11px" }}>SISMO (ESCALA MERCALI) </span>
-              <div className="escala-grid">
-                {[
-                  "I",
-                  "II",
-                  "III",
-                  "IV",
-                  "V",
-                  "VI",
-                  "VII",
-                  "VIII",
-                  "IX",
-                  "X",
-                  "XI",
-                  "XII",
-                ].map((nivel) => (
-                  <div key={nivel}>
-                    <label
-                      htmlFor=""
+              <div className="ms-3">
+                <span className="p-0 mt-0" style={{ fontSize: "10.5px" }}>
+                  SISMO (ESCALA MERCALI)
+                </span>
+                <div className="escala-grid">
+                  {[
+                    "I",
+                    "II",
+                    "III",
+                    "IV",
+                    "V",
+                    "VI",
+                    "VII",
+                    "VIII",
+                    "IX",
+                    "X",
+                    "XI",
+                    "XII",
+                  ].map((nivel) => (
+                    <div
+                      key={nivel}
                       style={{
                         borderStyle: data.escala_sismo.includes(nivel)
                           ? "solid"
                           : "none",
-                        padding: "1px",
+                        borderWidth: "0.5px",
                       }}
                     >
-                      {nivel}
-                    </label>
-                  </div>
-                ))}
-              </div>
-              <div className="row">
-                <div className="col">
-                  {[
-                    "INUNDACIÓN",
-                    "TEMPORAL",
-                    "DESLIZAMIENTO",
-                    "ACT. VOLCÁNICA",
-                    "INC. FORESTAL",
-                    "OTRO",
-                  ].map((evento) => (
-                    <div key={evento}>
-                      <span className="checkbox">
-                        {data.tipo_evento.includes(evento) ? "X" : ""}
-                      </span>
-                      <span>{evento}</span>
+                      <label
+                        htmlFor=""
+                        style={{
+                          padding: "0px",
+                          marginTop: "0px",
+                          lineHeight: "0px",
+                        }}
+                      >
+                        {nivel}
+                      </label>
                     </div>
                   ))}
                 </div>
-                <div className="col mb-0">
-                  {[
-                    "INCENDIO URBANO",
-                    "SUST. PELIGROSAS",
-                    "ACC. MULT. VÍCTIMAS",
-                    "CORTE ENERGÍA ELECT.",
-                    "CORTE AGUA POTABLE",
-                  ].map((evento) => (
-                    <div key={evento}>
-                      <span className="checkbox">
-                        {data.tipo_evento.includes(evento) ? "X" : ""}
-                      </span>
-                      <span>{evento}</span>
-                    </div>
-                  ))}
+              </div>
+
+              <div className="row w-100">
+                <div className="col">
+                  <table className="w-100">
+                    <thead></thead>
+                    <tbody>
+                      {eventoIzq.map((eveIzq, i) => {
+                        const eveDer = eventoDere[i] || "";
+                        return (
+                          <tr key={eveIzq}>
+                            <td
+                              className="border"
+                              style={{ width: "10%", height: "80%" }}
+                            >
+                              <span className="ms-2">
+                                {data.tipo_evento.includes(eveIzq) ? "X" : ""}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="ms-1">{eveIzq}</span>
+                            </td>
+                            {eveDer ? (
+                              <>
+                                <td className="border" style={{ width: "10%" }}>
+                                  <span className="ms-2">
+                                    {data.tipo_evento.includes(eveDer)
+                                      ? "X"
+                                      : ""}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className="ms-1">{eveDer}</span>
+                                </td>
+                              </>
+                            ) : (
+                              <>
+                                <td></td>
+                                <td></td>
+                              </>
+                            )}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -148,9 +182,9 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
         }}
       >
         <div className="row m-0">
-          <div className="col-6">
-            <strong>OCURRENCIA:</strong>
-            <ul className="list-inline mb-0 ms-2">
+          <div className="px-0 col-6" style={{ marginInlineStart: "5px" }}>
+            <span>OCURRENCIA:</span>
+            <ul className="list-inline mb-0 ms-1">
               <li className="list-inline-item me-3">{horaOcurrencia}</li>
               <li className="list-inline-item me-3">{diaOcurrencia}</li>
               <li className="list-inline-item me-3">{mesOcurrencia}</li>
@@ -164,12 +198,12 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
           </div>
 
           <div className="col-1 p-0 text-center">
-            <div style={{ border: "1px solid", height: "15px" }}>
+            <div style={{ border: "1px solid", height: "auto" }}>
               <span className="fw-bold">
                 U {data.tipo_ubicacion.includes("Urbana") ? "X" : ""}
               </span>
             </div>
-            <div style={{ border: "1px solid", height: "15px" }}>
+            <div style={{ border: "1px solid", height: "auto" }}>
               <span className="fw-bold">
                 R {data.tipo_ubicacion.includes("Rural") ? "X" : ""}
               </span>

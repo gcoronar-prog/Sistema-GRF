@@ -42,11 +42,8 @@
   grid-template-columns: repeat(12, auto);
   gap: 6px 12px;
   align-items: center;
-}
-
-.escala-grid h6 {
-  grid-column: 1 / -1;
-  margin-bottom: 4px;
+  margin-top: 0px;
+  padding: 0px;
 }
 
 @media print {
