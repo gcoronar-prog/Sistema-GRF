@@ -181,20 +181,31 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
           padding: "0px 0px",
         }}
       >
-        <div className="row m-0">
-          <div className="px-0 col-6" style={{ marginInlineStart: "5px" }}>
-            <span>OCURRENCIA:</span>
-            <ul className="list-inline mb-0 ms-1">
-              <li className="list-inline-item me-3">{horaOcurrencia}</li>
-              <li className="list-inline-item me-3">{diaOcurrencia}</li>
-              <li className="list-inline-item me-3">{mesOcurrencia}</li>
-              <li className="list-inline-item me-3">{anioOcurrencia}</li>
-            </ul>
+        <div className="row m-0 p-0">
+          <div className="px-0 col-6">
+            <span style={{ marginInlineStart: "3px" }}>OCURRENCIA:</span>
+            <div className="p-0" style={{ marginTop: "3px" }}>
+              <ul
+                className="list-inline ms-1"
+                style={{
+                  marginTop: "0px",
+                  fontSize: "9px",
+                  marginBottom: "0px",
+                }}
+              >
+                <li className="list-inline-item me-3">{horaOcurrencia}</li>
+                <li className="list-inline-item me-3">{diaOcurrencia}</li>
+                <li className="list-inline-item me-3">{mesOcurrencia}</li>
+                <li className="list-inline-item me-3">{anioOcurrencia}</li>
+              </ul>
+            </div>
           </div>
 
-          <div className="col">
-            <strong>DIRECCIÓN / UBICACIÓN:</strong>
-            <div className="small">{data.direccion}</div>
+          <div className="col" style={{ padding: "0.5px" }}>
+            <span className="ms-3">DIRECCIÓN / UBICACIÓN:</span>
+            <div className="ms-3" style={{ marginTop: "3px" }}>
+              {data.direccion}
+            </div>
           </div>
 
           <div className="col-1 p-0 text-center">
@@ -213,7 +224,13 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
       </section>
 
       {/* ================= 3. DAÑOS ================= */}
-      <section className="border p-2 mb-0">
+      <section
+        className="mb-0"
+        style={{
+          border: "1px solid",
+          padding: "0px 0px",
+        }}
+      >
         <div className="row">
           <div className="col border">
             <div className="row">
@@ -221,27 +238,26 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                 <table className="m-0 " style={{ width: "30%" }}>
                   <thead>
                     <tr>
-                      <th className="p-2">
-                        <span className="fw-bold m-0 text-break">
-                          3. DAÑOS PERSONAS
-                        </span>
+                      <th className="p-1 pt-0">
+                        <span className="fw-bold m-0 text-break">3.DAÑOS</span>
+                        <span className="fw-bold mt-1 mb-0 ms-1">PERSONAS</span>
                       </th>
                       <th
                         style={{ width: "16%" }}
-                        className="text-center align-bottom p-2"
+                        className="text-center align-bottom p-1 px-2"
                       >
                         H
                       </th>
                       <th
                         style={{ width: "16%" }}
-                        className="text-center align-bottom p-2"
+                        className="text-center align-bottom p-1 px-2"
                       >
                         M
                       </th>
-                      <th className="text-center align-bottom p-2">Total</th>
+                      <th className="text-center align-bottom p-1">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="px-0 ps-1">
+                  <tbody className="ps-1">
                     {[
                       "AFECTADAS",
                       "DAMNIFICADAS*",
@@ -253,11 +269,37 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                       const h = afectados[tipo]?.hombres || "";
                       const m = afectados[tipo]?.mujeres || "";
                       return (
-                        <tr key={tipo}>
-                          <td className="px-1 ms-0 ps-0">{tipo}</td>
-                          <td className="px-1 text-center border">{h}</td>
-                          <td className="px-1 text-center border">{m}</td>
-                          <td className="px-1 text-center border">{h + m}</td>
+                        <tr key={tipo} className="mb-0">
+                          <td className="px-1 ms-1" style={{ fontSize: "9px" }}>
+                            {tipo}
+                          </td>
+                          <td
+                            className="px-1 text-center"
+                            style={{
+                              border: "1px solid",
+                              padding: "0px 0px",
+                            }}
+                          >
+                            {h}
+                          </td>
+                          <td
+                            className="px-1 text-center"
+                            style={{
+                              border: "1px solid",
+                              padding: "0px 0px",
+                            }}
+                          >
+                            {m}
+                          </td>
+                          <td
+                            className="px-1 text-center"
+                            style={{
+                              border: "1px solid",
+                              padding: "0px 0px",
+                            }}
+                          >
+                            {h + m}
+                          </td>
                         </tr>
                       );
                     })}
@@ -265,24 +307,29 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                 </table>
               </div>
               <div className="col me-n4 mt-3">
-                <div className="fw-bold mb-1 ">VIVIENDAS</div>
+                <div className="fw-bold mb-0 ">VIVIENDAS</div>
                 {[
                   "DAÑO MENOR HABITABLE",
                   "DAÑO MAYOR NO HABITABLE",
                   "DESTRUIDAS, IRRECUPERABLE",
                 ].map((danio) => (
-                  <div className="row" key={danio}>
-                    <div className="col m-0 p-0">
+                  <div className="row p-0 m-0" key={danio}>
+                    <div className="col m-0 p-0 ms-2">
                       <span style={{ fontSize: "10px" }}>{danio}</span>
                     </div>
 
-                    <div className="col-auto m-0 p-0">
+                    <div className="col-auto m-0 p-0 me-2">
                       <table
-                        className="table table-bordered m-0 me-1"
-                        style={{ width: "46px", tableLayout: "fixed" }}
+                        className="m-0 me-3"
+                        style={{
+                          width: "46px",
+                          tableLayout: "fixed",
+                          border: "1px solid",
+                          padding: "0px 0px",
+                        }}
                       >
                         <tbody>
-                          <tr>
+                          <tr className="">
                             <td style={{ height: "26px" }}></td>
                           </tr>
                         </tbody>
@@ -292,14 +339,19 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                 ))}
                 <br />
                 <br />
-                <div className="row">
-                  <div className="col m-0 p-0 mt-2">
+                <div className="row p-0 m-0">
+                  <div className="col m-0 p-0 mt-2 ms-2">
                     <span>NO EVALUADAS</span>
                   </div>
                   <div className="col-auto m-0 p-0">
                     <table
-                      className="table table-bordered m-0 me-1"
-                      style={{ width: "46px", tableLayout: "fixed" }}
+                      className="m-0 me-4"
+                      style={{
+                        width: "46px",
+                        tableLayout: "fixed",
+                        border: "1px solid",
+                        padding: "0px 0px",
+                      }}
                     >
                       <tbody>
                         <tr>
@@ -315,24 +367,28 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
               </span>
             </div>
           </div>
-          <div className="col p-0 ms-3 d-flex flex-column">
+          <div className="col p-0 ms-2 d-flex flex-column">
             <div className="mt-3">
-              <strong>SERVICIOS BÁSICOS, INFRAESTRUCTURAS Y OTROS:</strong>
+              <span>SERVICIOS BÁSICOS, INFRAESTRUCTURAS Y OTROS:</span>
               <div className="me-1 p-1">{data.danio_vivienda}</div>
             </div>
             <div className="mt-auto">
-              <strong>MONTO ESTIMADO DE DAÑOS ($):</strong> {data.monto_danio}
+              <span>MONTO ESTIMADO DE DAÑOS ($):</span>
+              <span style={{ fontSize: "12px" }}>{data.monto_danio}</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ================= 4. ACCIONES ================= */}
-      <section className="border p-0">
+      <section
+        className="p-0"
+        style={{ border: "1px solid", padding: "0px 0px" }}
+      >
         <div className="row g-2 mt-0">
           <div className="col mt-0 p-0">
-            <div className="mt-0 p-0">
-              <span className="fw-bold mt-0 p-0 ms-1">4. DECISIONES</span>
+            <div className="mt-1 p-0">
+              <span className="fw-bold p-0 ms-2">4. DECISIONES</span>
               <span className="p-1">
                 &nbsp; ACCIONES Y SOLUCIONES INMEDIATAS:&nbsp;&nbsp; &nbsp;
               </span>
@@ -346,24 +402,32 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
             </div>
           </div>
           <div className="col-4 m-0 p-1">
-            <div className="fw-bold ms-1 me-1">
+            <div className="fw-bold ms-1 me-5">
               OPORTUNIDAD (TPO) RESTABLECIMIENTO:
             </div>
-            <div className="line-box p-0">{data.oportunidad}</div>
+            <div className="line-box p-0">
+              <span>{data.oportunidad}</span>
+            </div>
             <div className="line-box"></div>
           </div>
         </div>
       </section>
 
       {/* ================= 5. RECURSOS ================= */}
-      <section className="border p-0 m-0">
-        <div className="mt-0 p-0">
+      <section
+        className="p-0 m-0"
+        style={{ border: "1px solid", padding: "0px 0px" }}
+      >
+        <div className="mt-1 p-0">
           <span className="fw-bold ms-1 mt-0 p-0">
             5. RECURSOS INVOLUCRADOS
           </span>
           &nbsp;&nbsp; <span>TIPO (HUMANO-MATERIAL)</span>
         </div>
-        <div className="line-box me-4 ms-1">{data.recursos}</div>
+        <div className="line-box me-4 ms-1">
+          <span>{data.recursos}</span>
+        </div>
+        <div className="line-box me-4 ms-1"></div>
         <div className="line-box me-4 ms-1"></div>
       </section>
 
