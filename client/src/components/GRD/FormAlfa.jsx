@@ -98,11 +98,17 @@ const FormAlfa = () => {
 
     const info = data;
     const formattedOcurrencia = dayjs(
-      info.informe_alfa[0].fecha_ocurrencia
+      info.informe_alfa[0].fecha_ocurrencia,
     ).format("YYYY-MM-DDTHH:mm");
 
     const date = new Date();
-    const formattedDate = date.toISOString().split("T")[0];
+    const formattedDate = date
+      .toISOString()
+      .split("T")[0]
+      .split("-")
+      .reverse()
+      .join("-");
+    const horaDocu = date.toISOString().slice(11, 16);
 
     //console.log(data.informes[0].cod_alfa);
 
@@ -134,14 +140,12 @@ const FormAlfa = () => {
       fecha_ocurrencia: formattedOcurrencia,
       //resp_cte
       funcionario: nombre_responsable,
-      fecha_documento: formattedDate,
+      fecha_documento: formattedDate + " / " + horaDocu,
       //sector_cte
       region: "V Región",
       provincia: "San Antonio",
       comuna: "San Antonio",
     });
-
-    setSelectedValues(info.informe_alfa[0].tipo_evento || []);
   };
 
   const handleSubmit = async (e) => {
@@ -152,7 +156,7 @@ const FormAlfa = () => {
 
     const datosActualizados = {
       ...informesALFA,
-      tipo_evento: selectedValues,
+      //tipo_evento: selectedValues,
     };
 
     try {
@@ -447,7 +451,7 @@ const FormAlfa = () => {
             <div className="card-header bg-success text-white d-flex justify-content-between">
               <div>
                 <h4 className="card-title mb-0">Formulario Informes ALFA</h4>
-                <strong>Código informe: </strong>
+                <strong>Código informe: {informesALFA.cod_alfa}</strong>
               </div>
             </div>
             <div className="card-body">
@@ -470,6 +474,7 @@ const FormAlfa = () => {
                           value={informesALFA.fecha_ocurrencia}
                           onChange={handleChanges}
                           disabled={editing}
+                          required
                         />
                       </div>
                       <div className="col-md-auto">
@@ -517,7 +522,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "INUNDACIÓN"
+                                    "INUNDACIÓN",
                                   )}
                                 />
                               </div>
@@ -534,7 +539,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "TEMPORAL"
+                                    "TEMPORAL",
                                   )}
                                 />
                               </div>
@@ -553,7 +558,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "DESLIZAMIENTO"
+                                    "DESLIZAMIENTO",
                                   )}
                                 />
                               </div>
@@ -572,7 +577,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "ACT. VOLCÁNICA"
+                                    "ACT. VOLCÁNICA",
                                   )}
                                 />
                               </div>
@@ -591,7 +596,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "INC. FORESTAL"
+                                    "INC. FORESTAL",
                                   )}
                                 />
                               </div>
@@ -610,7 +615,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "INCENDIO URBANO"
+                                    "INCENDIO URBANO",
                                   )}
                                 />
                               </div>
@@ -629,7 +634,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "SUST. PELIGROSAS"
+                                    "SUST. PELIGROSAS",
                                   )}
                                 />
                               </div>
@@ -648,7 +653,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "ACC. MULT. VÍCTIMAS"
+                                    "ACC. MULT. VÍCTIMAS",
                                   )}
                                 />
                               </div>
@@ -667,7 +672,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "CORTE ENERGÍA"
+                                    "CORTE ENERGÍA",
                                   )}
                                 />
                               </div>
@@ -686,7 +691,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "CORTE AGUA"
+                                    "CORTE AGUA",
                                   )}
                                 />
                               </div>
@@ -703,7 +708,7 @@ const FormAlfa = () => {
                                   onChange={handleCheckbox}
                                   disabled={editing}
                                   checked={informesALFA.tipo_evento.includes(
-                                    "OTRO"
+                                    "OTRO",
                                   )}
                                 />
                               </div>
@@ -841,7 +846,7 @@ const FormAlfa = () => {
                                           updateAfectados(
                                             grupo,
                                             sexo,
-                                            e.target.value
+                                            e.target.value,
                                           )
                                         }
                                       />
@@ -1049,7 +1054,7 @@ const FormAlfa = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <label htmlFor="" className="form-label fw-bold">
-                            Capacidad de respuesta
+                            Niveles de Emergencia
                           </label>
                           <select
                             className="form-select"
@@ -1060,18 +1065,10 @@ const FormAlfa = () => {
                             disabled={editing}
                           >
                             <option value="">Seleccione nivel</option>
-                            <option value="1">
-                              Nivel I: Recurso local habitual
-                            </option>
-                            <option value="2">
-                              Nivel II: Recurso local reforzado
-                            </option>
-                            <option value="3">
-                              Nivel III: Recurso Apoyo local regional
-                            </option>
-                            <option value="4">
-                              Nivel IV: Recurso Apoyo nivel nacional
-                            </option>
+                            <option value="0">Emergencia Menor</option>
+                            <option value="1">Emergencia Mayor</option>
+                            <option value="2">Desastre</option>
+                            <option value="3">Catástrofe</option>
                           </select>
                         </div>
                       </div>
@@ -1094,21 +1091,20 @@ const FormAlfa = () => {
                           ></textarea>
                         </div>
                         <div className="col-md-6">
-                          <label
-                            htmlFor="fecha_hora"
-                            className="form-label fst-italic fw-bold"
-                          >
-                            Fecha y hora documento:
-                          </label>
-                          <span> {informesALFA.fecha_documento}</span>
-
-                          <label
-                            htmlFor=""
-                            className="form-label fst-italic fw-bold"
-                          >
-                            Responsable del informe:
-                          </label>
-                          <span> {nombre_responsable}</span>
+                          <div className="row text-center">
+                            <div className="col ">
+                              <span className=" fst-italic fw-bold">
+                                Fecha y hora documento:
+                              </span>
+                              <span> {informesALFA.fecha_documento}</span>
+                            </div>
+                            <div className="col text center ">
+                              <span className="fst-italic fw-bold ">
+                                Responsable del informe:
+                              </span>
+                              <span> {nombre_responsable}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </fieldset>

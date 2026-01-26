@@ -62,7 +62,7 @@ const getInformesALFA = async (req, res) => {
         LEFT JOIN responsable_alfa ra ON ia.id_responsable=ra.id_responsable
         LEFT JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
         WHERE ia.id_alfa = $1`,
-      [id]
+      [id],
     );
 
     // Respuesta con todos los datos
@@ -168,6 +168,7 @@ const updateALFA = async (req, res) => {
       data.comuna,
     ]);
 
+    console.log(result);
     return res.status(201).json(result);
   } catch (error) {
     console.log(error);
@@ -196,7 +197,7 @@ const deleteAlfa = async (req, res) => {
 const getFuncionarioGRD = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM funcionarios WHERE rol_func='GRD'"
+      "SELECT * FROM funcionarios WHERE rol_func='GRD'",
     );
     if (rows.length === 0) {
       return res.status(404).json({ message: "No hay datos de funcionarios" });
@@ -261,7 +262,7 @@ const getPrevAlfa = async (req, res) => {
       WHERE ia.id_alfa < $1
       ORDER BY ia.id_alfa DESC LIMIT 1
       `,
-      [id]
+      [id],
     );
 
     if (result.length === 0) {
@@ -291,7 +292,7 @@ const getNextAlfa = async (req, res) => {
           LEFT JOIN sectores_alfa sa ON ia.id_sector=sa.id_sector
       WHERE ia.id_alfa > $1
       ORDER BY ia.id_alfa ASC LIMIT 1`,
-      [id]
+      [id],
     );
 
     if (result.length === 0) {

@@ -46,6 +46,18 @@
   padding: 0px;
 }
 
+.fixed-box {
+  height: 50px;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.text-clamp {
+  white-space: normal; /* permite varias líneas */
+
+  line-height: 1.2;
+}
+
 @media print {
   .alfa-pdf * {
     page-break-inside: avoid;

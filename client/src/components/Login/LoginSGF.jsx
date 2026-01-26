@@ -26,7 +26,7 @@ function LoginSGF() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(login),
-        }
+        },
       );
       if (res.ok) {
         const data = await res.json();
@@ -48,7 +48,7 @@ function LoginSGF() {
         } else if (userRole === "userseguridad") {
           navigate("/home/segciudadana");
         } else if (userRole === "usergrd") {
-          navigate("/home/central");
+          navigate("/home/grd");
         }
       }
       if (!res.ok) {

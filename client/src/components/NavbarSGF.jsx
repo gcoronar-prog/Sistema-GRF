@@ -75,6 +75,21 @@ function NavbarSGF() {
     navigate(`/sgc/atencion/${id_atencion}`);
   };
 
+  const handleLastAlfa = async () => {
+    const res = await fetch(`${servidor_local}/lastalfa`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const lastALFA = await res.json();
+
+    const idAlfa = lastALFA[0].id_alfa;
+
+    navigate(`/alfa/${idAlfa}/edit`);
+  };
+
   const handleLastImagenes = async () => {
     const res = await fetch(`${servidor_local}/seg/imagenes/last`, {
       headers: {
@@ -130,6 +145,9 @@ function NavbarSGF() {
       case "userseguridad":
         navigate("/home/segciudadana");
         break;
+      case "usergrd":
+        navigate("/home/grd");
+        break;
       case "superadmin":
         navigate("/home/admin");
         break;
@@ -175,6 +193,7 @@ function NavbarSGF() {
               <i className="bi bi-shield-shaded"></i> Seguridad Ciudadana
             </>
           )}
+          {user.user_rol === "usergrd" && <>Gestión de Riesgos y Desastres</>}
         </h2>
         <img
           src={logoSGIE}
@@ -292,6 +311,18 @@ function NavbarSGF() {
                         </Link>
                       </li>
                     </ul>
+                  </li>
+                </>
+              )}
+
+              {/* User GRD */}
+              {user.user_rol === "usergrd" && (
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link" onClick={handleLastAlfa}>
+                      <i className="bi bi-clipboard-check me-1"></i> Informes
+                      ALFA
+                    </Link>
                   </li>
                 </>
               )}

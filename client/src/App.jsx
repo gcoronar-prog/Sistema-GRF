@@ -34,6 +34,7 @@ import ChangePassword from "./components/Login/ChangePassword";
 import HomeSGC from "./components/Seg_ciudadana/HomeSGC";
 import StatisticsSGC from "./components/Estadisticas/StatisticsSGC";
 import StatisicsSoliImg from "./components/Estadisticas/StatisticsSoliImg";
+import HomeGRD from "./components/GRD/HomeGRD";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           <Route path="/home/central" element={<HomeCentral />} />
           <Route path="/home/inspeccion" element={<HomeInspeccion />} />
           <Route path="/home/segciudadana" element={<HomeSGC />} />
+          <Route path="/home/grd" element={<HomeGRD />} />
 
           <Route path="/Reports/new" element={<FormCentral />} />
           <Route path="/Reports/:id/edit" element={<FormCentral />} />
