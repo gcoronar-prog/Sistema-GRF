@@ -87,7 +87,7 @@ function FormInspeccion() {
 
     //setNumControl(data.expediente.num_control);
     const formattedDate = dayjs(exped.expediente.fecha_resolucion).format(
-      "YYYY-MM-DDTHH:mm"
+      "YYYY-MM-DDTHH:mm",
     );
 
     setExpedientes({
@@ -290,7 +290,7 @@ function FormInspeccion() {
             "Content-type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       const data = await res.json();

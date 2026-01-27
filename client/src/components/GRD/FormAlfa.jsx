@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-
+import "../GRD/alfaForm.css";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -20,6 +20,13 @@ const FormAlfa = () => {
   const servidor_local = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const token = localStorage.getItem("token");
   const user = useTokenSession();
+  const tipoEventoRef = useRef();
+  const fechaOcurRef = useRef();
+  const descRef = useRef();
+  const direccionRef = useRef();
+  const ubicacionRef = useRef();
+
+  const ev_danioRef = useRef();
 
   const [informesALFA, setInformesALFA] = useState({
     //danios_cte
@@ -69,6 +76,7 @@ const FormAlfa = () => {
     .join(" ");
 
   const [editing, setEditing] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [selectedValues, setSelectedValues] = useState([]);
   const [lastIdAlfa, setLastIdAlfa] = useState(null);
   const [hiddenRequerido, setHiddenRequerido] = useState(true);
@@ -151,8 +159,54 @@ const FormAlfa = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const isEmpty = (value) => {
+      if (Array.isArray(value)) return value.length === 0;
+      if (typeof value === "string") return value.trim() === "";
+      return value === null || value === undefined;
+    };
+
+    const requeridos = [
+      {
+        field: informesALFA.tipo_evento,
+        ref: tipoEventoRef,
+      },
+      { field: informesALFA.fecha_ocurrencia, ref: fechaOcurRef },
+      { field: informesALFA.desc_evento, ref: descRef },
+      { field: informesALFA.direccion, ref: direccionRef },
+      { field: informesALFA.tipo_ubicacion, ref: ubicacionRef },
+
+      { field: informesALFA.necesidades, ref: ev_danioRef },
+    ];
+
+    const errorRequerido = requeridos.find((f) => isEmpty(f.field));
+
+    if (errorRequerido) {
+      alert("Debe completar los campos obligatorios.");
+      setHasError(true);
+
+      const el = errorRequerido.ref.current;
+
+      if (el) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
+        if (typeof el.focus === "function") {
+          el.focus();
+        } else {
+          el.querySelector("input, select, textarea")?.focus();
+        }
+      }
+
+      console.log(errorRequerido);
+      return;
+    }
+
+    setHasError(false);
+
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
-    if (!confirmar) handleCancel();
+    if (!confirmar) return;
 
     const datosActualizados = {
       ...informesALFA,
@@ -188,6 +242,8 @@ const FormAlfa = () => {
       console.error("Error en handleSubmit:", error.message);
       alert("Hubo un problema al enviar el formulario. Inténtalo de nuevo.");
     }
+    handleLastAlfa();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteInforme = async () => {
@@ -293,6 +349,7 @@ const FormAlfa = () => {
     } else {
       console.error("Error al obtener el último expediente.");
     }
+    setHasError(false);
   };
 
   const handleFirstAlfa = async () => {
@@ -314,6 +371,7 @@ const FormAlfa = () => {
     } else {
       console.error("Error al obtener el último expediente.");
     }
+    setHasError(false);
   };
 
   const handlePrevious = async () => {
@@ -331,6 +389,7 @@ const FormAlfa = () => {
     } catch (error) {
       console.error("Error al obtener expediente anterior:", error);
     }
+    setHasError(false);
   };
 
   const handleNext = async () => {
@@ -349,6 +408,7 @@ const FormAlfa = () => {
     } catch (error) {
       console.error("Error al obtener expediente :", error);
     }
+    setHasError(false);
   };
 
   const handleNewAlfa = () => {
@@ -389,6 +449,7 @@ const FormAlfa = () => {
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
     setEditing(true);
+    setHasError(false);
   };
 
   const gruposAfectados = [
@@ -415,7 +476,7 @@ const FormAlfa = () => {
           className="btn btn-outline-primary"
           type="button"
           onClick={handleFirstAlfa}
-          //disabled={disabledPrevButton}
+          disabled={!editing}
         >
           <i className="bi bi-skip-start me-1"></i> Primer Informe
         </button>
@@ -423,7 +484,7 @@ const FormAlfa = () => {
           className="btn btn-outline-primary"
           type="button"
           onClick={handlePrevious}
-          //disabled={disabledPrevButton}
+          disabled={!editing}
         >
           <i className="bi bi-chevron-left me-1"></i> Anterior
         </button>
@@ -431,7 +492,7 @@ const FormAlfa = () => {
           className="btn btn-outline-primary"
           type="button"
           onClick={handleNext}
-          //disabled={disabledNextButton}
+          disabled={!editing}
         >
           Siguiente <i className="bi bi-chevron-right ms-1"></i>
         </button>
@@ -439,7 +500,7 @@ const FormAlfa = () => {
           className="btn btn-outline-primary"
           type="button"
           onClick={handleLastAlfa}
-          //disabled={disabledNextButton}
+          disabled={!editing}
         >
           Ultimo Informe <i className="bi bi-skip-end ms-1"></i>
         </button>
@@ -455,27 +516,33 @@ const FormAlfa = () => {
               </div>
             </div>
             <div className="card-body">
-              <form className="was-validated" onSubmit={handleSubmit}>
+              <form className="" onSubmit={handleSubmit}>
                 <div className="row g-3">
                   <fieldset className="border border-primary rounded p-3">
                     <legend className="float-none w-auto px-2 h6 mb-0">
                       Tipo de evento
                     </legend>
                     <div className="row g-4">
-                      <div className="col-md-auto">
+                      <div className="col-md-auto" ref={fechaOcurRef}>
                         <label htmlFor="ocurrencia" className="form-label">
                           Fecha de ocurrencia
                         </label>
-                        <input
-                          className="form-control"
-                          type="datetime-local"
-                          name="fecha_ocurrencia"
-                          id="ocurrencia"
-                          value={informesALFA.fecha_ocurrencia}
-                          onChange={handleChanges}
-                          disabled={editing}
-                          required
-                        />
+                        <div className={hasError ? "rounded error-focus" : ""}>
+                          <input
+                            className="form-control"
+                            type="datetime-local"
+                            name="fecha_ocurrencia"
+                            id="ocurrencia"
+                            value={informesALFA.fecha_ocurrencia}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
+                        {hasError && (
+                          <div className="text-danger small">
+                            *Campo obligatorio
+                          </div>
+                        )}
                       </div>
                       <div className="col-md-auto">
                         <label htmlFor="sismo_escala" className="form-label">
@@ -504,17 +571,21 @@ const FormAlfa = () => {
                           <option value="XII">XII</option>
                         </select>
                       </div>
-                      <fieldset className="border rounded-3 p-3 mb-4">
+                      <fieldset className="border rounded-3 p-3 mb-0">
                         <legend className="float-none w-auto px-2 h6 mb-0">
                           Eventos
                         </legend>
-                        <div className="col-md-auto">
-                          <div className="row row-cols-4">
+
+                        <div
+                          ref={tipoEventoRef}
+                          className={"col-md-auto pb-0 px-2"}
+                        >
+                          <div className="row row-cols-3">
                             <div className="col">
                               <div className="form-check form-check-inline">
                                 <label htmlFor="inundacion">Inundación</label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="inundacion"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -531,7 +602,7 @@ const FormAlfa = () => {
                               <div className="form-check form-check-inline">
                                 <label htmlFor="temporal">Temporal</label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="temporal"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -550,7 +621,7 @@ const FormAlfa = () => {
                                   Activ. Volcánica
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="deslizamiento"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -569,7 +640,7 @@ const FormAlfa = () => {
                                   Activ. Volcánica
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="activ_volcanica"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -588,7 +659,7 @@ const FormAlfa = () => {
                                   Incendio Forestal
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="incendio_forestal"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -607,7 +678,7 @@ const FormAlfa = () => {
                                   Incendio Urbano
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="incendio_urbano"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -626,7 +697,7 @@ const FormAlfa = () => {
                                   Sustancias Peligrosas
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="sust_peligrosas"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -645,7 +716,7 @@ const FormAlfa = () => {
                                   Accidente Multiples Víctimas
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="acc_multiples_victim"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -664,7 +735,7 @@ const FormAlfa = () => {
                                   Corte Energía Eléctrica
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="corte_energia"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -683,7 +754,7 @@ const FormAlfa = () => {
                                   Corte de agua potable
                                 </label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="corte_agua"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -700,7 +771,7 @@ const FormAlfa = () => {
                               <div className="form-check form-check-inline">
                                 <label htmlFor="otro">Otro</label>
                                 <input
-                                  className="form-check-input"
+                                  className={`form-check-input ${hasError ? "error-focus" : ""}`}
                                   id="otro"
                                   name="tipo_evento"
                                   type="checkbox"
@@ -729,13 +800,18 @@ const FormAlfa = () => {
                             )}
                           </div>
                         </div>
+                        {hasError && (
+                          <div className="text-danger small">
+                            *Campos obligatorios
+                          </div>
+                        )}
                       </fieldset>
-                      <div className="col-md-6">
+                      <div className="col-md-6 pt-0" ref={descRef}>
                         <label htmlFor="desc_evento" className="form-label">
                           Descripción del evento
                         </label>
                         <textarea
-                          className="form-control"
+                          className={`form-control ${hasError ? "error-focus" : ""}`}
                           rows="2"
                           name="desc_evento"
                           id="desc_evento"
@@ -743,13 +819,18 @@ const FormAlfa = () => {
                           disabled={editing}
                           onChange={handleChanges}
                         ></textarea>
+                        {hasError && (
+                          <div className="text-danger small">
+                            *Campo obligatorio
+                          </div>
+                        )}
                       </div>
-                      <div className="col-md-auto">
+                      <div className="col" ref={direccionRef}>
                         <label htmlFor="direccion" className="form-label">
                           Dirección / Ubicación
                         </label>
                         <input
-                          className="form-control"
+                          className={`form-control ${hasError ? "error-focus" : ""}`}
                           name="direccion"
                           id="direccion"
                           type="text"
@@ -757,15 +838,20 @@ const FormAlfa = () => {
                           disabled={editing}
                           onChange={handleChanges}
                         />
+                        {hasError && (
+                          <div className="text-danger small">
+                            *Campo obligatorio
+                          </div>
+                        )}
                       </div>
 
-                      <div className="col-md-auto">
+                      <div className="col" ref={ubicacionRef}>
                         <label htmlFor="" className="form-label">
                           Tipo de ubicación
                         </label>
                         <div className="form-check">
                           <input
-                            className="form-check-input"
+                            className={`form-check-input ${hasError ? "error-focus" : ""}`}
                             type="radio"
                             name="tipo_ubicacion"
                             id="urbana"
@@ -779,7 +865,7 @@ const FormAlfa = () => {
 
                         <div className="form-check">
                           <input
-                            className="form-check-input"
+                            className={`form-check-input ${hasError ? "error-focus" : ""}`}
                             type="radio"
                             name="tipo_ubicacion"
                             id="rural"
@@ -794,7 +880,7 @@ const FormAlfa = () => {
                         <div className="form-check">
                           <label htmlFor="ruralbana">Rural/Urbana</label>
                           <input
-                            className="form-check-input"
+                            className={`form-check-input ${hasError ? "error-focus" : ""}`}
                             type="radio"
                             name="tipo_ubicacion"
                             id="ruralbana"
@@ -806,6 +892,11 @@ const FormAlfa = () => {
                             disabled={editing}
                           />
                         </div>
+                        {hasError && (
+                          <div className="text-danger small">
+                            *Campo obligatorio
+                          </div>
+                        )}
                       </div>
                     </div>
                   </fieldset>
@@ -816,7 +907,7 @@ const FormAlfa = () => {
                     </legend>
                     <div className="row">
                       {gruposAfectados.map((bloque, i) => (
-                        <div key={i} className="col-md-4">
+                        <div key={i} className="col-md-3">
                           <table className="table table-sm">
                             <thead>
                               <tr>
@@ -858,7 +949,10 @@ const FormAlfa = () => {
                           </table>
                         </div>
                       ))}
-                      <div className="col">
+                      <div className="col" style={{ marginLeft: "90px" }}>
+                        <label htmlFor="" className="form-label">
+                          Daño vivienda
+                        </label>
                         {[
                           "Daño menor habitable",
                           "Daño mayor no habitable",
@@ -992,10 +1086,10 @@ const FormAlfa = () => {
                         Evaluación de necesidades
                       </legend>
                       <div className="row">
-                        <div className="col">
+                        <div className="col" ref={ev_danioRef}>
                           <div className="form-check">
                             <input
-                              className="form-check-input"
+                              className={`form-check-input ${hasError ? "error-focus" : ""}`}
                               type="radio"
                               name="necesidades"
                               id="no_requerida"
@@ -1017,7 +1111,7 @@ const FormAlfa = () => {
                         <div className="col">
                           <div className="form-check">
                             <input
-                              className="form-check-input"
+                              className={`form-check-input ${hasError ? "error-focus" : ""}`}
                               type="radio"
                               name="necesidades"
                               id="requerida"
@@ -1047,6 +1141,11 @@ const FormAlfa = () => {
                               onChange={handleChanges}
                               disabled={editing}
                             ></textarea>
+                          </div>
+                        )}
+                        {hasError && (
+                          <div className="text-danger small">
+                            *Campo obligatorio
                           </div>
                         )}
                       </div>

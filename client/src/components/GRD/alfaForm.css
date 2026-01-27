@@ -1,0 +1,13 @@
+.error-focus {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 70, 0.562);
+  animation: pulse 1s ease-in-out 2;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+  }
+}
