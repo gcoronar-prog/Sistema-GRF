@@ -110,13 +110,19 @@ const FormAlfa = () => {
     ).format("YYYY-MM-DDTHH:mm");
 
     const date = new Date();
-    const formattedDate = date
+    const formattedDate = dayjs(info.informe_alfa[0].fecha_documento).format(
+      "DD-MM-YYYY",
+    );
+    const horaDocu = dayjs(info.informe_alfa[0].fecha_documento).format(
+      "HH:mm",
+    );
+    /*  const formattedDate = info.informe_alfa[0].fecha_documento
       .toISOString()
       .split("T")[0]
       .split("-")
       .reverse()
       .join("-");
-    const horaDocu = date.toISOString().slice(11, 16);
+    const horaDocu = date.toISOString().slice(11, 16);*/
 
     //console.log(data.informes[0].cod_alfa);
 
@@ -1191,10 +1197,11 @@ const FormAlfa = () => {
                         </div>
                         <div className="col-md-6">
                           <div className="row text-center">
-                            <div className="col ">
+                            <div className="col">
                               <span className=" fst-italic fw-bold">
                                 Fecha y hora documento:
                               </span>
+                              <br />
                               <span> {informesALFA.fecha_documento}</span>
                             </div>
                             <div className="col text center ">
