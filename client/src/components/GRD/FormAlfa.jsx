@@ -1242,7 +1242,7 @@ const FormAlfa = () => {
                     type="button"
                     onClick={handleNewAlfa}
                   >
-                    <i className="bi bi-clipboard2-plus"></i> Nueva solicitud
+                    <i className="bi bi-clipboard2-plus"></i> Nuevo informe
                   </button>
                   <button
                     className="btn btn-primary"
