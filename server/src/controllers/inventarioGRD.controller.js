@@ -37,13 +37,13 @@ const getInventarioGRD = async (req, res) => {
     await client.query("BEGIN");
     const inventario = await client.query(
       "SELECT * FROM inventario_grd WHERE id_producto=$1",
-      [id]
+      [id],
     );
     const codPro = inventario.rows[0].cod_producto;
 
     const produ = await client.query(
       "SELECT * FROM productos_grd WHERE cod_producto=$1",
-      [codPro]
+      [codPro],
     );
     await client.query("COMMIT");
     return res.json({
@@ -78,7 +78,7 @@ const createProducto = async (req, res) => {
         data.fecha_creado,
         data.prestamo,
         data.usuario_prestamo,
-      ]
+      ],
     );
     const idProducto = inventario.rows[0].cod_producto;
 
@@ -95,7 +95,7 @@ const createProducto = async (req, res) => {
         data.existencias,
         idProducto,
         data.precio_unitario,
-      ]
+      ],
     );
 
     await client.query("COMMIT");
@@ -133,7 +133,7 @@ const updateInventario = async (req, res) => {
         data.prestamo,
         data.usuario_prestamo,
         id,
-      ]
+      ],
     );
     const idProductGRD = inven.rows[0].cod_producto;
 
@@ -151,7 +151,7 @@ const updateInventario = async (req, res) => {
         data.precio_unitario,
         data.precio_total,
         idProductGRD,
-      ]
+      ],
     );
     await client.query("COMMIT");
 
@@ -177,12 +177,12 @@ const deleteInventario = async (req, res) => {
     await client.query("BEGIN");
     const inventario = await client.query(
       "DELETE FROM inventario_grd WHERE id_producto=$1 RETURNING *",
-      [id]
+      [id],
     );
     const idProductGRD = inventario.rows[0].cod_producto;
     const producto = await client.query(
       "DELETE FROM productos_grd WHERE cod_producto=$1 RETURNING *",
-      [idProductGRD]
+      [idProductGRD],
     );
     await client.query("COMMIT");
 
@@ -206,10 +206,10 @@ const getLastInventario = async (req, res) => {
   try {
     await client.query("BEGIN");
     const inventario = await client.query(
-      "SELECT * FROM inventario_grd ORDER BY id_producto DESC LIMIT 1"
+      "SELECT * FROM inventario_grd ORDER BY id_producto DESC LIMIT 1",
     );
     const producto = await client.query(
-      "SELECT * FROM productos_grd ORDER BY id_productos_grd DESC LIMIT 1"
+      "SELECT * FROM productos_grd ORDER BY id_productos_grd DESC LIMIT 1",
     );
     await client.query("COMMIT");
 
@@ -231,10 +231,10 @@ const getFirstInventario = async (req, res) => {
   try {
     await client.query("BEGIN");
     const inventario = await client.query(
-      "SELECT * FROM inventario_grd ORDER BY id_producto ASC LIMIT 1"
+      "SELECT * FROM inventario_grd ORDER BY id_producto ASC LIMIT 1",
     );
     const producto = await client.query(
-      "SELECT * FROM productos_grd ORDER BY id_productos_grd ASC LIMIT 1"
+      "SELECT * FROM productos_grd ORDER BY id_productos_grd ASC LIMIT 1",
     );
     await client.query("COMMIT");
 
@@ -259,7 +259,7 @@ const getPrevInventario = async (req, res) => {
     const prevInventario = await client.query(
       "SELECT * FROM inventario_grd WHERE id_producto < \
         (SELECT id_producto FROM inventario_grd WHERE id_producto=$1) ORDER BY id_producto DESC LIMIT 1",
-      [id]
+      [id],
     );
     const codProducto = prevInventario.rows[0].cod_producto;
 
@@ -267,7 +267,7 @@ const getPrevInventario = async (req, res) => {
       "SELECT * FROM productos_grd WHERE id_productos_grd <\
         (SELECT id_productos_grd FROM productos_grd WHERE cod_producto=$1)\
 	    ORDER BY id_productos_grd DESC LIMIT 1",
-      [codProducto]
+      [codProducto],
     );
 
     if (prevInventario.length === 0 && prevProducto === 0) {
@@ -299,7 +299,7 @@ const getNextInventario = async (req, res) => {
     const nextInventario = await client.query(
       "SELECT * FROM inventario_grd WHERE id_producto > \
           (SELECT id_producto FROM inventario_grd WHERE id_producto=$1) ORDER BY id_producto ASC LIMIT 1",
-      [id]
+      [id],
     );
     const codProducto = nextInventario.rows[0].cod_producto;
     console.log(codProducto);
@@ -307,7 +307,7 @@ const getNextInventario = async (req, res) => {
       "SELECT * FROM productos_grd WHERE id_productos_grd >\
       (SELECT id_productos_grd FROM productos_grd WHERE cod_producto=$1)\
 	    ORDER BY id_productos_grd asc LIMIT 1",
-      [codProducto]
+      [codProducto],
     );
 
     if (nextInventario.length === 0 || nextProducto.length === 0) {

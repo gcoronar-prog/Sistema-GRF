@@ -90,6 +90,21 @@ function NavbarSGF() {
     navigate(`/alfa/${idAlfa}/edit`);
   };
 
+  const handleInventario = async () => {
+    const res = await fetch(`${servidor_local}/inventario/last/grd`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const lastInventario = await res.json();
+
+    const id_inventario = lastInventario.inventario[0].id_inventario;
+
+    navigate(`/grd/inventario/${id_inventario}/edit`);
+  };
+
   const handleLastImagenes = async () => {
     const res = await fetch(`${servidor_local}/seg/imagenes/last`, {
       headers: {
@@ -322,6 +337,11 @@ function NavbarSGF() {
                     <Link className="nav-link" onClick={handleLastAlfa}>
                       <i className="bi bi-clipboard-check me-1"></i> Informes
                       ALFA
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" onClick={handleInventario}>
+                      <i className="bi bi-clipboard-check me-1"></i> Inventario
                     </Link>
                   </li>
                 </>
