@@ -11,15 +11,16 @@ const getInventarios = async (req, res) => {
   try {
     await client.query("BEGIN");
 
-    const [inventario, productos] = await Promise.all([
+    const [inventario, prestamo] = await Promise.all([
       client.query("SELECT * FROM inventario_grd"),
-      client.query("SELECT * FROM productos_grd"),
+      client.query("SELECT * FROM prestamo_grd"),
     ]);
     await client.query("COMMIT");
 
+    console.log(inventario, prestamo);
     return res.json({
       inventarioGRD: inventario.rows,
-      producto: productos.rows,
+      prestamo: prestamo.rows,
     });
   } catch (error) {
     console.error("Error obteniendo inventario", error);
@@ -41,14 +42,14 @@ const getInventarioGRD = async (req, res) => {
     );
     const codPro = inventario.rows[0].cod_producto;
 
-    const produ = await client.query(
-      "SELECT * FROM productos_grd WHERE cod_producto=$1",
+    const prestamo = await client.query(
+      "SELECT * FROM prestamo_grd WHERE id_prestamo=$1",
       [codPro],
     );
     await client.query("COMMIT");
     return res.json({
       inv: inventario.rows,
-      prod: produ.rows,
+      prest: prestamo.rows,
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -209,7 +210,7 @@ const getLastInventario = async (req, res) => {
       "SELECT * FROM inventario_grd ORDER BY id_producto DESC LIMIT 1",
     );
     const producto = await client.query(
-      "SELECT * FROM productos_grd ORDER BY id_productos_grd DESC LIMIT 1",
+      "SELECT * FROM prestamo_grd ORDER BY id_prestamo DESC LIMIT 1",
     );
     await client.query("COMMIT");
 
