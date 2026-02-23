@@ -6,6 +6,7 @@ import {
   getInventarioGRD,
   getInventarios,
   getLastInventario,
+  getListaProductos,
   getNextInventario,
   getPrevInventario,
   updateInventario,
@@ -15,6 +16,7 @@ const router = Router();
 
 router.get("/inventario/grd", getInventarios);
 router.get("/inventario/grd/:id", getInventarioGRD);
+router.get("/inventario/listado", getListaProductos);
 router.post("/inventario/new", createProducto);
 router.put("/inventario/grd/:id/edit", updateInventario);
 router.delete("/inventario/grd/:id/delete", deleteInventario);

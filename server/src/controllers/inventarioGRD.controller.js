@@ -31,34 +31,37 @@ const getInventarios = async (req, res) => {
 };
 
 const getInventarioGRD = async (req, res) => {
-  const client = await pool.connect();
   const { id } = req.params;
 
   try {
-    await client.query("BEGIN");
-    const inventario = await client.query(
+    const { rows } = await pool.query(
       "SELECT * FROM inventario_grd WHERE id_producto=$1",
       [id],
     );
-    const codPro = inventario.rows[0].cod_producto;
-
-    const prestamo = await client.query(
-      "SELECT * FROM prestamo_grd WHERE id_prestamo=$1",
-      [codPro],
-    );
-    await client.query("COMMIT");
-    return res.json({
-      inv: inventario.rows,
-      prest: prestamo.rows,
-    });
+    if (rows.length === 0) {
+      console.error("No existen registros");
+    }
+    return res.json(rows);
   } catch (error) {
-    await client.query("ROLLBACK");
     console.error(error);
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
-  } finally {
-    client.release();
+  }
+};
+
+const getListaProductos = async (req, res) => {
+  try {
+    const { rows } = await pool.query("SELECT * FROM productos_grd");
+    if (rows.length === 0) {
+      console.error("No existen registros");
+    }
+    return res.json(rows);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
   }
 };
 
@@ -330,6 +333,52 @@ const getNextInventario = async (req, res) => {
   }
 };
 
+const entrada_grd = `
+  INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,fecha_creado,\
+  marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,producto,\
+  precio_unitario,precio_total) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *;
+`;
+
+const nuevo_producto = `
+  INSERT INTO productos_grd (nombre_producto, observ_produ, tipo_produ,\
+  cantidad, precio_unit, precio_total, ubicacion) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *;`;
+
+const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,modelo,serial,cantidad,user_prestamo) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`;
+
+const nueva_salida = `INSERT INTO salida_inventario_grd (fecha_salida, estado_salida,direccion_salida,\
+sector_salida,tipo_ubi_salida,descripcion_salida,tipo_evento,responsable_salida,user_form,observaciones) \
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
+
+const update_entrada = `
+  UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,fecha_creado=$4,\
+  marca=$5,modelo=$6,cantidad=$7,tipo_producto=$8,factura=$9,orden_compra=$10,proveedor=$11,producto=$12,\
+  precio_unitario=$13,precio_total=$14 WHERE id_producto = $15 RETURNING *;
+`;
+
+const update_producto = `
+  UPDATE productos_grd SET nombre_producto=$1, observ_produ=$2, tipo_produ=$3,\
+  cantidad=$4, precio_unit=$5, precio_total=$6, ubicacion=$7 WHERE id_productos_grd = $8 RETURNING *;
+`;
+
+const update_prestamo = `
+  UPDATE prestamo_grd SET nombre=$1,marca=$2,modelo=$3,serial=$4,cantidad=$5,user_prestamo=$6\
+  WHERE id_prestamo = $7 RETURNING *;
+`;
+
+const update_salida = `
+  UPDATE salida_inventario_grd SET fecha_salida=$1, estado_salida=$2,direccion_salida=$3,\
+  sector_salida=$4,tipo_ubi_salida=$5,descripcion_salida=$6,tipo_evento=$7,responsable_salida=$8,\
+  user_form=$9,observaciones=$10 WHERE id_salida = $11 RETURNING *;
+`;
+
+const delete_entrada = `DELETE FROM inventario_grd WHERE id_producto=$1 RETURNING *;`;
+
+const delete_producto = `DELETE FROM productos_grd WHERE id_productos_grd=$1 RETURNING *;`;
+
+const delete_prestamo = `DELETE FROM prestamo_grd WHERE id_prestamo=$1 RETURNING *;`;
+
+const delete_salida = `DELETE FROM salida_inventario_grd WHERE id_salida=$1 RETURNING *;`;
+
 export {
   getInventario,
   getInventarios,
@@ -341,4 +390,5 @@ export {
   getFirstInventario,
   getPrevInventario,
   getNextInventario,
+  getListaProductos,
 };
