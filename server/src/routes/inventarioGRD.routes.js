@@ -8,9 +8,11 @@ import {
   deleteInventario,
   deletePrestamo,
   deleteSalida,
+  getFirstElement,
   getEntrada,
   getInventarioGRD,
   getInventarios,
+  getLastElement,
   getListaProductos,
   getListEntradas,
   getListPrestamos,
@@ -52,6 +54,9 @@ router.get("/inventario/salida/:id", getSalida);
 router.post("/inventario/salida/new", createSalida);
 router.put("/inventario/salida/edit/:id", updateSalida);
 router.delete("/inventario/salida/delete/:id", deleteSalida);
+
+router.get("/inventario/last", getLastElement);
+router.get("/inventario/first", getFirstElement);
 
 /*router.get("/inventario/last/grd", getLastInventario);
 router.get("/inventario/first/grd", getFirstInventario);

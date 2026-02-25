@@ -29,14 +29,14 @@ router.get(
   "/informes_central",
   verifyToken,
   verifyGroup("superadmin", "admin", "central"),
-  getInformes
+  getInformes,
 );
 router.get("/informes_central/:id", getInformeCentral);
 router.get(
   "/informes/pendientes",
   verifyToken,
   verifyGroup("superadmin", "admin", "central"),
-  getPendientes
+  getPendientes,
 );
 router.get("/informes/progreso", getProgreso);
 router.get("/informes/emergencia", getEmergencias);
@@ -44,83 +44,83 @@ router.post(
   "/informes_central",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  createInformeCentral
+  createInformeCentral,
 );
 router.put(
   "/informes_central/:id",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  updateInformeCentral
+  updateInformeCentral,
 );
 router.delete(
   "/informes_central/:id",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  deleteInformeCentral
+  deleteInformeCentral,
 );
 
 router.get(
   "/informe/central/last",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getLastInformeCentral
+  getLastInformeCentral,
 );
 router.get(
   "/informe/central/first",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getFirstInformeCentral
+  getFirstInformeCentral,
 );
 router.get(
   "/informe/central/:id/prev",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getPrevInformeCentral
+  getPrevInformeCentral,
 );
 router.get(
   "/informe/central/:id/next",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getNextInformeCentral
+  getNextInformeCentral,
 );
 
 router.get(
   "/acciones/central/:id",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getAccionesCentral
+  getAccionesCentral,
 );
 router.post(
   "/acciones/central/:id",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  createAccionCentral
+  createAccionCentral,
 );
 router.put(
   "/acciones/central/:id",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  updateAccion
+  updateAccion,
 );
 router.delete(
   "/acciones/central/:id",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  deleteAccion
+  deleteAccion,
 );
 
 router.get(
   "/search_inform",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  searchInformeCentral
+  searchInformeCentral,
 );
 
 router.get(
   "/acciones_pdf/:id",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getAcciones
+  getAcciones,
 );
 
 export default router;

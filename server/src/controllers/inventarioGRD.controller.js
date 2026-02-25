@@ -379,6 +379,8 @@ const createSalida = async (req, res) => {
       data.responsable_salida,
       data.user_form,
       data.observaciones,
+      data.id_producto,
+      data.cantidad,
     ]);
     return res.status(201).json(result);
   } catch (error) {
@@ -404,6 +406,7 @@ const updateSalida = async (req, res) => {
       data.responsable_salida,
       data.user_form,
       data.observaciones,
+      data.id_producto,
       id,
     ]);
     if (result.length === 0) {
@@ -433,6 +436,60 @@ const deleteSalida = async (req, res) => {
       .json({ message: "Problemas de conexión con el servidor" });
   }
 };
+
+const getLastElement = async (req, res) => {
+  const type = req.query.type;
+  let lastQuery;
+  try {
+    switch (type) {
+      case "entrada":
+        lastQuery = last_entrada;
+        break;
+      case "prestamo":
+        lastQuery = last_prestamo;
+        break;
+      case "salida":
+        lastQuery = last_salida;
+        break;
+      case "producto":
+        lastQuery = last_producto;
+        break;
+      default:
+        return res.status(400).json({ message: "Tipo inválido" });
+    }
+    const { rows } = await pool.query(lastQuery);
+    return res.status(201).json(rows);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
+const getFirstElement = async (req, res) => {
+  const queries = {
+    entrada: first_entrada,
+    prestamo: first_prestamo,
+    salida: first_salida,
+    producto: first_producto,
+  };
+  const type = req.query.type;
+  const firstQuery = queries[type];
+  if (!firstQuery) {
+    return res.status(400).json({ message: "Tipo inválido" });
+  }
+  try {
+    const { rows } = await pool.query(firstQuery);
+    return res.status(201).json(rows);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
 const entrada_grd = `
   INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,fecha_creado,\
   marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,id_producto)\
@@ -447,8 +504,8 @@ const nuevo_producto = `
 const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,modelo,serial,cantidad,user_prestamo) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`;
 
 const nueva_salida = `INSERT INTO salida_inventario_grd (fecha_salida, estado_salida,direccion_salida,\
-sector_salida,tipo_ubi_salida,descripcion_salida,tipo_evento,responsable_salida,user_form,observaciones) \
-VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
+sector_salida,tipo_ubi_salida,descripcion_salida,tipo_evento,responsable_salida,user_form,observaciones,id_producto,cantidad) \
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *;`;
 
 const update_entrada = `
   UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,fecha_creado=$4,\
@@ -469,7 +526,7 @@ const update_prestamo = `
 const update_salida = `
   UPDATE salida_inventario_grd SET fecha_salida=$1, estado_salida=$2,direccion_salida=$3,\
   sector_salida=$4,tipo_ubi_salida=$5,descripcion_salida=$6,tipo_evento=$7,responsable_salida=$8,\
-  user_form=$9,observaciones=$10 WHERE id_salida = $11 RETURNING *;
+  user_form=$9,observaciones=$10, id_producto=$11,cantidad=$12 WHERE id_salida = $13 RETURNING *;
 `;
 
 const delete_entrada = `DELETE FROM inventario_grd WHERE id_inventario=$1 RETURNING *;`;
@@ -479,6 +536,22 @@ const delete_producto = `DELETE FROM productos_grd WHERE id_producto=$1 RETURNIN
 const delete_prestamo = `DELETE FROM prestamo_grd WHERE id_prestamo=$1 RETURNING *;`;
 
 const delete_salida = `DELETE FROM salida_inventario_grd WHERE id_salida=$1 RETURNING *;`;
+
+const last_entrada = `SELECT * FROM inventario_grd ORDER BY id_inventario DESC LIMIT 1;`;
+
+const last_prestamo = `SELECT * FROM prestamo_grd ORDER BY id_prestamo DESC LIMIT 1;`;
+
+const last_salida = `SELECT * FROM salida_inventario_grd ORDER BY id_salida DESC LIMIT 1;`;
+
+const last_producto = `SELECT * FROM productos_grd ORDER BY id_producto DESC LIMIT 1;`;
+
+const first_salida = `SELECT * FROM salida_inventario_grd ORDER BY id_salida ASC LIMIT 1;`;
+
+const first_entrada = `SELECT * FROM inventario_grd ORDER BY id_inventario ASC LIMIT 1;`;
+
+const first_prestamo = `SELECT * FROM prestamo_grd ORDER BY id_prestamo ASC LIMIT 1;`;
+
+const first_producto = `SELECT * FROM productos_grd ORDER BY id_producto ASC LIMIT 1;`;
 
 export {
   getInventario,
@@ -503,4 +576,6 @@ export {
   createSalida,
   updateSalida,
   deleteSalida,
+  getLastElement,
+  getFirstElement,
 };
