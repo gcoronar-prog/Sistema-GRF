@@ -91,7 +91,7 @@ function NavbarSGF() {
   };
 
   const handleInventario = async () => {
-    const res = await fetch(`${servidor_local}/inventario/last/grd`, {
+    const res = await fetch(`${servidor_local}/inventario/last?type=producto`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ function NavbarSGF() {
 
     const lastInventario = await res.json();
 
-    const id_inventario = lastInventario.inventario[0].id_inventario;
+    const id_inventario = lastInventario[0].id_producto;
 
     navigate(`/grd/inventario/${id_inventario}/edit`);
   };

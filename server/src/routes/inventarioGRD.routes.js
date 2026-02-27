@@ -23,6 +23,8 @@ import {
   updateInventario,
   updatePrestamo,
   updateSalida,
+  getNextElement,
+  getPrevElement,
 } from "../controllers/inventarioGRD.controller.js";
 
 const router = Router();
@@ -57,6 +59,8 @@ router.delete("/inventario/salida/delete/:id", deleteSalida);
 
 router.get("/inventario/last", getLastElement);
 router.get("/inventario/first", getFirstElement);
+router.get("/inventario/next/:id", getNextElement);
+router.get("/inventario/prev/:id", getPrevElement);
 
 /*router.get("/inventario/last/grd", getLastInventario);
 router.get("/inventario/first/grd", getFirstInventario);

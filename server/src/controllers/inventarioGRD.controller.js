@@ -35,7 +35,7 @@ const getInventarioGRD = async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM inventario_grd WHERE id_producto=$1",
+      "SELECT * FROM productos_grd WHERE id_producto=$1",
       [id],
     );
     if (rows.length === 0) {
@@ -74,8 +74,11 @@ const createProducto = async (req, res) => {
       data.tipo_produ,
       data.cantidad,
       data.precio_unit,
-      data.precio_total,
       data.ubicacion,
+      data.serial,
+      data.unidad_medida,
+      data.user_creador,
+      data.fecha_creado,
     ]);
 
     return res.status(201).json(result);
@@ -97,8 +100,11 @@ const updateInventario = async (req, res) => {
       data.tipo_produ,
       data.cantidad,
       data.precio_unit,
-      data.precio_total,
       data.ubicacion,
+      data.serial,
+      data.unidad_medida,
+      data.user_creador,
+      data.fecha_creado,
       id,
     ]);
     return res.status(201).json(result);
@@ -144,7 +150,7 @@ const getEntrada = async (req, res) => {
   const { id } = req.params;
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM inventario_grd WHERE id_producto=$1",
+      "SELECT * FROM inventario_grd WHERE id_inventario=$1",
       [id],
     );
     if (rows.length === 0) {
@@ -202,7 +208,8 @@ const updateEntrada = async (req, res) => {
       data.factura,
       data.orden_compra,
       data.proveedor,
-      data.producto,
+      data.precio_unitario,
+      data.id_producto,
       id,
     ]);
     if (result.length === 0) {
@@ -490,16 +497,63 @@ const getFirstElement = async (req, res) => {
   }
 };
 
+const getNextElement = async (req, res) => {
+  const { id } = req.params;
+  const queries = {
+    entrada: next_entrada,
+    prestamo: next_prestamo,
+    salida: next_salida,
+    producto: next_producto,
+  };
+
+  const type = req.query.type;
+  const nextQuery = queries[type];
+  if (!nextQuery) {
+    return res.status(400).json({ message: "Tipo inválido" });
+  }
+  try {
+    const { rows } = await pool.query(nextQuery, [id]);
+    return res.status(201).json(rows);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
+const getPrevElement = async (req, res) => {
+  const { id } = req.params;
+  const queries = {
+    entrada: prev_entrada,
+    prestamo: prev_prestamo,
+    salida: prev_salida,
+    producto: prev_producto,
+  };
+  const type = req.query.type;
+  const prevQuery = queries[type];
+  if (!prevQuery) {
+    return res.status(400).json({ message: "Tipo inválido" });
+  }
+  try {
+    const { rows } = await pool.query(prevQuery, [id]);
+    return res.status(201).json(rows);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
 const entrada_grd = `
   INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,fecha_creado,\
-  marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,id_producto)\
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *
-
+  marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,precio_unitario,id_producto)\
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *
 `;
 
 const nuevo_producto = `
   INSERT INTO productos_grd (nombre_producto, observ_produ, tipo_produ,\
-  cantidad, precio_unit, precio_total, ubicacion) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *;`;
+  cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
 
 const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,modelo,serial,cantidad,user_prestamo) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`;
 
@@ -509,13 +563,13 @@ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *;`;
 
 const update_entrada = `
   UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,fecha_creado=$4,\
-  marca=$5,modelo=$6,cantidad=$7,tipo_producto=$8,factura=$9,orden_compra=$10,proveedor=$11,producto=$12,\
-   WHERE id_inventario = $13 RETURNING *;
+  marca=$5,modelo=$6,cantidad=$7,tipo_producto=$8,factura=$9,orden_compra=$10,proveedor=$11,precio_unitario=$12,id_producto=$13\
+   WHERE id_inventario = $14 RETURNING *;
 `;
 
 const update_producto = `
   UPDATE productos_grd SET nombre_producto=$1, observ_produ=$2, tipo_produ=$3,\
-  cantidad=$4, precio_unit=$5, precio_total=$6, ubicacion=$7 WHERE id_producto = $8 RETURNING *;
+  cantidad=$4, precio_unit=$5, ubicacion=$6, serial=$7, unidad_medida=$8, user_creador=$9, fecha_creado=$10 WHERE id_producto = $11 RETURNING *;
 `;
 
 const update_prestamo = `
@@ -553,6 +607,22 @@ const first_prestamo = `SELECT * FROM prestamo_grd ORDER BY id_prestamo ASC LIMI
 
 const first_producto = `SELECT * FROM productos_grd ORDER BY id_producto ASC LIMIT 1;`;
 
+const next_entrada = `SELECT * FROM inventario_grd WHERE id_inventario > $1 ORDER BY id_inventario ASC LIMIT 1`;
+
+const next_prestamo = `SELECT * FROM prestamo_grd WHERE id_prestamo > $1 ORDER BY id_prestamo ASC LIMIT 1`;
+
+const next_salida = `SELECT * FROM salida_inventario_grd WHERE id_salida > $1 ORDER BY id_salida ASC LIMIT 1`;
+
+const next_producto = `SELECT * FROM productos_grd WHERE id_producto > $1 ORDER BY id_producto ASC LIMIT 1`;
+
+const prev_entrada = `SELECT * FROM inventario_grd WHERE id_inventario < $1 ORDER BY id_inventario DESC LIMIT 1`;
+
+const prev_prestamo = `SELECT * FROM prestamo_grd WHERE id_prestamo < $1 ORDER BY id_prestamo DESC LIMIT 1`;
+
+const prev_salida = `SELECT * FROM salida_inventario_grd WHERE id_salida < $1 ORDER BY id_salida DESC LIMIT 1`;
+
+const prev_producto = `SELECT * FROM productos_grd WHERE id_producto < $1 ORDER BY id_producto DESC LIMIT 1`;
+
 export {
   getInventario,
   getInventarios,
@@ -578,4 +648,6 @@ export {
   deleteSalida,
   getLastElement,
   getFirstElement,
+  getNextElement,
+  getPrevElement,
 };

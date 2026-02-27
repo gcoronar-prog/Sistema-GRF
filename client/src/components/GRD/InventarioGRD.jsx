@@ -1,28 +1,30 @@
 import dayjs from "dayjs";
+import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 function InventarioGRD() {
   const navigate = useNavigate();
   const params = useParams();
-  const defaultInventario = {
-    cod_producto: "",
-    ubicacion: "",
-    observaciones: "",
-    usuario_creador: "",
-    fecha_creado: "",
-    prestamo: "",
-    usuario_prestamo: "",
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
+  const user_decoded = decoded;
+  const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
+    .filter(Boolean)
+    .join(" ");
 
-    id_productos_grd: "",
-    marca: "",
-    modelo: "",
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const defaultInventario = {
+    nombre_producto: "",
+    observ_produ: "",
+    tipo_produ: "",
+    cantidad: 0,
+    precio_unit: 0,
+    ubicacion: "",
     serial: "",
-    desc_producto: "",
+    modelo: "",
+    marca: "",
     unidad_medida: "",
-    existencias: "",
-    precio_unitario: "",
-    precio_total: "",
   };
   const [inventarios, setInventarios] = useState({ defaultInventario });
   const [editing, setEditing] = useState(true);
@@ -44,31 +46,18 @@ function InventarioGRD() {
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
 
-    const formattedFecha = dayjs(data.inv[0].fecha_creado).format(
-      "YYYY-MM-DDTHH:mm"
-    );
-    console.log(formattedFecha);
-    console.log(data.inv[0].formattedFecha);
     setInventarios({
-      id_producto: data.inv[0].id_producto,
-      cod_producto: data.inv[0].cod_producto,
-      ubicacion: data.inv[0].ubicacion,
-      observaciones: data.inv[0].observaciones,
-      usuario_creador: data.inv[0].usuario_creador,
-      //fecha_creado: formattedFecha,
-      fecha_creado: formattedFecha,
-      prestamo: data.inv[0].prestamo,
-      usuario_prestamo: data.inv[0].usuario_prestamo,
-
-      id_productos_grd: data.prod[0].id_productos_grd,
-      marca: data.prod[0].marca,
-      modelo: data.prod[0].modelo,
-      serial: data.prod[0].serial,
-      desc_producto: data.prod[0].desc_producto,
-      unidad_medida: data.prod[0].unidad_medida,
-      existencias: data.prod[0].existencias,
-      precio_unitario: data.prod[0].precio_unitario,
-      precio_total: data.prod[0].precio_total,
+      id_producto: data[0].id_producto,
+      nombre_producto: data[0].nombre_producto,
+      observ_produ: data[0].observ_produ,
+      tipo_produ: data[0].tipo_produ,
+      cantidad: data[0].cantidad,
+      precio_unit: data[0].precio_unit,
+      serial: data[0].serial,
+      ubicacion: data[0].ubicacion,
+      fecha_creado: data[0].fecha_creado,
+      unidad_medida: data[0].unidad_medida,
+      usuario_creador: nombre_responsable,
     });
   };
 
@@ -83,11 +72,11 @@ function InventarioGRD() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos enviados", inventarios.fecha_creado);
+    console.log("Datos enviados", inventarios);
 
     try {
       const url = params.id
-        ? `${servidor}/inventario/grd/${params.id}/edit`
+        ? `${servidor}/inventario/grd/edit/${params.id}`
         : `${servidor}/inventario/new`;
 
       const method = params.id ? "PUT" : "POST";
@@ -104,19 +93,21 @@ function InventarioGRD() {
 
       const data = await res.json();
 
-      const lastInventarioRes = await fetch(`${servidor}/inventario/last/grd`);
+      const lastInventarioRes = await fetch(
+        `${servidor}/inventario/last?type=producto`,
+      );
       const lastInventarioData = await lastInventarioRes.json();
-      setLastIdInventario(lastInventarioData.ultimo[0].id_producto);
 
-      // Si obtuvimos el último inventario, redirigimos a su página de edición
-      if (lastInventarioData && lastInventarioData.ultimo[0]) {
-        const lastId = lastInventarioData.ultimo[0].id_producto;
-        navigate(`/grd/inventario/${lastIdInventario + 1}/edit`);
+      if (lastInventarioData && lastInventarioData[0]) {
+        //const lastId = lastInventarioData[0].id_producto;
+        navigate(
+          `/inventario/grd/${lastInventarioData[0].id_producto + 1}/edit`,
+        );
       }
 
       const metodo = params.id
         ? ""
-        : `/grd/inventario/${lastIdInventario}/edit`;
+        : `/grd/inventario/${lastInventarioData[0].id_producto}/edit`;
       navigate(metodo);
       setEditing(true);
 
@@ -138,16 +129,14 @@ function InventarioGRD() {
     const id = params.id;
 
     try {
-      const res = await fetch(`${servidor}/inventario/last/grd`);
+      const res = await fetch(`${servidor}/inventario/last?type=producto`);
 
       if (!id) {
         if (res.ok) {
           const lastInventario = await res.json();
           if (lastInventario) {
-            navigate(
-              `/grd/inventario/${lastInventario.ultimo[0].id_producto}/edit`
-            );
-            console.log("ultima id", lastInventario.ultimo[0].id_producto);
+            navigate(`/grd/inventario/${lastInventario[0].id_producto}/edit`);
+            console.log("ultima id", lastInventario[0].id_producto);
           }
         }
       }
@@ -162,30 +151,30 @@ function InventarioGRD() {
   const handleDeleteInventario = async () => {
     const id = params.id;
 
-    await fetch(`${servidor}/inventario/grd/${id}/delete`, {
+    await fetch(`${servidor}/inventario/grd/delete/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
     const updateInventario = { ...inventarios };
     delete updateInventario[id];
     setInventarios(updateInventario);
-    const res = await fetch(`${servidor}/inventario/last/grd`);
+    const res = await fetch(`${servidor}/inventario/last?type=producto`);
     const data = await res.json();
     //console.log(data.informe_Alfa.cod_alfa);
-    navigate(`/grd/inventario/${data.ultimo[0].id_producto}/edit`);
+    navigate(`/grd/inventario/${data[0].id_producto}/edit`);
     // setDisabledNextButton(false);
   };
 
   const handleFirstInventario = async () => {
-    const res = await fetch(`${servidor}/inventario/first/grd`);
+    const res = await fetch(`${servidor}/inventario/first?type=producto`);
     if (res.ok) {
       const firstInventario = await res.json();
       //console.log(lastAlfa);
       if (firstInventario) {
-        const id_inventario = firstInventario.primero[0].id_producto;
+        const id_inventario = firstInventario[0].id_producto;
         navigate(`/grd/inventario/${id_inventario}/edit`);
 
-        console.log("Primer id", firstInventario);
+        //console.log("Primer id", firstInventario);
         setDisabledPrevButton(true);
         setDisabledNextButton(false);
       } else {
@@ -197,13 +186,13 @@ function InventarioGRD() {
   };
 
   const handleLastInventario = async () => {
-    const res = await fetch(`${servidor}/inventario/last/grd`);
+    const res = await fetch(`${servidor}/inventario/last?type=producto`);
     if (res.ok) {
       const lastInventario = await res.json();
       //console.log(lastAlfa);
       if (lastInventario) {
-        console.log(lastInventario.ultimo[0].id_producto);
-        const id_inventario = lastInventario.ultimo[0].id_producto;
+        console.log(lastInventario[0].id_producto);
+        const id_inventario = lastInventario[0].id_producto;
         navigate(`/grd/inventario/${id_inventario}/edit`);
         setLastIdInventario(id_inventario);
         setDisabledNextButton(true);
@@ -219,16 +208,13 @@ function InventarioGRD() {
   const handlePrevious = async () => {
     try {
       const response = await fetch(
-        `${servidor}/inventario/prev/grd/${params.id}`
+        `${servidor}/inventario/prev/${params.id}?type=producto`,
       );
       const data = await response.json();
 
-      if (
-        data?.inventario_prev?.length > 0 &&
-        data.inventario_prev[0].id_producto
-      ) {
-        //console.log(data.informesRows[0].cod_alfa);
-        navigate(`/grd/inventario/${data.inventario_prev[0].id_producto}/edit`);
+      if (data?.length > 0 && data[0].id_producto) {
+        navigate(`/grd/inventario/${data[0].id_producto}/edit`);
+
         setDisabledNextButton(false);
       } else {
         setDisabledPrevButton(true);
@@ -242,16 +228,13 @@ function InventarioGRD() {
   const handleNext = async () => {
     try {
       const response = await fetch(
-        `${servidor}/inventario/next/grd/${params.id}`
+        `${servidor}/inventario/next/${params.id}?type=producto`,
       );
       const data = await response.json();
 
-      if (
-        data?.inventario_next?.length > 0 &&
-        data?.inventario_next[0].id_producto
-      ) {
+      if (data?.length > 0 && data[0]?.id_producto) {
         //console.log(data.informesRows[0].cod_alfa);
-        navigate(`/grd/inventario/${data.inventario_next[0].id_producto}/edit`);
+        navigate(`/grd/inventario/${data[0].id_producto}/edit`);
         setDisabledPrevButton(false);
       } else {
         setDisabledNextButton(true);
@@ -263,202 +246,256 @@ function InventarioGRD() {
   };
 
   return (
-    <div>
-      <button
-        type="button"
-        onClick={handleFirstInventario}
-        disabled={disabledPrevButton}
-      >
-        Primer objeto
-      </button>
-      <button
-        type="button"
-        onClick={handlePrevious}
-        disabled={disabledPrevButton}
-      >
-        Atras
-      </button>
-      <button type="button" onClick={handleNext} disabled={disabledNextButton}>
-        Siguiente
-      </button>
-      <button
-        type="button"
-        onClick={handleLastInventario}
-        disabled={disabledNextButton}
-      >
-        Ultimo objeto
-      </button>
+    <>
+      <div className="container-fluid mt-4">
+        <div className="d-flex flex-wrap gap-2 mb-4">
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleFirstInventario}
+            disabled={disabledPrevButton}
+          >
+            <i className="bi bi-skip-start me-1"></i> Primer registro
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handlePrevious}
+            disabled={disabledPrevButton}
+          >
+            <i className="bi bi-chevron-left me-1"></i> Anterior
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleNext}
+            disabled={disabledNextButton}
+          >
+            Siguiente <i className="bi bi-chevron-right ms-1"></i>
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleLastInventario}
+            disabled={disabledNextButton}
+          >
+            Último registro <i className="bi bi-skip-end ms-1"></i>
+          </button>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-lg-7">
+          <div className="card shadow-sm mb-4">
+            <div className="card-header bg-success text-white d-flex justify-content-between">
+              <div>
+                <h4 className="card-title mb-0">Inventario GRD</h4>
+                <strong>Código producto: {inventarios.id_producto}</strong>
+              </div>
+            </div>
+            <div className="card-body">
+              <form action="" onSubmit={handleSubmit}>
+                <fieldset className="border border-primary rounded p-3">
+                  <legend className="float-none w-auto px-2 h6 mb-0">
+                    Datos producto
+                  </legend>
+                  <div className="row g-3">
+                    <div className="col-md-auto">
+                      <label htmlFor="nombre_producto" className="form-label">
+                        Nombre del producto
+                      </label>
+                      <input
+                        type="text"
+                        id="nombre_producto"
+                        name="nombre_producto"
+                        className="form-control"
+                        value={inventarios.nombre_producto}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
 
-      <form action="" onSubmit={handleSubmit}>
-        <label htmlFor="">Codigo del producto</label>
-        <input
-          type="text"
-          name="cod_producto"
-          value={inventarios.cod_producto}
-          onChange={handleChanges}
-          disabled={editing}
-        />
+                    <div className="col-md-auto">
+                      <label htmlFor="tipo_produ" className="form-label">
+                        Tipo producto
+                      </label>
+                      <input
+                        type="text"
+                        name="tipo_produ"
+                        id="tipo_produ"
+                        className="form-control"
+                        value={inventarios.tipo_produ}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                    <div className="col-md-auto">
+                      <label htmlFor="marca" className="form-label">
+                        Marca
+                      </label>
+                      <input
+                        type="text"
+                        name="marca"
+                        id="marca"
+                        className="form-control"
+                        value={inventarios.marca}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                    <div className="col-md-auto">
+                      <label htmlFor="modelo">Modelo</label>
+                      <input
+                        type="text"
+                        name="modelo"
+                        id="modelo"
+                        className="form-control"
+                        value={inventarios.modelo}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                    <div className="col-md-auto">
+                      <label htmlFor="serial">Serial</label>
+                      <input
+                        type="text"
+                        name="serial"
+                        id="serial"
+                        className="form-control"
+                        value={inventarios.serial}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                  </div>
+                </fieldset>
+                <fieldset className="border border-primary rounded p-3">
+                  <legend className="float-none w-auto px-2 h6 mb-0">
+                    Detalles producto
+                  </legend>
+                  <div className="row g-3">
+                    <div className="col-md-auto">
+                      <label htmlFor="cantidad">Cantidad</label>
+                      <input
+                        type="number"
+                        name="cantidad"
+                        id="cantidad"
+                        className="form-control"
+                        value={inventarios.cantidad}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                    <div className="col-md-auto">
+                      <label htmlFor="unidad_medida">Unidad de medida</label>
+                      <input
+                        type="text"
+                        name="unidad_medida"
+                        className="form-control"
+                        id="unidad_medida"
+                        value={inventarios.unidad_medida}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                    <div className="col-md-auto">
+                      <label htmlFor="precio_unit">Precio Unitario</label>
+                      <input
+                        type="number"
+                        name="precio_unit"
+                        id="precio_unit"
+                        className="form-control"
+                        value={inventarios.precio_unit}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                    <div className="col-md-auto">
+                      <label htmlFor="observ_produ">
+                        Descripción del producto
+                      </label>
+                      <textarea
+                        type="text"
+                        name="observ_produ"
+                        className="form-control"
+                        id="observ_produ"
+                        value={inventarios.observ_produ}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
+                    </div>
+                    <div className="col-md-auto">
+                      <label htmlFor="ubicacion1">Ubicación</label>
+                      <select
+                        name="ubicacion"
+                        id="ubicacion1"
+                        className="form-select"
+                        value={inventarios.ubicacion}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      >
+                        <option value="">
+                          Seleccione ubicación de insumos
+                        </option>
+                        <option value="Bodega">Bodega Municipal</option>
+                        <option value="Oficina">Oficina</option>
+                      </select>
+                    </div>
+                    <div className="col-md-auto"></div>
+                  </div>
 
-        <label htmlFor="">Marca</label>
-        <input
-          type="text"
-          name="marca"
-          value={inventarios.marca}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Modelo</label>
-        <input
-          type="text"
-          name="modelo"
-          id=""
-          value={inventarios.modelo}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Serial</label>
-        <input
-          type="text"
-          name="serial"
-          value={inventarios.serial}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Descripción del producto</label>
-        <input
-          type="text"
-          name="desc_producto"
-          id=""
-          value={inventarios.desc_producto}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Unidad de medida</label>
-        <input
-          type="text"
-          name="unidad_medida"
-          id=""
-          value={inventarios.unidad_medida}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Cantidad</label>
-        <input
-          type="number"
-          name="existencias"
-          id=""
-          value={inventarios.existencias}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Precio Unitario</label>
-        <input
-          type="number"
-          name="precio_unitario"
-          value={inventarios.precio_unitario}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Precio Total</label>
-        <input
-          type="number"
-          name="precio_total"
-          value={inventarios.precio_total}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Prestamo</label>
-        <label htmlFor="Sí">Sí</label>
-        <input
-          type="radio"
-          name="prestamo"
-          id="Sí"
-          value={"Sí"}
-          checked={inventarios.prestamo === "Sí"}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="No">No</label>
-        <input
-          type="radio"
-          name="prestamo"
-          id="No"
-          value={"No"}
-          checked={inventarios.prestamo === "No"}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Usuario Prestamo</label>
-        <input
-          type="text"
-          name="usuario_prestamo"
-          value={inventarios.usuario_prestamo}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Ubicación</label>
-        <select
-          name="ubicacion"
-          id=""
-          value={inventarios.ubicacion}
-          onChange={handleChanges}
-          disabled={editing}
-        >
-          <option value="Bodega">Bodega Municipal</option>
-          <option value="Oficina">Oficina</option>
-        </select>
-        <label htmlFor="">Observaciones</label>
-        <textarea
-          name="observaciones"
-          id=""
-          value={inventarios.observaciones}
-          onChange={handleChanges}
-          disabled={editing}
-        ></textarea>
-        <label htmlFor="">Usuario</label>
-        <input
-          type="text"
-          name="usuario_creador"
-          value={inventarios.usuario_creador}
-          onChange={handleChanges}
-          disabled={editing}
-        />
-        <label htmlFor="">Fecha y hora de ingreso</label>
-        <input
-          type="datetime-local"
-          name="fecha_creado"
-          id=""
-          value={inventarios.fecha_creado || ""}
-          onChange={handleChanges}
-          disabled={editing}
-        />
+                  <label htmlFor="">Usuario: </label>
+                  <span>{inventarios.usuario_creador}</span>
+                </fieldset>
+                <div className="d-flex flex-wrap gap-2 mt-4">
+                  {!editing && (
+                    <div className="d-flex flex-wrap gap-2 mt-4">
+                      <button type="submit" className="btn btn-primary">
+                        <i className="bi bi-save"></i> Guardar Informe
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        type="button"
+                        onClick={handleCancel}
+                      >
+                        <i className="bi bi-x-octagon"></i> Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </form>
 
-        {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
-        <button type="button" onClick={handleNewInventario}>
-          Nuevo Expediente
-        </button>
-        <button
-          type="button"
-          onClick={handleEdit}
-          style={{ display: editing ? "" : "none" }}
-        >
-          Editar
-        </button>
-        <button type="submit" style={{ display: editing ? "none" : "" }}>
-          Guardar Informe
-        </button>
-        <button
-          type="button"
-          onClick={handleCancel}
-          style={{ display: editing ? "none" : "" }}
-        >
-          Cancelar
-        </button>
-        <button type="button" onClick={handleDeleteInventario}>
-          Eliminar
-        </button>
-      </form>
-    </div>
+              {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+              {editing && (
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    onClick={handleNewInventario}
+                  >
+                    <i className="bi bi-clipboard2-plus"></i> Nuevo producto
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleEdit}
+                  >
+                    <i className="bi bi-pencil-square"></i> Editar
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={handleDeleteInventario}
+                  >
+                    <i className="bi bi-trash"></i> Eliminar
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
