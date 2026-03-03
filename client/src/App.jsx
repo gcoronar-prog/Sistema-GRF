@@ -9,6 +9,7 @@ import AttachFiles from "./components/AttachFiles";
 import FormInspeccion from "./components/Inspeccion/FormInspeccion";
 import FormAlfa from "./components/GRD/FormAlfa";
 import FormInventario from "./components/GRD/InventarioGRD";
+import FormEntradas from "./components/GRD/EntradaInventario";
 import FormSolicitud from "./components/Seg_ciudadana/FormSolicitud";
 import FormAtencion from "./components/Seg_ciudadana/FormAtencion";
 
@@ -65,6 +66,15 @@ function App() {
 
           <Route path="/grd/inventario/new" element={<FormInventario />} />
           <Route path="/grd/inventario/:id/edit" element={<FormInventario />} />
+
+          <Route
+            path="/grd/inventario/entrada/new"
+            element={<FormEntradas />}
+          />
+          <Route
+            path="/grd/inventario/entrada/:id/edit"
+            element={<FormEntradas />}
+          />
 
           <Route path="/sc/imagenes/new" element={<FormSolicitud />} />
           <Route path="/sc/imagenes/:id" element={<FormSolicitud />} />

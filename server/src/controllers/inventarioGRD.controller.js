@@ -172,7 +172,6 @@ const createEntrada = async (req, res) => {
       data.ubicacion,
       data.observaciones,
       data.usuario_creador,
-      data.fecha_creado,
       data.marca,
       data.modelo,
       data.cantidad,
@@ -180,6 +179,7 @@ const createEntrada = async (req, res) => {
       data.factura,
       data.orden_compra,
       data.proveedor,
+      data.precio_unitario,
       data.id_producto,
     ]);
 
@@ -200,7 +200,6 @@ const updateEntrada = async (req, res) => {
       data.ubicacion,
       data.observaciones,
       data.usuario_creador,
-      data.fecha_creado,
       data.marca,
       data.modelo,
       data.cantidad,
@@ -546,9 +545,9 @@ const getPrevElement = async (req, res) => {
 };
 
 const entrada_grd = `
-  INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,fecha_creado,\
+  INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,\
   marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,precio_unitario,id_producto)\
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *
 `;
 
 const nuevo_producto = `
@@ -562,9 +561,9 @@ sector_salida,tipo_ubi_salida,descripcion_salida,tipo_evento,responsable_salida,
 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *;`;
 
 const update_entrada = `
-  UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,fecha_creado=$4,\
-  marca=$5,modelo=$6,cantidad=$7,tipo_producto=$8,factura=$9,orden_compra=$10,proveedor=$11,precio_unitario=$12,id_producto=$13\
-   WHERE id_inventario = $14 RETURNING *;
+  UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,\
+  marca=$4,modelo=$5,cantidad=$6,tipo_producto=$7,factura=$8,orden_compra=$9,proveedor=$10,precio_unitario=$11,id_producto=$12\
+   WHERE id_inventario = $13 RETURNING *;
 `;
 
 const update_producto = `

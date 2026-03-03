@@ -105,6 +105,21 @@ function NavbarSGF() {
     navigate(`/grd/inventario/${id_inventario}/edit`);
   };
 
+  const handleEntrada = async () => {
+    const res = await fetch(`${servidor_local}/inventario/last?type=entrada`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const lastEntrada = await res.json();
+
+    const id_entrada = lastEntrada[0].id_inventario;
+
+    navigate(`/grd/inventario/entrada/${id_entrada}/edit`);
+  };
+
   const handleLastImagenes = async () => {
     const res = await fetch(`${servidor_local}/seg/imagenes/last`, {
       headers: {
@@ -342,6 +357,12 @@ function NavbarSGF() {
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleInventario}>
                       <i className="bi bi-clipboard-check me-1"></i> Inventario
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" onClick={handleEntrada}>
+                      <i className="bi bi-clipboard-check me-1"></i> Entrada
+                      productos
                     </Link>
                   </li>
                 </>

@@ -1,6 +1,5 @@
-import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 function InventarioGRD() {
@@ -18,15 +17,15 @@ function InventarioGRD() {
     nombre_producto: "",
     observ_produ: "",
     tipo_produ: "",
-    cantidad: 0,
-    precio_unit: 0,
+    cantidad: "",
+    precio_unit: "",
     ubicacion: "",
     serial: "",
     modelo: "",
-    marca: "",
     unidad_medida: "",
+    user_creador: "",
   };
-  const [inventarios, setInventarios] = useState({ defaultInventario });
+  const [inventarios, setInventarios] = useState(defaultInventario);
   const [editing, setEditing] = useState(true);
   const [disabledPrevButton, setDisabledPrevButton] = useState(false);
   const [disabledNextButton, setDisabledNextButton] = useState(false);
@@ -47,6 +46,8 @@ function InventarioGRD() {
     const data = await res.json();
 
     setInventarios({
+      ...defaultInventario,
+      ...data[0],
       id_producto: data[0].id_producto,
       nombre_producto: data[0].nombre_producto,
       observ_produ: data[0].observ_produ,
@@ -57,7 +58,7 @@ function InventarioGRD() {
       ubicacion: data[0].ubicacion,
       fecha_creado: data[0].fecha_creado,
       unidad_medida: data[0].unidad_medida,
-      usuario_creador: nombre_responsable,
+      user_creador: data[0].user_creador,
     });
   };
 
@@ -72,8 +73,9 @@ function InventarioGRD() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos enviados", inventarios);
-
+    //console.log("Datos enviados", inventarios);
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) return;
     try {
       const url = params.id
         ? `${servidor}/inventario/grd/edit/${params.id}`
@@ -84,14 +86,15 @@ function InventarioGRD() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(inventarios),
+        body: JSON.stringify({
+          user_creador: nombre_responsable,
+          ...inventarios,
+        }),
       });
 
       if (!res.ok) {
         throw new Error("Error al enviar los datos al servidor");
       }
-
-      const data = await res.json();
 
       const lastInventarioRes = await fetch(
         `${servidor}/inventario/last?type=producto`,
@@ -101,7 +104,7 @@ function InventarioGRD() {
       if (lastInventarioData && lastInventarioData[0]) {
         //const lastId = lastInventarioData[0].id_producto;
         navigate(
-          `/inventario/grd/${lastInventarioData[0].id_producto + 1}/edit`,
+          `/grd/inventario/${lastInventarioData[0].id_producto + 1}/edit`,
         );
       }
 
@@ -111,7 +114,7 @@ function InventarioGRD() {
       navigate(metodo);
       setEditing(true);
 
-      setDisabledPrevButton(false);
+      //setDisabledPrevButton(false);
     } catch (error) {
       //console.error("Error en handleSubmit:", error.message);
       console.error(error);
@@ -136,7 +139,7 @@ function InventarioGRD() {
           const lastInventario = await res.json();
           if (lastInventario) {
             navigate(`/grd/inventario/${lastInventario[0].id_producto}/edit`);
-            console.log("ultima id", lastInventario[0].id_producto);
+            //console.log("ultima id", lastInventario[0].id_producto);
           }
         }
       }
@@ -149,8 +152,10 @@ function InventarioGRD() {
   };
 
   const handleDeleteInventario = async () => {
-    const id = params.id;
+    const eliminar = window.confirm("¿Deseas eliminar el producto?");
+    if (!eliminar) return;
 
+    const id = params.id;
     await fetch(`${servidor}/inventario/grd/delete/${id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -175,8 +180,8 @@ function InventarioGRD() {
         navigate(`/grd/inventario/${id_inventario}/edit`);
 
         //console.log("Primer id", firstInventario);
-        setDisabledPrevButton(true);
-        setDisabledNextButton(false);
+        //setDisabledPrevButton(true);
+        //setDisabledNextButton(false);
       } else {
         console.log("No se encontró ningún registro.");
       }
@@ -195,8 +200,8 @@ function InventarioGRD() {
         const id_inventario = lastInventario[0].id_producto;
         navigate(`/grd/inventario/${id_inventario}/edit`);
         setLastIdInventario(id_inventario);
-        setDisabledNextButton(true);
-        setDisabledPrevButton(false);
+        //setDisabledNextButton(true);
+        //setDisabledPrevButton(false);
       } else {
         console.log("No se encontró ningún expediente.");
       }
@@ -215,9 +220,9 @@ function InventarioGRD() {
       if (data?.length > 0 && data[0].id_producto) {
         navigate(`/grd/inventario/${data[0].id_producto}/edit`);
 
-        setDisabledNextButton(false);
+        //setDisabledNextButton(false);
       } else {
-        setDisabledPrevButton(true);
+        //setDisabledPrevButton(true);
         console.log("No hay registro anterior.");
       }
     } catch (error) {
@@ -235,9 +240,9 @@ function InventarioGRD() {
       if (data?.length > 0 && data[0]?.id_producto) {
         //console.log(data.informesRows[0].cod_alfa);
         navigate(`/grd/inventario/${data[0].id_producto}/edit`);
-        setDisabledPrevButton(false);
+        //setDisabledPrevButton(false);
       } else {
-        setDisabledNextButton(true);
+        //setDisabledNextButton(true);
         console.log("No hay expedientes.");
       }
     } catch (error) {
@@ -253,7 +258,7 @@ function InventarioGRD() {
             className="btn btn-outline-primary"
             type="button"
             onClick={handleFirstInventario}
-            disabled={disabledPrevButton}
+            // disabled={disabledPrevButton}
           >
             <i className="bi bi-skip-start me-1"></i> Primer registro
           </button>
@@ -261,7 +266,7 @@ function InventarioGRD() {
             className="btn btn-outline-primary"
             type="button"
             onClick={handlePrevious}
-            disabled={disabledPrevButton}
+            //disabled={disabledPrevButton}
           >
             <i className="bi bi-chevron-left me-1"></i> Anterior
           </button>
@@ -269,7 +274,7 @@ function InventarioGRD() {
             className="btn btn-outline-primary"
             type="button"
             onClick={handleNext}
-            disabled={disabledNextButton}
+            //disabled={disabledNextButton}
           >
             Siguiente <i className="bi bi-chevron-right ms-1"></i>
           </button>
@@ -277,7 +282,7 @@ function InventarioGRD() {
             className="btn btn-outline-primary"
             type="button"
             onClick={handleLastInventario}
-            disabled={disabledNextButton}
+            //disabled={disabledNextButton}
           >
             Último registro <i className="bi bi-skip-end ms-1"></i>
           </button>
@@ -288,7 +293,7 @@ function InventarioGRD() {
           <div className="card shadow-sm mb-4">
             <div className="card-header bg-success text-white d-flex justify-content-between">
               <div>
-                <h4 className="card-title mb-0">Inventario GRD</h4>
+                <h4 className="card-title mb-0">Formulario Productos</h4>
                 <strong>Código producto: {inventarios.id_producto}</strong>
               </div>
             </div>
@@ -308,7 +313,7 @@ function InventarioGRD() {
                         id="nombre_producto"
                         name="nombre_producto"
                         className="form-control"
-                        value={inventarios.nombre_producto}
+                        value={inventarios.nombre_producto || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
@@ -323,45 +328,36 @@ function InventarioGRD() {
                         name="tipo_produ"
                         id="tipo_produ"
                         className="form-control"
-                        value={inventarios.tipo_produ}
+                        value={inventarios.tipo_produ || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
                     </div>
+
                     <div className="col-md-auto">
-                      <label htmlFor="marca" className="form-label">
-                        Marca
+                      <label htmlFor="modelo" className="form-label">
+                        Modelo
                       </label>
-                      <input
-                        type="text"
-                        name="marca"
-                        id="marca"
-                        className="form-control"
-                        value={inventarios.marca}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      />
-                    </div>
-                    <div className="col-md-auto">
-                      <label htmlFor="modelo">Modelo</label>
                       <input
                         type="text"
                         name="modelo"
                         id="modelo"
                         className="form-control"
-                        value={inventarios.modelo}
+                        value={inventarios.modelo || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
                     </div>
                     <div className="col-md-auto">
-                      <label htmlFor="serial">Serial</label>
+                      <label htmlFor="serial" className="form-label">
+                        Serial
+                      </label>
                       <input
                         type="text"
                         name="serial"
                         id="serial"
                         className="form-control"
-                        value={inventarios.serial}
+                        value={inventarios.serial || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
@@ -374,43 +370,49 @@ function InventarioGRD() {
                   </legend>
                   <div className="row g-3">
                     <div className="col-md-auto">
-                      <label htmlFor="cantidad">Cantidad</label>
+                      <label htmlFor="cantidad" className="form-label">
+                        Cantidad
+                      </label>
                       <input
                         type="number"
                         name="cantidad"
                         id="cantidad"
                         className="form-control"
-                        value={inventarios.cantidad}
+                        value={inventarios.cantidad || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
                     </div>
                     <div className="col-md-auto">
-                      <label htmlFor="unidad_medida">Unidad de medida</label>
+                      <label htmlFor="unidad_medida" className="form-label">
+                        Unidad de medida
+                      </label>
                       <input
                         type="text"
                         name="unidad_medida"
-                        className="form-control"
                         id="unidad_medida"
-                        value={inventarios.unidad_medida}
+                        className="form-control"
+                        value={inventarios.unidad_medida || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
                     </div>
                     <div className="col-md-auto">
-                      <label htmlFor="precio_unit">Precio Unitario</label>
+                      <label htmlFor="precio_unit" className="form-label">
+                        Precio Unitario
+                      </label>
                       <input
                         type="number"
                         name="precio_unit"
                         id="precio_unit"
                         className="form-control"
-                        value={inventarios.precio_unit}
+                        value={inventarios.precio_unit || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
                     </div>
                     <div className="col-md-auto">
-                      <label htmlFor="observ_produ">
+                      <label htmlFor="observ_produ" className="form-label">
                         Descripción del producto
                       </label>
                       <textarea
@@ -418,13 +420,15 @@ function InventarioGRD() {
                         name="observ_produ"
                         className="form-control"
                         id="observ_produ"
-                        value={inventarios.observ_produ}
+                        value={inventarios.observ_produ || ""}
                         onChange={handleChanges}
                         disabled={editing}
                       />
                     </div>
                     <div className="col-md-auto">
-                      <label htmlFor="ubicacion1">Ubicación</label>
+                      <label htmlFor="ubicacion1" className="form-label">
+                        Ubicación
+                      </label>
                       <select
                         name="ubicacion"
                         id="ubicacion1"
@@ -442,9 +446,6 @@ function InventarioGRD() {
                     </div>
                     <div className="col-md-auto"></div>
                   </div>
-
-                  <label htmlFor="">Usuario: </label>
-                  <span>{inventarios.usuario_creador}</span>
                 </fieldset>
                 <div className="d-flex flex-wrap gap-2 mt-4">
                   {!editing && (

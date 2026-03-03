@@ -1,0 +1,518 @@
+import { jwtDecode } from "jwt-decode";
+import React, { useEffect } from "react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+function EntradaInventario() {
+  const defaultEntradas = {
+    ubicacion: "",
+    observaciones: "",
+    usuario_creador: "",
+    marca: "",
+    modelo: "",
+    cantidad: "",
+    tipo_producto: "",
+    factura: "",
+    orden_compra: "",
+    proveedor: "",
+    producto: "",
+    precio_unitario: "",
+    id_producto: "",
+  };
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const navigate = useNavigate();
+  const params = useParams();
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
+  const user_decoded = decoded;
+  const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
+    .filter(Boolean)
+    .join(" ");
+
+  const [entradas, setEntradas] = useState(defaultEntradas);
+  const [editing, setEditing] = useState(true);
+  const [listado, setListado] = useState([]);
+
+  useEffect(() => {
+    if (params.id) {
+      loadEntrada(params.id);
+      listProductos();
+    } else {
+      setEntradas(defaultEntradas);
+    }
+  }, [params.id]);
+
+  const loadEntrada = async (id) => {
+    const res = await fetch(`${servidor}/inventario/entrada/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error("Problemas obteniendo datos");
+    const data = await res.json();
+
+    setEntradas({
+      ...defaultEntradas,
+      ...data[0],
+      id_inventario: data[0].id_inventario || "",
+      ubicacion: data[0].ubicacion || "",
+      observaciones: data[0].observaciones || "",
+      usuario_creador: data[0].usuario_creador || "",
+      marca: data[0].marca || "",
+      modelo: data[0].modelo || "",
+      cantidad: data[0].cantidad || "",
+      tipo_producto: data[0].tipo_producto || "",
+      factura: data[0].factura || "",
+      orden_compra: data[0].orden_compra || "",
+      proveedor: data[0].proveedor || "",
+      producto: data[0].producto || "",
+      precio_unitario: data[0].precio_unitario || "",
+      id_producto: data[0].id_producto || "",
+    });
+  };
+
+  const listProductos = async () => {
+    const res = await fetch(`${servidor}/inventario/listado`);
+    if (!res.ok) throw new Error("Problemas obteniendo datos");
+    const data = await res.json();
+    setListado(data);
+  };
+
+  const handleChanges = (e) => {
+    const { name, value } = e.target;
+    setEntradas({ ...entradas, [name]: value });
+  };
+
+  const handleEdit = async () => {
+    setEditing(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const confirmar = window.confirm("¿Deseas guardar los cambios?");
+    if (!confirmar) return;
+    try {
+      const url = params.id
+        ? `${servidor}/inventario/entrada/edit/${params.id}`
+        : `${servidor}/inventario/entrada/new`;
+      const method = params.id ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          usuario_creador: nombre_responsable,
+          ...entradas,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al enviar los datos al servidor");
+      }
+
+      const lastEntradaRes = await fetch(
+        `${servidor}/inventario/last?type=entrada`,
+      );
+      const lastEntradaData = await lastEntradaRes.json();
+
+      if (lastEntradaData && lastEntradaData[0]) {
+        //const lastId = lastInventarioData[0].id_producto;
+        navigate(
+          `/grd/inventario/entrada/${lastEntradaData[0].id_inventario}/edit`,
+        );
+      }
+
+      /*const metodo = params.id
+        ? ""
+        : `grd/inventario/entrada/${lastEntradaData[0].id_inventario}/edit`;
+      navigate(metodo);*/
+      setEditing(true);
+    } catch (error) {
+      console.error(error);
+    }
+    setEditing(true);
+  };
+
+  const handleNewEntrada = () => {
+    navigate("/grd/inventario/entrada/new");
+
+    setEditing(false);
+  };
+
+  const handleCancel = async () => {
+    const id = params.id;
+
+    try {
+      const res = await fetch(`${servidor}/inventario/last?type=entrada`);
+
+      if (!id) {
+        if (res.ok) {
+          const lastEntrada = await res.json();
+          if (lastEntrada) {
+            navigate(
+              `/grd/inventario/entrada/${lastEntrada[0].id_inventario}/edit`,
+            );
+          }
+        }
+      }
+
+      setEditing(true);
+    } catch (error) {
+      console.error(error);
+    }
+    setEditing(true);
+  };
+
+  const handleDeleteEntrada = async () => {
+    const eliminar = window.confirm("¿Deseas eliminar la entrada?");
+    if (!eliminar) return;
+
+    const id = params.id;
+    await fetch(`${servidor}/inventario/entrada/delete/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    const updateEntradas = { ...entradas };
+    delete updateEntradas[id];
+    setEntradas(updateEntradas);
+    const res = await fetch(`${servidor}/inventario/last?type=entrada`);
+    const data = await res.json();
+
+    navigate(`/grd/inventario/entrada/${data[0].id_inventario}/edit`);
+  };
+
+  const handleFirstEntrada = async () => {
+    const res = await fetch(`${servidor}/inventario/first?type=entrada`);
+    if (res.ok) {
+      const firstEntrada = await res.json();
+
+      if (firstEntrada) {
+        const id = firstEntrada[0].id_inventario;
+        navigate(`/grd/inventario/entrada/${id}/edit`);
+      } else {
+        console.log("No se encontró ningún registro.");
+      }
+    } else {
+      console.error("Error al obtener el inventario.");
+    }
+  };
+
+  const HandleLastEntrada = async () => {
+    const res = await fetch(`${servidor}/inventario/last?type=entrada`);
+    if (res.ok) {
+      const lastEntrada = await res.json();
+      //console.log(lastAlfa);
+      if (lastEntrada) {
+        const id = lastEntrada[0].id_inventario;
+        navigate(`/grd/inventario/entrada/${id}/edit`);
+        //setLastIdInventario(id);
+        //setDisabledNextButton(true);
+        //setDisabledPrevButton(false);
+      } else {
+        console.log("No se encontró ningún expediente.");
+      }
+    } else {
+      console.error("Error al obtener el último expediente.");
+    }
+  };
+
+  const handlePrevious = async () => {
+    try {
+      const response = await fetch(
+        `${servidor}/inventario/prev/${params.id}?type=entrada`,
+      );
+      const data = await response.json();
+
+      if (data?.length > 0 && data[0].id_inventario) {
+        navigate(`/grd/inventario/entrada/${data[0].id_inventario}/edit`);
+
+        //setDisabledNextButton(false);
+      } else {
+        //setDisabledPrevButton(true);
+        console.log("No hay registro anterior.");
+      }
+    } catch (error) {
+      console.error("Error al obtener registro:", error);
+    }
+  };
+
+  const handleNext = async () => {
+    try {
+      const response = await fetch(
+        `${servidor}/inventario/next/${params.id}?type=entrada`,
+      );
+      const data = await response.json();
+
+      if (data?.length > 0 && data[0]?.id_inventario) {
+        //console.log(data.informesRows[0].cod_alfa);
+        navigate(`/grd/inventario/entrada/${data[0].id_inventario}/edit`);
+        //setDisabledPrevButton(false);
+      } else {
+        //setDisabledNextButton(true);
+        console.log("No hay expedientes.");
+      }
+    } catch (error) {
+      console.error("Error al obtener expediente :", error);
+    }
+  };
+
+  return (
+    <>
+      <div className="container-fluid mt-4">
+        <div className="d-flex flex-wrap gap-2 mb-4">
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleFirstEntrada}
+            // disabled={disabledPrevButton}
+          >
+            <i className="bi bi-skip-start me-1"></i> Primer registro
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handlePrevious}
+            //disabled={disabledPrevButton}
+          >
+            <i className="bi bi-chevron-left me-1"></i> Anterior
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleNext}
+            //disabled={disabledNextButton}
+          >
+            Siguiente <i className="bi bi-chevron-right ms-1"></i>
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={HandleLastEntrada}
+            //disabled={disabledNextButton}
+          >
+            Último registro <i className="bi bi-skip-end ms-1"></i>
+          </button>
+        </div>
+        <div className="row">
+          <div className="col-lg-7">
+            <div className="card shadow-sm mb-4">
+              <div className="card-header bg-success text-white d-flex justify-content-between">
+                <div>
+                  <h4 className="card-title mb-0">Entrada de productos</h4>
+                  <strong>Código producto: {entradas.id_inventario}</strong>
+                </div>
+              </div>
+              <div className="card-body">
+                <form action="" onSubmit={handleSubmit}>
+                  <div className="col-md-auto">
+                    <label htmlFor="ubicacion1" className="form-label">
+                      Ubicación
+                    </label>
+                    <select
+                      name="ubicacion"
+                      id="ubicacion1"
+                      className="form-select"
+                      value={entradas.ubicacion}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    >
+                      <option value="">Seleccione ubicación de insumos</option>
+                      <option value="Bodega">Bodega Municipal</option>
+                      <option value="Oficina">Oficina</option>
+                    </select>
+                  </div>
+
+                  <label htmlFor="observaciones" className="form-label">
+                    Observación del producto
+                  </label>
+                  <textarea
+                    type="text"
+                    className="form-control"
+                    name="observaciones"
+                    id="observaciones"
+                    value={entradas.observaciones || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+                  <label htmlFor="marca" className="form-label">
+                    Marca producto
+                  </label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    name="marca"
+                    id="marca"
+                    value={entradas.marca || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+
+                  <label htmlFor="marca" className="form-label">
+                    Modelo producto
+                  </label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    name="modelo"
+                    id="modelo"
+                    value={entradas.modelo || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+
+                  <label htmlFor="cantidad" className="form-label">
+                    Cantidad
+                  </label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    name="cantidad"
+                    id="cantidad"
+                    value={entradas.cantidad || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+                  <div className="col-md-auto">
+                    <label htmlFor="tipo_producto" className="form-label">
+                      Tipo producto
+                    </label>
+                    <select
+                      name="tipo_producto"
+                      id="tipo_producto"
+                      className="form-select"
+                      value={entradas.tipo_producto || ""}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    >
+                      <option value="">Seleccione tipo de productos</option>
+                      <option value="Clavos">Clavos</option>
+                      <option value="Herramientas">Herramientas</option>
+                    </select>
+                  </div>
+
+                  <label htmlFor="factura" className="form-label">
+                    N° Factura
+                  </label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    name="factura"
+                    id="factura"
+                    value={entradas.factura || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+                  <label htmlFor="orden_compra" className="form-label">
+                    Orden de compra
+                  </label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    name="orden_compra"
+                    id="orden_compra"
+                    value={entradas.orden_compra || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+
+                  <label htmlFor="proveedor" className="form-label">
+                    Proveedor
+                  </label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    name="proveedor"
+                    id="proveedor"
+                    value={entradas.proveedor || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+
+                  <label htmlFor="precio_unitario" className="form-label">
+                    Precio unitario
+                  </label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    name="precio_unitario"
+                    id="precio_unitario"
+                    value={entradas.precio_unitario || ""}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  />
+                  <label htmlFor="productos" className="form-label">
+                    Productos
+                  </label>
+                  <select
+                    name="id_producto"
+                    id="id_producto"
+                    className="form-select"
+                    value={entradas.id_producto}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  >
+                    <option value="">Seleccione producto</option>
+                    {listado.map((p) => (
+                      <option value={p.id_producto}>{p.nombre_producto}</option>
+                    ))}
+                  </select>
+
+                  <div className="d-flex flex-wrap gap-2 mt-4">
+                    {!editing && (
+                      <div className="d-flex flex-wrap gap-2 mt-4">
+                        <button type="submit" className="btn btn-primary">
+                          <i className="bi bi-save"></i> Guardar Informe
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          type="button"
+                          onClick={handleCancel}
+                        >
+                          <i className="bi bi-x-octagon"></i> Cancelar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </form>
+
+                {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+                {editing && (
+                  <div className="d-flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={handleNewEntrada}
+                    >
+                      <i className="bi bi-clipboard2-plus"></i> Nuevo producto
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleEdit}
+                    >
+                      <i className="bi bi-pencil-square"></i> Editar
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={handleDeleteEntrada}
+                    >
+                      <i className="bi bi-trash"></i> Eliminar
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default EntradaInventario;
