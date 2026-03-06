@@ -120,6 +120,21 @@ function NavbarSGF() {
     navigate(`/grd/inventario/entrada/${id_entrada}/edit`);
   };
 
+  const handleLastPrestamo = async () => {
+    const res = await fetch(`${servidor_local}/inventario/last?type=prestamo`, {
+      headers: {
+        "Content-Type": "application/json",
+        // Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const lastPrestamo = await res.json();
+
+    const id_prestamo = lastPrestamo[0].id_prestamo;
+
+    navigate(`/grd/inventario/prestamo/${id_prestamo}/edit`);
+  };
+
   const handleLastImagenes = async () => {
     const res = await fetch(`${servidor_local}/seg/imagenes/last`, {
       headers: {
@@ -363,6 +378,12 @@ function NavbarSGF() {
                     <Link className="nav-link" onClick={handleEntrada}>
                       <i className="bi bi-clipboard-check me-1"></i> Entrada
                       productos
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" onClick={handleLastPrestamo}>
+                      <i className="bi bi-clipboard-check me-1"></i> Prestamo
+                      productos productos
                     </Link>
                   </li>
                 </>

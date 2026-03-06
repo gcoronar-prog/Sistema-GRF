@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -18,6 +18,7 @@ function EntradaInventario() {
     producto: "",
     precio_unitario: "",
     id_producto: "",
+    unid_medida: "",
   };
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ function EntradaInventario() {
       producto: data[0].producto || "",
       precio_unitario: data[0].precio_unitario || "",
       id_producto: data[0].id_producto || "",
+      unid_medida: data[0].unid_medida || "",
     });
   };
 
@@ -376,6 +378,25 @@ function EntradaInventario() {
                     onChange={handleChanges}
                     disabled={editing}
                   />
+                  <div className="col-md-auto">
+                    <label htmlFor="unid_medida" className="form-label">
+                      Unidad de medida
+                    </label>
+                    <select
+                      name="unid_medida"
+                      id="unid_medida"
+                      className="form-select"
+                      disabled={editing}
+                      value={entradas.unid_medida || ""}
+                      onChange={handleChanges}
+                    >
+                      <option value="">Seleccione unidad de medida</option>
+                      <option value="kgs">Kilogramos</option>
+                      <option value="lts">Litros</option>
+                      <option value="sacos">Sacos</option>
+                    </select>
+                  </div>
+
                   <div className="col-md-auto">
                     <label htmlFor="tipo_producto" className="form-label">
                       Tipo producto

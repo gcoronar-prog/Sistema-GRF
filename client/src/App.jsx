@@ -10,6 +10,7 @@ import FormInspeccion from "./components/Inspeccion/FormInspeccion";
 import FormAlfa from "./components/GRD/FormAlfa";
 import FormInventario from "./components/GRD/InventarioGRD";
 import FormEntradas from "./components/GRD/EntradaInventario";
+import FormPrestamo from "./components/GRD/PrestamoInventario";
 import FormSolicitud from "./components/Seg_ciudadana/FormSolicitud";
 import FormAtencion from "./components/Seg_ciudadana/FormAtencion";
 
@@ -74,6 +75,15 @@ function App() {
           <Route
             path="/grd/inventario/entrada/:id/edit"
             element={<FormEntradas />}
+          />
+
+          <Route
+            path="/grd/inventario/prestamo/new"
+            element={<FormPrestamo />}
+          />
+          <Route
+            path="/grd/inventario/prestamo/:id/edit"
+            element={<FormPrestamo />}
           />
 
           <Route path="/sc/imagenes/new" element={<FormSolicitud />} />

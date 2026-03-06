@@ -181,6 +181,7 @@ const createEntrada = async (req, res) => {
       data.proveedor,
       data.precio_unitario,
       data.id_producto,
+      data.unid_medida,
     ]);
 
     return res.status(201).json(result);
@@ -209,6 +210,7 @@ const updateEntrada = async (req, res) => {
       data.proveedor,
       data.precio_unitario,
       data.id_producto,
+      data.unid_medida,
       id,
     ]);
     if (result.length === 0) {
@@ -546,15 +548,15 @@ const getPrevElement = async (req, res) => {
 
 const entrada_grd = `
   INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,\
-  marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,precio_unitario,id_producto)\
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *
+  marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,precio_unitario,id_producto,unid_medida)\
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *
 `;
 
 const nuevo_producto = `
   INSERT INTO productos_grd (nombre_producto, observ_produ, tipo_produ,\
   cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
 
-const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,modelo,serial,cantidad,user_prestamo) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`;
+const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,modelo,serial,cantidad,user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
 
 const nueva_salida = `INSERT INTO salida_inventario_grd (fecha_salida, estado_salida,direccion_salida,\
 sector_salida,tipo_ubi_salida,descripcion_salida,tipo_evento,responsable_salida,user_form,observaciones,id_producto,cantidad) \
@@ -562,8 +564,8 @@ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *;`;
 
 const update_entrada = `
   UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,\
-  marca=$4,modelo=$5,cantidad=$6,tipo_producto=$7,factura=$8,orden_compra=$9,proveedor=$10,precio_unitario=$11,id_producto=$12\
-   WHERE id_inventario = $13 RETURNING *;
+  marca=$4,modelo=$5,cantidad=$6,tipo_producto=$7,factura=$8,orden_compra=$9,proveedor=$10,precio_unitario=$11,id_producto=$12,unid_medida=$13\
+   WHERE id_inventario = $14 RETURNING *;
 `;
 
 const update_producto = `
@@ -573,7 +575,8 @@ const update_producto = `
 
 const update_prestamo = `
   UPDATE prestamo_grd SET nombre=$1,marca=$2,modelo=$3,serial=$4,cantidad=$5,user_prestamo=$6\
-  WHERE id_prestamo = $7 RETURNING *;
+  estado_prestamo=$7, fecha_prestamo=$8, fecha_devolucion=$9, observ=$10\
+  WHERE id_prestamo = $11 RETURNING *;
 `;
 
 const update_salida = `
