@@ -303,7 +303,6 @@ const updatePrestamo = async (req, res) => {
     const { rows: result } = await pool.query(update_prestamo, [
       data.nombre,
       data.marca,
-      data.modelo,
       data.serial,
       data.cantidad,
       data.user_prestamo,
@@ -556,7 +555,8 @@ const nuevo_producto = `
   INSERT INTO productos_grd (nombre_producto, observ_produ, tipo_produ,\
   cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
 
-const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,modelo,serial,cantidad,user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
+const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,serial,cantidad,user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ,user_creador)\
+ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
 
 const nueva_salida = `INSERT INTO salida_inventario_grd (fecha_salida, estado_salida,direccion_salida,\
 sector_salida,tipo_ubi_salida,descripcion_salida,tipo_evento,responsable_salida,user_form,observaciones,id_producto,cantidad) \
@@ -574,8 +574,8 @@ const update_producto = `
 `;
 
 const update_prestamo = `
-  UPDATE prestamo_grd SET nombre=$1,marca=$2,modelo=$3,serial=$4,cantidad=$5,user_prestamo=$6\
-  estado_prestamo=$7, fecha_prestamo=$8, fecha_devolucion=$9, observ=$10\
+  UPDATE prestamo_grd SET nombre=$1,marca=$2, serial=$3,cantidad=$4,user_prestamo=$5\
+  estado_prestamo=$6, fecha_prestamo=$7, fecha_devolucion=$8, observ=$9,user_creador=$10\
   WHERE id_prestamo = $11 RETURNING *;
 `;
 
