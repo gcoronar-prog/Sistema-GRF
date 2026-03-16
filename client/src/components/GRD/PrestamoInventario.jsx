@@ -15,7 +15,6 @@ function PrestamoInventario() {
     observ: "",
     user_creador: "",
     tipo_form: "",
-    user_prestamo: "",
   };
 
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;

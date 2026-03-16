@@ -8,8 +8,6 @@ function EntradaInventario() {
     ubicacion: "",
     observaciones: "",
     usuario_creador: "",
-    marca: "",
-    modelo: "",
     cantidad: "",
     tipo_producto: "",
     factura: "",
@@ -19,6 +17,7 @@ function EntradaInventario() {
     precio_unitario: "",
     id_producto: "",
     unid_medida: "",
+    tipo_form: "",
   };
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const navigate = useNavigate();
@@ -33,6 +32,7 @@ function EntradaInventario() {
   const [entradas, setEntradas] = useState(defaultEntradas);
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
+  const [estado, setEstado] = useState(1);
 
   useEffect(() => {
     if (params.id) {
@@ -53,6 +53,15 @@ function EntradaInventario() {
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
 
+    /*switch (estado) {
+      case 1:
+        setEntradas({ ...entradas, tipo_form: "entrada" });
+        break;
+      case 2:
+        setEntradas({ ...entradas, tipo_form: "salida" });
+        break;
+    }*/
+
     setEntradas({
       ...defaultEntradas,
       ...data[0],
@@ -60,8 +69,6 @@ function EntradaInventario() {
       ubicacion: data[0].ubicacion || "",
       observaciones: data[0].observaciones || "",
       usuario_creador: data[0].usuario_creador || "",
-      marca: data[0].marca || "",
-      modelo: data[0].modelo || "",
       cantidad: data[0].cantidad || "",
       tipo_producto: data[0].tipo_producto || "",
       factura: data[0].factura || "",
@@ -71,6 +78,7 @@ function EntradaInventario() {
       precio_unitario: data[0].precio_unitario || "",
       id_producto: data[0].id_producto || "",
       unid_medida: data[0].unid_medida || "",
+      tipo_form: data[0].tipo_form || "",
     });
   };
 
@@ -84,6 +92,7 @@ function EntradaInventario() {
   const handleChanges = (e) => {
     const { name, value } = e.target;
     setEntradas({ ...entradas, [name]: value });
+    console.log(value);
   };
 
   const handleEdit = async () => {
@@ -310,177 +319,219 @@ function EntradaInventario() {
               </div>
               <div className="card-body">
                 <form action="" onSubmit={handleSubmit}>
-                  <div className="col-md-auto">
-                    <label htmlFor="ubicacion1" className="form-label">
-                      Ubicación
-                    </label>
-                    <select
-                      name="ubicacion"
-                      id="ubicacion1"
-                      className="form-select"
-                      value={entradas.ubicacion}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    >
-                      <option value="">Seleccione ubicación de insumos</option>
-                      <option value="Bodega">Bodega Municipal</option>
-                      <option value="Oficina">Oficina</option>
-                    </select>
+                  <div className="d-flex justify-content-center mb-3 gap-2 flex-wrap">
+                    <div className="btn-group mb-2">
+                      <button
+                        type="button"
+                        className={`btn ${
+                          estado === 1 ? "btn-success" : "btn-outline-success"
+                        }`}
+                        onClick={() => {
+                          (setEstado(1), (entradas.tipo_form = "entrada"));
+                        }}
+                        disabled={editing}
+                      >
+                        Entradas
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn ${
+                          estado === 2 ? "btn-danger" : "btn-outline-danger"
+                        }`}
+                        onClick={() => {
+                          (setEstado(2), (entradas.tipo_form = "salida"));
+                        }}
+                        disabled={editing}
+                      >
+                        Salidas
+                      </button>
+                    </div>
                   </div>
-
-                  <label htmlFor="observaciones" className="form-label">
-                    Observación del producto
-                  </label>
-                  <textarea
-                    type="text"
-                    className="form-control"
-                    name="observaciones"
-                    id="observaciones"
-                    value={entradas.observaciones || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-                  <label htmlFor="marca" className="form-label">
-                    Marca producto
-                  </label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="marca"
-                    id="marca"
-                    value={entradas.marca || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-
-                  <label htmlFor="marca" className="form-label">
-                    Modelo producto
-                  </label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="modelo"
-                    id="modelo"
-                    value={entradas.modelo || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-
-                  <label htmlFor="cantidad" className="form-label">
-                    Cantidad
-                  </label>
-                  <input
-                    className="form-control"
-                    type="number"
-                    name="cantidad"
-                    id="cantidad"
-                    value={entradas.cantidad || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-                  <div className="col-md-auto">
-                    <label htmlFor="unid_medida" className="form-label">
-                      Unidad de medida
-                    </label>
-                    <select
-                      name="unid_medida"
-                      id="unid_medida"
-                      className="form-select"
-                      disabled={editing}
-                      value={entradas.unid_medida || ""}
-                      onChange={handleChanges}
-                    >
-                      <option value="">Seleccione unidad de medida</option>
-                      <option value="kgs">Kilogramos</option>
-                      <option value="lts">Litros</option>
-                      <option value="sacos">Sacos</option>
-                    </select>
+                  <div className="row g-4">
+                    <fieldset className="border border-primary rounded p-3">
+                      <legend className="float-none w-auto px-2 h6 mb-0">
+                        Detalle Productos
+                      </legend>
+                      <div className="row g-3">
+                        <div className="col-md-auto">
+                          <label htmlFor="productos" className="form-label">
+                            Productos
+                          </label>
+                          <select
+                            name="id_producto"
+                            id="id_producto"
+                            className="form-select"
+                            value={entradas.id_producto}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          >
+                            <option value="">Seleccione producto</option>
+                            {listado.map((p) => (
+                              <option value={p.id_producto}>
+                                {p.nombre_producto}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="col-md-auto">
+                          <label htmlFor="tipo_producto" className="form-label">
+                            Tipo producto
+                          </label>
+                          <select
+                            name="tipo_producto"
+                            id="tipo_producto"
+                            className="form-select"
+                            value={entradas.tipo_producto || ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          >
+                            <option value="">
+                              Seleccione tipo de productos
+                            </option>
+                            <option value="Clavos">Clavos</option>
+                            <option value="Herramientas">Herramientas</option>
+                          </select>
+                        </div>
+                        <div className="col-md-auto">
+                          <label htmlFor="cantidad" className="form-label">
+                            Cantidad
+                          </label>
+                          <input
+                            className="form-control"
+                            type="number"
+                            name="cantidad"
+                            id="cantidad"
+                            value={entradas.cantidad || ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label htmlFor="unid_medida" className="form-label">
+                            Unidad de medida
+                          </label>
+                          <select
+                            name="unid_medida"
+                            id="unid_medida"
+                            className="form-select"
+                            disabled={editing}
+                            value={entradas.unid_medida || ""}
+                            onChange={handleChanges}
+                          >
+                            <option value="">
+                              Seleccione unidad de medida
+                            </option>
+                            <option value="kgs">Kilogramos</option>
+                            <option value="lts">Litros</option>
+                            <option value="sacos">Sacos</option>
+                          </select>
+                        </div>
+                        <div className="col-md-auto">
+                          <label
+                            htmlFor="precio_unitario"
+                            className="form-label"
+                          >
+                            Precio unitario
+                          </label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            name="precio_unitario"
+                            id="precio_unitario"
+                            value={entradas.precio_unitario || ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label htmlFor="ubicacion1" className="form-label">
+                            Ubicación
+                          </label>
+                          <select
+                            name="ubicacion"
+                            id="ubicacion1"
+                            className="form-select"
+                            value={entradas.ubicacion}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          >
+                            <option value="">
+                              Seleccione ubicación de insumos
+                            </option>
+                            <option value="Bodega">Bodega Municipal</option>
+                            <option value="Oficina">Oficina</option>
+                          </select>
+                        </div>
+                      </div>
+                    </fieldset>
                   </div>
-
-                  <div className="col-md-auto">
-                    <label htmlFor="tipo_producto" className="form-label">
-                      Tipo producto
-                    </label>
-                    <select
-                      name="tipo_producto"
-                      id="tipo_producto"
-                      className="form-select"
-                      value={entradas.tipo_producto || ""}
-                      onChange={handleChanges}
-                      disabled={editing}
-                    >
-                      <option value="">Seleccione tipo de productos</option>
-                      <option value="Clavos">Clavos</option>
-                      <option value="Herramientas">Herramientas</option>
-                    </select>
+                  <div className="row g-4">
+                    <fieldset className="border border-primary rounded p-3">
+                      <legend className="float-none w-auto px-2 h6 mb-0">
+                        Detalles compra
+                      </legend>
+                      <div className="row g-3">
+                        <div className="col-md-auto">
+                          <label htmlFor="factura" className="form-label">
+                            N° Factura
+                          </label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            name="factura"
+                            id="factura"
+                            value={entradas.factura || ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
+                        <div className="col-md-auto">
+                          <label htmlFor="orden_compra" className="form-label">
+                            Orden de compra
+                          </label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            name="orden_compra"
+                            id="orden_compra"
+                            value={entradas.orden_compra || ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <label htmlFor="proveedor" className="form-label">
+                            Proveedor
+                          </label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            name="proveedor"
+                            id="proveedor"
+                            value={entradas.proveedor || ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
+                        <div className="col-md-auto">
+                          <label htmlFor="observaciones" className="form-label">
+                            Observación del producto
+                          </label>
+                          <textarea
+                            type="text"
+                            className="form-control"
+                            cols={95}
+                            rows={3}
+                            name="observaciones"
+                            id="observaciones"
+                            value={entradas.observaciones || ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
+                      </div>
+                    </fieldset>
                   </div>
-
-                  <label htmlFor="factura" className="form-label">
-                    N° Factura
-                  </label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="factura"
-                    id="factura"
-                    value={entradas.factura || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-                  <label htmlFor="orden_compra" className="form-label">
-                    Orden de compra
-                  </label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="orden_compra"
-                    id="orden_compra"
-                    value={entradas.orden_compra || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-
-                  <label htmlFor="proveedor" className="form-label">
-                    Proveedor
-                  </label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="proveedor"
-                    id="proveedor"
-                    value={entradas.proveedor || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-
-                  <label htmlFor="precio_unitario" className="form-label">
-                    Precio unitario
-                  </label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="precio_unitario"
-                    id="precio_unitario"
-                    value={entradas.precio_unitario || ""}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-                  <label htmlFor="productos" className="form-label">
-                    Productos
-                  </label>
-                  <select
-                    name="id_producto"
-                    id="id_producto"
-                    className="form-select"
-                    value={entradas.id_producto}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  >
-                    <option value="">Seleccione producto</option>
-                    {listado.map((p) => (
-                      <option value={p.id_producto}>{p.nombre_producto}</option>
-                    ))}
-                  </select>
 
                   <div className="d-flex flex-wrap gap-2 mt-4">
                     {!editing && (

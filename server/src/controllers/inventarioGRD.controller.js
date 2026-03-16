@@ -172,16 +172,16 @@ const createEntrada = async (req, res) => {
       data.ubicacion,
       data.observaciones,
       data.usuario_creador,
-      data.marca,
-      data.modelo,
       data.cantidad,
       data.tipo_producto,
       data.factura,
       data.orden_compra,
       data.proveedor,
+      data.producto,
       data.precio_unitario,
       data.id_producto,
       data.unid_medida,
+      data.tipo_form,
     ]);
 
     return res.status(201).json(result);
@@ -201,16 +201,16 @@ const updateEntrada = async (req, res) => {
       data.ubicacion,
       data.observaciones,
       data.usuario_creador,
-      data.marca,
-      data.modelo,
       data.cantidad,
       data.tipo_producto,
       data.factura,
       data.orden_compra,
       data.proveedor,
+      data.producto,
       data.precio_unitario,
       data.id_producto,
       data.unid_medida,
+      data.tipo_form,
       id,
     ]);
     if (result.length === 0) {
@@ -546,8 +546,8 @@ const getPrevElement = async (req, res) => {
 };
 
 const entrada_grd = `
-  INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,\
-  marca,modelo,cantidad,tipo_producto,factura,orden_compra,proveedor,precio_unitario,id_producto,unid_medida)\
+  INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,cantidad,tipo_producto\
+  ,factura,orden_compra,proveedor,producto,precio_unitario,id_producto,unid_medida,tipo_form)\
    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *
 `;
 
@@ -564,8 +564,8 @@ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *;`;
 
 const update_entrada = `
   UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,\
-  marca=$4,modelo=$5,cantidad=$6,tipo_producto=$7,factura=$8,orden_compra=$9,proveedor=$10,precio_unitario=$11,id_producto=$12,unid_medida=$13\
-   WHERE id_inventario = $14 RETURNING *;
+cantidad=$4,tipo_producto=$5,factura=$6,orden_compra=$7,proveedor=$8,producto=$9,precio_unitario=$10,id_producto=$11,unid_medida=$12,\
+tipo_form=$13 WHERE id_inventario = $14 RETURNING *;
 `;
 
 const update_producto = `
