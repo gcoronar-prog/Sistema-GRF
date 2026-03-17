@@ -280,12 +280,17 @@ const createPrestamo = async (req, res) => {
   const data = req.body;
   try {
     const { rows: result } = await pool.query(nuevo_prestamo, [
-      data.nombre,
-      data.marca,
-      data.modelo,
-      data.serial,
-      data.cantidad,
       data.user_prestamo,
+      data.estado_prestamo,
+      data.fecha_prestamo,
+      data.fecha_devolucion,
+      data.observ,
+      data.user_creador,
+      data.correo,
+      data.telefono,
+      data.producto,
+      data.num_serie,
+      data.cantidad,
     ]);
     return res.status(201).json(result);
   } catch (error) {
@@ -301,11 +306,17 @@ const updatePrestamo = async (req, res) => {
   const data = req.body;
   try {
     const { rows: result } = await pool.query(update_prestamo, [
-      data.nombre,
-      data.marca,
-      data.serial,
-      data.cantidad,
       data.user_prestamo,
+      data.estado_prestamo,
+      data.fecha_prestamo,
+      data.fecha_devolucion,
+      data.observ,
+      data.user_creador,
+      data.correo,
+      data.telefono,
+      data.producto,
+      data.num_serie,
+      data.cantidad,
       id,
     ]);
     if (result.length === 0) {
@@ -555,8 +566,9 @@ const nuevo_producto = `
   INSERT INTO productos_grd (nombre_producto, observ_produ, tipo_produ,\
   cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
 
-const nuevo_prestamo = `INSERT INTO prestamo_grd (nombre,marca,serial,cantidad,user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ,user_creador)\
- VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
+const nuevo_prestamo = `INSERT INTO prestamo_grd (user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ, user_creador,\
+correo,telefono,producto,num_serie,cantidad)\
+ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *;`;
 
 const nueva_salida = `INSERT INTO salida_inventario_grd (fecha_salida, estado_salida,direccion_salida,\
 sector_salida,tipo_ubi_salida,descripcion_salida,tipo_evento,responsable_salida,user_form,observaciones,id_producto,cantidad) \
@@ -574,9 +586,9 @@ const update_producto = `
 `;
 
 const update_prestamo = `
-  UPDATE prestamo_grd SET nombre=$1,marca=$2, serial=$3,cantidad=$4,user_prestamo=$5\
-  estado_prestamo=$6, fecha_prestamo=$7, fecha_devolucion=$8, observ=$9,user_creador=$10\
-  WHERE id_prestamo = $11 RETURNING *;
+  UPDATE prestamo_grd SET user_prestamo=$1, estado_prestamo=$2, fecha_prestamo=$3, fecha_devolucion=$4, observ=$5, user_creador=$6,\
+  correo=$7, telefono=$8, producto=$9, num_serie=$10, cantidad=$11\
+  WHERE id_prestamo = $12 RETURNING *;
 `;
 
 const update_salida = `

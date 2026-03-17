@@ -4,17 +4,17 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function PrestamoInventario() {
   const defaultPrestamo = {
-    nombre: "",
-    marca: "",
-    serial: "",
-    cantidad: 0,
     user_prestamo: "",
     estado_prestamo: "",
     fecha_prestamo: "",
     fecha_devolucion: "",
     observ: "",
     user_creador: "",
-    tipo_form: "",
+    correo: "",
+    telefono: "",
+    producto: "",
+    num_serie: "",
+    cantidad: 0,
   };
 
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -52,16 +52,17 @@ function PrestamoInventario() {
     setPrestamos({
       ...defaultPrestamo,
       ...data[0],
-      nombre: data[0].nombre || "",
-      marca: data[0].marca || "",
-      serial: data[0].serial || "",
-      cantidad: data[0].cantidad || 0,
       user_prestamo: data[0].user_prestamo || "",
       estado_prestamo: data[0].estado_prestamo || "",
       fecha_prestamo: data[0].fecha_prestamo || "",
-      fecha_devolucion: data[0].fecha_devolucion || "",
+      fecha_devolucion: data[0].fecha_devolucion || 0,
       observ: data[0].observ || "",
       user_creador: data[0].user_creador || "",
+      correo: data[0].correo || "",
+      telefono: data[0].telefono || "",
+      producto: data[0].producto || "",
+      num_serie: data[0].num_serie || "",
+      cantidad: data[0].cantidad || "",
     });
   };
 
@@ -301,127 +302,101 @@ function PrestamoInventario() {
               </div>
               <div className="card-body">
                 <form action="" onSubmit={handleSubmit}>
-                  <label htmlFor="tipo_form" className="form-label">
-                    Tipo Formulario
-                  </label>
-                  <input type="text" id="tipo_form" name="tipo_form" />
-                  <label htmlFor="nombre" className="form-label">
-                    Productos:
-                  </label>
-                  <select
-                    name="nombre"
-                    id="nombre"
-                    className="form-select"
-                    value={prestamos.nombre}
-                    onChange={handleChanges}
-                    disabled={false}
-                  >
-                    <option value="">Seleccione producto</option>
-                    {listado.map((p) => (
-                      <option value={p.nombre_producto}>
-                        {p.nombre_producto}
-                      </option>
-                    ))}
-                  </select>
-                  <label htmlFor="marca" className="form-label">
-                    Marca producto:
-                  </label>
-                  <input
-                    type="text"
-                    id="marca"
-                    name="marca"
-                    className="form-control"
-                    value={prestamos.marca || ""}
-                    disabled={editing}
-                    onChange={handleChanges}
-                  />
-                  <label htmlFor="serial" className="form-label">
-                    Serial
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="serial"
-                    name="serial"
-                    value={prestamos.serial}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-                  <label htmlFor="cantidad" className="form-label">
-                    Cantidad prestamo
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="cantidad"
-                    name="cantidad"
-                    value={prestamos.cantidad}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-
-                  <label htmlFor="user_prestamo" className="form-label">
-                    Funcionario solicitante prestamo
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="user_prestamo"
-                    name="user_prestamo"
-                    value={prestamos.user_prestamo}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  />
-
-                  <label htmlFor="estado_prestamo" className="form-label">
-                    Estado de prestamo
-                  </label>
-                  <select
-                    name="estado_prestamo"
-                    id="estado_prestamo"
-                    className="form-select"
-                    value={prestamos.estado_prestamo}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  >
-                    <option value="">Seleccione estado de solicitud</option>
-                  </select>
-
-                  <label htmlFor="fecha_prestamo" className="form-label">
-                    Fecha solicitud prestamo
-                  </label>
+                  <label htmlFor="fecha_prestamo">Fecha de prestamo</label>
                   <input
                     type="datetime-local"
                     name="fecha_prestamo"
                     id="fecha_prestamo"
-                    className="form-control"
                     value={prestamos.fecha_prestamo}
                     onChange={handleChanges}
-                    disabled={editing}
                   />
-
-                  <label htmlFor="fecha_prestamo" className="form-label">
-                    Fecha devolución prestamo
-                  </label>
+                  <label htmlFor="fecha_devolucion">Fecha de prestamo</label>
                   <input
                     type="datetime-local"
                     name="fecha_devolucion"
                     id="fecha_devolucion"
-                    className="form-control"
                     value={prestamos.fecha_devolucion}
                     onChange={handleChanges}
-                    disabled={editing}
                   />
-                  <label htmlFor="observ" className="form-label">
-                    Observaciones:
+
+                  <label htmlFor="estado_prestamo">Estado de prestamo</label>
+                  <select
+                    name="estado_prestamo"
+                    id="estado_prestamo"
+                    value={prestamos.estado_prestamo}
+                    onChange={handleChanges}
+                  >
+                    <option value="En prestamo">En prestamo</option>
+                    <option value="Devuelta">Devuelta</option>
+                    <option value="Cancelada">Devuelta</option>
+                  </select>
+
+                  <label htmlFor="producto" className="form-label">
+                    Productos:
                   </label>
+                  <select
+                    name="producto"
+                    id="producto"
+                    className="form-select"
+                    value={prestamos.producto}
+                    onChange={handleChanges}
+                    disabled={editing}
+                  >
+                    <option value="">Seleccione producto</option>
+                    {listado.map((p) => (
+                      <option value={p.id_producto}>{p.nombre_producto}</option>
+                    ))}
+                  </select>
+
+                  <label htmlFor="cantidad">Cantidad solicitada</label>
+                  <input
+                    type="number"
+                    name="cantidad"
+                    id="cantidad"
+                    value={prestamos.cantidad}
+                    onChange={handleChanges}
+                  />
+                  <label htmlFor="num_serie">
+                    Número de Serie(si es que posee)
+                  </label>
+                  <input
+                    type="text"
+                    name="num_serie"
+                    id="num_serie"
+                    value={prestamos.num_serie}
+                    onChange={handleChanges}
+                  />
+
+                  <label htmlFor="user_prestamo">Usuario solicitante</label>
+                  <input
+                    type="text"
+                    name="user_prestamo"
+                    id="user_prestamo"
+                    value={prestamos.user_prestamo}
+                    onChange={handleChanges}
+                  />
+                  <label htmlFor="correo">Correo Solicitante</label>
+                  <input
+                    type="text"
+                    name="correo"
+                    id="correo"
+                    value={prestamos.correo}
+                    onChange={handleChanges}
+                  />
+                  <label htmlFor="telefono">Teléfono</label>
+                  <input
+                    type="text"
+                    name="telefono"
+                    id="telefono"
+                    value={prestamos.telefono}
+                    onChange={handleChanges}
+                  />
+                  <label htmlFor="observ">Observaciones</label>
                   <textarea
                     name="observ"
                     id="observ"
-                    className="form-control"
                     value={prestamos.observ}
                     onChange={handleChanges}
-                    disabled={editing}
                   ></textarea>
 
                   <div className="d-flex flex-wrap gap-2 mt-4">
