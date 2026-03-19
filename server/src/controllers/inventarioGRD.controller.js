@@ -314,7 +314,7 @@ const updatePrestamo = async (req, res) => {
       data.user_creador,
       data.correo,
       data.telefono,
-      data.producto,
+      data.id_producto,
       data.num_serie,
       data.cantidad,
       id,
@@ -347,6 +347,23 @@ const deletePrestamo = async (req, res) => {
   }
 };
 
+const getListPrestamoUser = async (req, res) => {
+  const user = req.query.type;
+  const query = { lista: listPrestUser };
+  const listado = query[user];
+  try {
+    const { rows } = await pool.query(listado);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No se encuentran datos" });
+    }
+    return res.status(201).json(rows);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
 //SALIDAS INVENTARIO
 
 const getListSalidas = async (req, res) => {
@@ -587,7 +604,7 @@ const update_producto = `
 
 const update_prestamo = `
   UPDATE prestamo_grd SET user_prestamo=$1, estado_prestamo=$2, fecha_prestamo=$3, fecha_devolucion=$4, observ=$5, user_creador=$6,\
-  correo=$7, telefono=$8, producto=$9, num_serie=$10, cantidad=$11\
+  correo=$7, telefono=$8, id_producto=$9, num_serie=$10, cantidad=$11\
   WHERE id_prestamo = $12 RETURNING *;
 `;
 
@@ -637,6 +654,8 @@ const prev_salida = `SELECT * FROM salida_inventario_grd WHERE id_salida < $1 OR
 
 const prev_producto = `SELECT * FROM productos_grd WHERE id_producto < $1 ORDER BY id_producto DESC LIMIT 1`;
 
+const listPrestUser = `SELECT * FROM prestamo_grd WHERE user_prestamo = $1`;
+
 export {
   getInventario,
   getInventarios,
@@ -664,4 +683,5 @@ export {
   getFirstElement,
   getNextElement,
   getPrevElement,
+  getListPrestamoUser,
 };

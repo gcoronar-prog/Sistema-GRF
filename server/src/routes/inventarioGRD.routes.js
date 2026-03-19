@@ -25,6 +25,7 @@ import {
   updateSalida,
   getNextElement,
   getPrevElement,
+  getListPrestamoUser,
 } from "../controllers/inventarioGRD.controller.js";
 
 const router = Router();
@@ -49,6 +50,7 @@ router.get("/inventario/prestamo/:id", getPrestamo);
 router.post("/inventario/prestamo/new", createPrestamo);
 router.put("/inventario/prestamo/edit/:id", updatePrestamo);
 router.delete("/inventario/prestamo/delete/:id", deletePrestamo);
+router.get("/inventario/list/user", getListPrestamoUser);
 
 //salidas de productos
 router.get("/inventario/salida/list", getListSalidas);

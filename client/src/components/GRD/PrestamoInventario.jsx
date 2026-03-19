@@ -12,7 +12,7 @@ function PrestamoInventario() {
     user_creador: "",
     correo: "",
     telefono: "",
-    producto: "",
+    id_producto: "",
     num_serie: "",
     cantidad: 0,
   };
@@ -30,7 +30,6 @@ function PrestamoInventario() {
   const [prestamos, setPrestamos] = useState(defaultPrestamo);
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
-  const [tipoForm, setTipoForm] = useState("");
 
   useEffect(() => {
     if (params.id) {
@@ -48,22 +47,42 @@ function PrestamoInventario() {
         //Authorization: `Bearer ${token}`,
       },
     });
+
     const data = await res.json();
+
     setPrestamos({
       ...defaultPrestamo,
       ...data[0],
       user_prestamo: data[0].user_prestamo || "",
       estado_prestamo: data[0].estado_prestamo || "",
-      fecha_prestamo: data[0].fecha_prestamo || "",
-      fecha_devolucion: data[0].fecha_devolucion || 0,
+      fecha_prestamo: data[0].fecha_prestamo,
+      fecha_devolucion: data[0].fecha_devolucion,
       observ: data[0].observ || "",
       user_creador: data[0].user_creador || "",
       correo: data[0].correo || "",
       telefono: data[0].telefono || "",
-      producto: data[0].producto || "",
+      id_producto: data[0].id_producto || 0,
       num_serie: data[0].num_serie || "",
       cantidad: data[0].cantidad || "",
     });
+  };
+
+  const formatDateTimeLocal = (dateString) => {
+    const date = new Date(dateString);
+
+    const pad = (n) => String(n).padStart(2, "0");
+
+    return (
+      date.getFullYear() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getDate()) +
+      "T" +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes())
+    );
   };
 
   const listProductos = async () => {
@@ -76,6 +95,7 @@ function PrestamoInventario() {
   const handleChanges = async (e) => {
     const { name, value } = e.target;
     setPrestamos({ ...prestamos, [name]: value });
+    console.log(name, value);
   };
 
   const handleEdit = async () => {
@@ -172,7 +192,7 @@ function PrestamoInventario() {
     });
     const updatePrestamo = { ...prestamos };
     delete updatePrestamo[id];
-    setEntradas(updatePrestamo);
+    setPrestamos(updatePrestamo);
     const res = await fetch(`${servidor}/inventario/last?type=prestamo`);
     const data = await res.json();
 
@@ -243,14 +263,14 @@ function PrestamoInventario() {
 
       if (data?.length > 0 && data[0]?.id_prestamo) {
         //console.log(data.informesRows[0].cod_alfa);
-        navigate(`/grd/inventario/entrada/${data[0].id_prestamo}/edit`);
+        navigate(`/grd/inventario/prestamo/${data[0].id_prestamo}/edit`);
         //setDisabledPrevButton(false);
       } else {
         //setDisabledNextButton(true);
-        console.log("No hay expedientes.");
+        console.log("No hay registro.");
       }
     } catch (error) {
-      console.error("Error al obtener expediente :", error);
+      console.error("Error al obtener registro:", error);
     }
   };
 
@@ -292,159 +312,273 @@ function PrestamoInventario() {
           </button>
         </div>
         <div className="row">
-          <div className="col-lg-7">
-            <div className="card shadow-sm mb-4">
-              <div className="card-header bg-success text-white d-flex justify-content-between">
-                <div>
-                  <h4 className="card-title mb-0">Prestamo de productos</h4>
-                  <strong>Código prestamo: {prestamos.id_prestamo}</strong>
+          <div className="row">
+            <div className="col-lg-7">
+              <div className="card shadow-sm mb-4">
+                <div className="card-header bg-success text-white d-flex justify-content-between">
+                  <div>
+                    <h4 className="card-title mb-0">Prestamo de productos</h4>
+                    <strong>Código prestamo: {prestamos.id_prestamo}</strong>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <form action="" onSubmit={handleSubmit}>
+                    <div className="row">
+                      <fieldset className="border border-primary rounded p-3">
+                        <legend className="float-none w-auto px-2 h6 mb-0">
+                          Fecha y estado prestamo
+                        </legend>
+                        <div className="row g-3">
+                          <div className="col-md-auto">
+                            <label
+                              htmlFor="fecha_prestamo"
+                              className="form-label"
+                            >
+                              Fecha de prestamo
+                            </label>
+                            <input
+                              className="form-control"
+                              type="datetime-local"
+                              name="fecha_prestamo"
+                              id="fecha_prestamo"
+                              value={formatDateTimeLocal(
+                                prestamos.fecha_prestamo,
+                              )}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+                          <div className="col-md-auto">
+                            <label
+                              htmlFor="fecha_devolucion"
+                              className="form-label"
+                            >
+                              Fecha devolución
+                            </label>
+                            <input
+                              className="form-control"
+                              type="datetime-local"
+                              name="fecha_devolucion"
+                              id="fecha_devolucion"
+                              value={formatDateTimeLocal(
+                                prestamos.fecha_devolucion,
+                              )}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+                          <div className="col-md-auto">
+                            <label
+                              htmlFor="estado_prestamo"
+                              className="form-label"
+                            >
+                              Estado de prestamo
+                            </label>
+                            <select
+                              className="form-select"
+                              name="estado_prestamo"
+                              id="estado_prestamo"
+                              value={prestamos.estado_prestamo}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            >
+                              <option value="En prestamo">En prestamo</option>
+                              <option value="Devuelta">Devuelta</option>
+                              <option value="Cancelada">Cancelada</option>
+                            </select>
+                          </div>
+                        </div>
+                      </fieldset>
+                      <fieldset className="border border-primary rounded p-3">
+                        <legend className="float-none w-auto px-2 h6 mb-0">
+                          Producto en prestamo
+                        </legend>
+                        <div className="row g-3">
+                          <div className="col-md-auto">
+                            <label htmlFor="producto" className="form-label">
+                              Productos:
+                            </label>
+                            <select
+                              name="id_producto"
+                              id="producto"
+                              className="form-select"
+                              value={prestamos.id_producto}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            >
+                              <option value="">Seleccione producto</option>
+                              {listado.map((p) => (
+                                <option value={p.id_producto}>
+                                  {p.nombre_producto}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="col-md-auto">
+                            <label htmlFor="cantidad" className="form-label">
+                              Cantidad solicitada:
+                            </label>
+                            <input
+                              className="form-control"
+                              type="number"
+                              name="cantidad"
+                              id="cantidad"
+                              value={prestamos.cantidad}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+
+                          <div className="col-md-auto">
+                            <label htmlFor="num_serie" className="form-label">
+                              Número de Serie(si es que posee):
+                            </label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              name="num_serie"
+                              id="num_serie"
+                              value={prestamos.num_serie}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+                        </div>
+                      </fieldset>
+                      <fieldset className="border border-primary rounded p-3">
+                        <legend className="float-none w-auto px-2 h6 mb-0">
+                          Datos Solicitante y Observaciones
+                        </legend>
+                        <div className="row g-3">
+                          <div className="col-md-auto">
+                            <label
+                              htmlFor="user_prestamo"
+                              className="form-label"
+                            >
+                              Usuario solicitante:
+                            </label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              name="user_prestamo"
+                              id="user_prestamo"
+                              value={prestamos.user_prestamo}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+
+                          <div className="col-md-auto">
+                            <label htmlFor="correo" className="form-label">
+                              Correo Solicitante:
+                            </label>
+                            <input
+                              className="form-control"
+                              type="email"
+                              name="correo"
+                              id="correo"
+                              value={prestamos.correo}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+                          <div className="col-md-auto">
+                            <label htmlFor="telefono" className="form-label">
+                              Teléfono
+                            </label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              name="telefono"
+                              id="telefono"
+                              value={prestamos.telefono}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-md-12">
+                            <label htmlFor="observ" className="form-label">
+                              Observaciones
+                            </label>
+                            <textarea
+                              rows={3}
+                              className="form-control"
+                              name="observ"
+                              id="observ"
+                              value={prestamos.observ}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            ></textarea>
+                          </div>
+                        </div>
+                      </fieldset>
+
+                      <div className="d-flex flex-wrap gap-2 mt-4">
+                        {!editing && (
+                          <div className="d-flex flex-wrap gap-2 mt-4">
+                            <button type="submit" className="btn btn-primary">
+                              <i className="bi bi-save"></i> Guardar
+                            </button>
+                            <button
+                              className="btn btn-danger"
+                              type="button"
+                              onClick={handleCancel}
+                            >
+                              <i className="bi bi-x-octagon"></i> Cancelar
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </form>
+
+                  {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
+                  {editing && (
+                    <div className="d-flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        onClick={handleNewPrestamo}
+                      >
+                        <i className="bi bi-clipboard2-plus"></i> Nuevo prestamo
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={handleEdit}
+                      >
+                        <i className="bi bi-pencil-square"></i> Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={handleDeletePrestamo}
+                      >
+                        <i className="bi bi-trash"></i> Eliminar
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="card-body">
-                <form action="" onSubmit={handleSubmit}>
-                  <label htmlFor="fecha_prestamo">Fecha de prestamo</label>
-                  <input
-                    type="datetime-local"
-                    name="fecha_prestamo"
-                    id="fecha_prestamo"
-                    value={prestamos.fecha_prestamo}
-                    onChange={handleChanges}
-                  />
-                  <label htmlFor="fecha_devolucion">Fecha de prestamo</label>
-                  <input
-                    type="datetime-local"
-                    name="fecha_devolucion"
-                    id="fecha_devolucion"
-                    value={prestamos.fecha_devolucion}
-                    onChange={handleChanges}
-                  />
-
-                  <label htmlFor="estado_prestamo">Estado de prestamo</label>
-                  <select
-                    name="estado_prestamo"
-                    id="estado_prestamo"
-                    value={prestamos.estado_prestamo}
-                    onChange={handleChanges}
-                  >
-                    <option value="En prestamo">En prestamo</option>
-                    <option value="Devuelta">Devuelta</option>
-                    <option value="Cancelada">Devuelta</option>
-                  </select>
-
-                  <label htmlFor="producto" className="form-label">
-                    Productos:
-                  </label>
-                  <select
-                    name="producto"
-                    id="producto"
-                    className="form-select"
-                    value={prestamos.producto}
-                    onChange={handleChanges}
-                    disabled={editing}
-                  >
-                    <option value="">Seleccione producto</option>
-                    {listado.map((p) => (
-                      <option value={p.id_producto}>{p.nombre_producto}</option>
-                    ))}
-                  </select>
-
-                  <label htmlFor="cantidad">Cantidad solicitada</label>
-                  <input
-                    type="number"
-                    name="cantidad"
-                    id="cantidad"
-                    value={prestamos.cantidad}
-                    onChange={handleChanges}
-                  />
-                  <label htmlFor="num_serie">
-                    Número de Serie(si es que posee)
-                  </label>
-                  <input
-                    type="text"
-                    name="num_serie"
-                    id="num_serie"
-                    value={prestamos.num_serie}
-                    onChange={handleChanges}
-                  />
-
-                  <label htmlFor="user_prestamo">Usuario solicitante</label>
-                  <input
-                    type="text"
-                    name="user_prestamo"
-                    id="user_prestamo"
-                    value={prestamos.user_prestamo}
-                    onChange={handleChanges}
-                  />
-                  <label htmlFor="correo">Correo Solicitante</label>
-                  <input
-                    type="text"
-                    name="correo"
-                    id="correo"
-                    value={prestamos.correo}
-                    onChange={handleChanges}
-                  />
-                  <label htmlFor="telefono">Teléfono</label>
-                  <input
-                    type="text"
-                    name="telefono"
-                    id="telefono"
-                    value={prestamos.telefono}
-                    onChange={handleChanges}
-                  />
-                  <label htmlFor="observ">Observaciones</label>
-                  <textarea
-                    name="observ"
-                    id="observ"
-                    value={prestamos.observ}
-                    onChange={handleChanges}
-                  ></textarea>
-
-                  <div className="d-flex flex-wrap gap-2 mt-4">
-                    {!editing && (
-                      <div className="d-flex flex-wrap gap-2 mt-4">
-                        <button type="submit" className="btn btn-primary">
-                          <i className="bi bi-save"></i> Guardar
-                        </button>
-                        <button
-                          className="btn btn-danger"
-                          type="button"
-                          onClick={handleCancel}
-                        >
-                          <i className="bi bi-x-octagon"></i> Cancelar
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </form>
-
-                {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
-                {editing && (
-                  <div className="d-flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={handleNewPrestamo}
-                    >
-                      <i className="bi bi-clipboard2-plus"></i> Nuevo prestamo
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={handleEdit}
-                    >
-                      <i className="bi bi-pencil-square"></i> Editar
-                    </button>
-
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={handleDeletePrestamo}
-                    >
-                      <i className="bi bi-trash"></i> Eliminar
-                    </button>
-                  </div>
-                )}
-              </div>
+            </div>
+            <div className="col">
+              <table border={1}>
+                <thead>
+                  <th>ID Producto</th>
+                  <th>Usuario prestamo</th>
+                  <th>Fecha de prestamo</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
