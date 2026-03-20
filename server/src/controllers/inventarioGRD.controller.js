@@ -261,7 +261,7 @@ const getPrestamo = async (req, res) => {
   const { id } = req.params;
   try {
     const { rows: result } = await pool.query(
-      "SELECT * FROM prestamo_grd WHERE id_prestamo=$1",
+      "SELECT a.*,b.* FROM prestamo_grd a JOIN productos_grd b ON a.id_producto=b.id_producto WHERE id_prestamo=$1",
       [id],
     );
     if (result.length === 0) {
@@ -348,15 +348,14 @@ const deletePrestamo = async (req, res) => {
 };
 
 const getListPrestamoUser = async (req, res) => {
-  const user = req.query.type;
-  const query = { lista: listPrestUser };
-  const listado = query[user];
+  const user = req.query.user;
+
   try {
-    const { rows } = await pool.query(listado);
+    const { rows } = await pool.query(listPrestUser, [user]);
     if (rows.length === 0) {
       return res.status(404).json({ message: "No se encuentran datos" });
     }
-    return res.status(201).json(rows);
+    return res.status(200).json(rows);
   } catch (error) {
     console.log(error);
     return res
@@ -654,7 +653,7 @@ const prev_salida = `SELECT * FROM salida_inventario_grd WHERE id_salida < $1 OR
 
 const prev_producto = `SELECT * FROM productos_grd WHERE id_producto < $1 ORDER BY id_producto DESC LIMIT 1`;
 
-const listPrestUser = `SELECT * FROM prestamo_grd WHERE user_prestamo = $1`;
+const listPrestUser = `SELECT a.*, b.nombre_producto FROM prestamo_grd a JOIN productos_grd b ON a.id_producto=b.id_producto WHERE user_prestamo = $1`;
 
 export {
   getInventario,

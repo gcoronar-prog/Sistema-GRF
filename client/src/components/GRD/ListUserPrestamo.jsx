@@ -1,0 +1,97 @@
+import React from "react";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+function ListUserPrestamo({ usuario }) {
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (usuario) {
+      LoadListUser();
+    }
+  }, [usuario]);
+
+  const [lista, setLista] = useState([]);
+
+  const LoadListUser = async () => {
+    try {
+      const res = await fetch(
+        `${servidor}/inventario/list/user?user=${encodeURIComponent(usuario)}`,
+      );
+      const data = await res.json();
+      //console.log(data);
+      setLista(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRedirect = async (id) => {
+    try {
+      const res = await fetch(`${servidor}/inventario/grd/${id}`);
+      const data = await res.json();
+      //console.log(data);
+      navigate(`/grd/inventario/${id}/edit`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const formatDateTimeLocal = (dateString) => {
+    const date = new Date(dateString);
+
+    const pad = (n) => String(n).padStart(2, "0");
+
+    return (
+      date.getDate() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getFullYear()) +
+      " " +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes()) +
+      "hrs."
+    );
+  };
+
+  return (
+    <>
+      <table className="table table-bordered table-striped-columns table-hover">
+        <thead>
+          <tr className="table-info">
+            <th>ID Producto</th>
+            <th>Usuario prestamo</th>
+            <th>Fecha de prestamo</th>
+            <th>Producto</th>
+            <th>Cantidad Solicitada</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lista.map((li) => (
+            <tr key={li.id_producto}>
+              <td>{li.id_producto}</td>
+              <td>{li.user_prestamo}</td>
+              <td>{formatDateTimeLocal(li.fecha_prestamo)}</td>
+              <td>{li.nombre_producto}</td>
+              <td>{li.cantidad}</td>
+              <td>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleRedirect(li.id_producto)}
+                >
+                  Ir a producto...
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
+}
+
+export default ListUserPrestamo;

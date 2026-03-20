@@ -1,6 +1,11 @@
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ListUserPrestamo from "./ListUserPrestamo";
+import { useReactToPrint } from "react-to-print";
+import { useRef } from "react";
+import InventarioGRD from "./InventarioGRD";
+import InventarioPDF from "../PDFs/InventarioPDF";
 
 function PrestamoInventario() {
   const defaultPrestamo = {
@@ -31,6 +36,8 @@ function PrestamoInventario() {
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
 
+  const printRef = useRef(null);
+
   useEffect(() => {
     if (params.id) {
       loadPrestamo(params.id);
@@ -39,6 +46,11 @@ function PrestamoInventario() {
       setPrestamos(defaultPrestamo);
     }
   }, [params.id]);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Prestamo productos",
+  });
 
   const loadPrestamo = async (id) => {
     const res = await fetch(`${servidor}/inventario/prestamo/${id}`, {
@@ -313,7 +325,7 @@ function PrestamoInventario() {
         </div>
         <div className="row">
           <div className="row">
-            <div className="col-lg-7">
+            <div className="col-lg-5">
               <div className="card shadow-sm mb-4">
                 <div className="card-header bg-success text-white d-flex justify-content-between">
                   <div>
@@ -498,7 +510,7 @@ function PrestamoInventario() {
                           </div>
                         </div>
                         <div className="row">
-                          <div className="col-md-12">
+                          <div className="col-md-6">
                             <label htmlFor="observ" className="form-label">
                               Observaciones
                             </label>
@@ -562,23 +574,21 @@ function PrestamoInventario() {
                     </div>
                   )}
                 </div>
+                <div className="card-footer text-end">
+                  {editing && (
+                    <button className="btn btn-danger" onClick={handlePrint}>
+                      <i className="bi bi-file-earmark-pdf"></i>
+                      Descargar PDF
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: "none" }}>
+                  <InventarioPDF ref={printRef} data={prestamos} />
+                </div>
               </div>
             </div>
-            <div className="col">
-              <table border={1}>
-                <thead>
-                  <th>ID Producto</th>
-                  <th>Usuario prestamo</th>
-                  <th>Fecha de prestamo</th>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="col-md-6">
+              <ListUserPrestamo usuario={prestamos.user_prestamo} />
             </div>
           </div>
         </div>

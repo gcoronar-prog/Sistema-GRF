@@ -38,6 +38,7 @@ import StatisticsSGC from "./components/Estadisticas/StatisticsSGC";
 import StatisicsSoliImg from "./components/Estadisticas/StatisticsSoliImg";
 import HomeGRD from "./components/GRD/HomeGRD";
 import ListPrestamo from "./components/GRD/ListPrestamo";
+import ListUserPrestamo from "./components/GRD/ListUserPrestamo";
 
 function App() {
   return (
@@ -78,7 +79,7 @@ function App() {
             element={<FormEntradas />}
           />
 
-          <Route path="/grd/listaPrestamo" element={<ListPrestamo />} />
+          <Route path="/grd/listaPrestamo" element={<ListUserPrestamo />} />
 
           <Route
             path="/grd/inventario/prestamo/new"
