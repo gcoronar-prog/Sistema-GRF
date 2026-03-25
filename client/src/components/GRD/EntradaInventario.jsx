@@ -2,6 +2,7 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ListEntradas from "./ListEntradas";
 
 function EntradaInventario() {
   const defaultEntradas = {
@@ -53,14 +54,11 @@ function EntradaInventario() {
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
 
-    /*switch (estado) {
-      case 1:
-        setEntradas({ ...entradas, tipo_form: "entrada" });
-        break;
-      case 2:
-        setEntradas({ ...entradas, tipo_form: "salida" });
-        break;
-    }*/
+    if (data[0].tipo_form === "entrada") {
+      setEstado(1);
+    } else {
+      setEstado(2);
+    }
 
     setEntradas({
       ...defaultEntradas,
@@ -309,7 +307,7 @@ function EntradaInventario() {
           </button>
         </div>
         <div className="row">
-          <div className="col-lg-7">
+          <div className="col-lg-5">
             <div className="card shadow-sm mb-4">
               <div className="card-header bg-success text-white d-flex justify-content-between">
                 <div>
@@ -553,7 +551,7 @@ function EntradaInventario() {
 
                 {/*BOTOOOOONEEEEEEEEEEEEEES!!!!! */}
                 {editing && (
-                  <div className="d-flex flex-wrap gap-2">
+                  <div className="d-flex flex-wrap gap-2 pb-2">
                     <button
                       type="button"
                       className="btn btn-success"
@@ -578,8 +576,19 @@ function EntradaInventario() {
                     </button>
                   </div>
                 )}
+                <div className="card-footer text-end">
+                  {editing && (
+                    <button className="btn btn-danger">
+                      <i className="bi bi-file-earmark-pdf"></i>
+                      Descargar PDF
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
+          </div>
+          <div className="col-md-auto">
+            <ListEntradas />
           </div>
         </div>
       </div>

@@ -1,78 +1,122 @@
 import { forwardRef } from "react";
+import "./CSS/prestamoGRD.css";
+import logoSGIE from "/Users/gcorona/Desktop/Sistema GIE/client/src/img/logo_sgie.png";
 
 const InventarioPDF = forwardRef(({ data }, ref) => {
   if (!data) return null;
-  const lista = [data];
 
   const formatDateTimeLocal = (dateString) => {
+    if (!dateString) return "-";
     const date = new Date(dateString);
 
     const pad = (n) => String(n).padStart(2, "0");
 
-    return (
-      date.getDate() +
-      "-" +
-      pad(date.getMonth() + 1) +
-      "-" +
-      pad(date.getFullYear()) +
-      " " +
-      pad(date.getHours()) +
-      ":" +
-      pad(date.getMinutes()) +
-      "hrs."
-    );
+    return `${pad(date.getDate())}-${pad(
+      date.getMonth() + 1,
+    )}-${date.getFullYear()} ${pad(date.getHours())}:${pad(
+      date.getMinutes(),
+    )} hrs.`;
   };
+  const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
   return (
-    <div ref={ref} className="inventario-grd-pdf">
-      <div>
-        <div className="row">
-          <div className="col">
-            <span>{formatDateTimeLocal(data.fecha_prestamo)}</span>
-          </div>
-          <div className="col">
-            Funcionario GRD:
-            <u>{data.user_creador}</u>
+    <div ref={ref} className="pdf-container">
+      {/* HEADER */}
+      <div className="pdf-header">
+        <div>
+          <img src={logo} alt="" />
+        </div>
+        <div className="text-center">
+          <h6 className="mb-0">ILUSTRE MUNICIPALIDAD DE SAN ANTONIO</h6>
+          <small>Gestión de Riesgos y Desastres</small>
+
+          <div className="text-center pt-2">
+            <strong>FORMULARIO DE PRÉSTAMO</strong>
+            <br />
+            <small>{formatDateTimeLocal(data.fecha_prestamo)}</small>
           </div>
         </div>
-        <fieldset className="border border-dark-subtle rounded p-3">
-          <legend className="float-none w-auto px-2 h6 mb-0">
-            Datos solicitante
-          </legend>
-          <span>{data.user_prestamo}</span>
-          <span>{data.correo}</span>
-          <span>{data.telefono}</span>
-        </fieldset>
+        <div>
+          <img src={logoSGIE} alt="" style={{ width: "120px" }} />
+        </div>
       </div>
 
-      <h4>Detalle de prestamos</h4>
-      <table className="table table-sm table-bordered table-striped-columns table-hover">
-        <thead>
-          <tr className="table-info">
-            <th>ID Producto</th>
-            <th>Usuario prestamo</th>
-            <th>Fecha de prestamo</th>
-            <th>Fecha devolución</th>
-            <th>Producto</th>
-            <th>N° Serie</th>
-            <th>Estado</th>
-            <th>Cantidad Solicitada</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lista.map((li) => (
-            <tr key={li.id_producto}>
-              <td>{li.id_producto}</td>
-              <td>{li.user_prestamo}</td>
-              <td>{formatDateTimeLocal(li.fecha_prestamo)}</td>
-              <td>{formatDateTimeLocal(li.fecha_devolucion)}</td>
-              <td>{li.nombre_producto}</td>
-              <td>{li.num_serie}</td>
-              <td>{li.estado_prestamo}</td>
-              <td>{li.cantidad}</td>
+      <hr />
+
+      {/* INFO GENERAL */}
+      <div className="pdf-section">
+        <div className="row">
+          <div className="col">
+            <strong>Funcionario GRD:</strong>
+            <div>{data.user_creador}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* DATOS SOLICITANTE */}
+      <fieldset className="pdf-fieldset">
+        <legend>Datos del solicitante</legend>
+
+        <div className="row">
+          <div className="col">
+            <strong>Nombre:</strong>
+            <div>{data.user_prestamo}</div>
+          </div>
+
+          <div className="col">
+            <strong>Correo:</strong>
+            <div>{data.correo}</div>
+          </div>
+
+          <div className="col">
+            <strong>Teléfono:</strong>
+            <div>{data.telefono}</div>
+          </div>
+        </div>
+      </fieldset>
+
+      {/* DETALLE */}
+      <div className="pdf-section">
+        <h5 className="section-title">Detalle de préstamo</h5>
+
+        <table className="pdf-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Producto</th>
+              <th>N° Serie</th>
+              <th>Cantidad</th>
+              <th>Estado</th>
+              <th>Fecha Préstamo</th>
+              <th>Fecha Devolución</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>{data.id_producto}</td>
+              <td>{data.nombre_producto}</td>
+              <td>{data.num_serie}</td>
+              <td>{data.cantidad}</td>
+              <td>{data.estado_prestamo}</td>
+              <td>{formatDateTimeLocal(data.fecha_prestamo)}</td>
+              <td>{formatDateTimeLocal(data.fecha_devolucion)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* FIRMAS */}
+      <div className="pdf-signatures pt-3">
+        <div className="text-center">
+          <div className="line"></div>
+          <small>Firma solicitante</small>
+        </div>
+
+        <div className="text-center">
+          <div className="line"></div>
+          <small>Firma y timbre Funcionario GRD</small>
+        </div>
+      </div>
     </div>
   );
 });

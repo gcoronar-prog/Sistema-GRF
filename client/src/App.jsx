@@ -37,8 +37,9 @@ import HomeSGC from "./components/Seg_ciudadana/HomeSGC";
 import StatisticsSGC from "./components/Estadisticas/StatisticsSGC";
 import StatisicsSoliImg from "./components/Estadisticas/StatisticsSoliImg";
 import HomeGRD from "./components/GRD/HomeGRD";
-import ListPrestamo from "./components/GRD/ListPrestamo";
+
 import ListUserPrestamo from "./components/GRD/ListUserPrestamo";
+import ListEntradas from "./components/GRD/ListEntradas";
 
 function App() {
   return (
@@ -77,6 +78,11 @@ function App() {
           <Route
             path="/grd/inventario/entrada/:id/edit"
             element={<FormEntradas />}
+          />
+
+          <Route
+            path="/grd/inventario/entrada/lista"
+            element={<ListEntradas />}
           />
 
           <Route path="/grd/listaPrestamo" element={<ListUserPrestamo />} />

@@ -420,7 +420,10 @@ function PrestamoInventario() {
                             >
                               <option value="">Seleccione producto</option>
                               {listado.map((p) => (
-                                <option value={p.id_producto}>
+                                <option
+                                  key={p.id_producto}
+                                  value={p.id_producto}
+                                >
                                   {p.nombre_producto}
                                 </option>
                               ))}

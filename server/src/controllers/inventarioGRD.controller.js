@@ -146,6 +146,26 @@ const getListEntradas = async (req, res) => {
   }
 };
 
+const getListTipo = async (req, res) => {
+  const tipo = req.query.tipo;
+  try {
+    const { rows } = await pool.query(
+      `SELECT a.*,b.* FROM inventario_grd a JOIN productos_grd b ON a.id_producto=b.id_producto
+        WHERE tipo_form=$1`,
+      [tipo],
+    );
+    if (rows.length === 0) {
+      console.error("No existen registros");
+    }
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
 const getEntrada = async (req, res) => {
   const { id } = req.params;
   try {
@@ -683,4 +703,5 @@ export {
   getNextElement,
   getPrevElement,
   getListPrestamoUser,
+  getListTipo,
 };
