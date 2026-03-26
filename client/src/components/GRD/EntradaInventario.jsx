@@ -1,14 +1,25 @@
 import { jwtDecode } from "jwt-decode";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ListEntradas from "./ListEntradas";
+import EntradasInventPDF from "../PDFs/EntradasInventPDF";
+import { useReactToPrint } from "react-to-print";
 
 function EntradaInventario() {
+  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+  const navigate = useNavigate();
+  const params = useParams();
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
+  const user_decoded = decoded;
+  const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
+    .filter(Boolean)
+    .join(" ");
   const defaultEntradas = {
     ubicacion: "",
     observaciones: "",
-    usuario_creador: "",
+    usuario_creador: nombre_responsable,
     cantidad: "",
     tipo_producto: "",
     factura: "",
@@ -20,20 +31,12 @@ function EntradaInventario() {
     unid_medida: "",
     tipo_form: "",
   };
-  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
-  const navigate = useNavigate();
-  const params = useParams();
-  const token = localStorage.getItem("token");
-  const decoded = jwtDecode(token);
-  const user_decoded = decoded;
-  const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
-    .filter(Boolean)
-    .join(" ");
-
   const [entradas, setEntradas] = useState(defaultEntradas);
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
   const [estado, setEstado] = useState(1);
+
+  const printRef = useRef(null);
 
   useEffect(() => {
     if (params.id) {
@@ -43,6 +46,11 @@ function EntradaInventario() {
       setEntradas(defaultEntradas);
     }
   }, [params.id]);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Entrada/Salida productos",
+  });
 
   const loadEntrada = async (id) => {
     const res = await fetch(`${servidor}/inventario/entrada/${id}`, {
@@ -67,6 +75,7 @@ function EntradaInventario() {
       ubicacion: data[0].ubicacion || "",
       observaciones: data[0].observaciones || "",
       usuario_creador: data[0].usuario_creador || "",
+      fecha_creado: data[0].fecha_creado || "",
       cantidad: data[0].cantidad || "",
       tipo_producto: data[0].tipo_producto || "",
       factura: data[0].factura || "",
@@ -86,7 +95,23 @@ function EntradaInventario() {
     const data = await res.json();
     setListado(data);
   };
+  const formatDateTimeLocal = (dateString) => {
+    const date = new Date(dateString);
 
+    const pad = (n) => String(n).padStart(2, "0");
+
+    return (
+      date.getFullYear() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getDate()) +
+      "T" +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes())
+    );
+  };
   const handleChanges = (e) => {
     const { name, value } = e.target;
     setEntradas({ ...entradas, [name]: value });
@@ -133,6 +158,8 @@ function EntradaInventario() {
         navigate(
           `/grd/inventario/entrada/${lastEntradaData[0].id_inventario}/edit`,
         );
+
+        console.log(usuario_creador);
       }
 
       /*const metodo = params.id
@@ -351,6 +378,20 @@ function EntradaInventario() {
                         Detalle Productos
                       </legend>
                       <div className="row g-3">
+                        <div className="col-md-auto">
+                          <label htmlFor="fecha_creado" className="form-label">
+                            Fecha de ingreso:
+                          </label>
+                          <input
+                            className="form-control"
+                            type="datetime-local"
+                            id="fecha_creado"
+                            name="fecha_creado"
+                            value={formatDateTimeLocal(entradas.fecha_creado)}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          />
+                        </div>
                         <div className="col-md-auto">
                           <label htmlFor="productos" className="form-label">
                             Productos
@@ -578,11 +619,14 @@ function EntradaInventario() {
                 )}
                 <div className="card-footer text-end">
                   {editing && (
-                    <button className="btn btn-danger">
+                    <button className="btn btn-danger" onClick={handlePrint}>
                       <i className="bi bi-file-earmark-pdf"></i>
                       Descargar PDF
                     </button>
                   )}
+                </div>
+                <div style={{ display: "none" }}>
+                  <EntradasInventPDF ref={printRef} data={entradas} />
                 </div>
               </div>
             </div>

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 function ListEntradas() {
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const [lista, setLista] = useState([]);
-  const [tipo, setTipo] = useState();
+  const [tipo, setTipo] = useState("entrada");
   const [estado, setEstado] = useState(1);
 
   const navigate = useNavigate();

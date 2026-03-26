@@ -192,6 +192,7 @@ const createEntrada = async (req, res) => {
       data.ubicacion,
       data.observaciones,
       data.usuario_creador,
+      data.fecha_creado,
       data.cantidad,
       data.tipo_producto,
       data.factura,
@@ -231,6 +232,7 @@ const updateEntrada = async (req, res) => {
       data.id_producto,
       data.unid_medida,
       data.tipo_form,
+      data.fecha_creado,
       id,
     ]);
     if (result.length === 0) {
@@ -383,6 +385,22 @@ const getListPrestamoUser = async (req, res) => {
       .json({ message: "Problemas de conexión con el servidor" });
   }
 };
+
+const getListProduID = async (req, res) => {
+  const idProdu = req.query.idProdu;
+  try {
+    const { rows } = await pool.query(listProduID, idProdu);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No se encuentran datos" });
+    }
+    return res.status(200).json(rows);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Problemas de conexión con el servidor" });
+  }
+};
+
 //SALIDAS INVENTARIO
 
 const getListSalidas = async (req, res) => {
@@ -593,9 +611,9 @@ const getPrevElement = async (req, res) => {
 };
 
 const entrada_grd = `
-  INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,cantidad,tipo_producto\
+  INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,fecha_creado,cantidad,tipo_producto\
   ,factura,orden_compra,proveedor,producto,precio_unitario,id_producto,unid_medida,tipo_form)\
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *
 `;
 
 const nuevo_producto = `
@@ -613,7 +631,7 @@ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *;`;
 const update_entrada = `
   UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,\
 cantidad=$4,tipo_producto=$5,factura=$6,orden_compra=$7,proveedor=$8,producto=$9,precio_unitario=$10,id_producto=$11,unid_medida=$12,\
-tipo_form=$13 WHERE id_inventario = $14 RETURNING *;
+tipo_form=$13, fecha_creado=$14 WHERE id_inventario = $15 RETURNING *;
 `;
 
 const update_producto = `
@@ -675,6 +693,8 @@ const prev_producto = `SELECT * FROM productos_grd WHERE id_producto < $1 ORDER 
 
 const listPrestUser = `SELECT a.*, b.nombre_producto FROM prestamo_grd a JOIN productos_grd b ON a.id_producto=b.id_producto WHERE user_prestamo = $1`;
 
+const listProduID = `SELECT * FROM productos_grd WHERE id_producto = $1`;
+
 export {
   getInventario,
   getInventarios,
@@ -704,4 +724,5 @@ export {
   getPrevElement,
   getListPrestamoUser,
   getListTipo,
+  getListProduID,
 };
