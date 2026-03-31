@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ListUserPrestamo from "./ListUserPrestamo";
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
-import InventarioGRD from "./InventarioGRD";
+
 import InventarioPDF from "../PDFs/InventarioPDF";
 
 function PrestamoInventario() {
@@ -35,8 +35,15 @@ function PrestamoInventario() {
   const [prestamos, setPrestamos] = useState(defaultPrestamo);
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
+  const [hasError, setHasError] = useState(false);
 
   const printRef = useRef(null);
+
+  const fechaPrestamoRef = useRef(null);
+  const estadoPrestamoRef = useRef(null);
+  const productoRef = useRef(null);
+  const cantidadRef = useRef(null);
+  const usuarioPrestamoRef = useRef(null);
 
   useEffect(() => {
     if (params.id) {
@@ -112,10 +119,53 @@ function PrestamoInventario() {
 
   const handleEdit = async () => {
     setEditing(false);
+    setHasError(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const isEmpty = (value) => {
+      if (Array.isArray(value)) return value.length === 0;
+      if (typeof value === "string") return value.trim() === "";
+      return value === null || value === undefined;
+    };
+
+    const requerido = [
+      { field: prestamos.fecha_prestamo, ref: fechaPrestamoRef },
+      { field: prestamos.estado_prestamo, ref: estadoPrestamoRef },
+      { field: prestamos.id_producto, ref: productoRef },
+      { field: prestamos.cantidad, ref: cantidadRef },
+      { field: prestamos.user_prestamo, ref: usuarioPrestamoRef },
+    ];
+
+    const errorRequerido = requerido.find((f) => isEmpty(f.field));
+
+    if (errorRequerido) {
+      alert("Debe completar los campos obligatorios.");
+      setHasError(true);
+
+      const el = errorRequerido.ref.current;
+
+      if (el) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
+        if (typeof el.focus === "function") {
+          el.focus();
+        } else {
+          el.querySelector("input, select, textarea")?.focus();
+        }
+      }
+
+      console.log(errorRequerido);
+      return;
+    }
+
+    setHasError(false);
+
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) return;
     try {
@@ -191,6 +241,7 @@ function PrestamoInventario() {
       console.error(error);
     }
     setEditing(true);
+    setHasError(false);
   };
 
   const handleDeletePrestamo = async () => {
@@ -225,6 +276,7 @@ function PrestamoInventario() {
     } else {
       console.error("Error al obtener el inventario.");
     }
+    setHasError(false);
   };
 
   const handleLastPrestamo = async () => {
@@ -244,6 +296,7 @@ function PrestamoInventario() {
     } else {
       console.error("Error al obtener el último expediente.");
     }
+    setHasError(false);
   };
 
   const handlePrevious = async () => {
@@ -264,6 +317,7 @@ function PrestamoInventario() {
     } catch (error) {
       console.error("Error al obtener registro:", error);
     }
+    setHasError(false);
   };
 
   const handleNext = async () => {
@@ -284,6 +338,7 @@ function PrestamoInventario() {
     } catch (error) {
       console.error("Error al obtener registro:", error);
     }
+    setHasError(false);
   };
 
   return (
@@ -341,24 +396,33 @@ function PrestamoInventario() {
                           Fecha y estado prestamo
                         </legend>
                         <div className="row g-3">
-                          <div className="col-md-auto">
+                          <div className="col-md-auto" ref={fechaPrestamoRef}>
                             <label
                               htmlFor="fecha_prestamo"
                               className="form-label"
                             >
                               Fecha de prestamo
                             </label>
-                            <input
-                              className="form-control"
-                              type="datetime-local"
-                              name="fecha_prestamo"
-                              id="fecha_prestamo"
-                              value={formatDateTimeLocal(
-                                prestamos.fecha_prestamo,
-                              )}
-                              onChange={handleChanges}
-                              disabled={editing}
-                            />
+                            <div
+                              className={hasError ? "rounded error-focus" : ""}
+                            >
+                              <input
+                                className="form-control"
+                                type="datetime-local"
+                                name="fecha_prestamo"
+                                id="fecha_prestamo"
+                                value={formatDateTimeLocal(
+                                  prestamos.fecha_prestamo,
+                                )}
+                                onChange={handleChanges}
+                                disabled={editing}
+                              />
+                            </div>
+                            {hasError && (
+                              <small className="text-danger">
+                                *Campo obligatorio
+                              </small>
+                            )}
                           </div>
                           <div className="col-md-auto">
                             <label
@@ -379,25 +443,34 @@ function PrestamoInventario() {
                               disabled={editing}
                             />
                           </div>
-                          <div className="col-md-auto">
+                          <div className="col-md-auto" ref={estadoPrestamoRef}>
                             <label
                               htmlFor="estado_prestamo"
                               className="form-label"
                             >
                               Estado de prestamo
                             </label>
-                            <select
-                              className="form-select"
-                              name="estado_prestamo"
-                              id="estado_prestamo"
-                              value={prestamos.estado_prestamo}
-                              onChange={handleChanges}
-                              disabled={editing}
+                            <div
+                              className={hasError ? "rounded error-focus" : ""}
                             >
-                              <option value="En prestamo">En prestamo</option>
-                              <option value="Devuelta">Devuelta</option>
-                              <option value="Cancelada">Cancelada</option>
-                            </select>
+                              <select
+                                className="form-select"
+                                name="estado_prestamo"
+                                id="estado_prestamo"
+                                value={prestamos.estado_prestamo}
+                                onChange={handleChanges}
+                                disabled={editing}
+                              >
+                                <option value="En prestamo">En prestamo</option>
+                                <option value="Devuelta">Devuelta</option>
+                                <option value="Cancelada">Cancelada</option>
+                              </select>
+                            </div>
+                            {hasError && (
+                              <small className="text-danger">
+                                *Campo obligatorio
+                              </small>
+                            )}
                           </div>
                         </div>
                       </fieldset>
@@ -406,42 +479,60 @@ function PrestamoInventario() {
                           Producto en prestamo
                         </legend>
                         <div className="row g-3">
-                          <div className="col-md-auto">
+                          <div className="col-md-auto" ref={productoRef}>
                             <label htmlFor="producto" className="form-label">
                               Productos:
                             </label>
-                            <select
-                              name="id_producto"
-                              id="producto"
-                              className="form-select"
-                              value={prestamos.id_producto}
-                              onChange={handleChanges}
-                              disabled={editing}
+                            <div
+                              className={hasError ? "rounded error-focus" : ""}
                             >
-                              <option value="">Seleccione producto</option>
-                              {listado.map((p) => (
-                                <option
-                                  key={p.id_producto}
-                                  value={p.id_producto}
-                                >
-                                  {p.nombre_producto}
-                                </option>
-                              ))}
-                            </select>
+                              <select
+                                name="id_producto"
+                                id="producto"
+                                className="form-select"
+                                value={prestamos.id_producto}
+                                onChange={handleChanges}
+                                disabled={editing}
+                              >
+                                <option value="">Seleccione producto</option>
+                                {listado.map((p) => (
+                                  <option
+                                    key={p.id_producto}
+                                    value={p.id_producto}
+                                  >
+                                    {p.nombre_producto}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            {hasError && (
+                              <small className="text-danger">
+                                *Campo obligatorio
+                              </small>
+                            )}
                           </div>
-                          <div className="col-md-auto">
+                          <div className="col-md-auto" ref={cantidadRef}>
                             <label htmlFor="cantidad" className="form-label">
                               Cantidad solicitada:
                             </label>
-                            <input
-                              className="form-control"
-                              type="number"
-                              name="cantidad"
-                              id="cantidad"
-                              value={prestamos.cantidad}
-                              onChange={handleChanges}
-                              disabled={editing}
-                            />
+                            <div
+                              className={hasError ? "rounded text-center" : ""}
+                            >
+                              <input
+                                className="form-control"
+                                type="number"
+                                name="cantidad"
+                                id="cantidad"
+                                value={prestamos.cantidad}
+                                onChange={handleChanges}
+                                disabled={editing}
+                              />
+                            </div>
+                            {hasError && (
+                              <small className="text-danger">
+                                *Campo obligatorio
+                              </small>
+                            )}
                           </div>
 
                           <div className="col-md-auto">
@@ -465,22 +556,31 @@ function PrestamoInventario() {
                           Datos Solicitante y Observaciones
                         </legend>
                         <div className="row g-3">
-                          <div className="col-md-auto">
+                          <div className="col-md-auto" ref={usuarioPrestamoRef}>
                             <label
                               htmlFor="user_prestamo"
                               className="form-label"
                             >
                               Usuario solicitante:
                             </label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              name="user_prestamo"
-                              id="user_prestamo"
-                              value={prestamos.user_prestamo}
-                              onChange={handleChanges}
-                              disabled={editing}
-                            />
+                            <div
+                              className={hasError ? "rounded error-focus" : ""}
+                            >
+                              <input
+                                className="form-control"
+                                type="text"
+                                name="user_prestamo"
+                                id="user_prestamo"
+                                value={prestamos.user_prestamo}
+                                onChange={handleChanges}
+                                disabled={editing}
+                              />
+                            </div>
+                            {hasError && (
+                              <small className="text-danger">
+                                *Campo obligatorio
+                              </small>
+                            )}
                           </div>
 
                           <div className="col-md-auto">

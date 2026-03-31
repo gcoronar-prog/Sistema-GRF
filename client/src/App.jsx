@@ -40,6 +40,7 @@ import HomeGRD from "./components/GRD/HomeGRD";
 
 import ListUserPrestamo from "./components/GRD/ListUserPrestamo";
 import ListEntradas from "./components/GRD/ListEntradas";
+import ListInventario from "./components/GRD/ListInventario";
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
             path="/grd/inventario/entrada/:id/edit"
             element={<FormEntradas />}
           />
+          <Route path="/grd/inventario/lista" element={<ListInventario />} />
 
           <Route
             path="/grd/inventario/entrada/lista"

@@ -19,7 +19,7 @@ function EntradaInventario() {
   const defaultEntradas = {
     ubicacion: "",
     observaciones: "",
-    usuario_creador: nombre_responsable,
+    usuario_creador: "",
     cantidad: "",
     tipo_producto: "",
     factura: "",
@@ -31,10 +31,16 @@ function EntradaInventario() {
     unid_medida: "",
     tipo_form: "",
   };
+  const fechaIngresoRef = useRef(null);
+  const productosRef = useRef(null);
+  const cantidadRef = useRef(null);
+  const precioUnitarioRef = useRef(null);
+
   const [entradas, setEntradas] = useState(defaultEntradas);
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
   const [estado, setEstado] = useState(1);
+  const [hasError, setHasError] = useState(false);
 
   const printRef = useRef(null);
 
@@ -120,11 +126,54 @@ function EntradaInventario() {
 
   const handleEdit = async () => {
     setEditing(false);
+    setHasError(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const isEmpty = (value) => {
+      if (Array.isArray(value)) return value.length === 0;
+      if (typeof value === "string") return value.trim() === "";
+      return value === null || value === undefined;
+    };
+
+    const requerido = [
+      { field: entradas.fecha_creado, ref: fechaIngresoRef },
+      { field: entradas.nombre_producto, ref: productosRef },
+      { field: entradas.cantidad, ref: cantidadRef },
+      { field: entradas.precio_unitario, ref: precioUnitarioRef },
+    ];
+
+    const errorRequerido = requerido.find((f) => isEmpty(f.field));
+
+    if (errorRequerido) {
+      alert("Debe completar los campos obligatorios.");
+      setHasError(true);
+
+      const el = errorRequerido.ref.current;
+
+      if (el) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
+        if (typeof el.focus === "function") {
+          el.focus();
+        } else {
+          el.querySelector("input, select, textarea")?.focus();
+        }
+      }
+
+      console.log(errorRequerido);
+      return;
+    }
+
+    setHasError(false);
+
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
+
     if (!confirmar) return;
     try {
       const url = params.id
@@ -201,6 +250,7 @@ function EntradaInventario() {
       console.error(error);
     }
     setEditing(true);
+    setHasError(false);
   };
 
   const handleDeleteEntrada = async () => {
@@ -235,6 +285,7 @@ function EntradaInventario() {
     } else {
       console.error("Error al obtener el inventario.");
     }
+    setHasError(false);
   };
 
   const HandleLastEntrada = async () => {
@@ -254,6 +305,7 @@ function EntradaInventario() {
     } else {
       console.error("Error al obtener el último expediente.");
     }
+    setHasError(false);
   };
 
   const handlePrevious = async () => {
@@ -274,6 +326,7 @@ function EntradaInventario() {
     } catch (error) {
       console.error("Error al obtener registro:", error);
     }
+    setHasError(false);
   };
 
   const handleNext = async () => {
@@ -294,6 +347,7 @@ function EntradaInventario() {
     } catch (error) {
       console.error("Error al obtener expediente :", error);
     }
+    setHasError(false);
   };
 
   return (
@@ -378,39 +432,61 @@ function EntradaInventario() {
                         Detalle Productos
                       </legend>
                       <div className="row g-3">
-                        <div className="col-md-auto">
+                        <div className="col-md-auto" ref={fechaIngresoRef}>
                           <label htmlFor="fecha_creado" className="form-label">
                             Fecha de ingreso:
                           </label>
-                          <input
-                            className="form-control"
-                            type="datetime-local"
-                            id="fecha_creado"
-                            name="fecha_creado"
-                            value={formatDateTimeLocal(entradas.fecha_creado)}
-                            onChange={handleChanges}
-                            disabled={editing}
-                          />
+                          <div
+                            className={hasError ? "rounded error-focus" : ""}
+                          >
+                            <input
+                              className="form-control"
+                              type="datetime-local"
+                              id="fecha_creado"
+                              name="fecha_creado"
+                              value={formatDateTimeLocal(entradas.fecha_creado)}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+                          {hasError && (
+                            <div className="text-danger small">
+                              *Campo obligatorio
+                            </div>
+                          )}
                         </div>
                         <div className="col-md-auto">
-                          <label htmlFor="productos" className="form-label">
+                          <label
+                            htmlFor="productos"
+                            className="form-label"
+                            ref={productosRef}
+                          >
                             Productos
                           </label>
-                          <select
-                            name="id_producto"
-                            id="id_producto"
-                            className="form-select"
-                            value={entradas.id_producto}
-                            onChange={handleChanges}
-                            disabled={editing}
+                          <div
+                            className={hasError ? "rounded error-focus" : ""}
                           >
-                            <option value="">Seleccione producto</option>
-                            {listado.map((p) => (
-                              <option value={p.id_producto}>
-                                {p.nombre_producto}
-                              </option>
-                            ))}
-                          </select>
+                            <select
+                              name="id_producto"
+                              id="id_producto"
+                              className="form-select"
+                              value={entradas.id_producto}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            >
+                              <option value="">Seleccione producto</option>
+                              {listado.map((p) => (
+                                <option value={p.id_producto}>
+                                  {p.nombre_producto}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {hasError && (
+                            <div className="text-danger small">
+                              *Campo obligatorio
+                            </div>
+                          )}
                         </div>
                         <div className="col-md-auto">
                           <label htmlFor="tipo_producto" className="form-label">
@@ -431,20 +507,29 @@ function EntradaInventario() {
                             <option value="Herramientas">Herramientas</option>
                           </select>
                         </div>
-                        <div className="col-md-auto">
+                        <div className="col-md-auto" ref={cantidadRef}>
                           <label htmlFor="cantidad" className="form-label">
                             Cantidad
                           </label>
-                          <input
-                            className="form-control"
-                            type="number"
-                            name="cantidad"
-                            id="cantidad"
-                            value={entradas.cantidad || ""}
-                            onChange={handleChanges}
-                            disabled={editing}
-                          />
+                          <div
+                            className={hasError ? "rounded error-focus" : ""}
+                          >
+                            <input
+                              className="form-control"
+                              type="number"
+                              name="cantidad"
+                              id="cantidad"
+                              value={entradas.cantidad || ""}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
                         </div>
+                        {hasError && (
+                          <div className="text-danger small">
+                            *Campo obligatorio
+                          </div>
+                        )}
                         <div className="col-md-4">
                           <label htmlFor="unid_medida" className="form-label">
                             Unidad de medida
@@ -465,22 +550,31 @@ function EntradaInventario() {
                             <option value="sacos">Sacos</option>
                           </select>
                         </div>
-                        <div className="col-md-auto">
+                        <div className="col-md-auto" ref={precioUnitarioRef}>
                           <label
                             htmlFor="precio_unitario"
                             className="form-label"
                           >
                             Precio unitario
                           </label>
-                          <input
-                            className="form-control"
-                            type="text"
-                            name="precio_unitario"
-                            id="precio_unitario"
-                            value={entradas.precio_unitario || ""}
-                            onChange={handleChanges}
-                            disabled={editing}
-                          />
+                          <div
+                            className={hasError ? "rounded error-focus" : ""}
+                          >
+                            <input
+                              className="form-control"
+                              type="text"
+                              name="precio_unitario"
+                              id="precio_unitario"
+                              value={entradas.precio_unitario || ""}
+                              onChange={handleChanges}
+                              disabled={editing}
+                            />
+                          </div>
+                          {hasError && (
+                            <div className="text-danger small">
+                              *Campo obligatorio
+                            </div>
+                          )}
                         </div>
                         <div className="col-md-4">
                           <label htmlFor="ubicacion1" className="form-label">

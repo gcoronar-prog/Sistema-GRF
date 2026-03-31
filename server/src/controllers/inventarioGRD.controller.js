@@ -52,7 +52,9 @@ const getInventarioGRD = async (req, res) => {
 
 const getListaProductos = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM productos_grd");
+    const { rows } = await pool.query(
+      "SELECT * FROM productos_grd ORDER BY id_producto DESC",
+    );
     if (rows.length === 0) {
       console.error("No existen registros");
     }
@@ -79,6 +81,7 @@ const createProducto = async (req, res) => {
       data.unidad_medida,
       data.user_creador,
       data.fecha_creado,
+      data.modelo,
     ]);
 
     return res.status(201).json(result);
@@ -105,6 +108,7 @@ const updateInventario = async (req, res) => {
       data.unidad_medida,
       data.user_creador,
       data.fecha_creado,
+      data.modelo,
       id,
     ]);
     return res.status(201).json(result);
@@ -618,7 +622,7 @@ const entrada_grd = `
 
 const nuevo_producto = `
   INSERT INTO productos_grd (nombre_producto, observ_produ, tipo_produ,\
-  cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
+  cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado,modelo) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *;`;
 
 const nuevo_prestamo = `INSERT INTO prestamo_grd (user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ, user_creador,\
 correo,telefono,producto,num_serie,cantidad)\
@@ -636,7 +640,7 @@ tipo_form=$13, fecha_creado=$14 WHERE id_inventario = $15 RETURNING *;
 
 const update_producto = `
   UPDATE productos_grd SET nombre_producto=$1, observ_produ=$2, tipo_produ=$3,\
-  cantidad=$4, precio_unit=$5, ubicacion=$6, serial=$7, unidad_medida=$8, user_creador=$9, fecha_creado=$10 WHERE id_producto = $11 RETURNING *;
+  cantidad=$4, precio_unit=$5, ubicacion=$6, serial=$7, unidad_medida=$8, user_creador=$9, fecha_creado=$10, modelo=$11 WHERE id_producto = $12 RETURNING *;
 `;
 
 const update_prestamo = `

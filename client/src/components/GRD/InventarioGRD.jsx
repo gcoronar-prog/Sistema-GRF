@@ -1,6 +1,10 @@
 import { jwtDecode } from "jwt-decode";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ListEntradas from "./ListEntradas";
+import ListInventario from "./ListInventario";
+import { useReactToPrint } from "react-to-print";
+import ProductosPDF from "../PDFs/ProductosPDF";
 
 function InventarioGRD() {
   const navigate = useNavigate();
@@ -30,10 +34,19 @@ function InventarioGRD() {
   const [disabledPrevButton, setDisabledPrevButton] = useState(false);
   const [disabledNextButton, setDisabledNextButton] = useState(false);
   const [lastIdInventario, setLastIdInventario] = useState(null);
+  const [hasError, setHasError] = useState(false);
+
+  const productoRef = useRef(null);
+  const tipoProductoRef = useRef(null);
+  const cantidadRef = useRef(null);
+  const precioRef = useRef(null);
+
+  const printRef = useRef(null);
 
   useEffect(() => {
     if (params.id) {
       loadInventario(params.id);
+      console.log(inventarios.precio_unit);
     } else {
       setInventarios(defaultInventario);
     }
@@ -69,11 +82,52 @@ function InventarioGRD() {
 
   const handleEdit = async () => {
     setEditing(false);
+    setHasError(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //console.log("Datos enviados", inventarios);
+
+    const isEmpty = (value) => {
+      if (Array.isArray(value)) return value.length === 0;
+      if (typeof value === "string") return value.trim() === "";
+      return value === null || value === undefined;
+    };
+
+    const requeridos = [
+      { field: inventarios.nombre_producto, ref: productoRef },
+      { field: inventarios.tipo_produ, ref: tipoProductoRef },
+      { field: inventarios.cantidad, ref: cantidadRef },
+      { field: inventarios.precio_unit, ref: precioRef },
+    ];
+
+    const errorRequerido = requerido.find((f) => isEmpty(f.field));
+
+    if (errorRequerido) {
+      alert("Debe completar los campos obligatorios.");
+      setHasError(true);
+
+      const el = errorRequerido.ref.current;
+
+      if (el) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+
+        if (typeof el.focus === "function") {
+          el.focus();
+        } else {
+          el.querySelector("input, select, textarea")?.focus();
+        }
+      }
+
+      console.log(errorRequerido);
+      return;
+    }
+
+    setHasError(false);
+
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) return;
     try {
@@ -149,6 +203,7 @@ function InventarioGRD() {
       console.error(error);
     }
     setEditing(true);
+    setHasError(false);
   };
 
   const handleDeleteInventario = async () => {
@@ -188,6 +243,7 @@ function InventarioGRD() {
     } else {
       console.error("Error al obtener el inventario.");
     }
+    setHasError(false);
   };
 
   const handleLastInventario = async () => {
@@ -208,6 +264,7 @@ function InventarioGRD() {
     } else {
       console.error("Error al obtener el último expediente.");
     }
+    setHasError(false);
   };
 
   const handlePrevious = async () => {
@@ -228,6 +285,7 @@ function InventarioGRD() {
     } catch (error) {
       console.error("Error al obtener registro:", error);
     }
+    setHasError(false);
   };
 
   const handleNext = async () => {
@@ -248,7 +306,13 @@ function InventarioGRD() {
     } catch (error) {
       console.error("Error al obtener expediente :", error);
     }
+    setHasError(false);
   };
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Prodcuto ingresado",
+  });
 
   return (
     <>
@@ -289,7 +353,7 @@ function InventarioGRD() {
         </div>
       </div>
       <div className="row">
-        <div className="col-lg-7">
+        <div className="col-lg-6">
           <div className="card shadow-sm mb-4">
             <div className="card-header bg-success text-white d-flex justify-content-between">
               <div>
@@ -304,34 +368,48 @@ function InventarioGRD() {
                     Datos producto
                   </legend>
                   <div className="row g-3">
-                    <div className="col-md-auto">
+                    <div className="col-md-auto" ref={productoRef}>
                       <label htmlFor="nombre_producto" className="form-label">
                         Nombre del producto
                       </label>
-                      <input
-                        type="text"
-                        id="nombre_producto"
-                        name="nombre_producto"
-                        className="form-control"
-                        value={inventarios.nombre_producto || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      />
+                      <div className={hasError ? "rounded error-focus" : ""}>
+                        <input
+                          type="text"
+                          id="nombre_producto"
+                          name="nombre_producto"
+                          className="form-control"
+                          value={inventarios.nombre_producto || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      {hasError && (
+                        <small className="text-danger">
+                          *Campo obligatorio
+                        </small>
+                      )}
                     </div>
 
-                    <div className="col-md-auto">
+                    <div className="col-md-auto" ref={tipoProductoRef}>
                       <label htmlFor="tipo_produ" className="form-label">
                         Tipo producto
                       </label>
-                      <input
-                        type="text"
-                        name="tipo_produ"
-                        id="tipo_produ"
-                        className="form-control"
-                        value={inventarios.tipo_produ || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      />
+                      <div className={hasError ? "rounded error-focus" : ""}>
+                        <input
+                          type="text"
+                          name="tipo_produ"
+                          id="tipo_produ"
+                          className="form-control"
+                          value={inventarios.tipo_produ || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      {hasError && (
+                        <small className="text-danger">
+                          *Campo obligatorio
+                        </small>
+                      )}
                     </div>
 
                     <div className="col-md-auto">
@@ -369,19 +447,26 @@ function InventarioGRD() {
                     Detalles producto
                   </legend>
                   <div className="row g-3">
-                    <div className="col-md-auto">
+                    <div className="col-md-auto" ref={cantidadRef}>
                       <label htmlFor="cantidad" className="form-label">
                         Cantidad
                       </label>
-                      <input
-                        type="number"
-                        name="cantidad"
-                        id="cantidad"
-                        className="form-control"
-                        value={inventarios.cantidad || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      />
+                      <div className={hasError ? "rounded error-focus" : ""}>
+                        <input
+                          type="number"
+                          name="cantidad"
+                          id="cantidad"
+                          className="form-control"
+                          value={inventarios.cantidad || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      {hasError && (
+                        <small className="text-center">
+                          *Campo obligatorio
+                        </small>
+                      )}
                     </div>
                     <div className="col-md-auto">
                       <label htmlFor="unidad_medida" className="form-label">
@@ -397,19 +482,26 @@ function InventarioGRD() {
                         disabled={editing}
                       />
                     </div>
-                    <div className="col-md-auto">
+                    <div className="col-md-auto" ref={precioRef}>
                       <label htmlFor="precio_unit" className="form-label">
                         Precio Unitario
                       </label>
-                      <input
-                        type="number"
-                        name="precio_unit"
-                        id="precio_unit"
-                        className="form-control"
-                        value={inventarios.precio_unit || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      />
+                      <div className={hasError ? "rounded error-focus" : ""}>
+                        <input
+                          type="number"
+                          name="precio_unit"
+                          id="precio_unit"
+                          className="form-control"
+                          value={inventarios.precio_unit || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      {hasError && (
+                        <small className="text-danger">
+                          *Campo obligatorio
+                        </small>
+                      )}
                     </div>
                     <div className="col-md-auto">
                       <label htmlFor="observ_produ" className="form-label">
@@ -492,8 +584,22 @@ function InventarioGRD() {
                   </button>
                 </div>
               )}
+              <div className="card-footer text-end mt-3">
+                {editing && (
+                  <button className="btn btn-danger" onClick={handlePrint}>
+                    <i className="bi bi-file-earmark-pdf"></i>
+                    Descargar PDF
+                  </button>
+                )}
+              </div>
+              <div style={{ display: "none" }}>
+                <ProductosPDF ref={printRef} data={inventarios} />
+              </div>
             </div>
           </div>
+        </div>
+        <div className="col-lg-6">
+          <ListInventario />
         </div>
       </div>
     </>
