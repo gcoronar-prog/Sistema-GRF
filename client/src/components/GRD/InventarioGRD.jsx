@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import ListEntradas from "./ListEntradas";
+
 import ListInventario from "./ListInventario";
 import { useReactToPrint } from "react-to-print";
 import ProductosPDF from "../PDFs/ProductosPDF";
@@ -46,7 +46,7 @@ function InventarioGRD() {
   useEffect(() => {
     if (params.id) {
       loadInventario(params.id);
-      console.log(inventarios.precio_unit);
+      //console.log(inventarios.precio_unit);
     } else {
       setInventarios(defaultInventario);
     }

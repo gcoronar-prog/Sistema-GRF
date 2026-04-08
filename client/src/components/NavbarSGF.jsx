@@ -124,7 +124,7 @@ function NavbarSGF() {
     const res = await fetch(`${servidor_local}/inventario/last?type=prestamo`, {
       headers: {
         "Content-Type": "application/json",
-        // Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -365,8 +365,7 @@ function NavbarSGF() {
                 <>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleLastAlfa}>
-                      <i className="bi bi-clipboard-check me-1"></i> Informes
-                      ALFA
+                      <i className="bi bi-fire me-1"></i> Informes ALFA
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -376,14 +375,14 @@ function NavbarSGF() {
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleEntrada}>
-                      <i className="bi bi-clipboard-check me-1"></i> Entrada
-                      productos
+                      <i className="bi bi-clipboard-check me-1"></i>
+                      Entrada/Salida de productos
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleLastPrestamo}>
                       <i className="bi bi-clipboard-check me-1"></i> Prestamo
-                      productos productos
+                      productos
                     </Link>
                   </li>
                 </>

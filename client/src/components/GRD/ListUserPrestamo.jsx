@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "./CSS/listadoInventario.css";
 
 function ListUserPrestamo({ usuario }) {
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -59,37 +60,49 @@ function ListUserPrestamo({ usuario }) {
 
   return (
     <>
-      <table className="table table-bordered table-striped-columns table-hover">
-        <thead>
-          <tr className="table-info">
-            <th>ID Producto</th>
-            <th>Usuario prestamo</th>
-            <th>Fecha de prestamo</th>
-            <th>Producto</th>
-            <th>Cantidad Solicitada</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lista.map((li) => (
-            <tr key={li.id_producto}>
-              <td>{li.id_producto}</td>
-              <td>{li.user_prestamo}</td>
-              <td>{formatDateTimeLocal(li.fecha_prestamo)}</td>
-              <td>{li.nombre_producto}</td>
-              <td>{li.cantidad}</td>
-              <td>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => handleRedirect(li.id_producto)}
-                >
-                  Ir a producto...
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="card ms-4 me-2">
+        <div className="card-header bg-success text-white d-flex justify-content-between p-4">
+          <h5 className="card-title mb-0">Listado prestamo productos</h5>
+        </div>
+        <div className="card-body">
+          <div className="table-responsive">
+            <table
+              className="table table-bordered table-striped-columns table-hover"
+              data-bs-spy="scroll"
+            >
+              <thead>
+                <tr className="table-info">
+                  <th>ID Producto</th>
+                  <th>Usuario prestamo</th>
+                  <th>Fecha de prestamo</th>
+                  <th>Producto</th>
+                  <th>Cantidad Solicitada</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lista.map((li) => (
+                  <tr key={li.id_producto}>
+                    <td>{li.id_producto}</td>
+                    <td>{li.user_prestamo}</td>
+                    <td>{formatDateTimeLocal(li.fecha_prestamo)}</td>
+                    <td>{li.nombre_producto}</td>
+                    <td>{li.cantidad}</td>
+                    <td>
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleRedirect(li.id_producto)}
+                      >
+                        Ir a producto...
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

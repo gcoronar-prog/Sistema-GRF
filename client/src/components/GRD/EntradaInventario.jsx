@@ -398,34 +398,6 @@ function EntradaInventario() {
               </div>
               <div className="card-body">
                 <form action="" onSubmit={handleSubmit}>
-                  <div className="d-flex justify-content-center mb-3 gap-2 flex-wrap">
-                    <div className="btn-group mb-2">
-                      <button
-                        type="button"
-                        className={`btn ${
-                          estado === 1 ? "btn-success" : "btn-outline-success"
-                        }`}
-                        onClick={() => {
-                          (setEstado(1), (entradas.tipo_form = "entrada"));
-                        }}
-                        disabled={editing}
-                      >
-                        Entradas
-                      </button>
-                      <button
-                        type="button"
-                        className={`btn ${
-                          estado === 2 ? "btn-danger" : "btn-outline-danger"
-                        }`}
-                        onClick={() => {
-                          (setEstado(2), (entradas.tipo_form = "salida"));
-                        }}
-                        disabled={editing}
-                      >
-                        Salidas
-                      </button>
-                    </div>
-                  </div>
                   <div className="row g-4">
                     <fieldset className="border border-primary rounded p-3">
                       <legend className="float-none w-auto px-2 h6 mb-0">
@@ -594,6 +566,42 @@ function EntradaInventario() {
                             <option value="Bodega">Bodega Municipal</option>
                             <option value="Oficina">Oficina</option>
                           </select>
+                        </div>
+                        <div className="col-md-4">
+                          <label htmlFor="" className="form-label">
+                            Tipo de informe
+                          </label>
+                          <div className="btn-group mb-2">
+                            <button
+                              type="button"
+                              className={`btn ${
+                                estado === 1
+                                  ? "btn-success"
+                                  : "btn-outline-success"
+                              }`}
+                              onClick={() => {
+                                (setEstado(1),
+                                  (entradas.tipo_form = "entrada"));
+                              }}
+                              disabled={editing}
+                            >
+                              Entradas
+                            </button>
+                            <button
+                              type="button"
+                              className={`btn ${
+                                estado === 2
+                                  ? "btn-danger"
+                                  : "btn-outline-danger"
+                              }`}
+                              onClick={() => {
+                                (setEstado(2), (entradas.tipo_form = "salida"));
+                              }}
+                              disabled={editing}
+                            >
+                              Salidas
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </fieldset>

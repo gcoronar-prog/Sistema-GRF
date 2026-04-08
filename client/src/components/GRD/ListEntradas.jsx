@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "./CSS/listadoInventario.css";
+import ListEntradaPDF from "../PDFs/ListEntradaPDF";
+import { useReactToPrint } from "react-to-print";
 
 function ListEntradas() {
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const [lista, setLista] = useState([]);
   const [tipo, setTipo] = useState("entrada");
   const [estado, setEstado] = useState(1);
+  const printRef = useRef(null);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -14,6 +18,11 @@ function ListEntradas() {
       loadLista();
     }
   }, [tipo]);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Entrada/Salida Inventario",
+  });
 
   const loadLista = async () => {
     try {
@@ -91,41 +100,52 @@ function ListEntradas() {
               </button>
             </div>
           </div>
-          <table className="table table-bordered table-striped-columns table-hover">
-            <thead className="table-info">
-              <tr>
-                <th>ID</th>
-                <th>Producto</th>
-                <th>Usuario creador</th>
-                <th>Fecha creación</th>
-                <th>Cantidad</th>
-                <th>Unidad de medida</th>
-                <th>Observaciones</th>
-                <th>Ir...</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lista.map((l) => (
-                <tr key={l.id_inventario}>
-                  <td>{l.id_inventario}</td>
-                  <td>{l.nombre_producto}</td>
-                  <td>{l.user_creador}</td>
-                  <td>{formatDateTimeLocal(l.fecha_creado)}</td>
-                  <td>{l.cantidad}</td>
-                  <td>{l.unid_medida}</td>
-                  <td>{l.observaciones}</td>
-                  <td>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => handleRedirect(l.id_inventario)}
-                    >
-                      Ir a...
-                    </button>
-                  </td>
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped-columns table-hover">
+              <thead className="table-info">
+                <tr>
+                  <th>ID</th>
+                  <th>Producto</th>
+                  <th>Usuario creador</th>
+                  <th>Fecha creación</th>
+                  <th>Cantidad</th>
+                  <th>Unidad de medida</th>
+                  <th>Observaciones</th>
+                  <th>Ir...</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {lista.map((l) => (
+                  <tr key={l.id_inventario}>
+                    <td>{l.id_inventario}</td>
+                    <td>{l.nombre_producto}</td>
+                    <td>{l.user_creador}</td>
+                    <td>{formatDateTimeLocal(l.fecha_creado)}</td>
+                    <td>{l.cantidad}</td>
+                    <td>{l.unid_medida}</td>
+                    <td>{l.observaciones}</td>
+                    <td>
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleRedirect(l.id_inventario)}
+                      >
+                        Ir a...
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="card-footer text-end">
+          <button className="btn btn-danger" onClick={handlePrint}>
+            <i className="bi bi-file-earmark-pdf"></i>
+            Descargar PDF
+          </button>
+        </div>
+        <div style={{ display: "none" }}>
+          <ListEntradaPDF ref={printRef} data={lista} />
         </div>
       </div>
     </>
