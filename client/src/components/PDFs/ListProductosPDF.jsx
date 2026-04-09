@@ -1,4 +1,6 @@
 import { forwardRef } from "react";
+import logoSGIE from "/Users/gcorona/Desktop/Sistema GIE/client/src/img/logo_sgie.png";
+import "./CSS/prestamoGRD.css";
 
 const ListProductosPDF = forwardRef(({ data }, ref) => {
   const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
@@ -25,6 +27,9 @@ const ListProductosPDF = forwardRef(({ data }, ref) => {
   return (
     <>
       <div ref={ref}>
+        <style type="text/css" media="print">
+          {"@page { size: landscape; }"}
+        </style>
         <div className="pdf-header">
           <div>
             <img src={logo} alt="" />
@@ -69,3 +74,5 @@ const ListProductosPDF = forwardRef(({ data }, ref) => {
     </>
   );
 });
+
+export default ListProductosPDF;

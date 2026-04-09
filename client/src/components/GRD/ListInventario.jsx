@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CSS/listadoInventario.css";
+import { useReactToPrint } from "react-to-print";
+import ListProductosPDF from "../PDFs/ListProductosPDF";
 
 function ListInventario() {
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -8,6 +10,7 @@ function ListInventario() {
   const [lista, setLista] = useState([]);
 
   const navigate = useNavigate();
+  const printRef = useRef(null);
 
   useEffect(() => {
     loadLista();
@@ -22,6 +25,11 @@ function ListInventario() {
       console.error(error);
     }
   };
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Inventario Productos",
+  });
 
   const handleRedirect = async (id) => {
     try {
@@ -73,6 +81,15 @@ function ListInventario() {
               </tbody>
             </table>
           </div>
+        </div>
+        <div className="card-footer text-end mt-3">
+          <button className="btn btn-danger" onClick={handlePrint}>
+            <i className="bi bi-file-earmark-pdf"></i>
+            Descargar PDF
+          </button>
+        </div>
+        <div style={{ display: "none" }}>
+          <ListProductosPDF ref={printRef} data={lista} />
         </div>
       </div>
     </>
