@@ -168,6 +168,7 @@ function PrestamoInventario() {
 
     const confirmar = window.confirm("¿Deseas guardar los cambios?");
     if (!confirmar) return;
+
     try {
       const url = params.id
         ? `${servidor}/inventario/prestamo/edit/${params.id}`
@@ -186,8 +187,10 @@ function PrestamoInventario() {
         }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
+        throw data;
       }
 
       const lastPrestamoRes = await fetch(
@@ -208,7 +211,15 @@ function PrestamoInventario() {
       navigate(metodo);*/
       setEditing(true);
     } catch (error) {
-      console.error(error);
+      if (error.code === "STOCK_INSUFICIENTE") {
+        setPrestamos((prev) => ({
+          ...prev,
+          cantidad: error.stock,
+        }));
+        alert("No hay stock suficiente");
+      } else {
+        alert(error.message);
+      }
     }
     setEditing(true);
   };

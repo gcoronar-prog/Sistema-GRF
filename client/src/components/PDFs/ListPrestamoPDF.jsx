@@ -3,16 +3,15 @@ import logoSGIE from "/Users/gcorona/Desktop/Sistema GIE/client/src/img/logo_sgi
 import "./CSS/prestamoGRD.css";
 import { jwtDecode } from "jwt-decode";
 
-const ListEntradaPDF = forwardRef(({ data }, ref) => {
+const ListPrestamoPDF = forwardRef(({ data }, ref) => {
   const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
-  if (!data) return null;
-  const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
   const user_decoded = decoded;
   const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
     .filter(Boolean)
     .join(" ");
+  if (!data) return null;
   const formatDateTimeLocal = (dateString) => {
     const date = new Date(dateString);
 
@@ -59,37 +58,30 @@ const ListEntradaPDF = forwardRef(({ data }, ref) => {
           </div>
         </div>
         <hr />
-
         <div className="pdf-section">
           <table className="pdf-table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Tipo de producto</th>
-                <th>Nombre producto</th>
-                <th>Funcionario GRD</th>
-                <th>Fecha ingreso</th>
+                <th>Usuario prestamo</th>
+                <th>Fecha prestamo</th>
+                <th>Fecha devolución</th>
+                <th>Estado</th>
+                <th>Producto</th>
                 <th>Cantidad</th>
-                <th>Precio unitario</th>
-                <th>Precio total</th>
-                <th>Factura</th>
-                <th>Orden de compra</th>
                 <th>Observaciones</th>
               </tr>
             </thead>
             <tbody>
               {data.map((l) => (
-                <tr key={l.id_inventario}>
-                  <td>{l.id_inventario}</td>
-                  <td>{l.tipo_producto}</td>
+                <tr>
+                  <td>{l.id_prestamo}</td>
+                  <td>{l.user_prestamo}</td>
+                  <td>{formatDateTimeLocal(l.fecha_prestamo)}</td>
+                  <td>{formatDateTimeLocal(l.fecha_devolucion)}</td>
+                  <td>{l.estado_prestamo}</td>
                   <td>{l.nombre_producto}</td>
-                  <td>{l.user_creador}</td>
-                  <td>{formatDateTimeLocal(l.fecha_creado)}</td>
-                  <td>{l.cantidad + " " + l.unid_medida}</td>
-                  <td>$ {l.precio_unitario}</td>
-                  <td>$ {l.precio_total}</td>
-                  <td>{l.factura}</td>
-                  <td>{l.orden_compra}</td>
+                  <td>{l.cantidad}</td>
                   <td>{l.observaciones}</td>
                 </tr>
               ))}
@@ -101,4 +93,5 @@ const ListEntradaPDF = forwardRef(({ data }, ref) => {
     </>
   );
 });
-export default ListEntradaPDF;
+
+export default ListPrestamoPDF;

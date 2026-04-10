@@ -370,18 +370,18 @@ function NavbarSGF() {
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleInventario}>
-                      <i className="bi bi-clipboard-check me-1"></i> Inventario
+                      <i className="bi bi-box-seam me-1"></i> Inventario
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleEntrada}>
-                      <i className="bi bi-clipboard-check me-1"></i>
+                      <i className="bi bi-arrow-down-up me-1"></i>
                       Entrada/Salida de productos
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleLastPrestamo}>
-                      <i className="bi bi-clipboard-check me-1"></i> Prestamo
+                      <i className="bi bi-arrow-left-right me-1"></i> Prestamo
                       productos
                     </Link>
                   </li>

@@ -211,10 +211,24 @@ const createEntrada = async (req, res) => {
 
     return res.status(201).json(result);
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Problemas de conexion con servidor" });
+    console.log(error);
+    if (
+      tipo_form === "salida" &&
+      (error.code === "P0001" ||
+        error.message?.includes("Stock insuficiente") ||
+        error.message?.includes("Cantidad invalida"))
+    ) {
+      const { rows } = await pool.query(
+        "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
+        [data.id_producto],
+      );
+      const stockActual = rows[0]?.cantidad || 0;
+      return res.status(400).json({
+        message: error.message,
+        code: error.code,
+        stock: stockActual,
+      });
+    }
   }
 };
 
@@ -244,10 +258,24 @@ const updateEntrada = async (req, res) => {
     }
     return res.status(201).json(result);
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Problemas de conexion con servidor" });
+    console.log(error);
+    if (
+      tipo_form === "salida" &&
+      (error.code === "P0001" ||
+        error.message?.includes("Stock insuficiente") ||
+        error.message?.includes("Cantidad invalida"))
+    ) {
+      const { rows } = await pool.query(
+        "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
+        [data.id_producto],
+      );
+      const stockActual = rows[0]?.cantidad || 0;
+      return res.status(400).json({
+        message: error.message,
+        code: error.code,
+        stock: stockActual,
+      });
+    }
   }
 };
 
@@ -293,9 +321,10 @@ const getPrestamo = async (req, res) => {
     if (result.length === 0) {
       console.error("No existen registros");
     }
-    return res.status(201).json(result);
+    return res.status(200).json(result);
   } catch (error) {
     console.error(error);
+
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -320,7 +349,21 @@ const createPrestamo = async (req, res) => {
     ]);
     return res.status(201).json(result);
   } catch (error) {
-    console.error(error);
+    if (
+      error.code === "P0001" ||
+      error.message?.includes("Stock insuficiente")
+    ) {
+      const { rows } = await pool.query(
+        "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
+        [data.id_producto],
+      );
+      const stockActual = rows[0]?.cantidad || 0;
+      return res.status(400).json({
+        message: error.message,
+        code: "STOCK_INSUFICIENTE",
+        stock: stockActual,
+      });
+    }
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -348,9 +391,25 @@ const updatePrestamo = async (req, res) => {
     if (result.length === 0) {
       return res.status(404).json({ message: "No se encuentra el producto" });
     }
-    return res.status(201).json(result);
+    return res.status(200).json(result);
   } catch (error) {
     console.error(error);
+
+    if (
+      error.code === "P0001" ||
+      error.message?.includes("Stock insuficiente")
+    ) {
+      const { rows } = await pool.query(
+        "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
+        [data.id_producto],
+      );
+      const stockActual = rows[0]?.cantidad || 0;
+      return res.status(400).json({
+        message: error.message,
+        code: "STOCK_INSUFICIENTE",
+        stock: stockActual,
+      });
+    }
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });

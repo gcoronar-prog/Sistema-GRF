@@ -1,10 +1,17 @@
 import { forwardRef } from "react";
 import logoSGIE from "/Users/gcorona/Desktop/Sistema GIE/client/src/img/logo_sgie.png";
 import "./CSS/prestamoGRD.css";
+import { jwtDecode } from "jwt-decode";
 
 const ListProductosPDF = forwardRef(({ data }, ref) => {
   const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
   if (!data) return null;
+  const token = localStorage.getItem("token");
+  const decoded = jwtDecode(token);
+  const user_decoded = decoded;
+  const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
+    .filter(Boolean)
+    .join(" ");
 
   const formatDateTimeLocal = (dateString) => {
     const date = new Date(dateString);
@@ -26,7 +33,7 @@ const ListProductosPDF = forwardRef(({ data }, ref) => {
   };
   return (
     <>
-      <div ref={ref}>
+      <div ref={ref} className="pdf-container">
         <style type="text/css" media="print">
           {"@page { size: landscape; }"}
         </style>
@@ -41,6 +48,8 @@ const ListProductosPDF = forwardRef(({ data }, ref) => {
             <div className="text-center pt-2">
               <strong>Inventario Entradas y salidas</strong>
               <br />
+              <small>Funcionario: {nombre_responsable}</small>
+              <br />
               <small>{formatDateTimeLocal(Date.now())}</small>
             </div>
           </div>
@@ -52,7 +61,16 @@ const ListProductosPDF = forwardRef(({ data }, ref) => {
         <div className="pdf-section">
           <table className="pdf-table">
             <thead>
-              <th></th>
+              <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Tipo Producto</th>
+                <th>Cantidad</th>
+                <th>Serial</th>
+                <th>Precio Unitario</th>
+                <th>Precio Total</th>
+                <th>Ubicación</th>
+              </tr>
             </thead>
             <tbody>
               {data.map((l) => (
@@ -69,6 +87,7 @@ const ListProductosPDF = forwardRef(({ data }, ref) => {
               ))}
             </tbody>
           </table>
+          <hr />
         </div>
       </div>
     </>

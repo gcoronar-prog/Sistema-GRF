@@ -82,13 +82,13 @@ function EntradaInventario() {
       observaciones: data[0].observaciones || "",
       usuario_creador: data[0].usuario_creador || "",
       fecha_creado: data[0].fecha_creado || "",
-      cantidad: data[0].cantidad || "",
+      cantidad: data[0].cantidad ?? "",
       tipo_producto: data[0].tipo_producto || "",
       factura: data[0].factura || "",
       orden_compra: data[0].orden_compra || "",
       proveedor: data[0].proveedor || "",
       producto: data[0].producto || "",
-      precio_unitario: data[0].precio_unitario || "",
+      precio_unitario: data[0].precio_unitario ?? "",
       id_producto: data[0].id_producto || "",
       unid_medida: data[0].unid_medida || "",
       tipo_form: data[0].tipo_form || "",
@@ -135,12 +135,13 @@ function EntradaInventario() {
     const isEmpty = (value) => {
       if (Array.isArray(value)) return value.length === 0;
       if (typeof value === "string") return value.trim() === "";
+      if (typeof value === "number") return value <= 0;
       return value === null || value === undefined;
     };
 
     const requerido = [
       { field: entradas.fecha_creado, ref: fechaIngresoRef },
-      { field: entradas.nombre_producto, ref: productosRef },
+      { field: entradas.id_producto, ref: productosRef },
       { field: entradas.cantidad, ref: cantidadRef },
       { field: entradas.precio_unitario, ref: precioUnitarioRef },
     ];
@@ -193,8 +194,10 @@ function EntradaInventario() {
         }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error("Error al enviar los datos al servidor");
+        throw data;
       }
 
       const lastEntradaRes = await fetch(
@@ -217,7 +220,19 @@ function EntradaInventario() {
       navigate(metodo);*/
       setEditing(true);
     } catch (error) {
-      console.error(error);
+      if (
+        entradas.tipo_form === "salida" ||
+        error.code === "STOCK_INSUFICIENTE" ||
+        error.code === "CANTIDAD_INVALIDA"
+      ) {
+        setEntradas((prev) => ({
+          ...prev,
+          cantidad: error.stock,
+        }));
+        alert("No hay stock suficiente");
+      } else {
+        alert(error.message);
+      }
     }
     setEditing(true);
   };
@@ -468,7 +483,7 @@ function EntradaInventario() {
                             name="tipo_producto"
                             id="tipo_producto"
                             className="form-select"
-                            value={entradas.tipo_producto || ""}
+                            value={entradas.tipo_producto ?? ""}
                             onChange={handleChanges}
                             disabled={editing}
                           >
@@ -491,17 +506,17 @@ function EntradaInventario() {
                               type="number"
                               name="cantidad"
                               id="cantidad"
-                              value={entradas.cantidad || ""}
+                              value={entradas.cantidad ?? ""}
                               onChange={handleChanges}
                               disabled={editing}
                             />
                           </div>
+                          {hasError && (
+                            <div className="text-danger small">
+                              *Campo obligatorio
+                            </div>
+                          )}
                         </div>
-                        {hasError && (
-                          <div className="text-danger small">
-                            *Campo obligatorio
-                          </div>
-                        )}
                         <div className="col-md-4">
                           <label htmlFor="unid_medida" className="form-label">
                             Unidad de medida
@@ -511,7 +526,7 @@ function EntradaInventario() {
                             id="unid_medida"
                             className="form-select"
                             disabled={editing}
-                            value={entradas.unid_medida || ""}
+                            value={entradas.unid_medida ?? ""}
                             onChange={handleChanges}
                           >
                             <option value="">
@@ -537,7 +552,7 @@ function EntradaInventario() {
                               type="text"
                               name="precio_unitario"
                               id="precio_unitario"
-                              value={entradas.precio_unitario || ""}
+                              value={entradas.precio_unitario ?? ""}
                               onChange={handleChanges}
                               disabled={editing}
                             />
@@ -621,7 +636,7 @@ function EntradaInventario() {
                             type="text"
                             name="factura"
                             id="factura"
-                            value={entradas.factura || ""}
+                            value={entradas.factura ?? ""}
                             onChange={handleChanges}
                             disabled={editing}
                           />
@@ -635,7 +650,7 @@ function EntradaInventario() {
                             type="text"
                             name="orden_compra"
                             id="orden_compra"
-                            value={entradas.orden_compra || ""}
+                            value={entradas.orden_compra ?? ""}
                             onChange={handleChanges}
                             disabled={editing}
                           />
@@ -649,7 +664,7 @@ function EntradaInventario() {
                             type="text"
                             name="proveedor"
                             id="proveedor"
-                            value={entradas.proveedor || ""}
+                            value={entradas.proveedor ?? ""}
                             onChange={handleChanges}
                             disabled={editing}
                           />
@@ -665,7 +680,7 @@ function EntradaInventario() {
                             rows={3}
                             name="observaciones"
                             id="observaciones"
-                            value={entradas.observaciones || ""}
+                            value={entradas.observaciones ?? ""}
                             onChange={handleChanges}
                             disabled={editing}
                           />
