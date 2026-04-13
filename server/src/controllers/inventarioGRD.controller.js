@@ -86,6 +86,12 @@ const createProducto = async (req, res) => {
 
     return res.status(201).json(result);
   } catch (error) {
+    if (data.cantidad < 0) {
+      return res.status(400).json({
+        message: "Cantidad invalida",
+        code: "CANTIDAD_INVALIDA",
+      });
+    }
     console.error(error);
     return res
       .status(500)
@@ -114,6 +120,12 @@ const updateInventario = async (req, res) => {
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
+    if (data.cantidad < 0) {
+      return res.status(400).json({
+        message: "Cantidad invalida",
+        code: "CANTIDAD_INVALIDA",
+      });
+    }
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -211,6 +223,12 @@ const createEntrada = async (req, res) => {
 
     return res.status(201).json(result);
   } catch (error) {
+    if (data.cantidad < 0) {
+      return res.status(400).json({
+        message: "Cantidad invalida",
+        code: "CANTIDAD_INVALIDA",
+      });
+    }
     console.log(error);
     if (
       tipo_form === "salida" &&
@@ -256,9 +274,15 @@ const updateEntrada = async (req, res) => {
     if (result.length === 0) {
       return res.status(404).json({ message: "No se encuentra el producto" });
     }
-    return res.status(201).json(result);
+    return res.status(200).json(result);
   } catch (error) {
     console.log(error);
+    if (data.cantidad < 0) {
+      return res.status(400).json({
+        message: "Cantidad invalida",
+        code: "CANTIDAD_INVALIDA",
+      });
+    }
     if (
       tipo_form === "salida" &&
       (error.code === "P0001" ||

@@ -101,7 +101,7 @@ function InventarioGRD() {
       { field: inventarios.precio_unit, ref: precioRef },
     ];
 
-    const errorRequerido = requerido.find((f) => isEmpty(f.field));
+    const errorRequerido = requeridos.find((f) => isEmpty(f.field));
 
     if (errorRequerido) {
       alert("Debe completar los campos obligatorios.");

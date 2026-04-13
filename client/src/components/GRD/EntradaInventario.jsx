@@ -19,7 +19,7 @@ function EntradaInventario() {
   const defaultEntradas = {
     ubicacion: "",
     observaciones: "",
-    usuario_creador: "",
+    usuario_creador: nombre_responsable,
     cantidad: "",
     tipo_producto: "",
     factura: "",
@@ -39,19 +39,27 @@ function EntradaInventario() {
   const [entradas, setEntradas] = useState(defaultEntradas);
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
-  const [estado, setEstado] = useState(1);
+  //const [estado, setEstado] = useState(null);
   const [hasError, setHasError] = useState(false);
+
+  const estado =
+    entradas.tipo_form === "entrada"
+      ? 1
+      : entradas.tipo_form === "salida"
+        ? 2
+        : null;
 
   const printRef = useRef(null);
 
   useEffect(() => {
+    console.log("tipo_form actualizado:", entradas.tipo_form);
     if (params.id) {
       loadEntrada(params.id);
       listProductos();
     } else {
       setEntradas(defaultEntradas);
     }
-  }, [params.id]);
+  }, [params.id, entradas.tipo_form]);
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -67,12 +75,6 @@ function EntradaInventario() {
     });
     if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
-
-    if (data[0].tipo_form === "entrada") {
-      setEstado(1);
-    } else {
-      setEstado(2);
-    }
 
     setEntradas({
       ...defaultEntradas,
@@ -91,7 +93,7 @@ function EntradaInventario() {
       precio_unitario: data[0].precio_unitario ?? "",
       id_producto: data[0].id_producto || "",
       unid_medida: data[0].unid_medida || "",
-      tipo_form: data[0].tipo_form || "",
+      tipo_form: data[0].tipo_form,
     });
   };
 
@@ -199,6 +201,7 @@ function EntradaInventario() {
       if (!res.ok) {
         throw data;
       }
+      console.log(data[0].tipo_form);
 
       const lastEntradaRes = await fetch(
         `${servidor}/inventario/last?type=entrada`,
@@ -221,9 +224,9 @@ function EntradaInventario() {
       setEditing(true);
     } catch (error) {
       if (
-        entradas.tipo_form === "salida" ||
-        error.code === "STOCK_INSUFICIENTE" ||
-        error.code === "CANTIDAD_INVALIDA"
+        entradas.tipo_form === "salida" &&
+        (error.code === "STOCK_INSUFICIENTE" ||
+          error.code === "CANTIDAD_INVALIDA")
       ) {
         setEntradas((prev) => ({
           ...prev,
@@ -595,8 +598,11 @@ function EntradaInventario() {
                                   : "btn-outline-success"
                               }`}
                               onClick={() => {
-                                (setEstado(1),
-                                  (entradas.tipo_form = "entrada"));
+                                (console.log(entradas.tipo_form),
+                                  setEntradas({
+                                    ...entradas,
+                                    tipo_form: "entrada",
+                                  }));
                               }}
                               disabled={editing}
                             >
@@ -610,7 +616,11 @@ function EntradaInventario() {
                                   : "btn-outline-danger"
                               }`}
                               onClick={() => {
-                                (setEstado(2), (entradas.tipo_form = "salida"));
+                                (console.log(entradas.tipo_form),
+                                  setEntradas({
+                                    ...entradas,
+                                    tipo_form: "salida",
+                                  }));
                               }}
                               disabled={editing}
                             >
