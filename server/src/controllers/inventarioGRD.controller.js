@@ -284,7 +284,7 @@ const updateEntrada = async (req, res) => {
       });
     }
     if (
-      tipo_form === "salida" &&
+      data.tipo_form === "salida" &&
       (error.code === "P0001" ||
         error.message?.includes("Stock insuficiente") ||
         error.message?.includes("Cantidad invalida"))

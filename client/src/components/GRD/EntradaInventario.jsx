@@ -52,14 +52,13 @@ function EntradaInventario() {
   const printRef = useRef(null);
 
   useEffect(() => {
-    console.log("tipo_form actualizado:", entradas.tipo_form);
     if (params.id) {
       loadEntrada(params.id);
       listProductos();
     } else {
       setEntradas(defaultEntradas);
     }
-  }, [params.id, entradas.tipo_form]);
+  }, [params.id]);
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -410,7 +409,11 @@ function EntradaInventario() {
             <div className="card shadow-sm mb-4">
               <div className="card-header bg-success text-white d-flex justify-content-between">
                 <div>
-                  <h4 className="card-title mb-0">Entrada de productos</h4>
+                  <h4 className="card-title mb-0">
+                    {entradas.tipo_form[0].toUpperCase() +
+                      entradas.tipo_form.slice(1)}{" "}
+                    de productos
+                  </h4>
                   <strong>Código producto: {entradas.id_inventario}</strong>
                 </div>
               </div>
