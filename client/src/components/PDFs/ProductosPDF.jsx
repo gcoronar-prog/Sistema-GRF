@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import logoSGIE from "/Users/gcorona/Desktop/Sistema GIE/client/src/img/logo_sgie.png";
+import logoSGIE from "../../img/logo_sgie.png";
 import "./CSS/prestamoGRD.css";
 
 const ProductosPDF = forwardRef(({ data }, ref) => {
