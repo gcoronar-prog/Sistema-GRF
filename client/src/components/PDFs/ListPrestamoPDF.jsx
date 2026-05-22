@@ -74,14 +74,14 @@ const ListPrestamoPDF = forwardRef(({ data }, ref) => {
             </thead>
             <tbody>
               {data.map((l) => (
-                <tr>
+                <tr key={l.id_prestamo}>
                   <td>{l.id_prestamo}</td>
                   <td>{l.user_prestamo}</td>
                   <td>{formatDateTimeLocal(l.fecha_prestamo)}</td>
                   <td>{formatDateTimeLocal(l.fecha_devolucion)}</td>
                   <td>{l.estado_prestamo}</td>
                   <td>{l.nombre_producto}</td>
-                  <td>{l.cantidad}</td>
+                  <td>{l.cantidad_p}</td>
                   <td>{l.observaciones}</td>
                 </tr>
               ))}

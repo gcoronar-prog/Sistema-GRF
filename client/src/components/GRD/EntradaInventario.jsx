@@ -13,13 +13,11 @@ function EntradaInventario() {
   const token = localStorage.getItem("token");
   const decoded = jwtDecode(token);
   const user_decoded = decoded;
-  const nombre_responsable = [user_decoded.nombre, user_decoded.apellido]
-    .filter(Boolean)
-    .join(" ");
+  const nombre_responsable = user_decoded.nombre + " " + user_decoded.apellido;
   const defaultEntradas = {
     ubicacion: "",
     observaciones: "",
-    usuario_creador: nombre_responsable,
+    usuario_creador: "",
     cantidad: "",
     tipo_producto: "",
     factura: "",
@@ -92,7 +90,7 @@ function EntradaInventario() {
       precio_unitario: data[0].precio_unitario ?? "",
       id_producto: data[0].id_producto || "",
       unid_medida: data[0].unid_medida || "",
-      tipo_form: data[0].tipo_form,
+      tipo_form: data[0].tipo_form || "", //data[0].tipo_form,
     });
   };
 
@@ -190,8 +188,8 @@ function EntradaInventario() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          usuario_creador: nombre_responsable,
           ...entradas,
+          usuario_creador: nombre_responsable,
         }),
       });
 
@@ -212,8 +210,6 @@ function EntradaInventario() {
         navigate(
           `/grd/inventario/entrada/${lastEntradaData[0].id_inventario}/edit`,
         );
-
-        console.log(usuario_creador);
       }
 
       /*const metodo = params.id
@@ -409,9 +405,13 @@ function EntradaInventario() {
             <div className="card shadow-sm mb-4">
               <div className="card-header bg-success text-white d-flex justify-content-between">
                 <div>
-                  <h4 className="card-title mb-0">
-                    {entradas.tipo_form[0].toUpperCase() +
-                      entradas.tipo_form.slice(1)}{" "}
+                  <h4 className="card-title mb-0 ">
+                    <p
+                      className="text-capitalize"
+                      style={{ display: "inline" }}
+                    >
+                      {entradas.tipo_form[0] + entradas.tipo_form.slice(1)}
+                    </p>{" "}
                     de productos
                   </h4>
                   <strong>Código producto: {entradas.id_inventario}</strong>
@@ -469,7 +469,10 @@ function EntradaInventario() {
                             >
                               <option value="">Seleccione producto</option>
                               {listado.map((p) => (
-                                <option value={p.id_producto}>
+                                <option
+                                  key={p.id_producto}
+                                  value={p.id_producto}
+                                >
                                   {p.nombre_producto}
                                 </option>
                               ))}

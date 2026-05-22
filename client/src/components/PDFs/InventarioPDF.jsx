@@ -20,6 +20,9 @@ const InventarioPDF = forwardRef(({ data }, ref) => {
   const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
   return (
     <div ref={ref} className="pdf-container">
+      <style type="text/css" media="print">
+        {"@page { size: portrait; }"}
+      </style>
       {/* HEADER */}
       <div className="pdf-header">
         <div>
@@ -96,7 +99,7 @@ const InventarioPDF = forwardRef(({ data }, ref) => {
               <td>{data.id_producto}</td>
               <td>{data.nombre_producto}</td>
               <td>{data.num_serie}</td>
-              <td>{data.cantidad}</td>
+              <td>{data.cantidad_p}</td>
               <td>{data.estado_prestamo}</td>
               <td>{formatDateTimeLocal(data.fecha_prestamo)}</td>
               <td>{formatDateTimeLocal(data.fecha_devolucion)}</td>

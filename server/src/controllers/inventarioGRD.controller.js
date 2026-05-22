@@ -369,7 +369,7 @@ const createPrestamo = async (req, res) => {
       data.telefono,
       data.producto,
       data.num_serie,
-      data.cantidad,
+      data.cantidad_p,
     ]);
     return res.status(201).json(result);
   } catch (error) {
@@ -381,13 +381,14 @@ const createPrestamo = async (req, res) => {
         "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
         [data.id_producto],
       );
-      const stockActual = rows[0]?.cantidad || 0;
+      const stockActual = rows[0]?.cantidad_p || 0;
       return res.status(400).json({
         message: error.message,
         code: "STOCK_INSUFICIENTE",
         stock: stockActual,
       });
     }
+    console.error(error);
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -409,7 +410,7 @@ const updatePrestamo = async (req, res) => {
       data.telefono,
       data.id_producto,
       data.num_serie,
-      data.cantidad,
+      data.cantidad_p,
       id,
     ]);
     if (result.length === 0) {
@@ -427,7 +428,7 @@ const updatePrestamo = async (req, res) => {
         "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
         [data.id_producto],
       );
-      const stockActual = rows[0]?.cantidad || 0;
+      const stockActual = rows[0]?.cantidad_p || 0;
       return res.status(400).json({
         message: error.message,
         code: "STOCK_INSUFICIENTE",
@@ -708,7 +709,7 @@ const nuevo_producto = `
   cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado,modelo) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *;`;
 
 const nuevo_prestamo = `INSERT INTO prestamo_grd (user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ, user_creador,\
-correo,telefono,producto,num_serie,cantidad)\
+correo,telefono,id_producto,num_serie,cantidad_p)\
  VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *;`;
 
 const nueva_salida = `INSERT INTO salida_inventario_grd (fecha_salida, estado_salida,direccion_salida,\
@@ -728,7 +729,7 @@ const update_producto = `
 
 const update_prestamo = `
   UPDATE prestamo_grd SET user_prestamo=$1, estado_prestamo=$2, fecha_prestamo=$3, fecha_devolucion=$4, observ=$5, user_creador=$6,\
-  correo=$7, telefono=$8, id_producto=$9, num_serie=$10, cantidad=$11\
+  correo=$7, telefono=$8, id_producto=$9, num_serie=$10, cantidad_p=$11\
   WHERE id_prestamo = $12 RETURNING *;
 `;
 

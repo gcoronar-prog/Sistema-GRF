@@ -19,7 +19,7 @@ function PrestamoInventario() {
     telefono: "",
     id_producto: "",
     num_serie: "",
-    cantidad: 0,
+    cantidad_p: 0,
   };
 
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -63,10 +63,11 @@ function PrestamoInventario() {
     const res = await fetch(`${servidor}/inventario/prestamo/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        //Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
+    if (!res.ok) throw new Error("Problemas obteniendo datos");
     const data = await res.json();
 
     setPrestamos({
@@ -82,7 +83,7 @@ function PrestamoInventario() {
       telefono: data[0].telefono || "",
       id_producto: data[0].id_producto || 0,
       num_serie: data[0].num_serie || "",
-      cantidad: data[0].cantidad || "",
+      cantidad_p: data[0].cantidad_p || "",
     });
   };
 
@@ -135,7 +136,7 @@ function PrestamoInventario() {
       { field: prestamos.fecha_prestamo, ref: fechaPrestamoRef },
       { field: prestamos.estado_prestamo, ref: estadoPrestamoRef },
       { field: prestamos.id_producto, ref: productoRef },
-      { field: prestamos.cantidad, ref: cantidadRef },
+      { field: prestamos.cantidad_p, ref: cantidadRef },
       { field: prestamos.user_prestamo, ref: usuarioPrestamoRef },
     ];
 
@@ -214,7 +215,7 @@ function PrestamoInventario() {
       if (error.code === "STOCK_INSUFICIENTE") {
         setPrestamos((prev) => ({
           ...prev,
-          cantidad: error.stock,
+          cantidad_p: error.stock,
         }));
         alert("No hay stock suficiente");
       } else {
@@ -447,9 +448,11 @@ function PrestamoInventario() {
                               type="datetime-local"
                               name="fecha_devolucion"
                               id="fecha_devolucion"
-                              value={formatDateTimeLocal(
-                                prestamos.fecha_devolucion,
-                              )}
+                              value={
+                                formatDateTimeLocal(
+                                  prestamos.fecha_devolucion,
+                                ) || ""
+                              }
                               onChange={handleChanges}
                               disabled={editing}
                             />
@@ -491,7 +494,7 @@ function PrestamoInventario() {
                         </legend>
                         <div className="row g-3">
                           <div className="col-md-auto" ref={productoRef}>
-                            <label htmlFor="producto" className="form-label">
+                            <label htmlFor="id_producto" className="form-label">
                               Productos:
                             </label>
                             <div
@@ -499,7 +502,7 @@ function PrestamoInventario() {
                             >
                               <select
                                 name="id_producto"
-                                id="producto"
+                                id="id_producto"
                                 className="form-select"
                                 value={prestamos.id_producto}
                                 onChange={handleChanges}
@@ -523,7 +526,7 @@ function PrestamoInventario() {
                             )}
                           </div>
                           <div className="col-md-auto" ref={cantidadRef}>
-                            <label htmlFor="cantidad" className="form-label">
+                            <label htmlFor="cantidad_p" className="form-label">
                               Cantidad solicitada:
                             </label>
                             <div
@@ -532,9 +535,9 @@ function PrestamoInventario() {
                               <input
                                 className="form-control"
                                 type="number"
-                                name="cantidad"
-                                id="cantidad"
-                                value={prestamos.cantidad}
+                                name="cantidad_p"
+                                id="cantidad_p"
+                                value={prestamos.cantidad_p}
                                 onChange={handleChanges}
                                 disabled={editing}
                               />
