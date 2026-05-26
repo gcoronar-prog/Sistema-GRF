@@ -21,6 +21,9 @@ const ProductosPDF = forwardRef(({ data }, ref) => {
   return (
     <>
       <div ref={ref} className="pdf-container">
+        <style type="text/css" media="print">
+          {"@page { size: portrait; }"}
+        </style>
         <div className="pdf-header">
           <div>
             <img src={logo} alt="" />

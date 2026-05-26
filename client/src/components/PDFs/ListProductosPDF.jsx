@@ -74,7 +74,7 @@ const ListProductosPDF = forwardRef(({ data }, ref) => {
             </thead>
             <tbody>
               {data.map((l) => (
-                <tr>
+                <tr key={l.id_producto}>
                   <td>{l.id_producto}</td>
                   <td>{l.nombre_producto}</td>
                   <td>{l.tipo_produ}</td>

@@ -96,7 +96,7 @@ function ListUserPrestamo({ usuario }) {
                     <td>{li.user_prestamo}</td>
                     <td>{formatDateTimeLocal(li.fecha_prestamo)}</td>
                     <td>{li.nombre_producto}</td>
-                    <td>{li.cantidad}</td>
+                    <td>{li.cantidad_p}</td>
                     <td>
                       <button
                         className="btn btn-primary"

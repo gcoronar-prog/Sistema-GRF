@@ -477,40 +477,38 @@ const FormAlfa = () => {
 
   return (
     <div className="container-fluid mt-4">
-      <div className="d-flex flex-wrap gap-2 mb-4">
-        <button
-          className="btn btn-outline-primary"
-          type="button"
-          onClick={handleFirstAlfa}
-          disabled={!editing}
-        >
-          <i className="bi bi-skip-start me-1"></i> Primer Informe
-        </button>
-        <button
-          className="btn btn-outline-primary"
-          type="button"
-          onClick={handlePrevious}
-          disabled={!editing}
-        >
-          <i className="bi bi-chevron-left me-1"></i> Anterior
-        </button>
-        <button
-          className="btn btn-outline-primary"
-          type="button"
-          onClick={handleNext}
-          disabled={!editing}
-        >
-          Siguiente <i className="bi bi-chevron-right ms-1"></i>
-        </button>
-        <button
-          className="btn btn-outline-primary"
-          type="button"
-          onClick={handleLastAlfa}
-          disabled={!editing}
-        >
-          Ultimo Informe <i className="bi bi-skip-end ms-1"></i>
-        </button>
-      </div>
+      {editing && (
+        <div className="d-flex flex-wrap gap-2 mb-4">
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleFirstAlfa}
+          >
+            <i className="bi bi-skip-start me-1"></i> Primer Informe
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handlePrevious}
+          >
+            <i className="bi bi-chevron-left me-1"></i> Anterior
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleNext}
+          >
+            Siguiente <i className="bi bi-chevron-right ms-1"></i>
+          </button>
+          <button
+            className="btn btn-outline-primary"
+            type="button"
+            onClick={handleLastAlfa}
+          >
+            Ultimo Informe <i className="bi bi-skip-end ms-1"></i>
+          </button>
+        </div>
+      )}
 
       <div className="row">
         <div className="col-lg-7">

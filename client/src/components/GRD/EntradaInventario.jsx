@@ -126,6 +126,10 @@ function EntradaInventario() {
   const handleEdit = async () => {
     setEditing(false);
     setHasError(false);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -232,11 +236,17 @@ function EntradaInventario() {
         alert(error.message);
       }
     }
+
     setEditing(true);
   };
 
   const handleNewEntrada = () => {
     navigate("/grd/inventario/entrada/new");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
 
     setEditing(false);
   };
@@ -262,6 +272,12 @@ function EntradaInventario() {
     } catch (error) {
       console.error(error);
     }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
     setEditing(true);
     setHasError(false);
   };
@@ -282,6 +298,11 @@ function EntradaInventario() {
     const data = await res.json();
 
     navigate(`/grd/inventario/entrada/${data[0].id_inventario}/edit`);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleFirstEntrada = async () => {
@@ -366,40 +387,43 @@ function EntradaInventario() {
   return (
     <>
       <div className="container-fluid mt-4">
-        <div className="d-flex flex-wrap gap-2 mb-4">
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleFirstEntrada}
-            // disabled={disabledPrevButton}
-          >
-            <i className="bi bi-skip-start me-1"></i> Primer registro
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handlePrevious}
-            //disabled={disabledPrevButton}
-          >
-            <i className="bi bi-chevron-left me-1"></i> Anterior
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleNext}
-            //disabled={disabledNextButton}
-          >
-            Siguiente <i className="bi bi-chevron-right ms-1"></i>
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={HandleLastEntrada}
-            //disabled={disabledNextButton}
-          >
-            Último registro <i className="bi bi-skip-end ms-1"></i>
-          </button>
-        </div>
+        {editing && (
+          <div className="d-flex flex-wrap gap-2 mb-4">
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleFirstEntrada}
+              // disabled={disabledPrevButton}
+            >
+              <i className="bi bi-skip-start me-1"></i> Primer registro
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handlePrevious}
+              //disabled={disabledPrevButton}
+            >
+              <i className="bi bi-chevron-left me-1"></i> Anterior
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleNext}
+              //disabled={disabledNextButton}
+            >
+              Siguiente <i className="bi bi-chevron-right ms-1"></i>
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={HandleLastEntrada}
+              //disabled={disabledNextButton}
+            >
+              Último registro <i className="bi bi-skip-end ms-1"></i>
+            </button>
+          </div>
+        )}
+
         <div className="row">
           <div className="col-lg-5">
             <div className="card shadow-sm mb-4">
@@ -473,7 +497,7 @@ function EntradaInventario() {
                                   key={p.id_producto}
                                   value={p.id_producto}
                                 >
-                                  {p.nombre_producto}
+                                  {p.id_producto + " | " + p.nombre_producto}
                                 </option>
                               ))}
                             </select>

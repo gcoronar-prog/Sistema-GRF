@@ -83,6 +83,7 @@ function InventarioGRD() {
   const handleEdit = async () => {
     setEditing(false);
     setHasError(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async (e) => {
@@ -204,6 +205,7 @@ function InventarioGRD() {
     }
     setEditing(true);
     setHasError(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteInventario = async () => {
@@ -317,40 +319,42 @@ function InventarioGRD() {
   return (
     <>
       <div className="container-fluid mt-4">
-        <div className="d-flex flex-wrap gap-2 mb-4">
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleFirstInventario}
-            // disabled={disabledPrevButton}
-          >
-            <i className="bi bi-skip-start me-1"></i> Primer registro
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handlePrevious}
-            //disabled={disabledPrevButton}
-          >
-            <i className="bi bi-chevron-left me-1"></i> Anterior
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleNext}
-            //disabled={disabledNextButton}
-          >
-            Siguiente <i className="bi bi-chevron-right ms-1"></i>
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleLastInventario}
-            //disabled={disabledNextButton}
-          >
-            Último registro <i className="bi bi-skip-end ms-1"></i>
-          </button>
-        </div>
+        {editing && (
+          <div className="d-flex flex-wrap gap-2 mb-4">
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleFirstInventario}
+              // disabled={disabledPrevButton}
+            >
+              <i className="bi bi-skip-start me-1"></i> Primer registro
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handlePrevious}
+              //disabled={disabledPrevButton}
+            >
+              <i className="bi bi-chevron-left me-1"></i> Anterior
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleNext}
+              //disabled={disabledNextButton}
+            >
+              Siguiente <i className="bi bi-chevron-right ms-1"></i>
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleLastInventario}
+              //disabled={disabledNextButton}
+            >
+              Último registro <i className="bi bi-skip-end ms-1"></i>
+            </button>
+          </div>
+        )}
       </div>
       <div className="row">
         <div className="col-lg-6">

@@ -11,8 +11,8 @@ function PrestamoInventario() {
   const defaultPrestamo = {
     user_prestamo: "",
     estado_prestamo: "",
-    fecha_prestamo: "",
-    fecha_devolucion: "",
+    fecha_prestamo: null,
+    fecha_devolucion: null,
     observ: "",
     user_creador: "",
     correo: "",
@@ -35,6 +35,7 @@ function PrestamoInventario() {
   const [prestamos, setPrestamos] = useState(defaultPrestamo);
   const [editing, setEditing] = useState(true);
   const [listado, setListado] = useState([]);
+  const [fecha_devol, setFecha_devol] = useState(false);
   const [hasError, setHasError] = useState(false);
 
   const printRef = useRef(null);
@@ -75,8 +76,8 @@ function PrestamoInventario() {
       ...data[0],
       user_prestamo: data[0].user_prestamo || "",
       estado_prestamo: data[0].estado_prestamo || "",
-      fecha_prestamo: data[0].fecha_prestamo,
-      fecha_devolucion: data[0].fecha_devolucion,
+      fecha_prestamo: data[0].fecha_prestamo || null,
+      fecha_devolucion: data[0].fecha_devolucion || null,
       observ: data[0].observ || "",
       user_creador: data[0].user_creador || "",
       correo: data[0].correo || "",
@@ -85,11 +86,17 @@ function PrestamoInventario() {
       num_serie: data[0].num_serie || "",
       cantidad_p: data[0].cantidad_p || "",
     });
+
+    if (data[0].estado_prestamo == "Devuelta") {
+      setFecha_devol(true);
+    } else {
+      setFecha_devol(false);
+    }
   };
 
   const formatDateTimeLocal = (dateString) => {
     const date = new Date(dateString);
-
+    if (!dateString) return "";
     const pad = (n) => String(n).padStart(2, "0");
 
     return (
@@ -116,9 +123,18 @@ function PrestamoInventario() {
     const { name, value } = e.target;
     setPrestamos({ ...prestamos, [name]: value });
     console.log(name, value);
+    if (value == "Devuelta") {
+      setFecha_devol(true);
+    } else {
+      setFecha_devol(false);
+    }
   };
 
   const handleEdit = async () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
     setEditing(false);
     setHasError(false);
   };
@@ -205,11 +221,6 @@ function PrestamoInventario() {
           `/grd/inventario/prestamo/${lastPrestamoData[0].id_prestamo}/edit`,
         );
       }
-
-      /*const metodo = params.id
-        ? ""
-        : `grd/inventario/entrada/${lastEntradaData[0].id_inventario}/edit`;
-      navigate(metodo);*/
       setEditing(true);
     } catch (error) {
       if (error.code === "STOCK_INSUFICIENTE") {
@@ -222,6 +233,11 @@ function PrestamoInventario() {
         alert(error.message);
       }
     }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
     setEditing(true);
   };
 
@@ -252,6 +268,12 @@ function PrestamoInventario() {
     } catch (error) {
       console.error(error);
     }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
     setEditing(true);
     setHasError(false);
   };
@@ -272,6 +294,11 @@ function PrestamoInventario() {
     const data = await res.json();
 
     navigate(`/grd/inventario/prestamo/${data[0].id_prestamo}/edit`);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleFirstPrestamo = async () => {
@@ -299,9 +326,6 @@ function PrestamoInventario() {
       if (lastPrestamo) {
         const id = lastPrestamo[0].id_prestamo;
         navigate(`/grd/inventario/prestamo/${id}/edit`);
-        //setLastIdInventario(id);
-        //setDisabledNextButton(true);
-        //setDisabledPrevButton(false);
       } else {
         console.log("No se encontró ningún expediente.");
       }
@@ -356,40 +380,42 @@ function PrestamoInventario() {
   return (
     <>
       <div className="container-fluid mt-4">
-        <div className="d-flex flex-wrap gap-2 mb-4">
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleFirstPrestamo}
-            // disabled={disabledPrevButton}
-          >
-            <i className="bi bi-skip-start me-1"></i> Primer registro
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handlePrevious}
-            //disabled={disabledPrevButton}
-          >
-            <i className="bi bi-chevron-left me-1"></i> Anterior
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleNext}
-            //disabled={disabledNextButton}
-          >
-            Siguiente <i className="bi bi-chevron-right ms-1"></i>
-          </button>
-          <button
-            className="btn btn-outline-primary"
-            type="button"
-            onClick={handleLastPrestamo}
-            //disabled={disabledNextButton}
-          >
-            Último registro <i className="bi bi-skip-end ms-1"></i>
-          </button>
-        </div>
+        {editing && (
+          <div className="d-flex flex-wrap gap-2 mb-4">
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleFirstPrestamo}
+              // disabled={disabledPrevButton}
+            >
+              <i className="bi bi-skip-start me-1"></i> Primer registro
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handlePrevious}
+              //disabled={disabledPrevButton}
+            >
+              <i className="bi bi-chevron-left me-1"></i> Anterior
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleNext}
+              //disabled={disabledNextButton}
+            >
+              Siguiente <i className="bi bi-chevron-right ms-1"></i>
+            </button>
+            <button
+              className="btn btn-outline-primary"
+              type="button"
+              onClick={handleLastPrestamo}
+              //disabled={disabledNextButton}
+            >
+              Último registro <i className="bi bi-skip-end ms-1"></i>
+            </button>
+          </div>
+        )}
         <div className="row">
           <div className="row">
             <div className="col-lg-5">
@@ -436,27 +462,29 @@ function PrestamoInventario() {
                               </small>
                             )}
                           </div>
-                          <div className="col-md-auto">
-                            <label
-                              htmlFor="fecha_devolucion"
-                              className="form-label"
-                            >
-                              Fecha devolución
-                            </label>
-                            <input
-                              className="form-control"
-                              type="datetime-local"
-                              name="fecha_devolucion"
-                              id="fecha_devolucion"
-                              value={
-                                formatDateTimeLocal(
-                                  prestamos.fecha_devolucion,
-                                ) || ""
-                              }
-                              onChange={handleChanges}
-                              disabled={editing}
-                            />
-                          </div>
+                          {fecha_devol && (
+                            <div className="col-md-auto">
+                              <label
+                                htmlFor="fecha_devolucion"
+                                className="form-label"
+                              >
+                                Fecha devolución
+                              </label>
+                              <input
+                                className="form-control"
+                                type="datetime-local"
+                                name="fecha_devolucion"
+                                id="fecha_devolucion"
+                                value={
+                                  formatDateTimeLocal(
+                                    prestamos.fecha_devolucion,
+                                  ) || ""
+                                }
+                                onChange={handleChanges}
+                                disabled
+                              />
+                            </div>
+                          )}
                           <div className="col-md-auto" ref={estadoPrestamoRef}>
                             <label
                               htmlFor="estado_prestamo"
@@ -475,9 +503,12 @@ function PrestamoInventario() {
                                 onChange={handleChanges}
                                 disabled={editing}
                               >
+                                <option value="" disabled>
+                                  Seleccione estado prestamo...
+                                </option>
                                 <option value="En prestamo">En prestamo</option>
-                                <option value="Devuelta">Devuelta</option>
-                                <option value="Cancelada">Cancelada</option>
+                                <option value="Devuelta">Devuelto</option>
+                                <option value="Cancelada">Cancelado</option>
                               </select>
                             </div>
                             {hasError && (
