@@ -297,7 +297,8 @@ function EntradaInventario() {
     const res = await fetch(`${servidor}/inventario/last?type=entrada`);
     const data = await res.json();
 
-    navigate(`/grd/inventario/entrada/${data[0].id_inventario}/edit`);
+    handlelastEntrada();
+    // navigate(`/grd/inventario/entrada/${data[0].id_inventario}/edit`);
 
     window.scrollTo({
       top: 0,
@@ -310,11 +311,12 @@ function EntradaInventario() {
     if (res.ok) {
       const firstEntrada = await res.json();
 
-      if (firstEntrada) {
+      if (firstEntrada[0]) {
         const id = firstEntrada[0].id_inventario;
         navigate(`/grd/inventario/entrada/${id}/edit`);
       } else {
         console.log("No se encontró ningún registro.");
+        alert("No existen registros");
       }
     } else {
       console.error("Error al obtener el inventario.");
@@ -327,7 +329,7 @@ function EntradaInventario() {
     if (res.ok) {
       const lastEntrada = await res.json();
       //console.log(lastAlfa);
-      if (lastEntrada) {
+      if (lastEntrada[0]) {
         const id = lastEntrada[0].id_inventario;
         navigate(`/grd/inventario/entrada/${id}/edit`);
         //setLastIdInventario(id);
@@ -335,6 +337,7 @@ function EntradaInventario() {
         //setDisabledPrevButton(false);
       } else {
         console.log("No se encontró ningún expediente.");
+        alert("No existen registros");
       }
     } else {
       console.error("Error al obtener el último expediente.");
@@ -356,6 +359,7 @@ function EntradaInventario() {
       } else {
         //setDisabledPrevButton(true);
         console.log("No hay registro anterior.");
+        alert("No existen registros");
       }
     } catch (error) {
       console.error("Error al obtener registro:", error);
@@ -377,6 +381,7 @@ function EntradaInventario() {
       } else {
         //setDisabledNextButton(true);
         console.log("No hay expedientes.");
+        alert("No existen registros");
       }
     } catch (error) {
       console.error("Error al obtener expediente :", error);
@@ -434,7 +439,9 @@ function EntradaInventario() {
                       className="text-capitalize"
                       style={{ display: "inline" }}
                     >
-                      {entradas.tipo_form[0] + entradas.tipo_form.slice(1)}
+                      {entradas.length == 0
+                        ? entradas.tipo_form[0] + entradas.tipo_form.slice(1)
+                        : "Entradas/Salidas"}
                     </p>{" "}
                     de productos
                   </h4>

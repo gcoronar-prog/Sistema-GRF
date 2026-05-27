@@ -115,34 +115,44 @@ function ListEntradas() {
                 </tr>
               </thead>
               <tbody>
-                {lista.map((l) => (
-                  <tr key={l.id_inventario}>
-                    <td>{l.id_inventario}</td>
-                    <td>{l.nombre_producto}</td>
-                    <td>{l.user_creador}</td>
-                    <td>{formatDateTimeLocal(l.fecha_creado)}</td>
-                    <td>{l.cantidad}</td>
-                    <td>{l.unid_medida}</td>
-                    <td>{l.observaciones}</td>
-                    <td>
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleRedirect(l.id_inventario)}
-                      >
-                        Ir a...
-                      </button>
+                {lista.length !== 0 ? (
+                  lista.map((l) => (
+                    <tr key={l.id_inventario}>
+                      <td>{l.id_inventario}</td>
+                      <td>{l.nombre_producto}</td>
+                      <td>{l.user_creador}</td>
+                      <td>{formatDateTimeLocal(l.fecha_creado)}</td>
+                      <td>{l.cantidad}</td>
+                      <td>{l.unid_medida}</td>
+                      <td>{l.observaciones}</td>
+                      <td>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleRedirect(l.id_inventario)}
+                        >
+                          Ir a...
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" className="text-center">
+                      No hay registros de {tipo} en el inventario
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
         <div className="card-footer text-end">
-          <button className="btn btn-danger" onClick={handlePrint}>
-            <i className="bi bi-file-earmark-pdf"></i>
-            Descargar PDF
-          </button>
+          {lista.length !== 0 && (
+            <button className="btn btn-danger" onClick={handlePrint}>
+              <i className="bi bi-file-earmark-pdf"></i>
+              Descargar PDF
+            </button>
+          )}
         </div>
         <div style={{ display: "none" }}>
           <ListEntradaPDF ref={printRef} data={lista} />

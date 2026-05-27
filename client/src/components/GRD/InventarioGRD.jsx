@@ -223,7 +223,8 @@ function InventarioGRD() {
     const res = await fetch(`${servidor}/inventario/last?type=producto`);
     const data = await res.json();
     //console.log(data.informe_Alfa.cod_alfa);
-    navigate(`/grd/inventario/${data[0].id_producto}/edit`);
+    //navigate(`/grd/inventario/${data[0].id_producto}/edit`);
+    handleLastInventario();
     // setDisabledNextButton(false);
   };
 
@@ -232,7 +233,7 @@ function InventarioGRD() {
     if (res.ok) {
       const firstInventario = await res.json();
       //console.log(lastAlfa);
-      if (firstInventario) {
+      if (firstInventario[0]) {
         const id_inventario = firstInventario[0].id_producto;
         navigate(`/grd/inventario/${id_inventario}/edit`);
 
@@ -241,6 +242,7 @@ function InventarioGRD() {
         //setDisabledNextButton(false);
       } else {
         console.log("No se encontró ningún registro.");
+        alert("No se encontró ningún registro.");
       }
     } else {
       console.error("Error al obtener el inventario.");
@@ -253,7 +255,7 @@ function InventarioGRD() {
     if (res.ok) {
       const lastInventario = await res.json();
       //console.log(lastAlfa);
-      if (lastInventario) {
+      if (lastInventario[0]) {
         console.log(lastInventario[0].id_producto);
         const id_inventario = lastInventario[0].id_producto;
         navigate(`/grd/inventario/${id_inventario}/edit`);
@@ -262,6 +264,7 @@ function InventarioGRD() {
         //setDisabledPrevButton(false);
       } else {
         console.log("No se encontró ningún expediente.");
+        alert("No se encontró ningún registro.");
       }
     } else {
       console.error("Error al obtener el último expediente.");
@@ -283,6 +286,7 @@ function InventarioGRD() {
       } else {
         //setDisabledPrevButton(true);
         console.log("No hay registro anterior.");
+        alert("No se encontró ningún registro.");
       }
     } catch (error) {
       console.error("Error al obtener registro:", error);
@@ -304,6 +308,7 @@ function InventarioGRD() {
       } else {
         //setDisabledNextButton(true);
         console.log("No hay expedientes.");
+        alert("No se encontró ningún registro.");
       }
     } catch (error) {
       console.error("Error al obtener expediente :", error);

@@ -1,14 +1,21 @@
 import React from "react";
 import { useTokenSession } from "../useTokenSession";
 import ListInventario from "./ListInventario";
+import ListAlfa from "./ListAlfa";
 
 function HomeGRD() {
   const userData = useTokenSession();
   return (
     <>
-      <div>
-        <ListInventario />
+      <div className="row">
+        <div className="col">
+          <ListAlfa />
+        </div>
+        <div className="col">
+          <ListInventario />
+        </div>
       </div>
+
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         <div
           className="toast show position-relative"

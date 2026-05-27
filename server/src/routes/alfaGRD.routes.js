@@ -6,6 +6,7 @@ import {
   getFirstAlfa,
   getFuncionarioGRD,
   getInformesALFA,
+  getInformesAlfa1,
   getLastAlfa,
   getNextAlfa,
   getPrevAlfa,
@@ -19,8 +20,9 @@ router.get(
   "/alfa/:id",
   //verifyToken,
   //verifyGroup("superadmin", "grd"),
-  getInformesALFA
+  getInformesALFA,
 );
+router.get("/alfa_grd/informes", getInformesAlfa1);
 router.post("/alfa", createAlfa);
 router.put("/alfa/:id", updateALFA);
 router.delete("/alfa/:id", deleteAlfa);

@@ -104,6 +104,12 @@ const FormAlfa = () => {
     if (!res.ok) throw new Error("Problemas obteniendo datos de informes");
     const data = await res.json();
 
+    if (!data || data.length === 0) {
+      setInformesALFA(defaultInformes);
+      setEditing(false);
+      navigate("/alfa/new");
+    }
+
     const info = data;
     const formattedOcurrencia = dayjs(
       info.informe_alfa[0].fecha_ocurrencia,
@@ -116,15 +122,6 @@ const FormAlfa = () => {
     const horaDocu = dayjs(info.informe_alfa[0].fecha_documento).format(
       "HH:mm",
     );
-    /*  const formattedDate = info.informe_alfa[0].fecha_documento
-      .toISOString()
-      .split("T")[0]
-      .split("-")
-      .reverse()
-      .join("-");
-    const horaDocu = date.toISOString().slice(11, 16);*/
-
-    //console.log(data.informes[0].cod_alfa);
 
     setInformesALFA({
       //danios_cte
@@ -351,6 +348,7 @@ const FormAlfa = () => {
         setDisabledPrevButton(false);
       } else {
         console.log("No se encontró ningún expediente.");
+        alert("No existen datos en el sistema.");
       }
     } else {
       console.error("Error al obtener el último expediente.");
@@ -363,7 +361,7 @@ const FormAlfa = () => {
     if (res.ok) {
       const firstAlfa = await res.json();
       //console.log(lastAlfa);
-      if (firstAlfa) {
+      if (firstAlfa[0]) {
         console.log(firstAlfa[0].id_alfa);
         const id_alfa = firstAlfa[0].id_alfa;
         navigate(`/alfa/${id_alfa}/edit`);
@@ -373,6 +371,7 @@ const FormAlfa = () => {
         setDisabledNextButton(false);
       } else {
         console.log("No se encontró ningún expediente.");
+        alert("No existen datos en el sistema.");
       }
     } else {
       console.error("Error al obtener el último expediente.");
@@ -391,6 +390,8 @@ const FormAlfa = () => {
       } else {
         setDisabledPrevButton(true);
         console.log("No hay expediente anterior.");
+        console.log("No se encontró ningún expediente.");
+        alert("No existen datos en el sistema.");
       }
     } catch (error) {
       console.error("Error al obtener expediente anterior:", error);
@@ -410,6 +411,8 @@ const FormAlfa = () => {
       } else {
         setDisabledNextButton(true);
         console.log("No hay expedientes.");
+        console.log("No se encontró ningún expediente.");
+        alert("No existen datos en el sistema.");
       }
     } catch (error) {
       console.error("Error al obtener expediente :", error);

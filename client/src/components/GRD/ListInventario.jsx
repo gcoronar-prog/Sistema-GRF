@@ -60,33 +60,43 @@ function ListInventario() {
                 </tr>
               </thead>
               <tbody>
-                {lista.map((l) => (
-                  <tr key={l.id_producto}>
-                    <td>{l.id_producto}</td>
-                    <td>{l.nombre_producto}</td>
-                    <td>{l.tipo_produ}</td>
-                    <td>{l.cantidad}</td>
-                    <td>{l.precio_unit}</td>
-                    <td>{l.precio_total}</td>
-                    <td>
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleRedirect(l.id_producto)}
-                      >
-                        Ir a...
-                      </button>
+                {lista.length !== 0 ? (
+                  lista.map((l) => (
+                    <tr key={l.id_producto}>
+                      <td>{l.id_producto}</td>
+                      <td>{l.nombre_producto}</td>
+                      <td>{l.tipo_produ}</td>
+                      <td>{l.cantidad}</td>
+                      <td>{"$" + l.precio_unit}</td>
+                      <td>{"$" + l.precio_total}</td>
+                      <td>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleRedirect(l.id_producto)}
+                        >
+                          Ir a...
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="text-center">
+                      No hay productos registrados
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
         <div className="card-footer text-end mt-3">
-          <button className="btn btn-danger" onClick={handlePrint}>
-            <i className="bi bi-file-earmark-pdf"></i>
-            Descargar PDF
-          </button>
+          {lista.length !== 0 && (
+            <button className="btn btn-danger" onClick={handlePrint}>
+              <i className="bi bi-file-earmark-pdf"></i>
+              Descargar PDF
+            </button>
+          )}
         </div>
         <div style={{ display: "none" }}>
           <ListProductosPDF ref={printRef} data={lista} />

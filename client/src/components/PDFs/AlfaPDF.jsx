@@ -652,6 +652,7 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                               width: "6%",
                               height: "5%",
                             }}
+                            key={e}
                           >
                             {data.cap_respuesta.includes(i) ? "X" : ""}
                           </td>

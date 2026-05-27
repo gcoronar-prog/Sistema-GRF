@@ -82,12 +82,15 @@ function NavbarSGF() {
         Authorization: `Bearer ${token}`,
       },
     });
-
     const lastALFA = await res.json();
+    console.log(lastALFA.length);
+    if (lastALFA.length !== 0) {
+      const idAlfa = lastALFA[0].id_alfa;
 
-    const idAlfa = lastALFA[0].id_alfa;
-
-    navigate(`/alfa/${idAlfa}/edit`);
+      navigate(`/alfa/${idAlfa}/edit`);
+    } else {
+      navigate(`/alfa/new`);
+    }
   };
 
   const handleInventario = async () => {
@@ -99,7 +102,10 @@ function NavbarSGF() {
     });
 
     const lastInventario = await res.json();
-
+    if (lastInventario.length === 0) {
+      navigate(`/grd/inventario/new`);
+      return;
+    }
     const id_inventario = lastInventario[0].id_producto;
 
     navigate(`/grd/inventario/${id_inventario}/edit`);
@@ -114,7 +120,10 @@ function NavbarSGF() {
     });
 
     const lastEntrada = await res.json();
-
+    if (lastEntrada.length === 0) {
+      navigate(`/grd/inventario/entrada/new`);
+      return;
+    }
     const id_entrada = lastEntrada[0].id_inventario;
 
     navigate(`/grd/inventario/entrada/${id_entrada}/edit`);
@@ -129,7 +138,10 @@ function NavbarSGF() {
     });
 
     const lastPrestamo = await res.json();
-
+    if (lastPrestamo.length === 0) {
+      navigate(`/grd/inventario/prestamo/new`);
+      return;
+    }
     const id_prestamo = lastPrestamo[0].id_prestamo;
 
     navigate(`/grd/inventario/prestamo/${id_prestamo}/edit`);

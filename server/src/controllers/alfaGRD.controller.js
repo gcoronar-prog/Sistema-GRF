@@ -13,6 +13,20 @@ const getAlfa = async (req, res) => {
   }
 };
 
+const getInformesAlfa1 = async (req, res) => {
+  try {
+    const { rows } = await pool.query(getInformes);
+    if (rows.length === 0) {
+      //return res.status(404).json({ message: "No existen informes" });
+      return;
+    }
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Problemas de conexión al servidor" });
+  }
+};
+
 const getAllInformesALFA = async (req, res) => {
   const client = await pool.connect(); // Asegúrate de usar await
   try {
@@ -435,9 +449,18 @@ WITH last_alfa AS (
   (SELECT id_evento FROM last_evento) AS evento,
   (SELECT id_responsable FROM last_responsable) AS responsable
   `;
+
+const getInformes = `SELECT a.*, b.*, c.*, d.*,e.* FROM informes_alfa a 
+JOIN danios_alfa b ON a.id_danios=b.id_danios
+JOIN evaluacion_alfa c ON a.id_evaluacion=c.id_evaluacion
+JOIN eventos_alfa d ON a.id_evento=d.id_evento
+JOIN responsable_alfa e ON a.id_responsable=e.id_responsable
+ORDER BY a.id_alfa DESC`;
+
 export {
   getAllInformesALFA,
   getInformesALFA,
+  getInformesAlfa1,
   createAlfa,
   updateALFA,
   deleteAlfa,

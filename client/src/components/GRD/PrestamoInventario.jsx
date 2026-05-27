@@ -292,8 +292,8 @@ function PrestamoInventario() {
     setPrestamos(updatePrestamo);
     const res = await fetch(`${servidor}/inventario/last?type=prestamo`);
     const data = await res.json();
-
-    navigate(`/grd/inventario/prestamo/${data[0].id_prestamo}/edit`);
+    handlelastPrestamo();
+    //navigate(`/grd/inventario/prestamo/${data[0].id_prestamo}/edit`);
 
     window.scrollTo({
       top: 0,
@@ -306,11 +306,12 @@ function PrestamoInventario() {
     if (res.ok) {
       const firstPrestamo = await res.json();
 
-      if (firstPrestamo) {
+      if (firstPrestamo[0]) {
         const id = firstPrestamo[0].id_prestamo;
         navigate(`/grd/inventario/prestamo/${id}/edit`);
       } else {
         console.log("No se encontró ningún registro.");
+        alert("No existen registros");
       }
     } else {
       console.error("Error al obtener el inventario.");
@@ -323,11 +324,12 @@ function PrestamoInventario() {
     if (res.ok) {
       const lastPrestamo = await res.json();
       //console.log(lastAlfa);
-      if (lastPrestamo) {
+      if (lastPrestamo[0]) {
         const id = lastPrestamo[0].id_prestamo;
         navigate(`/grd/inventario/prestamo/${id}/edit`);
       } else {
         console.log("No se encontró ningún expediente.");
+        alert("No existen registros");
       }
     } else {
       console.error("Error al obtener el último expediente.");
@@ -349,6 +351,7 @@ function PrestamoInventario() {
       } else {
         //setDisabledPrevButton(true);
         console.log("No hay registro anterior.");
+        alert("No existen registros");
       }
     } catch (error) {
       console.error("Error al obtener registro:", error);
@@ -370,6 +373,7 @@ function PrestamoInventario() {
       } else {
         //setDisabledNextButton(true);
         console.log("No hay registro.");
+        alert("No existen registros");
       }
     } catch (error) {
       console.error("Error al obtener registro:", error);
