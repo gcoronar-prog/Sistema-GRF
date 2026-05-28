@@ -52,6 +52,7 @@ function PrestamoInventario() {
       listProductos();
     } else {
       setPrestamos(defaultPrestamo);
+      listProductos();
     }
   }, [params.id]);
 

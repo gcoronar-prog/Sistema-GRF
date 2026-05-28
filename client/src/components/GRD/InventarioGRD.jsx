@@ -142,8 +142,8 @@ function InventarioGRD() {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_creador: nombre_responsable,
           ...inventarios,
+          user_creador: nombre_responsable,
         }),
       });
 

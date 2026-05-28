@@ -26,6 +26,7 @@ function ListUserPrestamo({ usuario }) {
       );
       const data = await res.json();
       //console.log(data);
+
       setLista(data);
     } catch (error) {
       console.error(error);

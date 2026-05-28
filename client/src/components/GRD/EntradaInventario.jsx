@@ -55,6 +55,7 @@ function EntradaInventario() {
       listProductos();
     } else {
       setEntradas(defaultEntradas);
+      listProductos();
     }
   }, [params.id]);
 
@@ -95,11 +96,16 @@ function EntradaInventario() {
   };
 
   const listProductos = async () => {
-    const res = await fetch(`${servidor}/inventario/listado`);
-    if (!res.ok) throw new Error("Problemas obteniendo datos");
-    const data = await res.json();
-    setListado(data);
+    try {
+      const res = await fetch(`${servidor}/inventario/listado`);
+      if (!res.ok) throw new Error("Problemas obteniendo datos");
+      const data = await res.json();
+      setListado(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   const formatDateTimeLocal = (dateString) => {
     const date = new Date(dateString);
 

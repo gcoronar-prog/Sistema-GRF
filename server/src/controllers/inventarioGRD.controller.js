@@ -58,6 +58,7 @@ const getListaProductos = async (req, res) => {
     if (rows.length === 0) {
       console.error("No existen registros");
     }
+
     return res.status(201).json(rows);
   } catch (error) {
     console.error(error);
