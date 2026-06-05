@@ -368,10 +368,11 @@ const createPrestamo = async (req, res) => {
       data.user_creador,
       data.correo,
       data.telefono,
-      data.producto,
+      data.id_producto,
       data.num_serie,
       data.cantidad_p,
     ]);
+    console.log(data);
     return res.status(201).json(result);
   } catch (error) {
     if (
@@ -464,7 +465,8 @@ const getListPrestamoUser = async (req, res) => {
   try {
     const { rows } = await pool.query(listPrestUser, [user]);
     if (rows.length === 0) {
-      return res.status(404).json({ message: "No se encuentran datos" });
+      console.log(rows);
+      //return res.status(404).json({ message: "No se encuentran datos" });
     }
     return res.status(200).json(rows);
   } catch (error) {

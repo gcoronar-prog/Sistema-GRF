@@ -12,9 +12,7 @@ function ListUserPrestamo({ usuario }) {
   const printRef = useRef(null);
 
   useEffect(() => {
-    if (usuario) {
-      LoadListUser();
-    }
+    LoadListUser();
   }, [usuario]);
 
   const [lista, setLista] = useState([]);

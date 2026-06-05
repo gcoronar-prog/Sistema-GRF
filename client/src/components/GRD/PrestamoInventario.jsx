@@ -17,9 +17,9 @@ function PrestamoInventario() {
     user_creador: "",
     correo: "",
     telefono: "",
-    id_producto: "",
+    id_producto: null,
     num_serie: "",
-    cantidad_p: 0,
+    cantidad_p: 1,
   };
 
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -83,7 +83,7 @@ function PrestamoInventario() {
       user_creador: data[0].user_creador || "",
       correo: data[0].correo || "",
       telefono: data[0].telefono || "",
-      id_producto: data[0].id_producto || 0,
+      id_producto: data[0].id_producto || null,
       num_serie: data[0].num_serie || "",
       cantidad_p: data[0].cantidad_p || "",
     });
@@ -200,8 +200,8 @@ function PrestamoInventario() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          usuario_creador: nombre_responsable,
           ...prestamos,
+          user_creador: nombre_responsable,
         }),
       });
 
@@ -209,6 +209,7 @@ function PrestamoInventario() {
 
       if (!res.ok) {
         throw data;
+        console.log(res);
       }
 
       const lastPrestamoRes = await fetch(
@@ -222,6 +223,7 @@ function PrestamoInventario() {
           `/grd/inventario/prestamo/${lastPrestamoData[0].id_prestamo}/edit`,
         );
       }
+      console.log(data);
       setEditing(true);
     } catch (error) {
       if (error.code === "STOCK_INSUFICIENTE") {
@@ -259,7 +261,7 @@ function PrestamoInventario() {
           const lastPrestamo = await res.json();
           if (lastPrestamo) {
             navigate(
-              `/grd/inventario/prestamo/${lastPrestamo[0].id_inventario}/edit`,
+              `/grd/inventario/prestamo/${lastPrestamo[0].id_prestamo}/edit`,
             );
           }
         }
@@ -540,11 +542,14 @@ function PrestamoInventario() {
                                 name="id_producto"
                                 id="id_producto"
                                 className="form-select"
-                                value={prestamos.id_producto}
+                                value={prestamos.id_producto || ""}
                                 onChange={handleChanges}
                                 disabled={editing}
                               >
-                                <option value="">Seleccione producto</option>
+                                <option value="" disabled>
+                                  Seleccione producto
+                                </option>
+
                                 {listado.map((p) => (
                                   <option
                                     key={p.id_producto}
@@ -576,6 +581,7 @@ function PrestamoInventario() {
                                 value={prestamos.cantidad_p}
                                 onChange={handleChanges}
                                 disabled={editing}
+                                min="1"
                               />
                             </div>
                             {hasError && (
