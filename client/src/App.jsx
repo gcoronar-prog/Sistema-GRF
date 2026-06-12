@@ -41,6 +41,7 @@ import HomeGRD from "./components/GRD/HomeGRD";
 import ListUserPrestamo from "./components/GRD/ListUserPrestamo";
 import ListEntradas from "./components/GRD/ListEntradas";
 import ListInventario from "./components/GRD/ListInventario";
+import StatisticsAlfa from "./components/Estadisticas/StatisticsAlfa";
 
 function App() {
   return (
@@ -137,6 +138,7 @@ function App() {
             element={<StatisicsSoliImg />}
           />
         </Route>
+        <Route path="/statistics/grd/alfa/v1" element={<StatisticsAlfa />} />
       </Routes>
     </BrowserRouter>
   );

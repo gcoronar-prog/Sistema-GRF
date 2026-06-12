@@ -12,7 +12,7 @@ import statisticsCentral from "./routes/statisticsCentral.routes.js";
 import StatisticsInspect from "./routes/statisticsInspect.routes.js";
 import statisticsSGC from "./routes/statisticsSGC.route.js";
 import statisticsSoliImg from "./routes/statisticsSoliImg.routes.js";
-
+import statisticsAlfa from "./routes/statisticsAlfa.routes.js";
 import informesCentral from "./routes/informes.routes.js";
 
 import dotenv from "dotenv";
@@ -65,7 +65,8 @@ app.use(
   statisticsCentral,
   StatisticsInspect,
   statisticsSGC,
-  statisticsSoliImg
+  statisticsSoliImg,
+  statisticsAlfa,
 );
 
 app.post(
@@ -103,7 +104,7 @@ app.post(
         error: error.message,
       });
     }
-  }
+  },
 );
 
 app.get(
@@ -120,7 +121,7 @@ app.get(
       console.error("Error al obtener las imágenes:", error);
       res.status(500).json({ msg: "Error del servidor" });
     }
-  }
+  },
 );
 
 app.get("/api/galeria/:id", async (req, res) => {
@@ -145,7 +146,7 @@ app.delete(
   "/api/galeria/:id",
   verifyToken,
   verifyGroup("superadmin", "central", "inspeccion", "seguridad"),
-  deleteArchivo
+  deleteArchivo,
 );
 
 const PORT = process.env.PORT;
