@@ -164,7 +164,7 @@ function StatisticsInspect() {
     let filtros = `Filtros aplicados:\n`;
     if (fechaInicio && fechaFin) {
       filtros += `Fecha: ${new Date(fechaInicio).toLocaleString(
-        "es-ES"
+        "es-ES",
       )} - ${new Date(fechaFin).toLocaleString("es-ES")}`;
     }
     doc.setFontSize(11);
@@ -374,7 +374,7 @@ function StatisticsInspect() {
           fechaInicioCitacion,
           fechaFinCitacion,
           fechaInicio,
-          fechaFin
+          fechaFin,
         );
       }
     } catch (error) {

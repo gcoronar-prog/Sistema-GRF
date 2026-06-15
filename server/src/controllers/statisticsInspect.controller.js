@@ -485,7 +485,7 @@ function buildWhereClause({
         values.length + 2
       }`,
       fechaInicioInfrac,
-      fechaFinInfrac
+      fechaFinInfrac,
     );
   }
 
@@ -495,7 +495,7 @@ function buildWhereClause({
         values.length + 2
       }`,
       fechaInicioInfrac,
-      fechaFinInfrac
+      fechaFinInfrac,
     );
   }
 
@@ -506,7 +506,7 @@ function buildWhereClause({
         values.length + 2
       }`,
       fechaInicio,
-      fechaFin
+      fechaFin,
     );
   }
 
@@ -518,7 +518,7 @@ function buildWhereClause({
       `expe.estado_exp IN (${estadosArray
         .map((_, index) => `$${values.length + index + 1}`)
         .join(", ")})`,
-      ...estadosArray
+      ...estadosArray,
     );
   }
 
@@ -531,7 +531,7 @@ function buildWhereClause({
       `expe.tipo_procedimiento IN (${procesoArray
         .map((_, index) => `$${values.length + index + 1}`)
         .join(", ")})`,
-      ...procesoArray
+      ...procesoArray,
     );
   }
 
@@ -542,7 +542,7 @@ function buildWhereClause({
       `infra.juzgado IN (${jplArray
         .map((_, index) => `$${values.length + index + 1}`)
         .join(", ")})`,
-      ...jplArray
+      ...jplArray,
     );
   }
 
@@ -573,7 +573,7 @@ function buildWhereClause({
     const cleanedSector = sector_infraccion.replace(/"/g, "");
     addCondition(
       `infra.sector_infraccion= $${values.length + 1}`,
-      cleanedSector
+      cleanedSector,
     );
   }
 

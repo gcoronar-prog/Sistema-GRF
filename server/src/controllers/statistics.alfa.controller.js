@@ -2,12 +2,11 @@ import { pool } from "../db.js";
 
 const getStatisticsAlfa = async (req, res) => {
   try {
-    const { fecha_inicio, fecha_fin } = req.query;
-    const whereClause = buildWhereClause({ fecha_inicio, fecha_fin });
-    const query = `${getAllAlfa}`;
-    const { rows } = await pool.query(query);
-    console.log(fecha_inicio, fecha_fin);
-    return res.status(201).json(rows);
+    const { whereClause, values } = buildWhereClause(req.query);
+    const consulta = `${getAllAlfa}`;
+    const { rows } = await pool.query(getAllAlfa + whereClause, values);
+    console.log(whereClause, values, consulta);
+    return res.status(201).json({ data: rows });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error fetching statistics" });
@@ -23,7 +22,14 @@ JOIN eventos_alfa d ON a.id_evento=d.id_evento
 JOIN responsable_alfa e ON a.id_responsable=e.id_responsable
 WHERE 1=1`;
 
-function buildWhereClause({ fecha_inicio, fecha_fin }) {
+function buildWhereClause({
+  fechaInicioDoc,
+  fechaFinDoc,
+  montoInicio,
+  montoFin,
+  escala,
+  tipoEventos,
+}) {
   const conditions = [];
   const values = [];
 
@@ -32,22 +38,46 @@ function buildWhereClause({ fecha_inicio, fecha_fin }) {
     values.push(...vals);
   };
 
-  if (fecha_inicio && fecha_fin) {
+  if (fechaInicioDoc && fechaFinDoc) {
     addCondition(
       `d.fecha_ocurrencia BETWEEN $${values.length + 1} AND $${values.length + 2}`,
-      fecha_inicio,
-      fecha_fin,
+      fechaInicioDoc,
+      fechaFinDoc,
     );
-  } else if (fecha_inicio) {
-    addCondition(`d.fecha_ocurrencia >= $${values.length + 1}`, fecha_inicio);
-  } else if (fecha_fin) {
-    addCondition(`d.fecha_ocurrencia >= $${values.length + 1}`, fecha_fin);
-  } else if (!fecha_inicio && !fecha_fin) {
+  }
+
+  if (montoInicio && montoFin) {
+    addCondition(
+      `b.monto_danio >= $${values.length + 1} AND b.monto_danio <= $${values.length + 2}`,
+      parseInt(montoInicio, 10),
+      parseInt(montoFin, 10),
+    );
+  } /*else if (fechaInicioDoc) {
+    addCondition(`d.fecha_ocurrencia >= $${values.length + 1}`, fechaInicioDoc);
+  } else if (fechaFinDoc) {
+    addCondition(`d.fecha_ocurrencia >= $${values.length + 1}`, fechaFinDoc);
+  } else if (!fechaInicioDoc && !fechaFinDoc) {
     addCondition(
       `d.fecha_ocurrencia >= $${values.length + 1}`,
       "2026-06-12T16:26:20.000Z",
     );
+  }*/
+
+  if (escala) {
+    addCondition(`d.escala_sismo = $${values.length + 1}`, escala);
   }
+
+  if (tipoEventos && tipoEventos.length) {
+    const placeholders = tipoEventos
+      .map((_, idx) => `$${values.length + idx + 1}`)
+      .join(", ");
+    addCondition(`d.tipo_evento IN (${placeholders})`, ...tipoEventos);
+  }
+
+  return {
+    whereClause: conditions.length ? " AND " + conditions.join(" AND ") : "",
+    values,
+  };
 }
 
 export { getStatisticsAlfa };
