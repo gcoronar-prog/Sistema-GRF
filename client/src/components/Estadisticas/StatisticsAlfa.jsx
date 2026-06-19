@@ -9,7 +9,10 @@ function StatisticsAlfa() {
   const [montoInicio, setMontoInicio] = useState("");
   const [montoFin, setMontoFin] = useState("");
   const [escala, setEscala] = useState("");
-  const [tipoEventos, setTipoEventos] = useState([]);
+  const [tipoEventos, setTipoEventos] = useState("");
+  const [evaDanios, setEvaDanios] = useState([]);
+  const [nivEmergencia, setNivEmergencia] = useState("");
+  const [danioPersonas, setDanioPersonas] = useState([]);
 
   const handleChanges = (e) => {
     const { name, value } = e.target;
@@ -25,7 +28,21 @@ function StatisticsAlfa() {
           : [...prev, value]
         : prev,
     );
-    console.log(name, value);
+    setEvaDanios((prev) =>
+      name === "evaDanios"
+        ? prev.includes(value)
+          ? prev.filter((e) => e !== value)
+          : [...prev, value]
+        : prev,
+    );
+    setNivEmergencia((prev) =>
+      name === "nivEmergencia"
+        ? prev.includes(value)
+          ? prev.filter((e) => e !== value)
+          : [...prev, value]
+        : prev,
+    );
+    setDanioPersonas((prev) => (name === "danioPersonas" ? value : prev));
   };
 
   const fetchData = async () => {
@@ -48,6 +65,18 @@ function StatisticsAlfa() {
 
     if (tipoEventos) {
       tipoEventos.forEach((evento) => params.append("tipoEventos", evento));
+    }
+
+    if (evaDanios) {
+      evaDanios.forEach((danio) => params.append("evaDanios", danio));
+    }
+
+    if (nivEmergencia) {
+      params.append("nivEmergencia", nivEmergencia);
+    }
+
+    if (danioPersonas) {
+      params.append("danioPersonas", danioPersonas);
     }
 
     try {
@@ -127,12 +156,12 @@ function StatisticsAlfa() {
         "Temporal",
         "Deslizamiento",
         "Act. Volcánica",
-        "Incendio forestal",
-        "Incendio urbano",
+        "Inc. forestal",
+        "Inc. urbano",
         "Sust. peligrosas",
-        "Accidente Mult. Víctimas",
-        "Corte Energía eléctrica",
-        "Corte agua potable",
+        "Acc. Mult. Víctimas",
+        "Corte Energía",
+        "Corte agua",
         "Otro",
       ].map((e) => (
         <>
@@ -141,7 +170,7 @@ function StatisticsAlfa() {
               key={e}
               type="checkbox"
               name="tipoEventos"
-              id="tipoEventos"
+              id={e}
               onChange={handleChanges}
               value={e}
             />
@@ -150,6 +179,73 @@ function StatisticsAlfa() {
         </>
       ))}
 
+      <h5>Daños vivienda</h5>
+      {[
+        "Daño menor habitable",
+        "Daño mayor no habitable",
+        "Destuidas, irrecuperables",
+        "No evaluadas",
+      ].map((e) => (
+        <>
+          <div key={e} style={{ display: "flex", alignItems: "center" }}>
+            <input
+              type="checkbox"
+              key={e}
+              name="evaDanios"
+              id={e}
+              onChange={handleChanges}
+              value={e}
+            />
+            <label htmlFor={e}>{e}</label>
+          </div>
+        </>
+      ))}
+
+      <div>
+        <h5>Niveles de emergencia</h5>
+        {["Emergencia Menor", "Emergencia Mayor", "Desastre", "Catástrofe"].map(
+          (e, index) => (
+            <>
+              <div key={e} style={{ display: "flex", alignItems: "center" }}>
+                <input
+                  type="checkbox"
+                  key={e}
+                  name="nivEmergencia"
+                  id={e}
+                  onChange={handleChanges}
+                  value={index + 1}
+                />
+                <label htmlFor={e}>{e}</label>
+              </div>
+            </>
+          ),
+        )}
+      </div>
+      <div>
+        <h5>Daños personas</h5>
+        {[
+          "Afectadas",
+          "Damnificadas",
+          "Heridas",
+          "Muertas",
+          "Desaparecidas",
+          "Albergados",
+        ].map((e) => (
+          <>
+            <div key={e} style={{ display: "flex", alignItems: "center" }}>
+              <input
+                type="checkbox"
+                key={e}
+                name="danioPersonas"
+                id={e}
+                onChange={handleChanges}
+                value={e}
+              />
+              <label htmlFor={e}>{e}</label>
+            </div>
+          </>
+        ))}
+      </div>
       <div>
         <button onClick={fetchData}>ver info</button>
       </div>

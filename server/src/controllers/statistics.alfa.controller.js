@@ -3,9 +3,10 @@ import { pool } from "../db.js";
 const getStatisticsAlfa = async (req, res) => {
   try {
     const { whereClause, values } = buildWhereClause(req.query);
-    const consulta = `${getAllAlfa}`;
-    const { rows } = await pool.query(getAllAlfa + whereClause, values);
-    console.log(whereClause, values, consulta);
+    const consulta =
+      values.length > 0 ? `${getAllAlfa} ${whereClause}` : `${getAllAlfa}`;
+    const { rows } = await pool.query(consulta, values);
+    console.log("where: ", whereClause, values);
     return res.status(201).json({ data: rows });
   } catch (error) {
     console.error(error);
@@ -29,6 +30,9 @@ function buildWhereClause({
   montoFin,
   escala,
   tipoEventos,
+  evaDanios,
+  nivEmergencia,
+  danioPersonas,
 }) {
   const conditions = [];
   const values = [];
@@ -68,13 +72,30 @@ function buildWhereClause({
   }
 
   if (tipoEventos && tipoEventos.length > 0) {
-    addCondition(
-      `d.tipo_evento @> $${values.length + 1}`,
-      JSON.stringify(tipoEventos),
-    );
-    //console.log(`'${JSON.stringify(tipoEventos)}'`);
+    const eventos = JSON.stringify(tipoEventos).toLocaleUpperCase();
+    addCondition(`d.tipo_evento @> $${values.length + 1}`, eventos);
   }
 
+  if (evaDanios && evaDanios.length > 0) {
+    addCondition(`b.ev_danio IN ($${values.length + 1})`, evaDanios);
+  }
+
+  if (nivEmergencia && nivEmergencia.length > 0) {
+    const emergenciaArray = Array.isArray(nivEmergencia)
+      ? nivEmergencia
+      : nivEmergencia.split(",");
+    addCondition(
+      `c.cap_respuesta IN (${emergenciaArray
+        .map((_, index) => `$${values.length + index + 1}`)
+        .join(", ")})`,
+      ...emergenciaArray,
+    );
+  }
+
+  if (danioPersonas) {
+    const danio = JSON.stringify(danioPersonas).toLowerCase();
+    addCondition(`b.tipo_afectados @> $${values.length + 1}`, danio);
+  }
   return {
     whereClause: conditions.length ? " AND " + conditions.join(" AND ") : "",
     values,
