@@ -67,11 +67,12 @@ function buildWhereClause({
     addCondition(`d.escala_sismo = $${values.length + 1}`, escala);
   }
 
-  if (tipoEventos && tipoEventos.length) {
-    const placeholders = tipoEventos
-      .map((_, idx) => `$${values.length + idx + 1}`)
-      .join(", ");
-    addCondition(`d.tipo_evento IN (${placeholders})`, ...tipoEventos);
+  if (tipoEventos && tipoEventos.length > 0) {
+    addCondition(
+      `d.tipo_evento @> $${values.length + 1}`,
+      JSON.stringify(tipoEventos),
+    );
+    //console.log(`'${JSON.stringify(tipoEventos)}'`);
   }
 
   return {

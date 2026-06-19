@@ -46,7 +46,7 @@ function StatisticsAlfa() {
       params.append("escala", escala);
     }
 
-    if (tipoEventos.length) {
+    if (tipoEventos) {
       tipoEventos.forEach((evento) => params.append("tipoEventos", evento));
     }
 
@@ -141,7 +141,7 @@ function StatisticsAlfa() {
               key={e}
               type="checkbox"
               name="tipoEventos"
-              id={e}
+              id="tipoEventos"
               onChange={handleChanges}
               value={e}
             />
