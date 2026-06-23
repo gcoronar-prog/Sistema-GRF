@@ -13,6 +13,7 @@ function StatisticsAlfa() {
   const [evaDanios, setEvaDanios] = useState([]);
   const [nivEmergencia, setNivEmergencia] = useState("");
   const [danioPersonas, setDanioPersonas] = useState([]);
+  const [evalNecesidad, setEvalNecesidad] = useState([]);
 
   const handleChanges = (e) => {
     const { name, value } = e.target;
@@ -42,7 +43,20 @@ function StatisticsAlfa() {
           : [...prev, value]
         : prev,
     );
-    setDanioPersonas((prev) => (name === "danioPersonas" ? value : prev));
+    setDanioPersonas((prev) =>
+      name === "danioPersonas"
+        ? prev.includes(value)
+          ? prev.filter((e) => e !== value)
+          : [...prev, value]
+        : prev,
+    );
+    setEvalNecesidad((prev) =>
+      name === "evalNecesidad"
+        ? prev.includes(value)
+          ? prev.filter((e) => e !== value)
+          : [...prev, value]
+        : prev,
+    );
   };
 
   const fetchData = async () => {
@@ -77,6 +91,10 @@ function StatisticsAlfa() {
 
     if (danioPersonas) {
       params.append("danioPersonas", danioPersonas);
+    }
+
+    if (evalNecesidad) {
+      params.append("evalNecesidad", evalNecesidad);
     }
 
     try {
@@ -247,6 +265,30 @@ function StatisticsAlfa() {
         ))}
       </div>
       <div>
+        <div>
+          <h5>Evaluación de necesidades</h5>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <input
+              type="checkbox"
+              name="evalNecesidad"
+              id="evalNecesidad"
+              onChange={handleChanges}
+              value={"Se requiere"}
+            />
+            <label htmlFor="evalNecesidad">Se requiere</label>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <input
+              type="checkbox"
+              name="evalNecesidad"
+              id="evalNoNecesidad"
+              onChange={handleChanges}
+              value={"No se requiere"}
+            />
+            <label htmlFor="evalNoNecesidad">No se requiere</label>
+          </div>
+        </div>
         <button onClick={fetchData}>ver info</button>
       </div>
     </>

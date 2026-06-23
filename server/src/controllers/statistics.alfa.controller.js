@@ -33,6 +33,7 @@ function buildWhereClause({
   evaDanios,
   nivEmergencia,
   danioPersonas,
+  evalNecesidad,
 }) {
   const conditions = [];
   const values = [];
@@ -92,10 +93,49 @@ function buildWhereClause({
     );
   }
 
-  if (danioPersonas) {
-    const danio = JSON.stringify(danioPersonas).toLowerCase();
-    addCondition(`b.tipo_afectados @> $${values.length + 1}`, danio);
+  if (danioPersonas && danioPersonas.length > 0) {
+    const mapaDanioPersonas = {
+      Afectadas: "afectadas",
+      Damnificadas: "damnificadas",
+      Heridas: "heridas",
+      Muertas: "muertes",
+      Desaparecidas: "desaparecidas",
+      Albergados: "albergados",
+    };
+    const danioArray = Array.isArray(danioPersonas)
+      ? danioPersonas
+      : danioPersonas.split(",");
+
+    const condicionesDanio = danioArray
+      .map((danio) => danio.trim())
+      .map((danio) => mapaDanioPersonas[danio])
+      .filter(Boolean)
+      .map(
+        (danio) => `
+      (
+        COALESCE(NULLIF(b.tipo_afectados #>> '{${danio},hombres}', '')::int, 0) +
+        COALESCE(NULLIF(b.tipo_afectados #>> '{${danio},mujeres}', '')::int, 0)
+      ) > 0
+    `,
+      );
+
+    if (condicionesDanio.length > 0) {
+      addCondition(`(${condicionesDanio.join(" OR ")})`);
+    }
   }
+
+  if (evalNecesidad && evalNecesidad.length > 0) {
+    const necesidadArray = Array.isArray(evalNecesidad)
+      ? evalNecesidad
+      : evalNecesidad.split(",");
+    addCondition(
+      `c.necesidades IN (${necesidadArray
+        .map((_, index) => `$${values.length + index + 1}`)
+        .join(", ")})`,
+      ...necesidadArray,
+    );
+  }
+
   return {
     whereClause: conditions.length ? " AND " + conditions.join(" AND ") : "",
     values,
