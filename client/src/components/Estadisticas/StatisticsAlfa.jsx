@@ -110,186 +110,323 @@ function StatisticsAlfa() {
   };
   return (
     <>
-      <div>
-        <label htmlFor="">fecha doc inicio</label>
-        <input
-          type="datetime-local"
-          name="fechaInicioDoc"
-          id="fechaInicioDoc"
-          value={fechaInicioDoc}
-          onChange={handleChanges}
-        />
-        <label htmlFor="">fecha doc fin</label>
-        <input
-          type="datetime-local"
-          name="fechaFinDoc"
-          id="fechaFinDoc"
-          value={fechaFinDoc}
-          onChange={handleChanges}
-        />
-
-        <label htmlFor="">Monto estimado en daños</label>
-        <label htmlFor="">Desde:</label>
-        <input
-          type="text"
-          name="montoInicio"
-          id="montoInicio"
-          value={montoInicio}
-          onChange={handleChanges}
-        />
-        <label htmlFor="">Hasta:</label>
-        <input
-          type="text"
-          name="montoFin"
-          id="montoFin"
-          value={montoFin}
-          onChange={handleChanges}
-        />
-        {console.log(fechaInicioDoc, fechaFinDoc)}
-      </div>
-      <label htmlFor="">Escala sismo</label>
-      <select name="escala" id="escala" value={escala} onChange={handleChanges}>
-        <option value="">Seleccione escala de sismo</option>
-        {[
-          "I",
-          "II",
-          "III",
-          "IV",
-          "V",
-          "VI",
-          "VII",
-          "VIII",
-          "IX",
-          "X",
-          "XI",
-          "XII",
-        ].map((e) => (
-          <option key={e} value={e}>
-            {e}
-          </option>
-        ))}
-      </select>
-      {[
-        "Inundación",
-        "Temporal",
-        "Deslizamiento",
-        "Act. Volcánica",
-        "Inc. forestal",
-        "Inc. urbano",
-        "Sust. peligrosas",
-        "Acc. Mult. Víctimas",
-        "Corte Energía",
-        "Corte agua",
-        "Otro",
-      ].map((e) => (
-        <>
-          <div key={e} style={{ display: "flex", alignItems: "center" }}>
-            <input
-              key={e}
-              type="checkbox"
-              name="tipoEventos"
-              id={e}
-              onChange={handleChanges}
-              value={e}
-            />
-            <label htmlFor={e}>{e}</label>
-          </div>
-        </>
-      ))}
-
-      <h5>Daños vivienda</h5>
-      {[
-        "Daño menor habitable",
-        "Daño mayor no habitable",
-        "Destuidas, irrecuperables",
-        "No evaluadas",
-      ].map((e) => (
-        <>
-          <div key={e} style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              key={e}
-              name="evaDanios"
-              id={e}
-              onChange={handleChanges}
-              value={e}
-            />
-            <label htmlFor={e}>{e}</label>
-          </div>
-        </>
-      ))}
-
-      <div>
-        <h5>Niveles de emergencia</h5>
-        {["Emergencia Menor", "Emergencia Mayor", "Desastre", "Catástrofe"].map(
-          (e, index) => (
-            <>
-              <div key={e} style={{ display: "flex", alignItems: "center" }}>
-                <input
-                  type="checkbox"
-                  key={e}
-                  name="nivEmergencia"
-                  id={e}
-                  onChange={handleChanges}
-                  value={index + 1}
-                />
-                <label htmlFor={e}>{e}</label>
+      <hr />
+      <div className="card shadow-sm">
+        <div className="card-header bg-success text-white">
+          <h5 className="mb-0">Estadísticas Informes ALFA</h5>
+        </div>
+        <div className="card-body">
+          <div className="row g-3">
+            <div className="col-md-4">
+              <div className="card border-secondary h-100">
+                <div className="card-header">
+                  <strong>Fecha de informe</strong>
+                </div>
+                <div className="card-body">
+                  <label className="form-label" htmlFor="fechaInicioDoc">
+                    Fecha de inicio
+                  </label>
+                  <input
+                    className="form-control mb-2"
+                    type="datetime-local"
+                    name="fechaInicioDoc"
+                    id="fechaInicioDoc"
+                    value={fechaInicioDoc}
+                    onChange={handleChanges}
+                  />
+                  <label className="form-label" htmlFor="fechaFinDoc">
+                    Fecha fin
+                  </label>
+                  <input
+                    className="form-control mb-2"
+                    type="datetime-local"
+                    name="fechaFinDoc"
+                    id="fechaFinDoc"
+                    value={fechaFinDoc}
+                    onChange={handleChanges}
+                  />
+                </div>
               </div>
-            </>
-          ),
-        )}
-      </div>
-      <div>
-        <h5>Daños personas</h5>
-        {[
-          "Afectadas",
-          "Damnificadas",
-          "Heridas",
-          "Muertas",
-          "Desaparecidas",
-          "Albergados",
-        ].map((e) => (
-          <>
-            <div key={e} style={{ display: "flex", alignItems: "center" }}>
-              <input
-                type="checkbox"
-                key={e}
-                name="danioPersonas"
-                id={e}
-                onChange={handleChanges}
-                value={e}
-              />
-              <label htmlFor={e}>{e}</label>
             </div>
-          </>
-        ))}
-      </div>
-      <div>
-        <div>
-          <h5>Evaluación de necesidades</h5>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              name="evalNecesidad"
-              id="evalNecesidad"
-              onChange={handleChanges}
-              value={"Se requiere"}
-            />
-            <label htmlFor="evalNecesidad">Se requiere</label>
-          </div>
 
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              name="evalNecesidad"
-              id="evalNoNecesidad"
-              onChange={handleChanges}
-              value={"No se requiere"}
-            />
-            <label htmlFor="evalNoNecesidad">No se requiere</label>
+            <div className="col-md-4">
+              <div className="card border-secondary h-100">
+                <div className="card-header">
+                  <strong>Monto estimado en daños</strong>
+                </div>
+                <div className="card-body">
+                  <label className="form-label" htmlFor="montoInicio">
+                    Desde:
+                  </label>
+                  <input
+                    className="form-control mb-2"
+                    type="text"
+                    name="montoInicio"
+                    id="montoInicio"
+                    value={montoInicio}
+                    onChange={handleChanges}
+                  />
+                  <label className="form-label" htmlFor="montoFin">
+                    Hasta:
+                  </label>
+                  <input
+                    className="form-control mb-2"
+                    type="text"
+                    name="montoFin"
+                    id="montoFin"
+                    value={montoFin}
+                    onChange={handleChanges}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="card border-secondary h-100">
+                <div className="card-header">
+                  <strong>Escala de Sismo (Mercali)</strong>
+                </div>
+                <div className="card-body">
+                  <label className="form-label" htmlFor="escala">
+                    Indique escala:
+                  </label>
+                  <select
+                    className="form-control mb-2"
+                    name="escala"
+                    id="escala"
+                    value={escala}
+                    onChange={handleChanges}
+                  >
+                    <option value="">Seleccione escala de sismo</option>
+                    {[
+                      "I",
+                      "II",
+                      "III",
+                      "IV",
+                      "V",
+                      "VI",
+                      "VII",
+                      "VIII",
+                      "IX",
+                      "X",
+                      "XI",
+                      "XII",
+                    ].map((e) => (
+                      <option key={e} value={e}>
+                        {e}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="row g-3">
+              <div className="col-md-4">
+                <div className="card border-secondary h-100">
+                  <div className="card-header">
+                    <strong>Incidente/emergencia</strong>
+                  </div>
+                  <div className="card-body">
+                    {[
+                      "Inundación",
+                      "Temporal",
+                      "Deslizamiento",
+                      "Act. Volcánica",
+                      "Inc. forestal",
+                      "Inc. urbano",
+                      "Sust. peligrosas",
+                      "Acc. Mult. Víctimas",
+                      "Corte Energía",
+                      "Corte agua",
+                      "Otro",
+                    ].map((e, idx) => (
+                      <div className="form-check" key={idx}>
+                        <input
+                          className="form-check-input"
+                          key={idx}
+                          type="checkbox"
+                          name="tipoEventos"
+                          id={idx}
+                          onChange={handleChanges}
+                          value={e}
+                        />
+                        <label className="form-check-label" htmlFor={idx}>
+                          {e}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-4">
+                <div className="card border-secondary h-100">
+                  <div className="card-header">
+                    <strong>Daños a vivienda</strong>
+                  </div>
+                  <div className="card-body">
+                    {[
+                      "Daño menor habitable",
+                      "Daño mayor no habitable",
+                      "Destuidas, irrecuperables",
+                      "No evaluadas",
+                    ].map((e) => (
+                      <div key={e} className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          key={e}
+                          name="evaDanios"
+                          id={e}
+                          onChange={handleChanges}
+                          value={e}
+                        />
+                        <label className="form-check-label" htmlFor={e}>
+                          {e}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-4">
+                <div className="card border-secondary h-100">
+                  <div className="card-header">
+                    <strong>Niveles de emergencia</strong>
+                  </div>
+                  <div className="card-body">
+                    {[
+                      "Emergencia Menor",
+                      "Emergencia Mayor",
+                      "Desastre",
+                      "Catástrofe",
+                    ].map((e, index) => (
+                      <>
+                        <div className="form-check" key={e}>
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            key={e}
+                            name="nivEmergencia"
+                            id={e}
+                            onChange={handleChanges}
+                            value={index + 1}
+                          />
+                          <label className="form-check-label" htmlFor={e}>
+                            {e}
+                          </label>
+                        </div>
+                      </>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="row g-3">
+                <div className="col-md-4">
+                  <div className="card border-secondary h-100">
+                    <div className="card-header">
+                      <strong>Daños a personas</strong>
+                    </div>
+                    <div className="card-body">
+                      {[
+                        "Afectadas",
+                        "Damnificadas",
+                        "Heridas",
+                        "Muertas",
+                        "Desaparecidas",
+                        "Albergados",
+                      ].map((e) => (
+                        <>
+                          <div className="form-check" key={e}>
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              key={e}
+                              name="danioPersonas"
+                              id={e}
+                              onChange={handleChanges}
+                              value={e}
+                            />
+                            <label className="form-check-label" htmlFor={e}>
+                              {e}
+                            </label>
+                          </div>
+                        </>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="card border-secondary h-100">
+                    <div className="card-header">
+                      <strong>Evaluación de necesidades</strong>
+                    </div>
+                    <div className="card-body">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          name="evalNecesidad"
+                          id="evalNecesidad"
+                          onChange={handleChanges}
+                          value={"Se requiere"}
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="evalNecesidad"
+                        >
+                          Se requiere
+                        </label>
+                      </div>
+
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          name="evalNecesidad"
+                          id="evalNoNecesidad"
+                          onChange={handleChanges}
+                          value={"No se requiere"}
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="evalNoNecesidad"
+                        >
+                          No se requiere
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <button onClick={fetchData}>ver info</button>
+      </div>
+      <hr />
+      <div className="row g-4">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-header bg-success text-white">
+              <strong>Acciones</strong>
+            </div>
+            <div className="card-body d-flex flex-column gap-3 align-items-center">
+              <button className="btn btn-danger w-75">
+                <i className="bi bi-file-pdf me-1"></i> Descargar PDF
+              </button>
+              <button className="btn btn-success w-75">
+                <i className="bi bi-file-earmark-excel me-1"></i> Descargar
+                Excel
+              </button>
+              <button className="btn btn-primary w-75">
+                <i className="bi bi-stars me-1"></i> Limpiar filtros
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
