@@ -94,6 +94,28 @@ export const exportExcel = (data, filename, formu) => {
       entidad_denuncia: item.entidad || "-",
       Num_parte: item.num_parte || "-",
     }));
+  } else if (formu === "ALFA") {
+    flatData = data.map((item) => ({
+      ID: item.id_alfa || "-",
+      Codigo: item.cod_alfa || "-",
+      Fecha_ocurrencia:
+        new Date(item.fecha_ocurrencia).toLocaleString("es-ES") || "-",
+      Evaluacion_daños: item.ev_danio || "-",
+      Monto_daños: item.monto_danio || "-",
+      Direccion: item.direccion || "-",
+      Tipo_Ubicacion: item.tipo_ubicacion || "-",
+      Tipo_afectados: JSON.stringify(item.tipo_afectados) || "-",
+      Tipo_evento: item.tipo_evento.join(" ,") || "-",
+      Escala_sismo: item.escala_sismo || "-",
+      Nivel_emergencia: item.nivel_emergencia || "-",
+      Evaluacion_necesidad: item.eval_necesidad || "-",
+      Danio_personas: item.danio_personas || "-",
+      Observaciones: item.observaciones || "-",
+      Responsable: item.responsable || "-",
+      Funcionario: item.funcionario || "-",
+      Fecha_documento:
+        new Date(item.fecha_documento).toLocaleString("es-ES") || "-",
+    }));
   } else {
     console.error("Formulario no reconocido para exportar");
     return;

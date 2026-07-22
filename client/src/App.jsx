@@ -137,8 +137,8 @@ function App() {
             path="/statistics/seguridad/imagenes/v1"
             element={<StatisicsSoliImg />}
           />
+          <Route path="/statistics/grd/alfa/v1" element={<StatisticsAlfa />} />
         </Route>
-        <Route path="/statistics/grd/alfa/v1" element={<StatisticsAlfa />} />
       </Routes>
     </BrowserRouter>
   );

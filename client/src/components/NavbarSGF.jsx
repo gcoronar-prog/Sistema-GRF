@@ -147,6 +147,21 @@ function NavbarSGF() {
     navigate(`/grd/inventario/prestamo/${id_prestamo}/edit`);
   };
 
+  const handleStatisticsAlfa = async () => {
+    try {
+      const res = await fetch(`${servidor_local}/estadisticaAlfa`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      navigate(`/statistics/grd/alfa/v1`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleLastImagenes = async () => {
     const res = await fetch(`${servidor_local}/seg/imagenes/last`, {
       headers: {
@@ -395,6 +410,12 @@ function NavbarSGF() {
                     <Link className="nav-link" onClick={handleLastPrestamo}>
                       <i className="bi bi-arrow-left-right me-1"></i> Prestamo
                       productos
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" onClick={handleStatisticsAlfa}>
+                      <i className="bi bi-arrow-left-right me-1"></i>
+                      Estadisticas ALFA
                     </Link>
                   </li>
                 </>

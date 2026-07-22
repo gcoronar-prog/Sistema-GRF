@@ -1,9 +1,13 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+import ListAlfaPDF from "../PDFs/ListAlfaPDF";
+import { exportExcel } from "../exportExcel";
 
 function StatisticsAlfa() {
   const server_back = import.meta.env.VITE_SERVER_ROUTE_BACK;
-
+  const printRef = useRef(null);
+  const [lista, setLista] = useState([]);
   const [fechaInicioDoc, setFechaInicioDoc] = useState("");
   const [fechaFinDoc, setFechaFinDoc] = useState("");
   const [montoInicio, setMontoInicio] = useState("");
@@ -59,6 +63,21 @@ function StatisticsAlfa() {
     );
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [
+    fechaInicioDoc,
+    fechaFinDoc,
+    montoInicio,
+    montoFin,
+    escala,
+    tipoEventos,
+    evaDanios,
+    nivEmergencia,
+    danioPersonas,
+    evalNecesidad,
+  ]);
+
   const fetchData = async () => {
     let url = `${server_back}/estadisticaAlfa?`;
     let params = new URLSearchParams();
@@ -103,11 +122,59 @@ function StatisticsAlfa() {
         headers: { "Content-Type": "application/json" },
       });
       const data = await response.json();
+
+      setLista(data.data);
       console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
+  const handleClearFilter = () => {
+    setFechaInicioDoc("");
+    setFechaFinDoc("");
+    setMontoInicio("");
+    setMontoFin("");
+    setEscala("");
+    setTipoEventos([]);
+    setEvaDanios([]);
+    setNivEmergencia([]);
+    setDanioPersonas([]);
+    setEvalNecesidad([]);
+  };
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Informes ALFA",
+  });
+
+  const handleExportExcel = async () => {
+    try {
+      const response = await fetch(
+        `${server_back}/estadisticaAlfa?${new URLSearchParams({
+          fechaInicioDoc,
+          fechaFinDoc,
+          montoInicio,
+          montoFin,
+          escala,
+          tipoEventos,
+          evaDanios,
+          nivEmergencia,
+          danioPersonas,
+          evalNecesidad,
+        })}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+      const data = await response.json();
+      exportExcel(data.data, "resumenalfa.xlsx", "ALFA");
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+    }
+  };
+
   return (
     <>
       <hr />
@@ -248,6 +315,7 @@ function StatisticsAlfa() {
                           type="checkbox"
                           name="tipoEventos"
                           id={idx}
+                          checked={tipoEventos.includes(e)}
                           onChange={handleChanges}
                           value={e}
                         />
@@ -280,6 +348,7 @@ function StatisticsAlfa() {
                           name="evaDanios"
                           id={e}
                           onChange={handleChanges}
+                          checked={evaDanios.includes(e)}
                           value={e}
                         />
                         <label className="form-check-label" htmlFor={e}>
@@ -312,6 +381,7 @@ function StatisticsAlfa() {
                             name="nivEmergencia"
                             id={e}
                             onChange={handleChanges}
+                            checked={nivEmergencia.includes(e)}
                             value={index + 1}
                           />
                           <label className="form-check-label" htmlFor={e}>
@@ -348,6 +418,7 @@ function StatisticsAlfa() {
                               name="danioPersonas"
                               id={e}
                               onChange={handleChanges}
+                              checked={danioPersonas.includes(e)}
                               value={e}
                             />
                             <label className="form-check-label" htmlFor={e}>
@@ -372,6 +443,7 @@ function StatisticsAlfa() {
                           name="evalNecesidad"
                           id="evalNecesidad"
                           onChange={handleChanges}
+                          checked={evalNecesidad.includes("Se requiere")}
                           value={"Se requiere"}
                         />
                         <label
@@ -389,6 +461,7 @@ function StatisticsAlfa() {
                           name="evalNecesidad"
                           id="evalNoNecesidad"
                           onChange={handleChanges}
+                          checked={evalNecesidad.includes("No se requiere")}
                           value={"No se requiere"}
                         />
                         <label
@@ -414,19 +487,28 @@ function StatisticsAlfa() {
               <strong>Acciones</strong>
             </div>
             <div className="card-body d-flex flex-column gap-3 align-items-center">
-              <button className="btn btn-danger w-75">
+              <button className="btn btn-danger w-75" onClick={handlePrint}>
                 <i className="bi bi-file-pdf me-1"></i> Descargar PDF
               </button>
-              <button className="btn btn-success w-75">
+              <button
+                className="btn btn-success w-75"
+                onClick={handleExportExcel}
+              >
                 <i className="bi bi-file-earmark-excel me-1"></i> Descargar
                 Excel
               </button>
-              <button className="btn btn-primary w-75">
+              <button
+                className="btn btn-primary w-75"
+                onClick={handleClearFilter}
+              >
                 <i className="bi bi-stars me-1"></i> Limpiar filtros
               </button>
             </div>
           </div>
         </div>
+      </div>
+      <div style={{ display: "none" }}>
+        <ListAlfaPDF ref={printRef} data={lista} />
       </div>
     </>
   );
