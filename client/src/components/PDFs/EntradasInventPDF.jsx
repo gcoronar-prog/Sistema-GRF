@@ -118,7 +118,14 @@ const EntradasInventPDF = forwardRef(({ data }, ref) => {
           </div>
         </fieldset>
         <hr />
-
+        <fieldset className="pdf-fieldset">
+          <div className="row">
+            <div className="col">
+              <strong>Números de serie:</strong>
+              <div>{data.num_serie}</div>
+            </div>
+          </div>
+        </fieldset>
         <fieldset className="pdf-fieldset">
           <div className="row">
             <div className="col">

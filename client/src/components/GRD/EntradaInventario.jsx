@@ -28,6 +28,7 @@ function EntradaInventario() {
     id_producto: "",
     unid_medida: "",
     tipo_form: "",
+    num_serie: "",
   };
   const fechaIngresoRef = useRef(null);
   const productosRef = useRef(null);
@@ -92,6 +93,7 @@ function EntradaInventario() {
       id_producto: data[0].id_producto || "",
       unid_medida: data[0].unid_medida || "",
       tipo_form: data[0].tipo_form || "", //data[0].tipo_form,
+      num_serie: data[0].num_serie || "",
     });
   };
 
@@ -303,7 +305,7 @@ function EntradaInventario() {
     const res = await fetch(`${servidor}/inventario/last?type=entrada`);
     const data = await res.json();
 
-    handlelastEntrada();
+    HandleLastEntrada();
     // navigate(`/grd/inventario/entrada/${data[0].id_inventario}/edit`);
 
     window.scrollTo({
@@ -552,6 +554,7 @@ function EntradaInventario() {
                               type="number"
                               name="cantidad"
                               id="cantidad"
+                              min={1}
                               value={entradas.cantidad ?? ""}
                               onChange={handleChanges}
                               disabled={editing}
@@ -721,6 +724,21 @@ function EntradaInventario() {
                             onChange={handleChanges}
                             disabled={editing}
                           />
+                        </div>
+                        <div className="col-md-auto">
+                          <label htmlFor="num_serie" className="form-label">
+                            Números de serie
+                          </label>
+                          <textarea
+                            className="form-control"
+                            name="num_serie"
+                            id="num_serie"
+                            cols={95}
+                            rows={3}
+                            value={entradas.num_serie ?? ""}
+                            onChange={handleChanges}
+                            disabled={editing}
+                          ></textarea>
                         </div>
                         <div className="col-md-auto">
                           <label htmlFor="observaciones" className="form-label">

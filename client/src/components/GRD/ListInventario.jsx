@@ -51,11 +51,10 @@ function ListInventario() {
               <thead className="table-info">
                 <tr>
                   <th>ID</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
                   <th>Producto</th>
                   <th>Tipo producto</th>
-                  <th>Cantidad</th>
-                  <th>Precio Unidad</th>
-                  <th>Precio total</th>
                   <th>Ir...</th>
                 </tr>
               </thead>
@@ -64,11 +63,10 @@ function ListInventario() {
                   lista.map((l) => (
                     <tr key={l.id_producto}>
                       <td>{l.id_producto}</td>
+                      <td>{l.marca_producto}</td>
+                      <td>{l.modelo}</td>
                       <td>{l.nombre_producto}</td>
                       <td>{l.tipo_produ}</td>
-                      <td>{l.cantidad}</td>
-                      <td>{"$" + l.precio_unit}</td>
-                      <td>{"$" + l.precio_total}</td>
                       <td>
                         <button
                           className="btn btn-primary"

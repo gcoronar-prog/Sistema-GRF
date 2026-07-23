@@ -397,7 +397,8 @@ function NavbarSGF() {
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleInventario}>
-                      <i className="bi bi-box-seam me-1"></i> Inventario
+                      <i className="bi bi-box-seam me-1"></i> Ingreso de
+                      productos
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -414,8 +415,8 @@ function NavbarSGF() {
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" onClick={handleStatisticsAlfa}>
-                      <i className="bi bi-arrow-left-right me-1"></i>
-                      Estadisticas ALFA
+                      <i className="bi bi-bar-chart-fill me-1"></i>
+                      Resumen ALFA
                     </Link>
                   </li>
                 </>

@@ -75,10 +75,7 @@ const createProducto = async (req, res) => {
       data.nombre_producto,
       data.observ_produ,
       data.tipo_produ,
-      data.cantidad,
-      data.precio_unit,
-      data.ubicacion,
-      data.serial,
+      data.marca_producto,
       data.unidad_medida,
       data.user_creador,
       data.fecha_creado,
@@ -108,10 +105,7 @@ const updateInventario = async (req, res) => {
       data.nombre_producto,
       data.observ_produ,
       data.tipo_produ,
-      data.cantidad,
-      data.precio_unit,
-      data.ubicacion,
-      data.serial,
+      data.marca_producto,
       data.unidad_medida,
       data.user_creador,
       data.fecha_creado,
@@ -121,12 +115,6 @@ const updateInventario = async (req, res) => {
     return res.status(201).json(result);
   } catch (error) {
     console.error(error);
-    if (data.cantidad < 0) {
-      return res.status(400).json({
-        message: "Cantidad invalida",
-        code: "CANTIDAD_INVALIDA",
-      });
-    }
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -220,6 +208,7 @@ const createEntrada = async (req, res) => {
       data.id_producto,
       data.unid_medida,
       data.tipo_form,
+      data.num_serie,
     ]);
 
     return res.status(201).json(result);
@@ -270,6 +259,7 @@ const updateEntrada = async (req, res) => {
       data.unid_medida,
       data.tipo_form,
       data.fecha_creado,
+      data.num_serie,
       id,
     ]);
     if (result.length === 0) {
@@ -703,13 +693,13 @@ const getPrevElement = async (req, res) => {
 
 const entrada_grd = `
   INSERT INTO inventario_grd (ubicacion,observaciones,usuario_creador,fecha_creado,cantidad,tipo_producto\
-  ,factura,orden_compra,proveedor,producto,precio_unitario,id_producto,unid_medida,tipo_form)\
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *
+  ,factura,orden_compra,proveedor,producto,precio_unitario,id_producto,unid_medida,tipo_form,num_serie)\
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *
 `;
 
 const nuevo_producto = `
   INSERT INTO productos_grd (nombre_producto, observ_produ, tipo_produ,\
-  cantidad, precio_unit, ubicacion,serial,unidad_medida,user_creador,fecha_creado,modelo) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *;`;
+  marca_producto,unidad_medida,user_creador,fecha_creado,modelo) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *;`;
 
 const nuevo_prestamo = `INSERT INTO prestamo_grd (user_prestamo,estado_prestamo,fecha_prestamo,fecha_devolucion,observ, user_creador,\
 correo,telefono,id_producto,num_serie,cantidad_p)\
@@ -722,12 +712,12 @@ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *;`;
 const update_entrada = `
   UPDATE inventario_grd SET ubicacion=$1,observaciones=$2,usuario_creador=$3,\
 cantidad=$4,tipo_producto=$5,factura=$6,orden_compra=$7,proveedor=$8,producto=$9,precio_unitario=$10,id_producto=$11,unid_medida=$12,\
-tipo_form=$13, fecha_creado=$14 WHERE id_inventario = $15 RETURNING *;
+tipo_form=$13, fecha_creado=$14, num_serie=$15 WHERE id_inventario = $16 RETURNING *;
 `;
 
 const update_producto = `
   UPDATE productos_grd SET nombre_producto=$1, observ_produ=$2, tipo_produ=$3,\
-  cantidad=$4, precio_unit=$5, ubicacion=$6, serial=$7, unidad_medida=$8, user_creador=$9, fecha_creado=$10, modelo=$11 WHERE id_producto = $12 RETURNING *;
+  marca_producto=$4, unidad_medida=$5, user_creador=$6, fecha_creado=$7, modelo=$8 WHERE id_producto = $9 RETURNING *;
 `;
 
 const update_prestamo = `

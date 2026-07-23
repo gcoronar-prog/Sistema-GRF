@@ -71,28 +71,16 @@ const ProductosPDF = forwardRef(({ data }, ref) => {
             </div>
 
             <div className="col">
-              <strong>N° de serie</strong>
-              <div>{data.serial}</div>
+              <strong>Marca del producto</strong>
+              <div>{data.marca_producto}</div>
             </div>
 
             <div className="col">
-              <strong>Cantidad:</strong>
-              <div>{data.cantidad + " " + data.unidad_medida}</div>
+              <strong>Unidad de medida:</strong>
+              <div>{data.unidad_medida}</div>
             </div>
           </div>
           <div className="row">
-            <div className="col">
-              <strong>Precio unitario:</strong>
-              <div>${data.precio_unit}</div>
-            </div>
-            <div className="col">
-              <strong>Precio total:</strong>
-              <div>${data.precio_total}</div>
-            </div>
-            <div className="col">
-              <strong>Ubicación:</strong>
-              <div>{data.ubicacion}</div>
-            </div>
             <div className="col"></div>
           </div>
         </fieldset>

@@ -21,10 +21,7 @@ function InventarioGRD() {
     nombre_producto: "",
     observ_produ: "",
     tipo_produ: "",
-    cantidad: "",
-    precio_unit: "",
-    ubicacion: "",
-    serial: "",
+    marca_producto: "",
     modelo: "",
     unidad_medida: "",
     user_creador: "",
@@ -38,8 +35,8 @@ function InventarioGRD() {
 
   const productoRef = useRef(null);
   const tipoProductoRef = useRef(null);
-  const cantidadRef = useRef(null);
-  const precioRef = useRef(null);
+  const marcaProductoRef = useRef(null);
+  //const precioRef = useRef(null);
 
   const printRef = useRef(null);
 
@@ -65,10 +62,7 @@ function InventarioGRD() {
       nombre_producto: data[0].nombre_producto,
       observ_produ: data[0].observ_produ,
       tipo_produ: data[0].tipo_produ,
-      cantidad: data[0].cantidad,
-      precio_unit: data[0].precio_unit,
-      serial: data[0].serial,
-      ubicacion: data[0].ubicacion,
+      marca_producto: data[0].marca_producto,
       fecha_creado: data[0].fecha_creado,
       unidad_medida: data[0].unidad_medida,
       user_creador: data[0].user_creador,
@@ -98,8 +92,8 @@ function InventarioGRD() {
     const requeridos = [
       { field: inventarios.nombre_producto, ref: productoRef },
       { field: inventarios.tipo_produ, ref: tipoProductoRef },
-      { field: inventarios.cantidad, ref: cantidadRef },
-      { field: inventarios.precio_unit, ref: precioRef },
+      { field: inventarios.marca_producto, ref: marcaProductoRef },
+      // { field: inventarios.precio_unit, ref: precioRef },
     ];
 
     const errorRequerido = requeridos.find((f) => isEmpty(f.field));
@@ -399,17 +393,17 @@ function InventarioGRD() {
                       )}
                     </div>
 
-                    <div className="col-md-auto" ref={tipoProductoRef}>
-                      <label htmlFor="tipo_produ" className="form-label">
-                        Tipo producto
+                    <div className="col-md-auto" ref={productoRef}>
+                      <label htmlFor="nombre_producto" className="form-label">
+                        Marca del producto
                       </label>
                       <div className={hasError ? "rounded error-focus" : ""}>
                         <input
                           type="text"
-                          name="tipo_produ"
-                          id="tipo_produ"
+                          id="marca_producto"
+                          name="marca_producto"
                           className="form-control"
-                          value={inventarios.tipo_produ || ""}
+                          value={inventarios.marca_producto || ""}
                           onChange={handleChanges}
                           disabled={editing}
                         />
@@ -435,7 +429,28 @@ function InventarioGRD() {
                         disabled={editing}
                       />
                     </div>
-                    <div className="col-md-auto">
+                    <div className="col-md-auto" ref={tipoProductoRef}>
+                      <label htmlFor="tipo_produ" className="form-label">
+                        Tipo producto
+                      </label>
+                      <div className={hasError ? "rounded error-focus" : ""}>
+                        <input
+                          type="text"
+                          name="tipo_produ"
+                          id="tipo_produ"
+                          className="form-control"
+                          value={inventarios.tipo_produ || ""}
+                          onChange={handleChanges}
+                          disabled={editing}
+                        />
+                      </div>
+                      {hasError && (
+                        <small className="text-danger">
+                          *Campo obligatorio
+                        </small>
+                      )}
+                    </div>
+                    {/*<div className="col-md-auto">
                       <label htmlFor="serial" className="form-label">
                         Serial
                       </label>
@@ -448,10 +463,40 @@ function InventarioGRD() {
                         onChange={handleChanges}
                         disabled={editing}
                       />
+                      
+                    </div>*/}
+                    <div className="col-md-auto">
+                      <label htmlFor="unidad_medida" className="form-label">
+                        Unidad de medida
+                      </label>
+                      <input
+                        type="text"
+                        name="unidad_medida"
+                        id="unidad_medida"
+                        className="form-control"
+                        value={inventarios.unidad_medida || ""}
+                        onChange={handleChanges}
+                        disabled={editing}
+                      />
                     </div>
                   </div>
+                  <div className="col-md-auto">
+                    <label htmlFor="observ_produ" className="form-label">
+                      Descripción del producto
+                    </label>
+                    <textarea
+                      type="text"
+                      name="observ_produ"
+                      className="form-control"
+                      id="observ_produ"
+                      value={inventarios.observ_produ || ""}
+                      onChange={handleChanges}
+                      disabled={editing}
+                    />
+                  </div>
                 </fieldset>
-                <fieldset className="border border-primary rounded p-3">
+
+                {/*<fieldset className="border border-primary rounded p-3">
                   <legend className="float-none w-auto px-2 h6 mb-0">
                     Detalles producto
                   </legend>
@@ -477,20 +522,7 @@ function InventarioGRD() {
                         </small>
                       )}
                     </div>
-                    <div className="col-md-auto">
-                      <label htmlFor="unidad_medida" className="form-label">
-                        Unidad de medida
-                      </label>
-                      <input
-                        type="text"
-                        name="unidad_medida"
-                        id="unidad_medida"
-                        className="form-control"
-                        value={inventarios.unidad_medida || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      />
-                    </div>
+
                     <div className="col-md-auto" ref={precioRef}>
                       <label htmlFor="precio_unit" className="form-label">
                         Precio Unitario
@@ -512,20 +544,7 @@ function InventarioGRD() {
                         </small>
                       )}
                     </div>
-                    <div className="col-md-auto">
-                      <label htmlFor="observ_produ" className="form-label">
-                        Descripción del producto
-                      </label>
-                      <textarea
-                        type="text"
-                        name="observ_produ"
-                        className="form-control"
-                        id="observ_produ"
-                        value={inventarios.observ_produ || ""}
-                        onChange={handleChanges}
-                        disabled={editing}
-                      />
-                    </div>
+
                     <div className="col-md-auto">
                       <label htmlFor="ubicacion1" className="form-label">
                         Ubicación
@@ -544,10 +563,10 @@ function InventarioGRD() {
                         <option value="Bodega">Bodega Municipal</option>
                         <option value="Oficina">Oficina</option>
                       </select>
-                    </div>
+                    </div>*
                     <div className="col-md-auto"></div>
                   </div>
-                </fieldset>
+                </fieldset>*/}
                 <div className="d-flex flex-wrap gap-2 mt-4">
                   {!editing && (
                     <div className="d-flex flex-wrap gap-2 mt-4">
@@ -596,8 +615,7 @@ function InventarioGRD() {
               <div className="card-footer text-end mt-3">
                 {editing && (
                   <button className="btn btn-danger" onClick={handlePrint}>
-                    <i className="bi bi-file-earmark-pdf"></i>
-                    Descargar PDF
+                    <i className="bi bi-file-earmark-pdf"></i> Descargar PDF
                   </button>
                 )}
               </div>
