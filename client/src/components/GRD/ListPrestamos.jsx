@@ -8,21 +8,38 @@ import { useReactToPrint } from "react-to-print";
 
 function ListPrestamos() {
   const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
-  const [lista, setLista] = useState([]);
+  const navigate = useNavigate();
   const printRef = useRef(null);
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    LoadListaPrestamo();
+  }, []);
 
-  const handlePrint = useReactToPrint({
-    contentRef: printRef,
-    documentTitle: "Prestamos de productos",
-  });
+  const [lista, setLista] = useState([]);
 
-  const loadLista = async () => {
+  const LoadListaPrestamo = async () => {
     try {
       const res = await fetch(`${servidor}/inventario/prestamo/list`);
       const data = await res.json();
+      //console.log(data);
+
       setLista(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Prestamo de Productos",
+  });
+
+  const handleRedirect = async (id) => {
+    try {
+      const res = await fetch(`${servidor}/inventario/grd/${id}`);
+      const data = await res.json();
+      //console.log(data);
+      navigate(`/grd/inventario/${id}/edit`);
     } catch (error) {
       console.error(error);
     }
@@ -47,87 +64,51 @@ function ListPrestamos() {
     );
   };
 
-  const handleRedirect = async (id) => {
-    try {
-      const res = await fetch(`${servidor}/inventario/prestamo/edit/${id}`);
-      const data = await res.json();
-      navigate(`/grd/prestamos/${id}/edit`);
-    } catch (error) {
-      console.error(error);
-    }
-  };
   return (
     <>
-      <div className="card ms-5">
+      <div className="card ms-4 me-2">
         <div className="card-header bg-success text-white d-flex justify-content-between p-4">
-          <h5 className="card-title mb-0">Listado de {tipo} </h5>
+          <h5 className="card-title mb-0">Listado prestamos productos</h5>
         </div>
         <div className="card-body">
-          <div className="d-flex justify-content-center mb-3 gap-2 flex-wrap">
-            <div className="btn-group mb-2">
-              <button
-                type="button"
-                className={`btn ${
-                  estado === 1 ? "btn-success" : "btn-outline-success"
-                }`}
-                onClick={() => {
-                  (setEstado(1), setTipo("entrada"));
-                }}
-              >
-                Entradas
-              </button>
-              <button
-                type="button"
-                className={`btn ${
-                  estado === 2 ? "btn-danger" : "btn-outline-danger"
-                }`}
-                onClick={() => {
-                  (setEstado(2), setTipo("salida"));
-                }}
-              >
-                Salidas
-              </button>
-            </div>
-          </div>
           <div className="table-responsive">
-            <table className="table table-bordered table-striped-columns table-hover">
-              <thead className="table-info">
-                <tr>
-                  <th>ID</th>
+            <table
+              className="table table-bordered table-striped-columns table-hover"
+              data-bs-spy="scroll"
+            >
+              <thead>
+                <tr className="table-info">
+                  <th>ID Producto</th>
+                  <th>Usuario prestamo</th>
+                  <th>Fecha de prestamo</th>
                   <th>Producto</th>
-                  <th>Usuario creador</th>
-                  <th>Fecha creación</th>
-                  <th>Cantidad</th>
-                  <th>Unidad de medida</th>
-                  <th>Observaciones</th>
-                  <th>Ir...</th>
+                  <th>Cantidad Solicitada</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {lista.length !== 0 ? (
-                  lista.map((l) => (
-                    <tr key={l.id_inventario}>
-                      <td>{l.id_inventario}</td>
-                      <td>{l.nombre_producto}</td>
-                      <td>{l.user_creador}</td>
-                      <td>{formatDateTimeLocal(l.fecha_creado)}</td>
-                      <td>{l.cantidad}</td>
-                      <td>{l.unid_medida}</td>
-                      <td>{l.observaciones}</td>
+                  lista.map((li, idx) => (
+                    <tr key={idx}>
+                      <td>{li.id_producto}</td>
+                      <td>{li.user_prestamo}</td>
+                      <td>{formatDateTimeLocal(li.fecha_prestamo)}</td>
+                      <td>{li.nombre_producto}</td>
+                      <td>{li.cantidad_p}</td>
                       <td>
                         <button
                           className="btn btn-primary"
-                          onClick={() => handleRedirect(l.id_inventario)}
+                          onClick={() => handleRedirect(li.id_producto)}
                         >
-                          Ir a...
+                          Ir a producto...
                         </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="8" className="text-center">
-                      No hay registros de {tipo} en el inventario
+                    <td colSpan="6" className="text-center">
+                      No hay préstamos registrados
                     </td>
                   </tr>
                 )}
@@ -135,7 +116,7 @@ function ListPrestamos() {
             </table>
           </div>
         </div>
-        <div className="card-footer text-end">
+        <div className="card-footer text-end mt-3">
           {lista.length !== 0 && (
             <button className="btn btn-danger" onClick={handlePrint}>
               <i className="bi bi-file-earmark-pdf"></i>
@@ -144,7 +125,7 @@ function ListPrestamos() {
           )}
         </div>
         <div style={{ display: "none" }}>
-          <ListEntradaPDF ref={printRef} data={lista} />
+          <ListPrestamoPDF ref={printRef} data={lista} />
         </div>
       </div>
     </>

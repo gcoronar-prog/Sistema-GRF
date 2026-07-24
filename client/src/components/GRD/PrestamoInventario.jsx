@@ -6,6 +6,7 @@ import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
 
 import InventarioPDF from "../PDFs/InventarioPDF";
+import ListPrestamos from "./ListPrestamos";
 
 function PrestamoInventario() {
   const defaultPrestamo = {
@@ -488,7 +489,7 @@ function PrestamoInventario() {
                                   ) || ""
                                 }
                                 onChange={handleChanges}
-                                disabled
+                                disabled={editing}
                               />
                             </div>
                           )}
@@ -555,7 +556,7 @@ function PrestamoInventario() {
                                     key={p.id_producto}
                                     value={p.id_producto}
                                   >
-                                    {p.nombre_producto}
+                                    {p.id_producto + "|" + p.nombre_producto}
                                   </option>
                                 ))}
                               </select>
@@ -749,6 +750,7 @@ function PrestamoInventario() {
             <div className="col-md-6">
               <ListUserPrestamo usuario={prestamos.user_prestamo} />
             </div>
+            <ListPrestamos />
           </div>
         </div>
       </div>

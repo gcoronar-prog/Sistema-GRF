@@ -54,19 +54,19 @@ function ListInventario() {
                   <th>Marca</th>
                   <th>Modelo</th>
                   <th>Producto</th>
-                  <th>Tipo producto</th>
+                  <th>Stock</th>
                   <th>Ir...</th>
                 </tr>
               </thead>
               <tbody>
                 {lista.length !== 0 ? (
-                  lista.map((l) => (
-                    <tr key={l.id_producto}>
-                      <td>{l.id_producto}</td>
-                      <td>{l.marca_producto}</td>
-                      <td>{l.modelo}</td>
-                      <td>{l.nombre_producto}</td>
-                      <td>{l.tipo_produ}</td>
+                  lista.map((l, id) => (
+                    <tr key={id}>
+                      <td>{l.id_inventario}</td>
+                      <td>{l.marca_inventario}</td>
+                      <td>{l.modelo_inventario}</td>
+                      <td>{l.nombre_inventario}</td>
+                      <td>{l.cantidad_inventario}</td>
                       <td>
                         <button
                           className="btn btn-primary"

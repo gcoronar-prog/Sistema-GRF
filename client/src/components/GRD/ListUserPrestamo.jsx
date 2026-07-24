@@ -70,7 +70,7 @@ function ListUserPrestamo({ usuario }) {
     <>
       <div className="card ms-4 me-2">
         <div className="card-header bg-success text-white d-flex justify-content-between p-4">
-          <h5 className="card-title mb-0">Listado prestamo productos</h5>
+          <h5 className="card-title mb-0">Listado prestamo usuario</h5>
         </div>
         <div className="card-body">
           <div className="table-responsive">
@@ -90,8 +90,8 @@ function ListUserPrestamo({ usuario }) {
               </thead>
               <tbody>
                 {lista.length !== 0 ? (
-                  lista.map((li) => (
-                    <tr key={li.id_producto}>
+                  lista.map((li, id) => (
+                    <tr key={id}>
                       <td>{li.id_producto}</td>
                       <td>{li.user_prestamo}</td>
                       <td>{formatDateTimeLocal(li.fecha_prestamo)}</td>

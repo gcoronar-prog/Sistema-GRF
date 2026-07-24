@@ -108,7 +108,8 @@ function ListEntradas() {
                   <th>Producto</th>
                   <th>Usuario creador</th>
                   <th>Fecha creación</th>
-                  <th>Cantidad</th>
+                  <th>Cantidad ingresada</th>
+                  <th>Stock Disponible</th>
                   <th>Unidad de medida</th>
                   <th>Observaciones</th>
                   <th>Ir...</th>
@@ -116,15 +117,16 @@ function ListEntradas() {
               </thead>
               <tbody>
                 {lista.length !== 0 ? (
-                  lista.map((l) => (
-                    <tr key={l.id_inventario}>
+                  lista.map((l, id) => (
+                    <tr key={id}>
                       <td>{l.id_inventario}</td>
-                      <td>{l.nombre_producto}</td>
-                      <td>{l.user_creador}</td>
+                      <td>{l.nombre_inventario}</td>
+                      <td>{l.usuario_creador}</td>
                       <td>{formatDateTimeLocal(l.fecha_creado)}</td>
                       <td>{l.cantidad}</td>
-                      <td>{l.unid_medida}</td>
-                      <td>{l.observaciones}</td>
+                      <td>{l.cantidad_inventario}</td>
+                      <td>{l.unidad_medida}</td>
+                      <td>{l.descripcion_inventario}</td>
                       <td>
                         <button
                           className="btn btn-primary"

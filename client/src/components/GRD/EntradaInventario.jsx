@@ -208,7 +208,9 @@ function EntradaInventario() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw data;
+        alert(data.error);
+        return;
+        //throw data;
       }
       console.log(data[0].tipo_form);
 

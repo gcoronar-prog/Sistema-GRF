@@ -127,9 +127,9 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                       "X",
                       "XI",
                       "XII",
-                    ].map((nivel) => (
+                    ].map((nivel, id) => (
                       <div
-                        key={nivel}
+                        key={id}
                         style={{
                           borderStyle:
                             data.escala_sismo === nivel ? "solid" : "none",
@@ -159,7 +159,7 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                         {eventoIzq.map((eveIzq, i) => {
                           const eveDer = eventoDere[i] || "";
                           return (
-                            <tr key={eveIzq}>
+                            <tr key={i}>
                               <td
                                 style={{
                                   border: "1px solid",
@@ -334,11 +334,11 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                         "MUERTAS",
                         "DESAPARECIDAS* ",
                         "ALBERGADOS* ",
-                      ].map((tipo) => {
+                      ].map((tipo, id) => {
                         const h = afectados[tipo]?.hombres || "";
                         const m = afectados[tipo]?.mujeres || "";
                         return (
-                          <tr key={tipo} className="mb-0">
+                          <tr key={id} className="mb-0">
                             <td
                               className="px-1 ms-1"
                               style={{ fontSize: "9px" }}
@@ -384,8 +384,8 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                     "DAÑO MENOR HABITABLE",
                     "DAÑO MAYOR NO HABITABLE",
                     "DESTRUIDAS, IRRECUPERABLE",
-                  ].map((danio) => (
-                    <div className="row p-0 m-0" key={danio}>
+                  ].map((danio, id) => (
+                    <div className="row p-0 m-0" key={id}>
                       <div className="col m-0 p-0 ms-0">
                         <span style={{ fontSize: "10px" }}>{danio}</span>
                       </div>
@@ -644,7 +644,7 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                   <tbody className="m-4">
                     {arrayEmergencia.map((e, i) => {
                       return (
-                        <tr className="">
+                        <tr className="" key={i}>
                           <td
                             className="text-center"
                             style={{
@@ -652,7 +652,6 @@ const AlfaPDF = forwardRef(({ data }, ref) => {
                               width: "6%",
                               height: "5%",
                             }}
-                            key={e}
                           >
                             {data.cap_respuesta.includes(i) ? "X" : ""}
                           </td>

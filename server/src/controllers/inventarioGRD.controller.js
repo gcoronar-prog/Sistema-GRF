@@ -53,7 +53,7 @@ const getInventarioGRD = async (req, res) => {
 const getListaProductos = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM productos_grd ORDER BY id_producto DESC",
+      "SELECT * FROM info_inventario_grd ORDER BY id_producto DESC",
     );
     if (rows.length === 0) {
       console.error("No existen registros");
@@ -155,7 +155,9 @@ const getListTipo = async (req, res) => {
   const tipo = req.query.tipo;
   try {
     const { rows } = await pool.query(
-      `SELECT a.*,b.* FROM inventario_grd a JOIN productos_grd b ON a.id_producto=b.id_producto
+      `SELECT a.id_inventario,a.usuario_creador, a.fecha_creado,a.cantidad,b.cantidad_inventario,
+	b.marca_inventario,b.nombre_inventario,b.unidad_medida,b.descripcion_inventario
+FROM inventario_grd a JOIN info_inventario_grd b ON a.id_producto=b.id_producto
         WHERE tipo_form=$1`,
       [tipo],
     );
@@ -280,15 +282,9 @@ const updateEntrada = async (req, res) => {
         error.message?.includes("Stock insuficiente") ||
         error.message?.includes("Cantidad invalida"))
     ) {
-      const { rows } = await pool.query(
-        "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
-        [data.id_producto],
-      );
-      const stockActual = rows[0]?.cantidad || 0;
       return res.status(400).json({
         message: error.message,
         code: error.code,
-        stock: stockActual,
       });
     }
   }
@@ -313,7 +309,9 @@ const deleteEntrada = async (req, res) => {
 // PRESTAMOS
 const getListPrestamos = async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM prestamo_grd");
+    const { rows } = await pool.query(
+      "SELECT a.*,b.nombre_producto FROM prestamo_grd a JOIN productos_grd b ON a.id_producto=b.id_producto",
+    );
     if (rows.length === 0) {
       console.error("No existen registros");
     }
@@ -365,22 +363,8 @@ const createPrestamo = async (req, res) => {
     console.log(data);
     return res.status(201).json(result);
   } catch (error) {
-    if (
-      error.code === "P0001" ||
-      error.message?.includes("Stock insuficiente")
-    ) {
-      const { rows } = await pool.query(
-        "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
-        [data.id_producto],
-      );
-      const stockActual = rows[0]?.cantidad_p || 0;
-      return res.status(400).json({
-        message: error.message,
-        code: "STOCK_INSUFICIENTE",
-        stock: stockActual,
-      });
-    }
-    console.error(error);
+    if (error.code === "P0001" || error.message?.includes("Stock insuficiente"))
+      console.error(error);
     return res
       .status(500)
       .json({ message: "Problemas de conexión con el servidor" });
@@ -416,15 +400,9 @@ const updatePrestamo = async (req, res) => {
       error.code === "P0001" ||
       error.message?.includes("Stock insuficiente")
     ) {
-      const { rows } = await pool.query(
-        "SELECT cantidad FROM productos_grd WHERE id_producto=$1",
-        [data.id_producto],
-      );
-      const stockActual = rows[0]?.cantidad_p || 0;
       return res.status(400).json({
         message: error.message,
         code: "STOCK_INSUFICIENTE",
-        stock: stockActual,
       });
     }
     return res
