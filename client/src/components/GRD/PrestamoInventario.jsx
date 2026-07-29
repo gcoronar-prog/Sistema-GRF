@@ -749,8 +749,8 @@ function PrestamoInventario() {
             </div>
             <div className="col-md-6">
               <ListUserPrestamo usuario={prestamos.user_prestamo} />
+              <ListPrestamos />
             </div>
-            <ListPrestamos />
           </div>
         </div>
       </div>

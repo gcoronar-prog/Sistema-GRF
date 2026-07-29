@@ -219,7 +219,7 @@ const getResumenClasi = async (req, res) => {
       ([clasificacion, tipos]) => ({
         clasificacion,
         tipos,
-      })
+      }),
     );
 
     await client.query("COMMIT");
@@ -437,7 +437,7 @@ const getResumenVehi = async (req, res) => {
       ([nombre_vehiculo, datos]) => ({
         nombre_vehiculo,
         datos,
-      })
+      }),
     );
 
     await client.query("COMMIT");
@@ -480,7 +480,7 @@ function buildWhereClause({
         values.length + 2
       }`,
       fechaInicio,
-      fechaFin
+      fechaFin,
     );
   }
 
@@ -490,14 +490,14 @@ function buildWhereClause({
       `doi.estado_informe IN (${estadosArray
         .map((_, index) => `$${values.length + index + 1}`)
         .join(", ")})`,
-      ...estadosArray
+      ...estadosArray,
     );
   }
 
   if (clasificacion && clasificacion !== "[]") {
     addCondition(
       `dti.clasificacion_informe::jsonb @> $${values.length + 1}::jsonb`,
-      clasificacion
+      clasificacion,
     );
   }
 
@@ -507,42 +507,42 @@ function buildWhereClause({
       `doi.captura_informe IN (${capturaArray
         .map((_, index) => `$${values.length + index + 1}`)
         .join(", ")})`,
-      ...capturaArray
+      ...capturaArray,
     );
   }
 
   if (origen && origen !== "[]") {
     addCondition(
       `doi.origen_informe::jsonb @> $${values.length + 1}::jsonb`,
-      origen
+      origen,
     );
   }
 
   if (recursos && recursos !== "[]") {
     addCondition(
       `dti.recursos_informe::jsonb @> $${values.length + 1}::jsonb`,
-      recursos
+      recursos,
     );
   }
 
   if (sector && sector !== "[]") {
     addCondition(
       `dui.sector_informe::jsonb @> $${values.length + 1}::jsonb`,
-      sector
+      sector,
     );
   }
 
   if (vehiculo && vehiculo !== "[]") {
     addCondition(
       `dvi.vehiculos_informe::jsonb @> $${values.length + 1}::jsonb`,
-      vehiculo
+      vehiculo,
     );
   }
 
   if (tipoReporte && tipoReporte !== "[]") {
     addCondition(
       `dti.tipo_informe::jsonb @> $${values.length + 1}::jsonb`,
-      tipoReporte
+      tipoReporte,
     );
   }
 

@@ -73,12 +73,6 @@ const EntradasInventPDF = forwardRef(({ data }, ref) => {
               <strong>Producto:</strong>
               <div>{data.id_producto}</div>
             </div>
-
-            <div className="col">
-              <strong>Tipo de producto:</strong>
-              <div>{data.tipo_producto}</div>
-            </div>
-
             <div className="col">
               <strong>Cantidad:</strong>
               <div>{data.cantidad + " " + data.unid_medida}</div>

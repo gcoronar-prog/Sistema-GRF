@@ -525,7 +525,7 @@ function EntradaInventario() {
                             </div>
                           )}
                         </div>
-                        <div className="col-md-auto">
+                        {/*<div className="col-md-auto">
                           <label htmlFor="tipo_producto" className="form-label">
                             Tipo producto
                           </label>
@@ -543,7 +543,7 @@ function EntradaInventario() {
                             <option value="Clavos">Clavos</option>
                             <option value="Herramientas">Herramientas</option>
                           </select>
-                        </div>
+                        </div>*/}
                         <div className="col-md-auto" ref={cantidadRef}>
                           <label htmlFor="cantidad" className="form-label">
                             Cantidad

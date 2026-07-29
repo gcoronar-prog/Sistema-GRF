@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import SelectOrigin from "../SelectOrigin";
 import SelectSector from "../SelectSector";
 import SelectVehiculo from "../SelectVehiculo";
@@ -17,6 +17,8 @@ import EstadoCentralPDF from "../PDFs/EstadoCentralPDF.jsx";
 import SelectUsers from "./SelectUsers.jsx";
 import UserCentralPDF from "../PDFs/UserCentralPDF.jsx";
 import VehiculoCentralPDF from "../PDFs/VehiculoCentralPDF.jsx";
+import { useReactToPrint } from "react-to-print";
+import ListCentralPDF from "../PDFs/ListCentralPDF.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -40,6 +42,8 @@ function StatisticsCentral() {
   };
 
   const [central, setCentral] = useState([]);
+  const [lista, setLista] = useState([]);
+  const printRef = useRef(null);
   const [fechaInicio, setFechaInicio] = useState(startMonth);
   const [fechaFin, setFechaFin] = useState(dateNow);
   const [selectedOrigen, setSelectedOrigen] = useState([]);
@@ -67,7 +71,22 @@ function StatisticsCentral() {
     email: false,
   });
 
-  const fetchData = async (tipoDoc) => {
+  useEffect(() => {
+    fetchData();
+  }, [
+    fechaInicio,
+    fechaFin,
+    estadoFilter,
+    capturaFilter,
+    selectedClasif,
+    selectedOrigen,
+    selectedSector,
+    selectedVehiculo,
+    selectedTipo,
+    selectedRecursos,
+    selectedUser,
+  ]);
+  const fetchData = async () => {
     let url = `${server_back}/estadisticaCentral?`;
     let params = new URLSearchParams();
 
@@ -126,109 +145,16 @@ function StatisticsCentral() {
       const data = await res.json();
       //setCentral(data.informe || []);
       //console.log(data.informe);
-      if (data.informe.length !== 0) {
-        if (tipoDoc === 1) {
-          generarPDF(data.informe);
-        } else if (tipoDoc === 2) {
-          exportExcel(data.informe, "Central.xlsx", "central");
-        }
-      } else {
-        alert("No hay datos para mostrar");
-      }
+      setLista(data.informe);
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
   };
-
-  const generarPDF = (dato) => {
-    const doc = new jsPDF({ orientation: "landscape" });
-    const logo = `${import.meta.env.VITE_LOGO_MUNI}`;
-
-    const logoSegPub = `${import.meta.env.VITE_LOGO_SEG}`;
-    //doc.addImage(imagen,formato,x,y,ancho,alto)
-    doc.addImage(logo, "PNG", 250, 5, 35, 18);
-    doc.addImage(logoSegPub, "PNG", 200, 9, 42, 15);
-    // Título
-    doc.setFontSize(18);
-    doc.setTextColor(40, 40, 40);
-    doc.text("Reportes Central Municipal", 14, 15);
-
-    // Filtros
-    let filtros = `Filtros aplicados:\n`;
-    if (fechaInicio && fechaFin) {
-      filtros += `Fecha: ${new Date(fechaInicio).toLocaleString(
-        "es-ES"
-      )} - ${new Date(fechaFin).toLocaleString("es-ES")}`;
-    }
-    doc.setFontSize(11);
-    doc.setTextColor(80);
-    doc.text(filtros, 14, 25);
-
-    // Columnas
-    const tableColumn = [
-      "ID",
-      "Fecha",
-      "Clasificación",
-      "Origen",
-      "Persona",
-      "Fuente Captura",
-      "Tipo de Informe",
-      //"Descripción",
-      "Sector",
-      "Dirección",
-    ];
-
-    // Filas
-    const tableRows = dato.map((c) => [
-      c.cod_informes_central,
-      new Date(c.fecha_informe).toLocaleString("es-ES"),
-      c.clasificacion_informe?.label || "-",
-      c.origen_informe?.label || "-",
-      c.persona_informante?.label || "-",
-      c.captura_informe || "-",
-      c.tipo_informe?.label || "-",
-      //c.descripcion_informe || "-",
-      c.sector_informe?.label || "-",
-      c.direccion_informe || "-",
-    ]);
-
-    // Tabla con estilo profesional
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 35,
-      theme: "grid",
-      tableWidth: "full",
-      styles: {
-        fontSize: 9,
-        cellPadding: 3,
-        valign: "middle",
-        textColor: 33,
-        lineColor: [200, 200, 200],
-        lineWidth: 0.2,
-      },
-      headStyles: {
-        fillColor: [33, 37, 41],
-        textColor: 255,
-        fontStyle: "bold",
-        halign: "center",
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245],
-      },
-      columnStyles: {
-        0: { cellWidth: 18 },
-        1: { cellWidth: 35 },
-        4: { cellWidth: 21 },
-        5: { cellWidth: 20 },
-        6: { cellWidth: 21 },
-        7: { cellWidth: 40 },
-        9: { cellWidth: 39 },
-      },
-    });
-
-    doc.output("dataurlnewwindow");
-  };
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: "Informes Central Municipal",
+  });
 
   const handleCheckboxChange = (e) => {
     const { name, checked, dataset, value } = e.target;
@@ -517,10 +443,7 @@ function StatisticsCentral() {
               <strong>Acciones</strong>
             </div>
             <div className="card-body d-flex flex-column gap-3 align-items-center">
-              <button
-                className="btn btn-danger w-75"
-                onClick={() => fetchData(1)}
-              >
+              <button className="btn btn-danger w-75" onClick={handlePrint}>
                 <i className="bi bi-file-pdf me-1"></i> Descargar PDF
               </button>
               <button
@@ -590,6 +513,9 @@ function StatisticsCentral() {
         </div>
       </div>
       <br />
+      <div style={{ display: "none" }}>
+        <ListCentralPDF ref={printRef} data={lista} />
+      </div>
     </>
   );
 }
