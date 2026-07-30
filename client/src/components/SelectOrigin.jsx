@@ -18,7 +18,7 @@ function SelectOrigin({
 
       return data
         .filter((item) =>
-          item.origen.toLowerCase().includes(inputValue.toLowerCase())
+          item.origen.toLowerCase().includes(inputValue.toLowerCase()),
         )
         .map((item) => ({
           value: item.id_origen,

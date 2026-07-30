@@ -53,6 +53,10 @@ function StatisticsCentral() {
   const [selectedRecursos, setSelectedRecursos] = useState([]);
   const [selectedClasif, setSelectedClasif] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
+  const [origen, setOrigen] = useState([]);
+  const [sector, setSector] = useState([]);
+  const [tipo, setTipo] = useState([]);
+  const [recursos, setRecursos] = useState([]);
 
   /*const [rangoFilter, setRangoFilter] = useState([]);
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
@@ -73,6 +77,10 @@ function StatisticsCentral() {
 
   useEffect(() => {
     fetchData();
+    loadOrigen();
+    loadSector();
+    loadTipo();
+    loadRecursos();
   }, [
     fechaInicio,
     fechaFin,
@@ -108,15 +116,15 @@ function StatisticsCentral() {
     });
 
     if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
+      params.append("clasificacion", selectedClasif);
     }
 
     if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
+      params.append("origen", selectedOrigen);
     }
 
     if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
+      params.append("sector", selectedSector);
     }
 
     if (selectedVehiculo) {
@@ -124,11 +132,11 @@ function StatisticsCentral() {
     }
 
     if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
+      params.append("tipoReporte", selectedTipo);
     }
 
     if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
+      params.append("recursos", selectedRecursos);
     }
     const userCentral = selectedUser.value;
     if (selectedUser) {
@@ -222,15 +230,15 @@ function StatisticsCentral() {
     });
 
     if (selectedClasif) {
-      params.append("clasificacion", JSON.stringify(selectedClasif));
+      params.append("clasificacion", selectedClasif);
     }
 
     if (selectedOrigen) {
-      params.append("origen", JSON.stringify(selectedOrigen));
+      params.append("origen", selectedOrigen);
     }
 
     if (selectedSector) {
-      params.append("sector", JSON.stringify(selectedSector));
+      params.append("sector", selectedSector);
     }
 
     if (selectedVehiculo) {
@@ -238,11 +246,11 @@ function StatisticsCentral() {
     }
 
     if (selectedTipo) {
-      params.append("tipoReporte", JSON.stringify(selectedTipo));
+      params.append("tipoReporte", selectedTipo);
     }
 
     if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
+      params.append("recursos", selectedRecursos);
     }
 
     if (selectedUser) {
@@ -279,6 +287,86 @@ function StatisticsCentral() {
     fetchResumen("resumen_user_central", UserCentralPDF);
   const resumenVehi = () =>
     fetchResumen("resumen_vehi_central", VehiculoCentralPDF);
+
+  const loadOrigen = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+    try {
+      const response = await fetch(`${servidor}/origenes`);
+      if (!response.ok) {
+        throw new Error("Error al cargar los datos");
+      }
+      const data = await response.json();
+      setOrigen(data);
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.error("Error:", err);
+      return [];
+    }
+  };
+
+  const loadSector = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+    try {
+      const response = await fetch(`${servidor}/sectores`);
+      if (!response.ok) {
+        throw new Error("Error al cargar los datos");
+      }
+      const data = await response.json();
+      setSector(data);
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.error("Error:", err);
+      return [];
+    }
+  };
+
+  const loadTipo = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+    try {
+      const response = await fetch(
+        `${servidor}/tipoReporte?grupo_reporte=${selectedClasif}`,
+      );
+      if (!response.ok) {
+        throw new Error("Error al cargar los datos");
+      }
+      const data = await response.json();
+      setTipo(data.tipo);
+
+      return data;
+    } catch (err) {
+      console.error("Error:", err);
+      return [];
+    }
+  };
+
+  const loadRecursos = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+    try {
+      const response = await fetch(`${servidor}/recursos`);
+      if (!response.ok) {
+        throw new Error("Error al cargar los datos");
+      }
+      const data = await response.json();
+      setRecursos(data);
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.error("Error:", err);
+      return [];
+    }
+  };
+
+  const handlechanges = (e) => {
+    const { name, value } = e.target;
+    setSelectedOrigen((prev) => (name === "selectedOrigen" ? value : prev));
+    setSelectedSector((prev) => (name === "selectedSector" ? value : prev));
+    setSelectedClasif((prev) => (name === "selectedClasif" ? value : prev));
+    setSelectedTipo((prev) => (name === "selectedTipo" ? value : prev));
+    setSelectedRecursos((prev) => (name === "selectedRecursos" ? value : prev));
+    console.log(name, value);
+  };
 
   return (
     <>
@@ -377,44 +465,93 @@ function StatisticsCentral() {
           <div className="row g-4 mt-3">
             <div className="col-md-4">
               <label className="form-label fw-bold">Clasificación</label>
-              <SelectClasifica
-                selectedClasif={selectedClasif}
-                setSelectedClasif={setSelectedClasif}
-              />
+              <select
+                name="selectedClasif"
+                id="selectedClasif"
+                className="form-select"
+                onChange={handlechanges}
+              >
+                <option value="">Selecciones...</option>
+                {[
+                  { value: 1, label: "Emergencia" },
+                  { value: 2, label: "Incidente" },
+                  { value: 3, label: "Factor de riesgo" },
+                  { value: 4, label: "Novedad" },
+                ].map((o) => (
+                  <option key={o.value} value={o.label}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="col-md-4">
               <label className="form-label fw-bold">Origen</label>
-              <SelectOrigin
-                selectedOrigin={selectedOrigen}
-                setSelectedOrigin={setSelectedOrigen}
-              />
+              <select
+                name="selectedOrigen"
+                id="selectedOrigen"
+                className="form-select"
+                onChange={handlechanges}
+              >
+                <option value="">Seleccione...</option>
+                {origen.map((o) => (
+                  <option key={o.id_origen} value={o.id_origen}>
+                    {o.origen}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="col-md-4">
               <label className="form-label fw-bold">Sector</label>
-              <SelectSector
-                selectedSector={selectedSector}
-                setSelectedSector={setSelectedSector}
-              />
+              <select
+                name="selectedSector"
+                id="selectedSector"
+                className="form-select"
+                onChange={handlechanges}
+              >
+                <option value="">Seleccione...</option>
+                {sector.map((o) => (
+                  <option key={o.id_sector} value={o.id_sector}>
+                    {o.sector}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
-
           <div className="row g-4 mt-3">
             <div className="col-md-4">
               <label className="form-label fw-bold">Tipo de informe</label>
-              <SelectTipo
-                tipo={selectedClasif}
-                selectedTipo={selectedTipo}
-                setSelectedTipo={setSelectedTipo}
-              />
+              <select
+                name="selectedTipo"
+                id="selectedTipo"
+                className="form-select"
+                onChange={handlechanges}
+              >
+                <option value="">Seleccione...</option>
+                {tipo.map((o) => (
+                  <option key={o.id_tipo} value={o.id_tipo}>
+                    {o.descripcion}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="col-md-4">
               <label className="form-label fw-bold">Recursos</label>
-              <SelectRecursos
-                selectedRecursos={selectedRecursos}
-                setSelectedRecursos={setSelectedRecursos}
-              />
+              <select
+                name="selectedRecursos"
+                id="selectedRecursos"
+                className="form-select"
+                onChange={handlechanges}
+                multiple
+              >
+                <option value="">Seleccione...</option>
+                {recursos.map((r) => (
+                  <option key={r.id_recursos} value={r.id_recursos}>
+                    {r.recursos}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div className="col-md-4">
+            {/* <div className="col-md-4">
               <label className="form-label fw-bold">Vehículos</label>
               <SelectVehiculo
                 selectedVehiculo={selectedVehiculo}
@@ -429,7 +566,7 @@ function StatisticsCentral() {
                 estadistica={true}
                 tipo={"central"}
               />
-            </div>
+          </div>*/}
           </div>
         </div>
       </div>
