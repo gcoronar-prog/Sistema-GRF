@@ -464,7 +464,7 @@ function InventarioGRD() {
                         disabled={editing}
                       />
                       
-                    </div>*/}
+                    </div>
                     <div className="col-md-auto">
                       <label htmlFor="unidad_medida" className="form-label">
                         Unidad de medida
@@ -478,7 +478,7 @@ function InventarioGRD() {
                         onChange={handleChanges}
                         disabled={editing}
                       />
-                    </div>
+                    </div>*/}
                   </div>
                   <div className="col-md-auto">
                     <label htmlFor="observ_produ" className="form-label">

@@ -1,13 +1,13 @@
 import { Router } from "express";
 import {
   getEstadisticaCentral,
-  getResumenClasi,
+  /*getResumenClasi,
   getResumenEstado,
   getResumenOrigen,
   getResumenRango,
   getResumenRecursos,
   getResumenUser,
-  getResumenVehi,
+  getResumenVehi,*/
 } from "../controllers/statisticsCentral.controller.js";
 import { verifyGroup, verifyToken } from "../middlewares/jwt.middleware.js";
 import {
@@ -21,16 +21,16 @@ router.get(
   "/estadisticaCentral",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getEstadisticaCentral
+  getEstadisticaCentral,
 );
 router.put(
   "/estadisticaCentral",
   verifyToken,
   verifyGroup("superadmin", "central"),
-  getEstadisticaCentral
+  getEstadisticaCentral,
 );
 
-router.get(
+/*router.get(
   "/resumen_clasif_central",
   verifyToken,
   verifyGroup("superadmin", "central"),
@@ -73,7 +73,7 @@ router.get(
   verifyToken,
   verifyGroup("superadmin", "central"),
   getResumenVehi
-);
+);*/
 
 router.get("/users_gie_central", getUsersCentral);
 router.get("/users_gie_inspect", getUsersInspect);

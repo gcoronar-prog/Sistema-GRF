@@ -40,7 +40,7 @@ const getEstadisticaCentral = async (req, res) => {
   }
 };
 
-const getResumenEstado = async (req, res) => {
+/*const getResumenEstado = async (req, res) => {
   const client = await pool.connect();
   const { whereClause, values } = buildWhereClause(req.query);
 
@@ -451,7 +451,7 @@ const getResumenVehi = async (req, res) => {
     console.error(error);
     return res.status(500).json({ msg: "Error de conexión con el servido" });
   }
-};
+};*/
 
 function buildWhereClause({
   fechaInicio,
@@ -494,7 +494,7 @@ function buildWhereClause({
     );
   }
 
-  if (clasificacion && clasificacion !== "[]") {
+  if (clasificacion && clasificacion.length > 0) {
     addCondition(
       `dti.clasificacion_informe::jsonb @> $${values.length + 1}::jsonb`,
       clasificacion,
@@ -511,23 +511,21 @@ function buildWhereClause({
     );
   }
 
-  if (origen && origen !== "[]") {
+  if (origen && origen.length > 0) {
     addCondition(
-      `doi.origen_informe::jsonb @> $${values.length + 1}::jsonb`,
+      `doi.origen_informe->>'label' = $${values.length + 1}`,
       origen,
     );
   }
 
   if (recursos && recursos !== "[]") {
-    addCondition(
-      `dti.recursos_informe::jsonb @> $${values.length + 1}::jsonb`,
-      recursos,
-    );
+    addCondition(`dti.recursos_informe @> $${values.length + 1}`, recursos);
+    console.log(recursos);
   }
 
   if (sector && sector !== "[]") {
     addCondition(
-      `dui.sector_informe::jsonb @> $${values.length + 1}::jsonb`,
+      `dui.sector_informe ->>'label' = $${values.length + 1}`,
       sector,
     );
   }
@@ -541,7 +539,7 @@ function buildWhereClause({
 
   if (tipoReporte && tipoReporte !== "[]") {
     addCondition(
-      `dti.tipo_informe::jsonb @> $${values.length + 1}::jsonb`,
+      `dti.tipo_informe ->> 'value' = $${values.length + 1}`,
       tipoReporte,
     );
   }
@@ -557,12 +555,12 @@ function buildWhereClause({
 }
 
 export {
-  getResumenClasi,
   getEstadisticaCentral,
+  /*getResumenClasi,
   getResumenEstado,
   getResumenOrigen,
   getResumenRecursos,
   getResumenRango,
   getResumenUser,
-  getResumenVehi,
+  getResumenVehi,*/
 };

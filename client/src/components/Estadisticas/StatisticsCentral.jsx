@@ -19,6 +19,7 @@ import UserCentralPDF from "../PDFs/UserCentralPDF.jsx";
 import VehiculoCentralPDF from "../PDFs/VehiculoCentralPDF.jsx";
 import { useReactToPrint } from "react-to-print";
 import ListCentralPDF from "../PDFs/ListCentralPDF.jsx";
+import MultiSelectDropdown from "../MultiSelectDropdown.jsx";
 
 function StatisticsCentral() {
   const startMonth = dayjs().startOf("month").format("YYYY-MM-DDTHH:mm");
@@ -57,6 +58,8 @@ function StatisticsCentral() {
   const [sector, setSector] = useState([]);
   const [tipo, setTipo] = useState([]);
   const [recursos, setRecursos] = useState([]);
+  const [vehiculos, setVehiculos] = useState([]);
+  const [users, setUsers] = useState([]);
 
   /*const [rangoFilter, setRangoFilter] = useState([]);
   const [clasifFilter, setClasifFilter] = useState(defaultValues);
@@ -75,12 +78,39 @@ function StatisticsCentral() {
     email: false,
   });
 
+  const ref = useRef(null);
+
+  const handleMultiSelect = () => {
+    const cerrarSiClickAfuera = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", cerrarSiClickAfuera);
+    return () => document.removeEventListener("mousedown", cerrarSiClickAfuera);
+  };
+
+  const toggleOpcion = (opcion) => {
+    setSelectedRecursos((prev) =>
+      prev.includes(opcion)
+        ? prev.filter((o) => o !== opcion)
+        : [...prev, opcion],
+    );
+  };
+
   useEffect(() => {
-    fetchData();
+    handleMultiSelect();
+  });
+
+  useEffect(() => {
     loadOrigen();
     loadSector();
     loadTipo();
     loadRecursos();
+    loadVehiculos();
+    loadUsers();
+  }, []);
+
+  useEffect(() => {
+    fetchData();
   }, [
     fechaInicio,
     fechaFin,
@@ -94,6 +124,7 @@ function StatisticsCentral() {
     selectedRecursos,
     selectedUser,
   ]);
+
   const fetchData = async () => {
     let url = `${server_back}/estadisticaCentral?`;
     let params = new URLSearchParams();
@@ -114,6 +145,11 @@ function StatisticsCentral() {
         params.append("captura", captura);
       }
     });
+    Object.keys(capturaFilter).forEach((captura) => {
+      if (capturaFilter[captura]) {
+        params.append("captura", captura);
+      }
+    });
 
     if (selectedClasif) {
       params.append("clasificacion", selectedClasif);
@@ -128,7 +164,7 @@ function StatisticsCentral() {
     }
 
     if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+      params.append("vehiculo", selectedVehiculo);
     }
 
     if (selectedTipo) {
@@ -136,7 +172,7 @@ function StatisticsCentral() {
     }
 
     if (selectedRecursos) {
-      params.append("recursos", selectedRecursos);
+      params.append("recursos", JSON.stringify(selectedRecursos));
     }
     const userCentral = selectedUser.value;
     if (selectedUser) {
@@ -159,6 +195,7 @@ function StatisticsCentral() {
       console.log(error);
     }
   };
+
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: "Informes Central Municipal",
@@ -273,7 +310,7 @@ function StatisticsCentral() {
     }
   };
 
-  const resumenRecursos = () =>
+  /* const resumenRecursos = () =>
     fetchResumen("resumen_recursos_central", RecursosCentralPDF);
   const resumenClasi = () =>
     fetchResumen("resumen_clasif_central", ClasifCentralPDF);
@@ -286,7 +323,7 @@ function StatisticsCentral() {
   const resumenUser = () =>
     fetchResumen("resumen_user_central", UserCentralPDF);
   const resumenVehi = () =>
-    fetchResumen("resumen_vehi_central", VehiculoCentralPDF);
+    fetchResumen("resumen_vehi_central", VehiculoCentralPDF);*/
 
   const loadOrigen = async () => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
@@ -358,14 +395,59 @@ function StatisticsCentral() {
     }
   };
 
+  const loadVehiculos = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+    try {
+      const response = await fetch(`${servidor}/vehiculos`);
+      if (!response.ok) {
+        throw new Error("Error al cargar los datos");
+      }
+      const data = await response.json();
+      setVehiculos(data);
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.error("Error:", err);
+      return [];
+    }
+  };
+
+  const loadUsers = async () => {
+    const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
+    try {
+      const response = await fetch(`${servidor}/users_gie_central`);
+      if (!response.ok) {
+        throw new Error("Error al cargar los datos");
+      }
+      const data = await response.json();
+      setUsers(data);
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.error("Error:", err);
+      return [];
+    }
+  };
+
   const handlechanges = (e) => {
     const { name, value } = e.target;
     setSelectedOrigen((prev) => (name === "selectedOrigen" ? value : prev));
     setSelectedSector((prev) => (name === "selectedSector" ? value : prev));
     setSelectedClasif((prev) => (name === "selectedClasif" ? value : prev));
     setSelectedTipo((prev) => (name === "selectedTipo" ? value : prev));
-    setSelectedRecursos((prev) => (name === "selectedRecursos" ? value : prev));
+    setSelectedUser((prev) => (name === "selectedUser" ? value : prev));
+
     console.log(name, value);
+  };
+
+  const handleRecursosChange = (nuevosValores) => {
+    setSelectedRecursos(nuevosValores);
+    console.log("selectedRecursos", nuevosValores);
+  };
+
+  const handleVehiculosChange = (nuevosValores) => {
+    setSelectedVehiculo(nuevosValores);
+    console.log("selectedvehiculos", nuevosValores);
   };
 
   return (
@@ -494,7 +576,7 @@ function StatisticsCentral() {
               >
                 <option value="">Seleccione...</option>
                 {origen.map((o) => (
-                  <option key={o.id_origen} value={o.id_origen}>
+                  <option key={o.id_origen} value={o.origen}>
                     {o.origen}
                   </option>
                 ))}
@@ -510,7 +592,7 @@ function StatisticsCentral() {
               >
                 <option value="">Seleccione...</option>
                 {sector.map((o) => (
-                  <option key={o.id_sector} value={o.id_sector}>
+                  <option key={o.id_sector} value={o.sector}>
                     {o.sector}
                   </option>
                 ))}
@@ -534,39 +616,41 @@ function StatisticsCentral() {
                 ))}
               </select>
             </div>
+
             <div className="col-md-4">
               <label className="form-label fw-bold">Recursos</label>
+              <MultiSelectDropdown
+                opciones={recursos.map((r) => r.recursos)}
+                placeholder="Seleccione..."
+                onChange={handleRecursosChange}
+              />
+            </div>
+
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Vehículos</label>
+              <MultiSelectDropdown
+                opciones={vehiculos.map((r) => r.vehiculo)}
+                placeholder="Seleccione..."
+                onChange={handleVehiculosChange}
+              />
+            </div>
+
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Centralista</label>
               <select
-                name="selectedRecursos"
-                id="selectedRecursos"
-                className="form-select"
+                name="selectedUser"
+                id="selectedUser"
                 onChange={handlechanges}
-                multiple
+                className="form-select"
               >
                 <option value="">Seleccione...</option>
-                {recursos.map((r) => (
-                  <option key={r.id_recursos} value={r.id_recursos}>
-                    {r.recursos}
+                {users.map((o) => (
+                  <option key={o.id_user} value={o.user_name}>
+                    {o.nombre} {o.apellido}
                   </option>
                 ))}
               </select>
             </div>
-            {/* <div className="col-md-4">
-              <label className="form-label fw-bold">Vehículos</label>
-              <SelectVehiculo
-                selectedVehiculo={selectedVehiculo}
-                setSelectedVehiculo={setSelectedVehiculo}
-              />
-            </div>
-            <div className="col-md-4">
-              <label className="form-label fw-bold">Centralista</label>
-              <SelectUsers
-                selectedUser={selectedUser}
-                setSelectedUser={setSelectedUser}
-                estadistica={true}
-                tipo={"central"}
-              />
-          </div>*/}
           </div>
         </div>
       </div>
@@ -585,7 +669,7 @@ function StatisticsCentral() {
               </button>
               <button
                 className="btn btn-success w-75"
-                onClick={() => fetchData(2)}
+                onClick={() => fetchData()}
               >
                 <i className="bi bi-file-earmark-excel me-1"></i> Exportar a
                 Excel
@@ -600,7 +684,7 @@ function StatisticsCentral() {
           </div>
         </div>
 
-        <div className="col-md-6">
+        {/*<div className="col-md-6">
           <div className="card">
             <div className="card-header bg-success text-white">
               <strong>Resumen Estadísticas</strong>
@@ -647,7 +731,7 @@ function StatisticsCentral() {
               ))}
             </div>
           </div>
-        </div>
+        </div>*/}
       </div>
       <br />
       <div style={{ display: "none" }}>
