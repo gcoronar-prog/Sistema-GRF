@@ -27,7 +27,8 @@ const getEstadisticaCentral = async (req, res) => {
 
     const result = await client.query(informes, values);
     await client.query("COMMIT");
-    //console.log(result.rows);
+
+    console.log(informes, values);
     return res.status(200).json({
       informe: result.rows,
     });
@@ -496,7 +497,7 @@ function buildWhereClause({
 
   if (clasificacion && clasificacion.length > 0) {
     addCondition(
-      `dti.clasificacion_informe::jsonb @> $${values.length + 1}::jsonb`,
+      `dti.clasificacion_informe ->>'label'= $${values.length + 1}`,
       clasificacion,
     );
   }
@@ -519,8 +520,11 @@ function buildWhereClause({
   }
 
   if (recursos && recursos !== "[]") {
-    addCondition(`dti.recursos_informe @> $${values.length + 1}`, recursos);
-    console.log(recursos);
+    addCondition(
+      `EXISTS (SELECT 1 FROM jsonb_array_elements(dti.recursos_informe) AS elem
+      WHERE elem->>'label' = ANY(string_to_array( $${values.length + 1},',')))`,
+      recursos,
+    );
   }
 
   if (sector && sector !== "[]") {
@@ -532,7 +536,8 @@ function buildWhereClause({
 
   if (vehiculo && vehiculo !== "[]") {
     addCondition(
-      `dvi.vehiculos_informe::jsonb @> $${values.length + 1}::jsonb`,
+      `EXISTS (SELECT 1 FROM jsonb_array_elements(dvi.vehiculos_informe) AS elem
+      WHERE elem->>'label' = ANY(string_to_array($${values.length + 1},',')))`,
       vehiculo,
     );
   }

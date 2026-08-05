@@ -110,6 +110,10 @@ function StatisticsCentral() {
   }, []);
 
   useEffect(() => {
+    loadTipo(selectedClasif);
+  }, [selectedClasif]);
+
+  useEffect(() => {
     fetchData();
   }, [
     fechaInicio,
@@ -172,7 +176,7 @@ function StatisticsCentral() {
     }
 
     if (selectedRecursos) {
-      params.append("recursos", JSON.stringify(selectedRecursos));
+      params.append("recursos", selectedRecursos);
     }
     const userCentral = selectedUser.value;
     if (selectedUser) {
@@ -245,7 +249,7 @@ function StatisticsCentral() {
     setCentral([]);
   };
 
-  const fetchResumen = async (endpoint, pdf) => {
+  /*const fetchResumen = async (endpoint, pdf) => {
     const url = `${server_back}/${endpoint}?`;
     let params = new URLSearchParams();
 
@@ -279,7 +283,7 @@ function StatisticsCentral() {
     }
 
     if (selectedVehiculo) {
-      params.append("vehiculo", JSON.stringify(selectedVehiculo));
+      params.append("vehiculo", selectedVehiculo);
     }
 
     if (selectedTipo) {
@@ -308,7 +312,7 @@ function StatisticsCentral() {
     } catch (error) {
       console.error(error);
     }
-  };
+  };*/
 
   /* const resumenRecursos = () =>
     fetchResumen("resumen_recursos_central", RecursosCentralPDF);
@@ -359,18 +363,17 @@ function StatisticsCentral() {
     }
   };
 
-  const loadTipo = async () => {
+  const loadTipo = async (clasifica) => {
     const servidor = import.meta.env.VITE_SERVER_ROUTE_BACK;
     try {
       const response = await fetch(
-        `${servidor}/tipoReporte?grupo_reporte=${selectedClasif}`,
+        `${servidor}/tipoReporte?grupo_reporte=${clasifica || ""}`,
       );
       if (!response.ok) {
         throw new Error("Error al cargar los datos");
       }
       const data = await response.json();
       setTipo(data.tipo);
-
       return data;
     } catch (err) {
       console.error("Error:", err);
@@ -553,7 +556,7 @@ function StatisticsCentral() {
                 className="form-select"
                 onChange={handlechanges}
               >
-                <option value="">Selecciones...</option>
+                <option value="">Seleccione...</option>
                 {[
                   { value: 1, label: "Emergencia" },
                   { value: 2, label: "Incidente" },
