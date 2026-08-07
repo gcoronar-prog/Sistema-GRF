@@ -59,6 +59,7 @@ function StatisticsCentral() {
   const [tipo, setTipo] = useState([]);
   const [recursos, setRecursos] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
+  const [clasifica, setClasifica] = useState([]);
   const [users, setUsers] = useState([]);
 
   /*const [rangoFilter, setRangoFilter] = useState([]);
@@ -178,9 +179,9 @@ function StatisticsCentral() {
     if (selectedRecursos) {
       params.append("recursos", selectedRecursos);
     }
-    const userCentral = selectedUser.value;
+
     if (selectedUser) {
-      params.append("centralista", userCentral);
+      params.append("centralista", selectedUser);
     }
 
     try {
@@ -227,13 +228,13 @@ function StatisticsCentral() {
   const handleClearFilter = () => {
     setFechaInicio(startMonth);
     setFechaFin(dateNow);
-    setSelectedOrigen([]);
-    setSelectedSector([]);
-    setSelectedVehiculo([]);
-    setSelectedTipo([]);
-    setSelectedRecursos([]);
+    setOrigen([]);
+    setSector([]);
+    setTipo([]);
+    setRecursos([]);
+    setVehiculos([]);
+    setUsers([]);
     setSelectedClasif([]);
-    setSelectedUser([]);
     setEstadoFilter({
       atendido: false,
       progreso: false,
@@ -424,7 +425,7 @@ function StatisticsCentral() {
       }
       const data = await response.json();
       setUsers(data);
-      console.log(data);
+
       return data;
     } catch (err) {
       console.error("Error:", err);

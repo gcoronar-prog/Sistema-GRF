@@ -549,7 +549,7 @@ function buildWhereClause({
     );
   }
 
-  if (centralista) {
+  if (centralista && centralista !== "") {
     addCondition(`doi.user_creador = $${values.length + 1}`, centralista);
   }
 
